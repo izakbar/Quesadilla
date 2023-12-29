@@ -74,18 +74,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Events\CombatEventType.cs" />
-    <Compile Include="Models\Events\ProcessCombatEventArgs.cs" />
-    <Compile Include="Models\Events\ProcessNewDataEventArgs.cs" />
-    <Compile Include="Models\Events\ProcessSystemChangeEventArgs.cs" />
-    <Compile Include="Models\InterestingFile.cs" />
-    <Compile Include="Models\LocalInfo.cs" />
-    <Compile Include="Models\Logfile\LogEntry.cs" />
-    <Compile Include="Models\Logfile\LogEntryType.cs" />
-    <Compile Include="Models\Logfile\LogFileInfo.cs" />
-    <Compile Include="Models\Logfile\LogFileType.cs" />
-    <Compile Include="Models\LogWatcher.cs" />
-    <Compile Include="Models\NewData.cs" />
+    <Compile Include="Classes\Events\CombatEventType.cs" />
+    <Compile Include="Classes\Events\ProcessCombatEventArgs.cs" />
+    <Compile Include="Classes\Events\ProcessNewDataEventArgs.cs" />
+    <Compile Include="Classes\Events\ProcessSystemChangeEventArgs.cs" />
+    <Compile Include="Classes\InterestingFile.cs" />
+    <Compile Include="Classes\LocalInfo.cs" />
+    <Compile Include="Classes\Logfile\LogEntry.cs" />
+    <Compile Include="Classes\Logfile\LogEntryType.cs" />
+    <Compile Include="Classes\Logfile\LogFileInfo.cs" />
+    <Compile Include="Classes\Logfile\LogFileType.cs" />
+    <Compile Include="Classes\LogWatcher.cs" />
+    <Compile Include="Classes\NewData.cs" />
+    <Compile Include="Classes\SolarSystems\SolarSystem.cs" />
+    <Compile Include="Classes\SolarSystems\SolarSystemManager.cs" />
     <Compile Include="Quesadilla.cs">
       <SubType>Form</SubType>
     </Compile>

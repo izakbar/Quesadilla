@@ -1,11 +1,11 @@
-﻿using Quesadilla.Models.Logfile;
+﻿using Quesadilla.Classes.Logfile;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quesadilla.Models.Events
+namespace Quesadilla.Classes.Events
 {
     public class ProcessNewDataEventArgs : EventArgs
     {

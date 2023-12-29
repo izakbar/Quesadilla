@@ -1,5 +1,5 @@
-﻿using Quesadilla.Models.Events;
-using Quesadilla.Models.Logfile;
+﻿using Quesadilla.Classes.Events;
+using Quesadilla.Classes.Logfile;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Quesadilla.Models
+namespace Quesadilla.Classes
 {
     public class LogWatcher
     {

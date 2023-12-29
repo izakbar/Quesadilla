@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quesadilla.Models.Events
+namespace Quesadilla.Classes.Logfile
 {
-    public enum CombatEventType
+    public enum LogFileType
     {
-        Start,
-        Stop,
+        Game,
+        Chat,
+        Local,
     }
 }

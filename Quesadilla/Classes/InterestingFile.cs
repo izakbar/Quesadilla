@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quesadilla.Models
+namespace Quesadilla.Classes
 {
     public class InterestingFile
     {

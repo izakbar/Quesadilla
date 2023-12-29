@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quesadilla.Models.Events
+namespace Quesadilla.Classes.Events
 {
     public class ProcessCombatEventArgs : EventArgs
     {

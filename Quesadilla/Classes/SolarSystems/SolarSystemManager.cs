@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quesadilla.Models.Logfile
+namespace Quesadilla.Classes.SolarSystems
 {
-    public enum LogFileType
+    public class SolarSystemManager
     {
-        Game,
-        Chat,
-        Local,
     }
 }
