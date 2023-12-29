@@ -1,0 +1,9 @@
+C:\Users\carls\source\repos\Quesadilla\Quesadilla\bin\Debug\Quesadilla.exe.config
+C:\Users\carls\source\repos\Quesadilla\Quesadilla\bin\Debug\Quesadilla.exe
+C:\Users\carls\source\repos\Quesadilla\Quesadilla\bin\Debug\Quesadilla.pdb
+C:\Users\carls\source\repos\Quesadilla\Quesadilla\obj\Debug\Quesadilla.csproj.AssemblyReference.cache
+C:\Users\carls\source\repos\Quesadilla\Quesadilla\obj\Debug\Quesadilla.Properties.Resources.resources
+C:\Users\carls\source\repos\Quesadilla\Quesadilla\obj\Debug\Quesadilla.csproj.GenerateResource.cache
+C:\Users\carls\source\repos\Quesadilla\Quesadilla\obj\Debug\Quesadilla.csproj.CoreCompileInputs.cache
+C:\Users\carls\source\repos\Quesadilla\Quesadilla\obj\Debug\Quesadilla.exe
+C:\Users\carls\source\repos\Quesadilla\Quesadilla\obj\Debug\Quesadilla.pdb
