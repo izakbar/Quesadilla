@@ -33,11 +33,6 @@ namespace Quesadilla.Models.Logfile
         public DateTime TimeAdded { get; set; }
         public string ToString()
         {
-            return "PlayerName: " + PlayerName + Environment.NewLine +
-                "CharacterName: " + CharacterName + Environment.NewLine +
-                "LineContent: " + LineContent + Environment.NewLine +
-                "LogType: " + LogType + Environment.NewLine +
-                "RawLine: " + RawLine;
-        }
+            return CharacterName + "(" + PlayerName + ") " + LogType + ":" + LineContent;        }
     }
 }

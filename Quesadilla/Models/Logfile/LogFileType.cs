@@ -10,5 +10,6 @@ namespace Quesadilla.Models.Logfile
     {
         Game,
         Chat,
+        Local,
     }
 }

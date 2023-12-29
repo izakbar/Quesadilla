@@ -24,6 +24,7 @@ namespace Quesadilla
 
             watchers.Add(new LogWatcher("querious", Models.Logfile.LogFileType.Chat));
             watchers.Add(new LogWatcher("delve", Models.Logfile.LogFileType.Chat));
+            watchers.Add(new LogWatcher(null, Models.Logfile.LogFileType.Local));
 
             foreach (LogWatcher watcher in watchers)
             {

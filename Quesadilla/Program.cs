@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
 using Serilog;
+using Serilog.Formatting.Display;
+using Serilog.Sinks.WinForms.Base;
 
 namespace Quesadilla
 {
@@ -23,8 +25,9 @@ namespace Quesadilla
         {
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
-                .MinimumLevel.Information()
+                .MinimumLevel.Debug()
                 .WriteTo.File("Quesadilla_.log", rollingInterval: RollingInterval.Day)
+                .WriteToSimpleAndRichTextBox(new MessageTemplateTextFormatter("{Timestamp} [{Level}] {Message} {Exception}\n"))
                 .CreateLogger();
         }
     }

@@ -27,29 +27,45 @@ namespace Quesadilla.Models
         private readonly Regex _chatLogRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s(?<time>\\d{2}\\:\\d{2}\\:\\d{2})\\s\\]\\s(?<name>\\w.*)\\s>\\s(?<content>.*)", RegexOptions.Compiled);
         private readonly Regex _gameLogRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s(?<time>\\d{2}\\:\\d{2}\\:\\d{2})\\s\\]\\s\\(\\w.*\\)\\s(?<content>.*)", RegexOptions.Compiled);
         private readonly Regex _gameLogCombatRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(combat\\)", RegexOptions.Compiled);
+
+        private readonly Regex _localSystemChange = new Regex("EVE\\sSystem\\s>\\sChannel\\schanged\\sto\\sLocal\\s:\\s(?<systemname>.*)", RegexOptions.Compiled);
         private readonly Regex _localListener = new Regex("Listener\\:\\s*(?<name>.*)", RegexOptions.Compiled);
+        private readonly Regex _localInitialSystem = new Regex("Channel\\sID:\\s*\\(\\(\\'solarsystemid2\\',\\s(?<initialsystem>[0-9]{8})", RegexOptions.Compiled);
 
         public event EventHandler<ProcessNewDataEventArgs> ProcessNewData;
         public event EventHandler<ProcessCombatEventArgs> ProcessCombat;
+        public event EventHandler<ProcessSystemChangeEventArgs> SystemChange;
 
         public string SystemChannelPrefix => this._systemChannelPrefix;
         public static string RootLogsPath { get; private set; }
         public LocalInfo InitialLocalInfo { get; set; }
+
+
         public LogWatcher(string systemChannelPrefix, LogFileType logFileType, string logPath = "")
         {
             this._systemChannelPrefix = systemChannelPrefix;
             this._logFileType = logFileType;
             if (LogWatcher.RootLogsPath == null)
                 LogWatcher.RootLogsPath = logPath.Length != 0 ? logPath : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "EVE\\logs");
-            if (this._logFileType == LogFileType.Game)
+
+            switch (this._logFileType)
             {
-                this._fileEncoding = Encoding.ASCII;
-                this._logPath = LogWatcher.RootLogsPath + "\\Gamelogs";
-            }
-            else
-            {
-                this._fileEncoding = Encoding.Unicode;
-                this._logPath = LogWatcher.RootLogsPath + "\\Chatlogs";
+                case LogFileType.Game:
+                    this._fileEncoding = Encoding.ASCII;
+                    this._logPath = LogWatcher.RootLogsPath + "\\Gamelogs";
+                    break;
+                case LogFileType.Chat:
+                    this._fileEncoding = Encoding.Unicode;
+                    this._logPath = LogWatcher.RootLogsPath + "\\Chatlogs";
+                    break;
+                case LogFileType.Local:
+                    this._fileEncoding = Encoding.Unicode;
+                    this._logPath = LogWatcher.RootLogsPath + "\\Chatlogs";
+                    break;
+                default:
+                    this._fileEncoding = Encoding.Unicode;
+                    this._logPath = LogWatcher.RootLogsPath + "\\Chatlogs";
+                    break;
             }
         }
 
@@ -61,17 +77,27 @@ namespace Quesadilla.Models
                 {
                     logger.Information(changedLogFile.FullName);
 
-                    long fileLength = this.GetFileLength(changedLogFile.FullName);
-                    string logListener = this.GetLogListener(changedLogFile.FullName);
-                    this._interestingFiles.Add(changedLogFile.FullName, new InterestingFile(changedLogFile.FullName, fileLength, DateTime.Now, logListener));
-                    this.OnProcessNewData(new LogEntry()
+                    if (this._logFileType == LogFileType.Chat || this._logFileType == LogFileType.Game)
                     {
-                        FileName = changedLogFile.Name,
-                        EntryType = this._logFileType == LogFileType.Game ? LogEntryType.NewGameLogEvent : LogEntryType.NewChatLogEvent,
-                        LineContent = fileLength.ToString(),
-                        LogType = this._logFileType,
-                        CharacterName = logListener
-                    });
+                        long fileLength = this.GetFileLength(changedLogFile.FullName);
+                        string logListener = this.GetLogListener(changedLogFile.FullName);
+                        this._interestingFiles.Add(changedLogFile.FullName, new InterestingFile(changedLogFile.FullName, fileLength, DateTime.Now, logListener));
+                        this.OnProcessNewData(new LogEntry()
+                        {
+                            FileName = changedLogFile.Name,
+                            EntryType = this._logFileType == LogFileType.Game ? LogEntryType.NewGameLogEvent : LogEntryType.NewChatLogEvent,
+                            LineContent = fileLength.ToString(),
+                            LogType = this._logFileType,
+                            CharacterName = logListener
+                        });
+                    }
+                    if (this._logFileType == LogFileType.Local)
+                    {
+                        long fileLength = this.GetFileLength(changedLogFile.FullName);
+                        LocalInfo localInfo = this.InitLocal(changedLogFile.FullName);
+                        this._interestingFiles.Add(changedLogFile.FullName, new InterestingFile(changedLogFile.FullName, fileLength, DateTime.Now, localInfo.CharName));
+                        this.OnSystemChange(localInfo.CurrentSystem == string.Empty ? localInfo.InitialSystem.ToString() : localInfo.CurrentSystem, localInfo.CharName);
+                    }
                 }
             }
             if (this._logFileType == LogFileType.Game)
@@ -103,51 +129,71 @@ namespace Quesadilla.Models
                             this._interestingFiles[interestingFile.Key].LastPosition = newData.FileLength;
                             this._interestingFiles[interestingFile.Key].LastUpdate = DateTime.Now;
                         }
+
+                        if ( this._logFileType == LogFileType.Local )
+                        {
+                            string[] array = ((IEnumerable<string>)newData.Data.Split(new string[1]
+                            {
+                "\n"
+                            }, StringSplitOptions.RemoveEmptyEntries)).Where<string>((Func<string, bool>)(line => line.Length > 0)).ToArray<string>();
+                            if (array.Length != 0)
+                            {
+                                foreach (string input in array)
+                                {
+                                    Match match = this._localSystemChange.Match(input);
+                                    if (match.Success)
+                                        this.OnSystemChange(match.Groups["systemname"].ToString(), interestingFile.Value.CharName);
+                                }
+                            }
+                        }
+                        else 
+                        { 
                         string[] array = ((IEnumerable<string>)newData.Data.Split(new string[1]
                         {
                 "\n"
                         }, StringSplitOptions.RemoveEmptyEntries)).Select<string, string>((Func<string, string>)(line => line.Replace(Convert.ToChar(65279).ToString(), "").Replace(Convert.ToChar(65534).ToString(), "").Replace("\r", "").Trim())).Where<string>((Func<string, bool>)(line => line.Length > 0)).ToArray<string>();
-                        if (array.Length != 0)
-                        {
-                            foreach (string input in array)
+                            if (array.Length != 0)
                             {
-                                LogEntry tempLogEntry = new LogEntry();
-                                Match match = this._logFileType == LogFileType.Chat ? this._chatLogRegex.Match(input) : this._gameLogRegex.Match(input);
-                                tempLogEntry.RawLine = input;
-                                tempLogEntry.FileName = fileInfo.Name;
-                                tempLogEntry.LogPrefix = this._systemChannelPrefix;
-                                tempLogEntry.TimeAdded = DateTime.Now;
-                                tempLogEntry.LogType = this._logFileType;
-                                tempLogEntry.CharacterName = interestingFile.Value.CharName;
-                                if (this._logFileType == LogFileType.Game && this._gameLogCombatRegex.IsMatch(input))
+                                foreach (string input in array)
                                 {
-                                    if (!this._interestingFiles[interestingFile.Key].InCombat)
+                                    LogEntry tempLogEntry = new LogEntry();
+                                    Match match = this._logFileType == LogFileType.Chat ? this._chatLogRegex.Match(input) : this._gameLogRegex.Match(input);
+                                    tempLogEntry.RawLine = input;
+                                    tempLogEntry.FileName = fileInfo.Name;
+                                    tempLogEntry.LogPrefix = this._systemChannelPrefix;
+                                    tempLogEntry.TimeAdded = DateTime.Now;
+                                    tempLogEntry.LogType = this._logFileType;
+                                    tempLogEntry.CharacterName = interestingFile.Value.CharName;
+                                    if (this._logFileType == LogFileType.Game && this._gameLogCombatRegex.IsMatch(input))
                                     {
-                                        this._interestingFiles[interestingFile.Key].InCombat = true;
-                                        this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Start);
+                                        if (!this._interestingFiles[interestingFile.Key].InCombat)
+                                        {
+                                            this._interestingFiles[interestingFile.Key].InCombat = true;
+                                            this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Start);
+                                        }
+                                        this._interestingFiles[interestingFile.Key].TimeOutTriggered = false;
+                                        this._interestingFiles[interestingFile.Key].LastCombat = this._interestingFiles[interestingFile.Key].LastUpdate;
                                     }
-                                    this._interestingFiles[interestingFile.Key].TimeOutTriggered = false;
-                                    this._interestingFiles[interestingFile.Key].LastCombat = this._interestingFiles[interestingFile.Key].LastUpdate;
-                                }
-                                if (match.Success)
-                                {
-                                    tempLogEntry.LogTime = match.Groups["time"].ToString();
-                                    tempLogEntry.LineContent = match.Groups["content"].ToString();
-                                    tempLogEntry.EntryType = LogEntryType.ChatEvent;
-                                    tempLogEntry.ParseSuccess = true;
-                                    if (this._logFileType == LogFileType.Chat)
-                                        tempLogEntry.PlayerName = match.Groups["name"].ToString();
-                                }
-                                else
-                                {
-                                    tempLogEntry.LineContent = input;
-                                    tempLogEntry.ParseSuccess = false;
-                                    tempLogEntry.EntryType = this._logFileType == LogFileType.Chat ? LogEntryType.UnknownChatLogEvent : LogEntryType.UnknownGameLogEvent;
-                                }
-                                if (this._previousLogEntries.All<LogEntry>((Func<LogEntry, bool>)(logEntry => logEntry.LineContent != tempLogEntry.LineContent)))
-                                {
-                                    this._previousLogEntries.Add(tempLogEntry);
-                                    logEntryList.Add(tempLogEntry);
+                                    if (match.Success)
+                                    {
+                                        tempLogEntry.LogTime = match.Groups["time"].ToString();
+                                        tempLogEntry.LineContent = match.Groups["content"].ToString();
+                                        tempLogEntry.EntryType = LogEntryType.ChatEvent;
+                                        tempLogEntry.ParseSuccess = true;
+                                        if (this._logFileType == LogFileType.Chat)
+                                            tempLogEntry.PlayerName = match.Groups["name"].ToString();
+                                    }
+                                    else
+                                    {
+                                        tempLogEntry.LineContent = input;
+                                        tempLogEntry.ParseSuccess = false;
+                                        tempLogEntry.EntryType = this._logFileType == LogFileType.Chat ? LogEntryType.UnknownChatLogEvent : LogEntryType.UnknownGameLogEvent;
+                                    }
+                                    if (this._previousLogEntries.All<LogEntry>((Func<LogEntry, bool>)(logEntry => logEntry.LineContent != tempLogEntry.LineContent)))
+                                    {
+                                        this._previousLogEntries.Add(tempLogEntry);
+                                        logEntryList.Add(tempLogEntry);
+                                    }
                                 }
                             }
                         }
@@ -181,8 +227,25 @@ namespace Quesadilla.Models
         }
         private List<FileInfo> GetChangedLogFiles()
         {
+            string filespec = "*.txt";
+            switch (this._logFileType)
+            {
+                case LogFileType.Game:
+                    filespec = "*.txt";
+                    break;
+                case LogFileType.Chat:
+                    filespec = this._systemChannelPrefix + "*.txt";
+                    break;
+                case LogFileType.Local:
+                    filespec = "local*.txt";
+                    break;
+                default:
+                    filespec = "*.txt";
+                    break;
+            }
+
             List<FileInfo> changedLogFiles = new List<FileInfo>();
-            foreach (FileInfo fileInfo in new List<FileInfo>((IEnumerable<FileInfo>)((IEnumerable<FileInfo>)new DirectoryInfo(this._logPath).GetFiles((this._logFileType != LogFileType.Game ? this._systemChannelPrefix : "") + "*.txt")).Where<FileInfo>((Func<FileInfo, bool>)(file => file.CreationTime > DateTime.Now.AddDays(-1.0))).OrderByDescending<FileInfo, DateTime>((Func<FileInfo, DateTime>)(file => file.LastWriteTime)).ThenByDescending<FileInfo, string>((Func<FileInfo, string>)(file => file.Name))))
+            foreach (FileInfo fileInfo in new List<FileInfo>((IEnumerable<FileInfo>)((IEnumerable<FileInfo>)new DirectoryInfo(this._logPath).GetFiles(filespec)).Where<FileInfo>((Func<FileInfo, bool>)(file => file.CreationTime > DateTime.Now.AddDays(-1.0))).OrderByDescending<FileInfo, DateTime>((Func<FileInfo, DateTime>)(file => file.LastWriteTime)).ThenByDescending<FileInfo, string>((Func<FileInfo, string>)(file => file.Name))))
             {
                 long fileLength = this.GetFileLength(fileInfo.FullName);
                 if (this._fileSizes.ContainsKey(fileInfo.FullName))
@@ -244,20 +307,95 @@ namespace Quesadilla.Models
         {
             this._interestingFiles.Clear();
             FileInfo fileInfo = this.InitLogFileInfo();
-            long fileLength = this.GetFileLength(fileInfo.FullName);
-            string logListener = this.GetLogListener(fileInfo.FullName);
-            this._interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, logListener));
-            this.OnProcessNewData(new LogEntry()
+
+            if (this._logFileType == LogFileType.Local)
             {
-                FileName = fileInfo.Name,
-                EntryType = this._logFileType == LogFileType.Game ? LogEntryType.OpenGameLogEvent : LogEntryType.OpenChatLogEvent,
-                LineContent = fileLength.ToString(),
-                CharacterName = logListener
-            });
+                if (fileInfo != null)
+                {
+                    long fileLength = this.GetFileLength(fileInfo.FullName);
+                    this.InitialLocalInfo = this.InitLocal(fileInfo.FullName);
+                    this._interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, this.InitialLocalInfo.CharName));
+                    this.OnSystemChange(this.InitialLocalInfo.CurrentSystem == string.Empty ? this.InitialLocalInfo.InitialSystem.ToString() : this.InitialLocalInfo.CurrentSystem, this.InitialLocalInfo.CharName);
+                }
+            }
+            else
+            {
+                long fileLength = this.GetFileLength(fileInfo.FullName);
+                string logListener = this.GetLogListener(fileInfo.FullName);
+                this._interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, logListener));
+                this.OnProcessNewData(new LogEntry()
+                {
+                    FileName = fileInfo.Name,
+                    EntryType = this._logFileType == LogFileType.Game ? LogEntryType.OpenGameLogEvent : LogEntryType.OpenChatLogEvent,
+                    LineContent = fileLength.ToString(),
+                    CharacterName = logListener
+                });
+            }
+        }
+        private LocalInfo InitLocal(string fileName)
+        {
+            LocalInfo localInfo = new LocalInfo();
+            using (StreamReader streamReader = new StreamReader((Stream)new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), this._fileEncoding))
+            {
+                try
+                {
+                    while (streamReader.Peek() >= 0)
+                    {
+                        string str = this.CleanLineData(streamReader.ReadLine());
+                        if (localInfo.InitialSystem == -1)
+                        {
+                            Match match = this._localInitialSystem.Match(str ?? string.Empty);
+                            if (match.Success)
+                            {
+                                localInfo.InitialSystem = int.Parse(match.Groups["initialsystem"].ToString());
+                                continue;
+                            }
+                        }
+                        if (localInfo.CharName == string.Empty)
+                        {
+                            Match match = this._localListener.Match(str ?? string.Empty);
+                            if (match.Success)
+                            {
+                                localInfo.CharName = match.Groups["name"].ToString();
+                                if (localInfo.CharName.Trim().Length <= 4)
+                                {
+                                    localInfo.CharName = string.Empty;
+                                    continue;
+                                }
+                                continue;
+                            }
+                        }
+                        Match match1 = this._localSystemChange.Match(str ?? string.Empty);
+                        if (match1.Success)
+                            localInfo.CurrentSystem = match1.Groups["systemname"].ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return new LocalInfo();
+                }
+            }
+            return localInfo;
         }
         private FileInfo InitLogFileInfo()
         {
-            List<FileInfo> fileInfoList = new List<FileInfo>((IEnumerable<FileInfo>)((IEnumerable<FileInfo>)new DirectoryInfo(this._logPath).GetFiles("local*.txt")).Where<FileInfo>((Func<FileInfo, bool>)(file => file.CreationTime > DateTime.Now.AddDays(-1.0))).OrderByDescending<FileInfo, DateTime>((Func<FileInfo, DateTime>)(file => file.LastWriteTime)).ThenByDescending<FileInfo, string>((Func<FileInfo, string>)(file => file.Name)));
+            string filespec = "*.txt";
+            switch (this._logFileType )
+            {
+                case LogFileType.Game:
+                    filespec = "*.txt";
+                    break;
+                case LogFileType.Chat:
+                    filespec = this._systemChannelPrefix + "*.txt";
+                    break;
+                case LogFileType.Local:
+                    filespec = "local*.txt";
+                    break;
+                default:
+                    filespec = "*.txt";
+                    break;
+            }
+            List<FileInfo> fileInfoList = new List<FileInfo>((IEnumerable<FileInfo>)((IEnumerable<FileInfo>)new DirectoryInfo(this._logPath).GetFiles(filespec)).Where<FileInfo>((Func<FileInfo, bool>)(file => file.CreationTime > DateTime.Now.AddDays(-1.0))).OrderByDescending<FileInfo, DateTime>((Func<FileInfo, DateTime>)(file => file.LastWriteTime)).ThenByDescending<FileInfo, string>((Func<FileInfo, string>)(file => file.Name)));
             bool flag = true;
             FileInfo fileInfo1 = (FileInfo)null;
             foreach (FileInfo fileInfo2 in fileInfoList)
@@ -267,6 +405,9 @@ namespace Quesadilla.Models
                 {
                     fileInfo1 = fileInfo2;
                     flag = false;
+                }
+                if ( this._fileSizes.ContainsKey(fileInfo2.FullName) ) {
+                    this._fileSizes.Remove(fileInfo2.FullName);
                 }
                 this._fileSizes.Add(fileInfo2.FullName, fileLength);
             }
@@ -283,12 +424,19 @@ namespace Quesadilla.Models
                 return;
             this.ProcessNewData((object)this, new ProcessNewDataEventArgs(entry, this._systemChannelPrefix));
         }
-
         private void OnCombat(string logFileName, string characterName, CombatEventType combatEvent)
         {
+            logger.Debug(combatEvent.ToString());
             if (this.ProcessCombat == null)
                 return;
             this.ProcessCombat((object)this, new ProcessCombatEventArgs(logFileName, characterName, combatEvent));
+        }
+        private void OnSystemChange(string systemName, string charName)
+        {
+            logger.Debug(charName + "->" +systemName);
+            if (this.SystemChange == null)
+                return;
+            this.SystemChange((object)this, new ProcessSystemChangeEventArgs(systemName, charName));
         }
     }
 }
