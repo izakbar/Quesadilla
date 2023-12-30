@@ -42,10 +42,12 @@
             // 
             // richTextBoxLogControl1
             // 
+            this.richTextBoxLogControl1.BackColor = System.Drawing.SystemColors.Info;
+            this.richTextBoxLogControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.richTextBoxLogControl1.ForContext = "";
-            this.richTextBoxLogControl1.Location = new System.Drawing.Point(2, 363);
+            this.richTextBoxLogControl1.Location = new System.Drawing.Point(0, 375);
             this.richTextBoxLogControl1.Name = "richTextBoxLogControl1";
-            this.richTextBoxLogControl1.Size = new System.Drawing.Size(886, 187);
+            this.richTextBoxLogControl1.Size = new System.Drawing.Size(900, 187);
             this.richTextBoxLogControl1.TabIndex = 0;
             this.richTextBoxLogControl1.Text = "";
             // 
@@ -72,6 +74,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "Quesadilla";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Quesadilla_FormClosing);
             this.Load += new System.EventHandler(this.Quesadilla_Load);
             this.ResumeLayout(false);
 

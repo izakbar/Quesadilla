@@ -6,11 +6,12 @@ using Serilog.Sinks.WinForms.Base;
 
 namespace Quesadilla
 {
-    internal static class Program
+    public static class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
+
         [STAThread]
         static void Main()
         {

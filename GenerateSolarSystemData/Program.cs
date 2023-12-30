@@ -41,7 +41,7 @@ namespace QuesadillaExport
                         X = solarSystem.X,
                         Y = solarSystem.Y,
                         Z = solarSystem.Z,
-                        NativeId = solarSystem.solarSystemId,
+                        Id = solarSystem.solarSystemId,
                         ConnectedTo = new List<SolarSystemConnectionData>(),
                     }
                 );

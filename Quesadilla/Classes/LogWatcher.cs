@@ -79,24 +79,30 @@ namespace Quesadilla.Classes
 
                     if (this._logFileType == LogFileType.Chat || this._logFileType == LogFileType.Game)
                     {
-                        long fileLength = this.GetFileLength(changedLogFile.FullName);
-                        string logListener = this.GetLogListener(changedLogFile.FullName);
-                        this._interestingFiles.Add(changedLogFile.FullName, new InterestingFile(changedLogFile.FullName, fileLength, DateTime.Now, logListener));
-                        this.OnProcessNewData(new LogEntry()
+                        lock (this)
                         {
-                            FileName = changedLogFile.Name,
-                            EntryType = this._logFileType == LogFileType.Game ? LogEntryType.NewGameLogEvent : LogEntryType.NewChatLogEvent,
-                            LineContent = fileLength.ToString(),
-                            LogType = this._logFileType,
-                            CharacterName = logListener
-                        });
+                            long fileLength = this.GetFileLength(changedLogFile.FullName);
+                            string logListener = this.GetLogListener(changedLogFile.FullName);
+                            this._interestingFiles.Add(changedLogFile.FullName, new InterestingFile(changedLogFile.FullName, fileLength, DateTime.Now, logListener));
+                            this.OnProcessNewData(new LogEntry()
+                            {
+                                FileName = changedLogFile.Name,
+                                EntryType = this._logFileType == LogFileType.Game ? LogEntryType.NewGameLogEvent : LogEntryType.NewChatLogEvent,
+                                LineContent = fileLength.ToString(),
+                                LogType = this._logFileType,
+                                CharacterName = logListener
+                            });
+                        }
                     }
                     if (this._logFileType == LogFileType.Local)
                     {
-                        long fileLength = this.GetFileLength(changedLogFile.FullName);
-                        LocalInfo localInfo = this.InitLocal(changedLogFile.FullName);
-                        this._interestingFiles.Add(changedLogFile.FullName, new InterestingFile(changedLogFile.FullName, fileLength, DateTime.Now, localInfo.CharName));
-                        this.OnSystemChange(localInfo.CurrentSystem == string.Empty ? localInfo.InitialSystem.ToString() : localInfo.CurrentSystem, localInfo.CharName);
+                        lock (this)
+                        {
+                            long fileLength = this.GetFileLength(changedLogFile.FullName);
+                            LocalInfo localInfo = this.InitLocal(changedLogFile.FullName);
+                            this._interestingFiles.Add(changedLogFile.FullName, new InterestingFile(changedLogFile.FullName, fileLength, DateTime.Now, localInfo.CharName));
+                            this.OnSystemChange(localInfo.CurrentSystem == string.Empty ? localInfo.InitialSystem.ToString() : localInfo.CurrentSystem, localInfo.CharName);
+                        }
                     }
                 }
             }
@@ -117,7 +123,7 @@ namespace Quesadilla.Classes
             List<LogEntry> logEntryList = new List<LogEntry>();
             lock (this)
             {
-                foreach (KeyValuePair<string, InterestingFile> interestingFile in this._interestingFiles)
+                foreach (KeyValuePair<string, InterestingFile> interestingFile in _interestingFiles)
                 {
                     FileInfo fileInfo = new FileInfo(interestingFile.Key);
                     if (this.GetFileLength(fileInfo.FullName) != interestingFile.Value.LastPosition)
@@ -312,24 +318,33 @@ namespace Quesadilla.Classes
             {
                 if (fileInfo != null)
                 {
-                    long fileLength = this.GetFileLength(fileInfo.FullName);
-                    this.InitialLocalInfo = this.InitLocal(fileInfo.FullName);
-                    this._interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, this.InitialLocalInfo.CharName));
-                    this.OnSystemChange(this.InitialLocalInfo.CurrentSystem == string.Empty ? this.InitialLocalInfo.InitialSystem.ToString() : this.InitialLocalInfo.CurrentSystem, this.InitialLocalInfo.CharName);
+                    lock (this)
+                    {
+                        long fileLength = this.GetFileLength(fileInfo.FullName);
+                        this.InitialLocalInfo = this.InitLocal(fileInfo.FullName);
+                        this._interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, this.InitialLocalInfo.CharName));
+                        this.OnSystemChange(this.InitialLocalInfo.CurrentSystem == string.Empty ? this.InitialLocalInfo.InitialSystem.ToString() : this.InitialLocalInfo.CurrentSystem, this.InitialLocalInfo.CharName);
+                    }
                 }
             }
             else
             {
-                long fileLength = this.GetFileLength(fileInfo.FullName);
-                string logListener = this.GetLogListener(fileInfo.FullName);
-                this._interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, logListener));
-                this.OnProcessNewData(new LogEntry()
+                if (fileInfo != null)
                 {
-                    FileName = fileInfo.Name,
-                    EntryType = this._logFileType == LogFileType.Game ? LogEntryType.OpenGameLogEvent : LogEntryType.OpenChatLogEvent,
-                    LineContent = fileLength.ToString(),
-                    CharacterName = logListener
-                });
+                    lock (this)
+                    {
+                        long fileLength = this.GetFileLength(fileInfo.FullName);
+                        string logListener = this.GetLogListener(fileInfo.FullName);
+                        this._interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, logListener));
+                        this.OnProcessNewData(new LogEntry()
+                        {
+                            FileName = fileInfo.Name,
+                            EntryType = this._logFileType == LogFileType.Game ? LogEntryType.OpenGameLogEvent : LogEntryType.OpenChatLogEvent,
+                            LineContent = fileLength.ToString(),
+                            CharacterName = logListener
+                        });
+                    }
+                }
             }
         }
         private LocalInfo InitLocal(string fileName)

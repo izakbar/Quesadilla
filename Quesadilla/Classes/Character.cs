@@ -10,5 +10,6 @@ namespace Quesadilla.Classes
     {
         public string CharacterName {  get; set; }
         public string Location { get; set; }
+        public int LocationId { get; set; }
     }
 }
