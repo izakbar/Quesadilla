@@ -20,7 +20,7 @@ namespace Quesadilla.Classes
         private string _logPath;
         private string _systemChannelPrefix;
         private Encoding _fileEncoding;
-        private LogFileType _logFileType;
+        public LogFileType _logFileType;
         private List<LogEntry> _previousLogEntries = new List<LogEntry>();
         private Dictionary<string, long> _fileSizes = new Dictionary<string, long>();
         private Dictionary<string, InterestingFile> _interestingFiles = new Dictionary<string, InterestingFile>();
