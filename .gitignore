@@ -45,3 +45,8 @@
 /Quesadilla/bin/Debug/Serilog.Sinks.WinForms.Base.dll
 /Quesadilla/bin/Debug/Serilog.Sinks.WinForms.dll
 /Quesadilla/obj/Debug/DesignTimeResolveAssemblyReferences.cache
+/GenerateSolarSystemData/bin/Debug/net6.0
+/GenerateSolarSystemData/obj
+/packages/Newtonsoft.Json.13.0.3/lib
+/packages/Newtonsoft.Json.13.0.3
+/Quesadilla/bin/Debug
