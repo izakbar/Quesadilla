@@ -118,8 +118,7 @@ namespace Quesadilla
                 HashSet<int> intSet = new HashSet<int>();
                 if (!this._ignoreStrings.Any<Regex>((Func<Regex, bool>)(ignoreString => ignoreString.IsMatch(entry.LineContent))) && entry.LogType == LogFileType.Chat)
                 {
-
-                    var v1 = _solarSystems.SolarSystems.Values.Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => tempSystem.MatchNameRegex(entry.LineContent)));
+                    // try and find systems mentioned in intel
                     foreach (SolarSystem solarSystem in 
                         _solarSystems.SolarSystems.Values.Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => tempSystem.MatchNameRegex(entry.LineContent)))
                         .Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => !this._ignoreSystems.Contains(this._solarSystems.Names[tempSystem.Name])))
