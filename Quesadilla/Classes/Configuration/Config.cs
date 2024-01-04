@@ -23,7 +23,14 @@ namespace Quesadilla.Classes
             c = JsonConvert.DeserializeObject<Config>(json);
 
             if (c.ignoreSystems == null ) c.ignoreSystems = new List<int>();
-            if (c.ignoreStrings == null)  c.ignoreStrings = new List<Regex>();
+            if (c.ignoreStrings == null)
+            {
+                c.ignoreStrings = new List<Regex>();
+                c.ignoreStrings.Add(new Regex("\\b" + "clr" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
+                c.ignoreStrings.Add(new Regex("\\b" + "clear" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
+                c.ignoreStrings.Add(new Regex("\\b" + "status" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
+            }
+
             if (c.AlertConfiguration == null)
             {
                 c.AlertConfiguration = new List<AlertConfig>();

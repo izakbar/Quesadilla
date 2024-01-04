@@ -47,10 +47,6 @@ namespace Quesadilla
 
             _solarSystems.HomeSolarSystemID = _solarSystems.Names[Configuration.HomeSystem];
 
-            Configuration.ignoreStrings.Add(new Regex("\\b" + "clr" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
-            Configuration.ignoreStrings.Add(new Regex("\\b" + "clear" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
-            Configuration.ignoreStrings.Add(new Regex("\\b" + "status" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
-
             watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.Chat));
 
             watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.Chat));
