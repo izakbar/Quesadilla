@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Quesadilla));
             this.mainTimer = new System.Windows.Forms.Timer(this.components);
             this.richTextBoxLogControl1 = new Serilog.Sinks.WinForms.RichTextBoxLogControl();
             this.jsonLogTextBox1 = new Serilog.Sinks.WinForms.JsonLogTextBox();
@@ -45,35 +46,36 @@
             this.richTextBoxLogControl1.BackColor = System.Drawing.SystemColors.Info;
             this.richTextBoxLogControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.richTextBoxLogControl1.ForContext = "";
-            this.richTextBoxLogControl1.Location = new System.Drawing.Point(0, 375);
+            this.richTextBoxLogControl1.Location = new System.Drawing.Point(0, 242);
+            this.richTextBoxLogControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.richTextBoxLogControl1.Name = "richTextBoxLogControl1";
-            this.richTextBoxLogControl1.Size = new System.Drawing.Size(900, 187);
+            this.richTextBoxLogControl1.Size = new System.Drawing.Size(600, 123);
             this.richTextBoxLogControl1.TabIndex = 0;
             this.richTextBoxLogControl1.Text = "";
             // 
             // jsonLogTextBox1
             // 
             this.jsonLogTextBox1.ForContext = "";
-            this.jsonLogTextBox1.Location = new System.Drawing.Point(559, 429);
+            this.jsonLogTextBox1.Location = new System.Drawing.Point(373, 279);
             this.jsonLogTextBox1.LogBorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.jsonLogTextBox1.LogPadding = new System.Windows.Forms.Padding(3);
-            this.jsonLogTextBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.jsonLogTextBox1.Name = "jsonLogTextBox1";
             this.jsonLogTextBox1.ReadOnly = false;
             this.jsonLogTextBox1.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this.jsonLogTextBox1.Size = new System.Drawing.Size(8, 8);
+            this.jsonLogTextBox1.Size = new System.Drawing.Size(5, 5);
             this.jsonLogTextBox1.TabIndex = 1;
             // 
             // Quesadilla
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(900, 562);
+            this.ClientSize = new System.Drawing.Size(600, 365);
             this.Controls.Add(this.jsonLogTextBox1);
             this.Controls.Add(this.richTextBoxLogControl1);
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.Name = "Quesadilla";
-            this.Text = "Form1";
+            this.Text = "Quesadilla";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Quesadilla_FormClosing);
             this.Load += new System.EventHandler(this.Quesadilla_Load);
             this.ResumeLayout(false);

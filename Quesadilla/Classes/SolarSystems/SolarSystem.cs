@@ -20,6 +20,8 @@ namespace Quesadilla.Classes.SolarSystems
         [JsonIgnore]
         public Vector3 Xyz { get; set; }
         [JsonIgnore]
+        public DateTime AlertTime { get; set; }
+        [JsonIgnore]
         private Regex _nameRegex;
         [JsonIgnore]
         public Regex NameRegex => this._nameRegex;

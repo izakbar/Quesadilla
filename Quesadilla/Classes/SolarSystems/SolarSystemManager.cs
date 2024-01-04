@@ -126,5 +126,10 @@ namespace Quesadilla.Classes.SolarSystems
             return (FoundPath);
         }
 
+        public void AddAlert(int systemId)
+        {
+            SolarSystems[systemId].AlertTime = DateTime.Now;
+        }
+
     }
 }

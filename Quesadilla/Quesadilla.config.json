@@ -1,3 +1,44 @@
-﻿{
-"HomeSystem": "K7D-II"
+{
+  "HomeSystem": "K7D-II",
+  "ignoreStrings": [
+    {
+      "Pattern": "\\bclr\\b",
+      "Options": 9
+    },
+    {
+      "Pattern": "\\bclear\\b",
+      "Options": 9
+    },
+    {
+      "Pattern": "\\bstatus\\b",
+      "Options": 9
+    },
+    {
+      "Pattern": "\\bclr\\b",
+      "Options": 9
+    },
+    {
+      "Pattern": "\\bclear\\b",
+      "Options": 9
+    },
+    {
+      "Pattern": "\\bstatus\\b",
+      "Options": 9
+    },
+    {
+      "Pattern": "\\bclr\\b",
+      "Options": 9
+    },
+    {
+      "Pattern": "\\bclear\\b",
+      "Options": 9
+    },
+    {
+      "Pattern": "\\bstatus\\b",
+      "Options": 9
+    }
+  ],
+  "ignoreSystems": [],
+  "InitialPosition": "-6, 989",
+  "IgnoreAsTooManyJumps": 8
 }

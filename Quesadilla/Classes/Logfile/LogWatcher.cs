@@ -32,14 +32,17 @@ namespace Quesadilla.Classes
         private readonly Regex _localListener = new Regex("Listener\\:\\s*(?<name>.*)", RegexOptions.Compiled);
         private readonly Regex _localInitialSystem = new Regex("Channel\\sID:\\s*\\(\\(\\'solarsystemid2\\',\\s(?<initialsystem>[0-9]{8})", RegexOptions.Compiled);
 
+        private readonly Regex CHAT_CONNECTION_LOST_MESSAGE  = new Regex("Connection to chat server lost", RegexOptions.Compiled);
+        private readonly Regex CHAT_CONNECTION_RESTORED_MESSAGE = new Regex("Reconnected to chat server", RegexOptions.Compiled);
+
         public event EventHandler<ProcessNewDataEventArgs> ProcessNewData;
         public event EventHandler<ProcessCombatEventArgs> ProcessCombat;
         public event EventHandler<ProcessSystemChangeEventArgs> SystemChange;
+        public event EventHandler<ProcessChatServerChangeEventArgs> ChatServerChange;
 
         public string SystemChannelPrefix => this._systemChannelPrefix;
         public static string RootLogsPath { get; private set; }
         public LocalInfo InitialLocalInfo { get; set; }
-
 
         public LogWatcher(string systemChannelPrefix, LogFileType logFileType, string logPath = "")
         {
@@ -75,7 +78,7 @@ namespace Quesadilla.Classes
             {
                 if (!this._interestingFiles.ContainsKey(changedLogFile.FullName))
                 {
-                    logger.Information(changedLogFile.FullName);
+                    logger.Debug(changedLogFile.FullName);
 
                     if (this._logFileType == LogFileType.Chat || this._logFileType == LogFileType.Game)
                     {
@@ -128,7 +131,7 @@ namespace Quesadilla.Classes
                     FileInfo fileInfo = new FileInfo(interestingFile.Key);
                     if (this.GetFileLength(fileInfo.FullName) != interestingFile.Value.LastPosition)
                     {
-                        NewData newData;
+                        LogfileData newData;
                         lock (this)
                         {
                             newData = this.ReadLogFile(interestingFile.Key, interestingFile.Value.LastPosition);
@@ -146,9 +149,12 @@ namespace Quesadilla.Classes
                             {
                                 foreach (string input in array)
                                 {
-                                    Match match = this._localSystemChange.Match(input);
-                                    if (match.Success)
-                                        this.OnSystemChange(match.Groups["systemname"].ToString(), interestingFile.Value.CharName);
+                                    Match match = _localSystemChange.Match(input);
+                                    if (match.Success) OnSystemChange(match.Groups["systemname"].ToString(), interestingFile.Value.CharName);
+                                    match = CHAT_CONNECTION_LOST_MESSAGE.Match(input);
+                                    if (match.Success) OnChatServerChange(false, interestingFile.Value.CharName);
+                                    match = CHAT_CONNECTION_RESTORED_MESSAGE.Match(input);
+                                    if (match.Success) OnChatServerChange(true, interestingFile.Value.CharName);
                                 }
                             }
                         }
@@ -211,9 +217,9 @@ namespace Quesadilla.Classes
             foreach (LogEntry entry in logEntryList)
                 this.OnProcessNewData(entry);
         }
-        private NewData ReadLogFile(string fileName, long startingPosition)
+        private LogfileData ReadLogFile(string fileName, long startingPosition)
         {
-            NewData newData = new NewData();
+            LogfileData newData = new LogfileData();
             using (StreamReader streamReader = new StreamReader((Stream)new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), this._fileEncoding))
             {
                 try
@@ -312,33 +318,43 @@ namespace Quesadilla.Classes
         public void StartWatch()
         {
             this._interestingFiles.Clear();
-            FileInfo fileInfo = this.InitLogFileInfo();
+            List<FileInfo> files = this.InitLogFileInfo();
 
             if (this._logFileType == LogFileType.Local)
             {
-                if (fileInfo != null)
+                if (files.Count > 0)
                 {
                     lock (this)
                     {
-                        long fileLength = this.GetFileLength(fileInfo.FullName);
-                        this.InitialLocalInfo = this.InitLocal(fileInfo.FullName);
-                        this._interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, this.InitialLocalInfo.CharName));
-                        this.OnSystemChange(this.InitialLocalInfo.CurrentSystem == string.Empty ? this.InitialLocalInfo.InitialSystem.ToString() : this.InitialLocalInfo.CurrentSystem, this.InitialLocalInfo.CharName);
+                        // only want most recent for each toon
+                        var foundChars = new List<string>();
+                        foreach (var fileInfo in files)
+                        {
+                            long fileLength = this.GetFileLength(fileInfo.FullName);
+                            InitialLocalInfo = InitLocal(fileInfo.FullName);
+                            _interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, InitialLocalInfo.CharName));
+                            if (!foundChars.Contains(InitialLocalInfo.CharName))
+                            {
+                                OnSystemChange(InitialLocalInfo.CurrentSystem == string.Empty ? InitialLocalInfo.InitialSystem.ToString() : InitialLocalInfo.CurrentSystem, InitialLocalInfo.CharName);
+                                foundChars.Add(InitialLocalInfo.CharName);
+                            }
+                        }
                     }
                 }
             }
             else
             {
-                if (fileInfo != null)
+                if (files.Count > 0)
                 {
                     lock (this)
                     {
-                        long fileLength = this.GetFileLength(fileInfo.FullName);
-                        string logListener = this.GetLogListener(fileInfo.FullName);
-                        this._interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, logListener));
+                        // not local - so should only be one file
+                        long fileLength = this.GetFileLength(files.First().FullName);
+                        string logListener = this.GetLogListener(files.First().FullName);
+                        this._interestingFiles.Add(files.First().FullName, new InterestingFile(files.First().FullName, fileLength, DateTime.Now, logListener));
                         this.OnProcessNewData(new LogEntry()
                         {
-                            FileName = fileInfo.Name,
+                            FileName = files.First().Name,
                             EntryType = this._logFileType == LogFileType.Game ? LogEntryType.OpenGameLogEvent : LogEntryType.OpenChatLogEvent,
                             LineContent = fileLength.ToString(),
                             CharacterName = logListener
@@ -392,8 +408,11 @@ namespace Quesadilla.Classes
             }
             return localInfo;
         }
-        private FileInfo InitLogFileInfo()
+        private List<FileInfo> InitLogFileInfo()
         {
+
+            List<FileInfo> files = new List<FileInfo>();
+
             string filespec = "*.txt";
             switch (this._logFileType )
             {
@@ -412,21 +431,27 @@ namespace Quesadilla.Classes
             }
             List<FileInfo> fileInfoList = new List<FileInfo>((IEnumerable<FileInfo>)((IEnumerable<FileInfo>)new DirectoryInfo(this._logPath).GetFiles(filespec)).Where<FileInfo>((Func<FileInfo, bool>)(file => file.CreationTime > DateTime.Now.AddDays(-1.0))).OrderByDescending<FileInfo, DateTime>((Func<FileInfo, DateTime>)(file => file.LastWriteTime)).ThenByDescending<FileInfo, string>((Func<FileInfo, string>)(file => file.Name)));
             bool flag = true;
-            FileInfo fileInfo1 = (FileInfo)null;
             foreach (FileInfo fileInfo2 in fileInfoList)
             {
                 long fileLength = this.GetFileLength(fileInfo2.FullName);
-                if (flag)
+                if (this._logFileType == LogFileType.Local)
                 {
-                    fileInfo1 = fileInfo2;
-                    flag = false;
+                    files.Add(fileInfo2);
+                }
+                else
+                {
+                    if (flag)
+                    {
+                        files.Add(fileInfo2);
+                        flag = false;
+                    }
                 }
                 if ( this._fileSizes.ContainsKey(fileInfo2.FullName) ) {
                     this._fileSizes.Remove(fileInfo2.FullName);
                 }
                 this._fileSizes.Add(fileInfo2.FullName, fileLength);
             }
-            return fileInfo1;
+            return files;
         }
         private string CleanLineData(string line)
         {
@@ -452,6 +477,13 @@ namespace Quesadilla.Classes
             if (this.SystemChange == null)
                 return;
             this.SystemChange((object)this, new ProcessSystemChangeEventArgs(systemName, charName));
+        }
+        private void OnChatServerChange(bool chatServerUp, string charName)
+        {
+            logger.Debug(charName + "-> Chat Server " + (chatServerUp == true ? "Up" : "Down"));
+            if (this.ChatServerChange == null)
+                return;
+            this.ChatServerChange((object)this, new ProcessChatServerChangeEventArgs(chatServerUp, charName));
         }
     }
 }

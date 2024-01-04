@@ -120,21 +120,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Character.cs" />
+    <Compile Include="Classes\Configuration\AlertConfig.cs" />
+    <Compile Include="Classes\Configuration\AlertConfigJumpsComparison.cs" />
+    <Compile Include="Classes\Configuration\AlertConfigRangeType.cs" />
+    <Compile Include="Classes\Configuration\AlertConfigType.cs" />
+    <Compile Include="Classes\Configuration\Config.cs" />
     <Compile Include="Classes\Events\CombatEventType.cs" />
+    <Compile Include="Classes\Events\ProcessChatServerChangeEventArgs.cs" />
     <Compile Include="Classes\Events\ProcessCombatEventArgs.cs" />
     <Compile Include="Classes\Events\ProcessNewDataEventArgs.cs" />
     <Compile Include="Classes\Events\ProcessSystemChangeEventArgs.cs" />
-    <Compile Include="Classes\HeapPriorityQueue.cs" />
+    <Compile Include="Classes\Queues\HeapPriorityQueue.cs" />
     <Compile Include="Classes\InterestingFile.cs" />
-    <Compile Include="Classes\IPriorityQueue.cs" />
-    <Compile Include="Classes\LocalInfo.cs" />
+    <Compile Include="Classes\Queues\IPriorityQueue.cs" />
+    <Compile Include="Classes\Logfile\LocalInfo.cs" />
     <Compile Include="Classes\Logfile\LogEntry.cs" />
     <Compile Include="Classes\Logfile\LogEntryType.cs" />
     <Compile Include="Classes\Logfile\LogFileInfo.cs" />
     <Compile Include="Classes\Logfile\LogFileType.cs" />
-    <Compile Include="Classes\LogWatcher.cs" />
-    <Compile Include="Classes\NewData.cs" />
-    <Compile Include="Classes\PriorityQueueNode.cs" />
+    <Compile Include="Classes\Logfile\LogWatcher.cs" />
+    <Compile Include="Classes\Logfile\LogfileData.cs" />
+    <Compile Include="Classes\Queues\PriorityQueueNode.cs" />
     <Compile Include="Classes\SolarSystems\PathInfo.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystem.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemConnectionData.cs" />
@@ -157,6 +163,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="Quesadilla.resx">
       <DependentUpon>Quesadilla.cs</DependentUpon>
@@ -180,6 +187,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Icon1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="q.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

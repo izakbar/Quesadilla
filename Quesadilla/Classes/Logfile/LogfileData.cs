@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Quesadilla.Classes
 {
-    public class NewData
+    public class LogfileData
     {
         public string Data { get; set; }
         public long FileLength { get; set; }

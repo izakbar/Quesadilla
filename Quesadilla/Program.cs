@@ -26,7 +26,7 @@ namespace Quesadilla
         {
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
-                .MinimumLevel.Debug()
+                .MinimumLevel.Information()
                 .WriteTo.File("Quesadilla_.log", rollingInterval: RollingInterval.Day)
                 .WriteToSimpleAndRichTextBox(new MessageTemplateTextFormatter("{Timestamp} [{Level}] {Message} {Exception}\n"))
                 .CreateLogger();

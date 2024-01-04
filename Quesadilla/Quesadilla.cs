@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Quesadilla.Classes;
+using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.SolarSystems;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,42 +25,31 @@ namespace Quesadilla
     {
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
         private SolarSystemManager _solarSystems = new SolarSystemManager();
+        private Config Configuration = new Config();
         private List<LogWatcher> watchers = new List<LogWatcher>();
+
+        private string configuration_filename = "Quesadilla.config.json";
 
         // TODO - config things - really need to go into config structure later
         public List<Character> CharacterList { get; set; }
 
-        private List<Regex> _ignoreStrings = new List<Regex>();
-        private List<int> _ignoreSystems = new List<int>();
-
-        public static IConfiguration Configuration { get; set; }
-        private static void SetupConfiguration()
-        {
-            var builder = new ConfigurationBuilder()
-                .AddJsonFile("Quesadilla.config.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
-
-            // check for some configuration - if not found then setup defaults.
-            if (string.IsNullOrEmpty(Configuration["HomeSystem"]))
-            {
-                Configuration["HomeSystem"] = "K7D-II";
-            }
-
-        }
-
         public Quesadilla()
         {
             InitializeComponent();
-            SetupConfiguration();
+
+            Configuration = Config.Load(configuration_filename);
 
             // stop main tick timer!
             mainTimer.Enabled = false;
 
             CharacterList = new List<Character>();
             _solarSystems.ReadSolarSystems("Quesadilla.Systems.Json");
-            _solarSystems.HomeSolarSystemID = _solarSystems.Names[Configuration["HomeSystem"]];
+
+            _solarSystems.HomeSolarSystemID = _solarSystems.Names[Configuration.HomeSystem];
+
+            Configuration.ignoreStrings.Add(new Regex("\\b" + "clr" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
+            Configuration.ignoreStrings.Add(new Regex("\\b" + "clear" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
+            Configuration.ignoreStrings.Add(new Regex("\\b" + "status" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
 
             watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.Chat));
 
@@ -72,6 +63,7 @@ namespace Quesadilla
                 if (watcher._logFileType == LogFileType.Local)
                 {
                     watcher.SystemChange += new EventHandler<ProcessSystemChangeEventArgs>(this._localWatcher_SystemChange);
+                    watcher.ChatServerChange += new EventHandler<ProcessChatServerChangeEventArgs>(this._localWatcher_ChatServerChange);
                 }
                 else
                 {
@@ -92,7 +84,10 @@ namespace Quesadilla
 
         private void Quesadilla_Load(object sender, EventArgs e)
         {
-
+            if (Configuration.InitialPosition != null)
+            {
+                Location = Configuration.InitialPosition;
+            }
         }
 
         private void mainTimer_Tick(object sender, EventArgs e)
@@ -111,7 +106,52 @@ namespace Quesadilla
             {
                 CharacterName = characterName.Trim(),
             });
-            Log.Information("sys > New character found: " + characterName);
+            Log.Information("New character found: " + characterName);
+        }
+        private bool checkJumpsRange(AlertConfig alert, PathInfo path)
+        {
+            bool checkJumpsRangeComparison(int jumps, AlertConfigJumpsComparison comparison, int? comparisonNumber) { 
+                if ( comparison == AlertConfigJumpsComparison.None) return true;
+                if ( comparisonNumber is null ) return false;
+
+                switch (comparison)
+                {
+                    case AlertConfigJumpsComparison.Equal:
+                        if (jumps == comparisonNumber) return true;
+                        break;
+                    case AlertConfigJumpsComparison.LessThan:
+                        if (jumps < comparisonNumber) return true;
+                        break;
+                    case AlertConfigJumpsComparison.LessThanEqual:
+                        if (jumps <= comparisonNumber) return true;
+                        break;
+                    case AlertConfigJumpsComparison.GreaterThan:
+                        if (jumps > comparisonNumber) return true;
+                        break;
+                    case AlertConfigJumpsComparison.GreaterThanEqual:
+                        if (jumps >= comparisonNumber) return true;
+                        break;
+                    default: 
+                        return false;
+                        break;
+                }
+                return false;
+            }
+            bool shouldAlert = false;
+            if (!alert.Enabled) return false;
+
+            shouldAlert = checkJumpsRangeComparison(path.TotalJumps, alert.Jumps1Comparison, alert.Jumps1Number) && checkJumpsRangeComparison(path.TotalJumps, alert.Jumps2Comparison, alert.Jumps2Number);
+
+            return shouldAlert;
+        }
+        private string generateAlertText(PathInfo path, AlertConfig alert, string characterName)
+        {
+            string returnString = alert.TextDisplay;
+            returnString = returnString.Replace("{jumps}", path.TotalJumps.ToString());
+            returnString = returnString.Replace("{character}", characterName);
+            returnString = returnString.Replace("{tosystem}", _solarSystems.SolarSystems[path.ToSystem].Name);
+            returnString = returnString.Replace("{fromsystem}", _solarSystems.SolarSystems[path.FromSystem].Name);
+            return returnString;
         }
         private void logFile_ProcessNewData(object sender, ProcessNewDataEventArgs e)
         {
@@ -126,19 +166,19 @@ namespace Quesadilla
                 {
                     case LogEntryType.OpenChatLogEvent:
                         //if (!this._conf.DisplayOpenFileAlerts) break;
-                        Log.Information(e.LogPrefix + " > Chat log opened: (" + entry.CharacterName + ") " + entry.FileName);
+                        Log.Debug(e.LogPrefix + " > Chat log opened: (" + entry.CharacterName + ") " + entry.FileName);
                         break;
                     case LogEntryType.NewChatLogEvent:
                         //if (!this._conf.DisplayNewFileAlerts) break;
-                        Log.Information(e.LogPrefix + " > New chat log detected: (" + entry.CharacterName + ") " + entry.FileName);
+                        Log.Debug(e.LogPrefix + " > New chat log detected: (" + entry.CharacterName + ") " + entry.FileName);
                         break;
                     case LogEntryType.OpenGameLogEvent:
                         //if (!this._conf.DisplayOpenFileAlerts) break;
-                        Log.Information(e.LogPrefix + " > Game log opened: (" + entry.CharacterName + ") " + entry.FileName);
+                        Log.Debug(e.LogPrefix + " > Game log opened: (" + entry.CharacterName + ") " + entry.FileName);
                         break;
                     case LogEntryType.NewGameLogEvent:
                         //if (!this._conf.DisplayNewFileAlerts) break;
-                        Log.Information(e.LogPrefix + " > New game log detected: (" + entry.CharacterName + ") " + entry.FileName);
+                        Log.Debug(e.LogPrefix + " > New game log detected: (" + entry.CharacterName + ") " + entry.FileName);
                         break;
                 }
             }
@@ -147,54 +187,122 @@ namespace Quesadilla
                 if (!entry.ParseSuccess)
                     return;
                 HashSet<int> intSet = new HashSet<int>();
-                if (!this._ignoreStrings.Any<Regex>((Func<Regex, bool>)(ignoreString => ignoreString.IsMatch(entry.LineContent))) && entry.LogType == LogFileType.Chat)
+                if (!Configuration.ignoreStrings.Any<Regex>((Func<Regex, bool>)(ignoreString => ignoreString.IsMatch(entry.LineContent))) && entry.LogType == LogFileType.Chat)
                 {
                     // try and find systems mentioned in intel
                     foreach (SolarSystem solarSystem in
                         _solarSystems.SolarSystems.Values.Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => tempSystem.MatchNameRegex(entry.LineContent)))
-                        .Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => !this._ignoreSystems.Contains(this._solarSystems.Names[tempSystem.Name])))
+                        .Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => ! Configuration.ignoreSystems.Contains(this._solarSystems.Names[tempSystem.Name])))
                         )
-                        intSet.Add(this._solarSystems.Names[solarSystem.Name]);
+                        intSet.Add(_solarSystems.Names[solarSystem.Name]);
                 }
-                foreach (int toSystemId in intSet)
-                {
-                    int homeSystemId = _solarSystems.HomeSolarSystemID;
 
-                    // Cache paths - if not already stored
-                    var homeSystemPathInfo = _solarSystems.FindAndCachePath(homeSystemId, toSystemId);
-                    Log.Debug("Jumps from " + _solarSystems.SolarSystems[homeSystemId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + homeSystemPathInfo.TotalJumps );
-                    foreach (var c in CharacterList.Where(o => o.LocationId > 0)  )
-                    {
-                        var CurrectLocationPathInfo = _solarSystems.FindAndCachePath(c.LocationId, toSystemId);
-                        Log.Debug("Jumps from " + _solarSystems.SolarSystems[c.LocationId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + CurrectLocationPathInfo.TotalJumps);
-                    }
-
-                    /*
-                                                            foreach (AlertTrigger alertTrigger in this._alertTriggers.Where<AlertTrigger>((Func<AlertTrigger, bool>)(tempTrigger =>
-                                                            {
-                                                                if (!tempTrigger.Enabled)
-                                                                    return false;
-                                                                return tempTrigger.RangeTo == RangeAlertType.System || tempTrigger.RangeTo == RangeAlertType.Character;
-                                                            })))
-                                                            {
-                                                                if (alertTrigger.RangeTo == RangeAlertType.System)
-                                                                {
-                                                                    int systemId = alertTrigger.SystemId;
-                                                                    if (!this._solarSystems.PathCache.ContainsKey(this._solarSystems.GenerateUniquePathId(systemId, toSystemId)))
-                                                                        this._solarSystems.FindAndCachePath(systemId, toSystemId);
-                                                                }
-                                                            }
-                    */
-                }
                 if (intSet.Count > 0)
                 {
+                    Log.Information(entry.LineContent);
+                    foreach (int toSystemId in intSet)
+                    {
+                        int homeSystemId = _solarSystems.HomeSolarSystemID;
+
+                        // Cache paths - if not already stored
+                        var homeSystemPathInfo = _solarSystems.FindAndCachePath(homeSystemId, toSystemId);
+                        Log.Information("Jumps from HOME:" + _solarSystems.SolarSystems[homeSystemId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + homeSystemPathInfo.TotalJumps);
+                        foreach (var c in CharacterList.Where(o => o.LocationId > 0))
+                        {
+                            var CurrectLocationPathInfo = _solarSystems.FindAndCachePath(c.LocationId, toSystemId);
+                            Log.Information("Jumps from " + c.CharacterName + ":" + _solarSystems.SolarSystems[c.LocationId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + CurrectLocationPathInfo.TotalJumps);
+                        }
+
+                        /*
+                                                                foreach (AlertTrigger alertTrigger in this._alertTriggers.Where<AlertTrigger>((Func<AlertTrigger, bool>)(tempTrigger =>
+                                                                {
+                                                                    if (!tempTrigger.Enabled)
+                                                                        return false;
+                                                                    return tempTrigger.RangeTo == RangeAlertType.System || tempTrigger.RangeTo == RangeAlertType.Character;
+                                                                })))
+                                                                {
+                                                                    if (alertTrigger.RangeTo == RangeAlertType.System)
+                                                                    {
+                                                                        int systemId = alertTrigger.SystemId;
+                                                                        if (!this._solarSystems.PathCache.ContainsKey(this._solarSystems.GenerateUniquePathId(systemId, toSystemId)))
+                                                                            this._solarSystems.FindAndCachePath(systemId, toSystemId);
+                                                                    }
+                                                                }
+                        */
+
+                        // Range alerts
+                        foreach (AlertConfig alert in Configuration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
+                        {
+                            if (!tempTrigger.Enabled)
+                                return false;
+                            return tempTrigger.AlertType == AlertConfigType.Range;
+                        })))
+                        {
+                            Log.Debug("trigger");
+                            bool sendAlert = false;
+                            PathInfo path = new PathInfo();
+                            string alertText = "";
+
+                            switch ( alert.AlertRangeType )
+                            {
+                                case AlertConfigRangeType.Home:
+                                     path = homeSystemPathInfo;
+                                    sendAlert = checkJumpsRange(alert,path);
+                                    if ( sendAlert )
+                                    {
+                                        alertText = generateAlertText(path, alert, "");
+                                        Log.Error("ALERT - " + alertText);
+                                    }
+                                    break;
+
+                                case AlertConfigRangeType.System:
+                                    // check against specific system
+                                    path = _solarSystems.FindAndCachePath(_solarSystems.Names[alert.TriggerText], toSystemId);
+                                    sendAlert = checkJumpsRange(alert, path);
+                                    if (sendAlert)
+                                    {
+                                        alertText = generateAlertText(path, alert, "");
+                                        Log.Error("ALERT - " + alertText);
+                                    }
+                                    break;
+                                case AlertConfigRangeType.OneCharacter:
+                                    // check against one specific character
+                                    foreach (var x in CharacterList.Where(o => o.CharacterName == alert.TriggerText))
+                                    {
+                                        path = _solarSystems.FindAndCachePath(x.LocationId, toSystemId);
+                                        sendAlert = checkJumpsRange(alert, path);
+                                        if (sendAlert)
+                                        {
+                                            alertText = generateAlertText(path, alert, x.CharacterName);
+                                            Log.Error("ALERT - " + alertText);
+                                        }
+                                    }
+                                    break;
+                                case AlertConfigRangeType.AllCharacters:
+                                    // check against all characters
+                                    foreach (var x in CharacterList)
+                                    {
+                                        path = _solarSystems.FindAndCachePath(x.LocationId, toSystemId);
+                                        sendAlert = checkJumpsRange(alert, path);
+                                        if (sendAlert)
+                                        {
+                                            alertText = generateAlertText(path, alert, x.CharacterName);
+                                            Log.Error("ALERT - " + alertText);
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
                     int systemId1 = -1;
                     foreach (int systemId2 in intSet)
                     {
-//                        this._solarSystems.AddAlert(systemId2);
+                        _solarSystems.AddAlert(systemId2);
                         systemId1 = systemId2;
                     }
-//                    if (this.CheckZoomTo(entry.LogPrefix)) this.ZoomTo(systemId1);
+                    //                    if (this.CheckZoomTo(entry.LogPrefix)) this.ZoomTo(systemId1);
                 }
                 entry.MatchedIds = intSet;
                 this._newIntelQueue.Enqueue(entry);
@@ -266,7 +374,8 @@ namespace Quesadilla
                 {
                     c.LocationId = foundSystemId;
                     c.Location = foundSystemName;
-                } else
+                }
+                else
                 {
                     CharacterList.Add(new Character()
                     {
@@ -280,11 +389,18 @@ namespace Quesadilla
 
             if (foundSystemId == -1)
                 return;
-            Log.Information("sys > System Change: " + characterName + " (" + foundSystemName + ")");
+            Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
+        }
+
+        private void _localWatcher_ChatServerChange(object sender, ProcessChatServerChangeEventArgs e)
+        {
+            Log.Information("Chat Server: " + (e.ChatServerUp == true ? "Up" : "Down"));
         }
 
         private void Quesadilla_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Configuration.InitialPosition = Location;
+            Configuration.Save(configuration_filename);
         }
     }
 }
