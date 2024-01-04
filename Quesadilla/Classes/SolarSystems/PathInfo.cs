@@ -12,10 +12,13 @@ namespace Quesadilla.Classes.SolarSystems
 
         public List<int> PathSystems { get; set; }
 
-        public int FromSystem { get; set; }
+        public int FromSystemId { get; set; }
 
-        public int ToSystem { get; set; }
+        public int ToSystemId { get; set; }
+        public string FromSystemName { get; set; }
 
-        public string PathId => String.Format("{0}:{1}", FromSystem, ToSystem);
+        public string ToSystemName { get; set; }
+
+        public string PathId => String.Format("{0}:{1}", FromSystemId, ToSystemId);
     }
 }

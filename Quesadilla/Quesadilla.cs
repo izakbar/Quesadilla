@@ -4,6 +4,7 @@ using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.Logfile;
+using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.SolarSystems;
 using Serilog;
 using System;
@@ -13,7 +14,9 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -24,11 +27,17 @@ namespace Quesadilla
     public partial class Quesadilla : Form
     {
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
+
         private SolarSystemManager _solarSystems = new SolarSystemManager();
         private Config Configuration = new Config();
         private List<LogWatcher> watchers = new List<LogWatcher>();
 
+        private Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
+        private Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
+
         private string configuration_filename = "Quesadilla.config.json";
+
+        public bool AlertShowing = false;
 
         // TODO - config things - really need to go into config structure later
         public List<Character> CharacterList { get; set; }
@@ -83,14 +92,150 @@ namespace Quesadilla
             if (Configuration.InitialPosition != null)
             {
                 Location = Configuration.InitialPosition;
+                TopMost = Configuration.StayOnTop;
+                Width = Configuration.WindowSize.X >= 100 ? Configuration.WindowSize.X : 100 ;
+                Height = Configuration.WindowSize.Y >= 100 ? Configuration.WindowSize.Y : 100;
             }
         }
+        private SoundPlayer LoadSoundFromFile(string fileName)
+        {
 
+            Stream soundStream = null;
+
+            switch (fileName)
+            {
+                case "1up1.wav":
+                    soundStream = Properties.Resources._1up1;
+                    break;
+                case "Boo2.wav":
+                    soundStream = Properties.Resources.Boo2;
+                    break;
+                case "Coin.wav":
+                    soundStream = Properties.Resources.Coin;
+                    break;
+                case "KamekLaugh.wav":
+                    soundStream = Properties.Resources.KamekLaugh;
+                    break;
+                case "Powerup.wav":
+                    soundStream = Properties.Resources.Powerup;
+                    break;
+                case "RedCoin2.wav":
+                    soundStream = Properties.Resources.RedCoin2;
+                    break;
+                case "RedCoin3.wav":
+                    soundStream = Properties.Resources.RedCoin3;
+                    break;
+                case "StarCoin.wav":
+                    soundStream = Properties.Resources.StarCoin;
+                    break;
+                case "SuitFly.wav":
+                    soundStream = Properties.Resources.SuitFly;
+                    break;
+                case "SuitSpin.wav":
+                    soundStream = Properties.Resources.SuitSpin;
+                    break;
+                case "Whistle.wav":
+                    soundStream = Properties.Resources.Whistle;
+                    break;
+                case "tuba.wav":
+                    soundStream = Properties.Resources.tuba;
+                    break;
+                case "xylophone.wav":
+                    soundStream = Properties.Resources.xylophone;
+                    break;
+                case "oldtrombone.wav":
+                    soundStream = Properties.Resources.oldtrombone;
+                    break;
+                case "harpsichord.wav":
+                    soundStream = Properties.Resources.harpsichord;
+                    break;
+                case "button5.wav":
+                    soundStream = Properties.Resources.button5;
+                    break;
+                case "modsinglenote.wav":
+                    soundStream = Properties.Resources.modsinglenote;
+                    break;
+                case "flute.wav":
+                    soundStream = Properties.Resources.flute;
+                    break;
+                case "violin.wav":
+                    soundStream = Properties.Resources.violin;
+                    break;
+                case "skamos66.wav":
+                    soundStream = Properties.Resources.skamos66;
+                    break;
+                case "trumpet.wav":
+                    soundStream = Properties.Resources.trumpet;
+                    break;
+
+
+            }
+            if (soundStream != null)
+            {
+                SoundPlayer soundPlayer = new SoundPlayer((Stream)soundStream);
+                soundPlayer.Load();
+                return soundPlayer;
+            }
+
+            if (soundStream == null && File.Exists(fileName))
+            {
+                using (FileStream fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    try
+                    {
+                        SoundPlayer soundPlayer = new SoundPlayer((Stream)fileStream);
+                        soundPlayer.Load();
+                        return soundPlayer;
+                    }
+                    catch (Exception ex)
+                    {
+                        return (SoundPlayer)null;
+                    }
+                }
+            }
+            return (SoundPlayer)null;
+        }
         private void mainTimer_Tick(object sender, EventArgs e)
         {
             foreach (LogWatcher watcher in watchers)
             {
                 watcher.Tick();
+            }
+
+            // dequeue Alerts
+            if ( NewAlerts.Count > 0 )
+            {
+
+                var NewAlert = NewAlerts.Dequeue();
+                Log.Error(NewAlert.AlertText);
+
+                ActiveAlerts.Enqueue(NewAlert);
+                // do any extra processing 
+
+                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Configuration.AlertPopupSeconds, Configuration.AlertPopupOpacity, Configuration.AlertPopupOpacityStep, Configuration.AlertPopupLocation, Configuration.AlertPopupBackground);
+                NewAlertWindow.Show(this);
+
+                SoundPlayer sound = LoadSoundFromFile(NewAlert.SoundFile);
+                if ( sound != null ) sound.Play();
+                
+            }
+
+            // Show number of recent alers
+            if ( ActiveAlerts.Count > 0 )
+            {
+                // check if we should expire first entry
+                var a = ActiveAlerts.First();
+                var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
+                if ( diffInSeconds > Configuration.ExpireAlertSeconds )
+                {
+                    // expired so dequeue
+                    a = ActiveAlerts.Dequeue();
+                }
+
+                alertsOutstanding.Text = ActiveAlerts.Count.ToString();
+            } else
+            {
+                alertsOutstanding.Text = "";
             }
         }
         private void AddNewCharacter(string characterName)
@@ -136,18 +281,45 @@ namespace Quesadilla
             bool shouldAlert = false;
             if (!alert.Enabled) return false;
 
-            shouldAlert = checkJumpsRangeComparison(path.TotalJumps, alert.Jumps1Comparison, alert.Jumps1Number) && checkJumpsRangeComparison(path.TotalJumps, alert.Jumps2Comparison, alert.Jumps2Number);
+            shouldAlert = 
+                checkJumpsRangeComparison(path.TotalJumps, alert.Jumps1Comparison, alert.Jumps1Number) && 
+                checkJumpsRangeComparison(path.TotalJumps, alert.Jumps2Comparison, alert.Jumps2Number) &&
+                path.TotalJumps < Configuration.IgnoreAsTooManyJumps ;
 
             return shouldAlert;
         }
-        private string generateAlertText(PathInfo path, AlertConfig alert, string characterName)
+        private string PathToString(PathInfo path)
+        {
+            string route = "";
+            foreach(int systemId in path.PathSystems)
+            {
+                if ( route.Length > 0 ) route += " -> ";
+                route += _solarSystems.SolarSystems[systemId].Name;
+            }
+
+            return route;
+        }
+        private string generateAlertText(LogEntry entry, PathInfo path, AlertConfig alert, string characterName)
         {
             string returnString = alert.TextDisplay;
             returnString = returnString.Replace("{jumps}", path.TotalJumps.ToString());
             returnString = returnString.Replace("{character}", characterName);
-            returnString = returnString.Replace("{tosystem}", _solarSystems.SolarSystems[path.ToSystem].Name);
-            returnString = returnString.Replace("{fromsystem}", _solarSystems.SolarSystems[path.FromSystem].Name);
+            returnString = returnString.Replace("{tosystem}", _solarSystems.SolarSystems[path.ToSystemId].Name);
+            returnString = returnString.Replace("{fromsystem}", _solarSystems.SolarSystems[path.FromSystemId].Name);
+            returnString = returnString.Replace("{text}", entry.LineContent);
+            returnString = returnString.Replace("{reporter}", entry.PlayerName);
+            returnString = returnString.Replace("{route}", PathToString(path));
             return returnString;
+        }
+        private void EnqueueAlert(AlertQueueItem alert)
+        {
+            // only add to new alerts if not already in new alerts. This should prever an alert for each character on same logfile entry
+            var f = NewAlerts.Where(o => o.Path.ToSystemId == alert.Path.ToSystemId).ToList();
+            if (f.Count == 0 || NewAlerts.Count == 0)
+            {
+                alert.RouteText = PathToString(alert.Path);
+                NewAlerts.Enqueue(alert);
+            }
         }
         private void logFile_ProcessNewData(object sender, ProcessNewDataEventArgs e)
         {
@@ -202,29 +374,12 @@ namespace Quesadilla
 
                         // Cache paths - if not already stored
                         var homeSystemPathInfo = _solarSystems.FindAndCachePath(homeSystemId, toSystemId);
-                        Log.Information("Jumps from HOME:" + _solarSystems.SolarSystems[homeSystemId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + homeSystemPathInfo.TotalJumps);
+                        Log.Debug("Jumps from HOME:" + _solarSystems.SolarSystems[homeSystemId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + homeSystemPathInfo.TotalJumps);
                         foreach (var c in CharacterList.Where(o => o.LocationId > 0))
                         {
                             var CurrectLocationPathInfo = _solarSystems.FindAndCachePath(c.LocationId, toSystemId);
-                            Log.Information("Jumps from " + c.CharacterName + ":" + _solarSystems.SolarSystems[c.LocationId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + CurrectLocationPathInfo.TotalJumps);
+                            Log.Debug("Jumps from " + c.CharacterName + ":" + _solarSystems.SolarSystems[c.LocationId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + CurrectLocationPathInfo.TotalJumps);
                         }
-
-                        /*
-                                                                foreach (AlertTrigger alertTrigger in this._alertTriggers.Where<AlertTrigger>((Func<AlertTrigger, bool>)(tempTrigger =>
-                                                                {
-                                                                    if (!tempTrigger.Enabled)
-                                                                        return false;
-                                                                    return tempTrigger.RangeTo == RangeAlertType.System || tempTrigger.RangeTo == RangeAlertType.Character;
-                                                                })))
-                                                                {
-                                                                    if (alertTrigger.RangeTo == RangeAlertType.System)
-                                                                    {
-                                                                        int systemId = alertTrigger.SystemId;
-                                                                        if (!this._solarSystems.PathCache.ContainsKey(this._solarSystems.GenerateUniquePathId(systemId, toSystemId)))
-                                                                            this._solarSystems.FindAndCachePath(systemId, toSystemId);
-                                                                    }
-                                                                }
-                        */
 
                         // Range alerts
                         foreach (AlertConfig alert in Configuration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
@@ -234,7 +389,6 @@ namespace Quesadilla
                             return tempTrigger.AlertType == AlertConfigType.Range;
                         })))
                         {
-                            Log.Debug("trigger");
                             bool sendAlert = false;
                             PathInfo path = new PathInfo();
                             string alertText = "";
@@ -246,8 +400,18 @@ namespace Quesadilla
                                     sendAlert = checkJumpsRange(alert,path);
                                     if ( sendAlert )
                                     {
-                                        alertText = generateAlertText(path, alert, "");
-                                        Log.Error("ALERT - " + alertText);
+                                        alertText = generateAlertText(entry, path, alert, "");
+                                        Log.Debug("ALERT - " + alertText);
+                                        EnqueueAlert(
+                                            new AlertQueueItem()
+                                            {
+                                                AlertText = alertText,
+                                                Entry = entry,
+                                                Path = path,
+                                                Context = homeSystemPathInfo.FromSystemName,
+                                                SoundFile = alert.SoundFile,
+                                            }
+                                            );
                                     }
                                     break;
 
@@ -257,8 +421,18 @@ namespace Quesadilla
                                     sendAlert = checkJumpsRange(alert, path);
                                     if (sendAlert)
                                     {
-                                        alertText = generateAlertText(path, alert, "");
-                                        Log.Error("ALERT - " + alertText);
+                                        alertText = generateAlertText(entry, path, alert, "");
+                                        Log.Debug("ALERT - " + alertText);
+                                        EnqueueAlert(
+                                            new AlertQueueItem()
+                                            {
+                                                AlertText = alertText,
+                                                Entry = entry,
+                                                Path = path,
+                                                Context = path.FromSystemName,
+                                                SoundFile = alert.SoundFile,
+                                            }
+                                            );
                                     }
                                     break;
                                 case AlertConfigRangeType.OneCharacter:
@@ -269,8 +443,18 @@ namespace Quesadilla
                                         sendAlert = checkJumpsRange(alert, path);
                                         if (sendAlert)
                                         {
-                                            alertText = generateAlertText(path, alert, x.CharacterName);
-                                            Log.Error("ALERT - " + alertText);
+                                            alertText = generateAlertText(entry, path, alert, x.CharacterName);
+                                            Log.Debug("ALERT - " + alertText);
+                                            EnqueueAlert(
+                                                new AlertQueueItem()
+                                                {
+                                                    AlertText = alertText,
+                                                    Entry = entry,
+                                                    Path = path,
+                                                    Context = x.CharacterName,
+                                                    SoundFile = alert.SoundFile,
+                                                }
+                                                );
                                         }
                                     }
                                     break;
@@ -282,8 +466,18 @@ namespace Quesadilla
                                         sendAlert = checkJumpsRange(alert, path);
                                         if (sendAlert)
                                         {
-                                            alertText = generateAlertText(path, alert, x.CharacterName);
-                                            Log.Error("ALERT - " + alertText);
+                                            alertText = generateAlertText(entry, path, alert, x.CharacterName);
+                                            Log.Debug("ALERT - " + alertText);
+                                            EnqueueAlert(
+                                                new AlertQueueItem()
+                                                {
+                                                    AlertText = alertText,
+                                                    Entry = entry,
+                                                    Path = path,
+                                                    Context = x.CharacterName,
+                                                    SoundFile = alert.SoundFile,
+                                                }
+                                                );
                                         }
                                     }
                                     break;
@@ -396,6 +590,8 @@ namespace Quesadilla
         private void Quesadilla_FormClosing(object sender, FormClosingEventArgs e)
         {
             Configuration.InitialPosition = Location;
+            Configuration.WindowSize = new Point(Width, Height);
+            Configuration.StayOnTop = TopMost;
             Configuration.Save(configuration_filename);
         }
     }

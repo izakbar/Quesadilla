@@ -33,6 +33,7 @@
             this.mainTimer = new System.Windows.Forms.Timer(this.components);
             this.richTextBoxLogControl1 = new Serilog.Sinks.WinForms.RichTextBoxLogControl();
             this.jsonLogTextBox1 = new Serilog.Sinks.WinForms.JsonLogTextBox();
+            this.alertsOutstanding = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // mainTimer
@@ -44,10 +45,11 @@
             // richTextBoxLogControl1
             // 
             this.richTextBoxLogControl1.BackColor = System.Drawing.SystemColors.Info;
+            this.richTextBoxLogControl1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.richTextBoxLogControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.richTextBoxLogControl1.ForContext = "";
             this.richTextBoxLogControl1.Location = new System.Drawing.Point(0, 242);
-            this.richTextBoxLogControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.richTextBoxLogControl1.Margin = new System.Windows.Forms.Padding(2);
             this.richTextBoxLogControl1.Name = "richTextBoxLogControl1";
             this.richTextBoxLogControl1.Size = new System.Drawing.Size(600, 123);
             this.richTextBoxLogControl1.TabIndex = 0;
@@ -65,11 +67,23 @@
             this.jsonLogTextBox1.Size = new System.Drawing.Size(5, 5);
             this.jsonLogTextBox1.TabIndex = 1;
             // 
+            // alertsOutstanding
+            // 
+            this.alertsOutstanding.BackColor = System.Drawing.SystemColors.Control;
+            this.alertsOutstanding.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.alertsOutstanding.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.alertsOutstanding.ForeColor = System.Drawing.Color.Crimson;
+            this.alertsOutstanding.Location = new System.Drawing.Point(0, -1);
+            this.alertsOutstanding.Name = "alertsOutstanding";
+            this.alertsOutstanding.Size = new System.Drawing.Size(44, 40);
+            this.alertsOutstanding.TabIndex = 2;
+            // 
             // Quesadilla
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(600, 365);
+            this.Controls.Add(this.alertsOutstanding);
             this.Controls.Add(this.jsonLogTextBox1);
             this.Controls.Add(this.richTextBoxLogControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -79,6 +93,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Quesadilla_FormClosing);
             this.Load += new System.EventHandler(this.Quesadilla_Load);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -87,6 +102,7 @@
         private System.Windows.Forms.Timer mainTimer;
         private Serilog.Sinks.WinForms.RichTextBoxLogControl richTextBoxLogControl1;
         private Serilog.Sinks.WinForms.JsonLogTextBox jsonLogTextBox1;
+        private System.Windows.Forms.TextBox alertsOutstanding;
     }
 }
 

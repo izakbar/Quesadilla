@@ -12,54 +12,21 @@
     {
       "Pattern": "\\bstatus\\b",
       "Options": 9
-    },
-    {
-      "Pattern": "\\bclr\\b",
-      "Options": 9
-    },
-    {
-      "Pattern": "\\bclear\\b",
-      "Options": 9
-    },
-    {
-      "Pattern": "\\bstatus\\b",
-      "Options": 9
-    },
-    {
-      "Pattern": "\\bclr\\b",
-      "Options": 9
-    },
-    {
-      "Pattern": "\\bclear\\b",
-      "Options": 9
-    },
-    {
-      "Pattern": "\\bstatus\\b",
-      "Options": 9
-    },
-    {
-      "Pattern": "\\bclr\\b",
-      "Options": 9
-    },
-    {
-      "Pattern": "\\bclear\\b",
-      "Options": 9
-    },
-    {
-      "Pattern": "\\bstatus\\b",
-      "Options": 9
     }
   ],
   "ignoreSystems": [],
-  "InitialPosition": "-6, 989",
-  "IgnoreAsTooManyJumps": 8,
+  "InitialPosition": "-11, 886",
+  "WindowSize": "507, 314",
+  "StayOnTop": true,
+  "IgnoreAsTooManyJumps": 15,
+  "ExpireAlertSeconds": 500,
   "AlertConfiguration": [
     {
       "Enabled": true,
       "AlertType": 0,
       "AlertRangeType": 3,
-      "SoundFile": "sound1.mp3",
-      "TextDisplay": "Hostile {jumps} jumps from {character} in {tosystem}",
+      "SoundFile": "oldtrombone.wav",
+      "TextDisplay": "Hostile {jumps} jumps from {character} in {tosystem} {route}",
       "Jumps1Number": 5,
       "Jumps1Comparison": 1,
       "Jumps2Number": null,
@@ -68,11 +35,11 @@
       "CustomTriggerEverySeconds": null
     },
     {
-      "Enabled": true,
+      "Enabled": false,
       "AlertType": 0,
       "AlertRangeType": 4,
-      "SoundFile": "sound1.mp3",
-      "TextDisplay": "Hostile {jumps} jumps from {character} in {tosystem}",
+      "SoundFile": "skamos66.wav",
+      "TextDisplay": "Hostile {jumps} jumps from {character} in {tosystem} {route}",
       "Jumps1Number": 5,
       "Jumps1Comparison": 1,
       "Jumps2Number": null,
@@ -84,8 +51,8 @@
       "Enabled": true,
       "AlertType": 0,
       "AlertRangeType": 2,
-      "SoundFile": "sound1.mp3",
-      "TextDisplay": "Hostile {jumps} jumps from {fromsystem} to {tosystem}",
+      "SoundFile": "skamos66.wav",
+      "TextDisplay": "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
       "Jumps1Number": 5,
       "Jumps1Comparison": 1,
       "Jumps2Number": null,
@@ -94,17 +61,35 @@
       "CustomTriggerEverySeconds": null
     },
     {
-      "Enabled": true,
+      "Enabled": false,
       "AlertType": 0,
       "AlertRangeType": 1,
-      "SoundFile": "sound1.mp3",
-      "TextDisplay": "Hostile {jumps} jumps from {fromsystem} to {tosystem}",
+      "SoundFile": "trumpet.wav",
+      "TextDisplay": "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
       "Jumps1Number": 5,
       "Jumps1Comparison": 1,
       "Jumps2Number": null,
       "Jumps2Comparison": 0,
       "TriggerText": "1DQ1-A",
       "CustomTriggerEverySeconds": null
+    },
+    {
+      "Enabled": true,
+      "AlertType": 1,
+      "AlertRangeType": 0,
+      "SoundFile": "tuba.wav",
+      "TextDisplay": "ESS robbery {log} reported by {reporter}",
+      "Jumps1Number": null,
+      "Jumps1Comparison": 0,
+      "Jumps2Number": null,
+      "Jumps2Comparison": 0,
+      "TriggerText": "ess",
+      "CustomTriggerEverySeconds": null
     }
-  ]
+  ],
+  "AlertPopupSeconds": 6,
+  "AlertPopupOpacity": 99,
+  "AlertPopupOpacityStep": 5,
+  "AlertPopupLocation": 3,
+  "AlertPopupBackground": "background5.jpg"
 }

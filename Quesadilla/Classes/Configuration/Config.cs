@@ -22,7 +22,24 @@ namespace Quesadilla.Classes
             var json = reader.ReadToEnd();
             c = JsonConvert.DeserializeObject<Config>(json);
 
-            if (c.ignoreSystems == null ) c.ignoreSystems = new List<int>();
+            if (c is null)
+            {
+                c = new Config();
+                c.HomeSystem = "K7D-II";
+                c.InitialPosition = new Point(0, 0);
+                c.WindowSize = new Point(300, 100);
+                c.StayOnTop = true;
+                c.IgnoreAsTooManyJumps = 15;
+                c.ExpireAlertSeconds = 500;
+
+                c.AlertPopupSeconds = 8;
+                c.AlertPopupOpacity = 99;
+                c.AlertPopupOpacityStep = 5;
+                c.AlertPopupLocation = PopupLocationType.BottomLeft;
+                c.AlertPopupBackground = "background2.jpg";
+            }
+
+            if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
             if (c.ignoreStrings == null)
             {
                 c.ignoreStrings = new List<Regex>();
@@ -39,8 +56,8 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.AllCharacters,
-                    TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem}",
-                    SoundFile = "sound1.mp3",
+                    TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem} {route}",
+                    SoundFile = "RedCoin2.wav",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
                     Jumps2Comparison = AlertConfigJumpsComparison.None,
@@ -50,8 +67,8 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.OneCharacter,
-                    TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem}",
-                    SoundFile = "sound1.mp3",
+                    TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem} {route}",
+                    SoundFile = "RedCoin2.wav",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
                     Jumps2Comparison = AlertConfigJumpsComparison.None,
@@ -62,8 +79,8 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.Home,
-                    TextDisplay = "Hostile {jumps} jumps from {fromsystem} to {tosystem}",
-                    SoundFile = "sound1.mp3",
+                    TextDisplay = "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
+                    SoundFile = "RedCoin3.wav",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
                     Jumps2Comparison = AlertConfigJumpsComparison.None,
@@ -73,12 +90,20 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.System,
-                    TextDisplay = "Hostile {jumps} jumps from {fromsystem} to {tosystem}",
-                    SoundFile = "sound1.mp3",
+                    TextDisplay = "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
+                    SoundFile = "RedCoin2.wav",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
                     Jumps2Comparison = AlertConfigJumpsComparison.None,
                     TriggerText = "1DQ1-A",
+                });
+                c.AlertConfiguration.Add(new AlertConfig()
+                {
+                    Enabled = true,
+                    AlertType = AlertConfigType.Text,
+                    TextDisplay = "ESS robbery {log} reported by {reporter}",
+                    SoundFile = "Boo2.wav",
+                    TriggerText = "ess",
                 });
             }
 
@@ -93,9 +118,18 @@ namespace Quesadilla.Classes
 
         public string HomeSystem { get; set; }
         public List<Regex> ignoreStrings { get; set; }
-        public  List<int> ignoreSystems { get; set; }
+        public List<int> ignoreSystems { get; set; }
         public Point InitialPosition { get; set; }
+        public Point WindowSize { get; set; }
+        public bool StayOnTop { get; set; }
         public int IgnoreAsTooManyJumps { get; set; }
+        public int ExpireAlertSeconds { get; set; }
         public List<AlertConfig> AlertConfiguration { get; set; }
+
+        public int AlertPopupSeconds { get; set; }
+        public int AlertPopupOpacity { get; set; }
+        public int AlertPopupOpacityStep { get; set; }
+        public PopupLocationType AlertPopupLocation { get; set; }
+        public string AlertPopupBackground { get; set; }
     }
 }

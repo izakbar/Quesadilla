@@ -1,0 +1,21 @@
+﻿using Quesadilla.Classes.Logfile;
+using Quesadilla.Classes.SolarSystems;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Media;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Quesadilla.Classes.Queues
+{
+    public class AlertQueueItem
+    {
+        public PathInfo Path {  get; set; }
+        public LogEntry Entry { get; set; }
+        public string AlertText { get; set; }
+        public string RouteText { get; set; }
+        public string Context { get; set; }
+        public string SoundFile { get; set; }
+    }
+}

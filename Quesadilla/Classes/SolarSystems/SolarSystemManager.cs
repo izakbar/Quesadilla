@@ -36,8 +36,8 @@ namespace Quesadilla.Classes.SolarSystems
         {
             PathInfo pathInfo = new PathInfo()
             {
-                FromSystem = fromSystemId,
-                ToSystem = toSystemId
+                FromSystemId = fromSystemId,
+                ToSystemId = toSystemId
             };
             // don't do any work if path already exists.
             if (_pathfindingCache.ContainsKey(pathInfo.PathId))
@@ -48,6 +48,7 @@ namespace Quesadilla.Classes.SolarSystems
 
             Log.Debug("Pathid " + pathInfo.PathId + " does not exist - building");
             SolarSystem fromSystem = SolarSystems[fromSystemId];
+            SolarSystem toSystem = SolarSystems[toSystemId];
             SolarSystemNode fromSystemNode = new SolarSystemNode()
             {
                 Id = fromSystem.Id,
@@ -55,8 +56,10 @@ namespace Quesadilla.Classes.SolarSystems
                 ConnectedTo = fromSystem.ConnectedTo,
                 PathData = new PathInfo()
                 {
-                    FromSystem = fromSystemId,
-                    ToSystem = fromSystemId,
+                    FromSystemId = fromSystemId,
+                    ToSystemId = fromSystemId,
+                    FromSystemName = fromSystem.Name,
+                    ToSystemName = toSystem.Name,
                     PathSystems = new List<int>() { fromSystemId }
                 }
             };
@@ -91,8 +94,10 @@ namespace Quesadilla.Classes.SolarSystems
                             ConnectedTo = connectionSystem.ConnectedTo,
                             PathData = new PathInfo()
                             {
-                                FromSystem = fromSystemId,
-                                ToSystem = connection.ToSystemId,
+                                FromSystemId = fromSystemId,
+                                ToSystemId = connection.ToSystemId,
+                                FromSystemName = fromSystem.Name,
+                                ToSystemName = SolarSystems[connection.ToSystemId].Name,
                                 PathSystems = new List<int>(checkingSystem.PathData.PathSystems),
                             }
                         };
