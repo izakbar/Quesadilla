@@ -155,6 +155,7 @@ namespace Quesadilla
 
         private void QuesadillaAlertPopup_Click(object sender, EventArgs e)
         {
+            Opacity = 0;
             CloseWindow();
         }
 

@@ -56,10 +56,13 @@ namespace Quesadilla
 
             _solarSystems.HomeSolarSystemID = _solarSystems.Names[Configuration.HomeSystem];
 
-            watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.Chat));
+            watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.Chat));
+            watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.Chat));
+            watchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.Chat));
 
             watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.Chat));
             watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.Chat));
+
             watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local));
 
             // setup event handlers
