@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Queues;
 using System;
@@ -60,26 +61,33 @@ namespace Quesadilla
         }
 
 
-        public QuesadillaAlertPopup(AlertQueueItem alert, int seconds, int opacity, int opacitystep, PopupLocationType location, string background)
+        public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration)
         {
             InitializeComponent();
             _alert = alert;
-            _seconds = seconds;
-            _opacity = opacity;
-            _opacitystep = opacitystep;
+            _seconds = configuration.AlertPopupSeconds;
+            _opacity = configuration.AlertPopupOpacity;
+            _opacitystep = configuration.AlertPopupOpacityStep;
 
             Opacity = 0;
 
+            AlertText.ForeColor = configuration.AlertPopupAlertTextColour;
             AlertText.Text = _alert.AlertText;
+
+            SystemName.ForeColor = configuration.AlertPopupSystemNameColour;
             SystemName.Text = _alert.Path.ToSystemName;
+
+            ContextInfo.ForeColor = configuration.AlertPopupContextInfoColour;
             ContextInfo.Text = _alert.Path.TotalJumps.ToString() + " jump" + (_alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + _alert.Context;
+
+            IntelLine.ForeColor = configuration.AlertPopupIntelLineColour;
             IntelLine.Text = _alert.Entry.LineContent;
 
-            BackgroundImage = LoadImageFromFile(background);
+            BackgroundImage = LoadImageFromFile(configuration.AlertPopupBackground);
 
             // position on screen
             Screen screen = Screen.FromControl(this);
-            switch (location)
+            switch (configuration.AlertPopupLocation)
             {
                 case PopupLocationType.TopLeft:
                     Location = new Point()

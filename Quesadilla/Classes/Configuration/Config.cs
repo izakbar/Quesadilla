@@ -37,6 +37,12 @@ namespace Quesadilla.Classes
                 c.AlertPopupOpacityStep = 5;
                 c.AlertPopupLocation = PopupLocationType.BottomLeft;
                 c.AlertPopupBackground = "background2.jpg";
+
+                c.AlertPopupSystemNameColour = Color.Red;
+                c.AlertPopupContextInfoColour = Color.Red;
+                c.AlertPopupIntelLineColour = Color.SaddleBrown;
+                c.AlertPopupAlertTextColour = Color.MistyRose;
+
             }
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
@@ -131,5 +137,9 @@ namespace Quesadilla.Classes
         public int AlertPopupOpacityStep { get; set; }
         public PopupLocationType AlertPopupLocation { get; set; }
         public string AlertPopupBackground { get; set; }
+        public Color AlertPopupSystemNameColour { get; set; }
+        public Color AlertPopupContextInfoColour { get; set; }
+        public Color AlertPopupIntelLineColour { get; set; }
+        public Color AlertPopupAlertTextColour { get; set; }
     }
 }

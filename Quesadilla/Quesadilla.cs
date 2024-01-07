@@ -56,12 +56,12 @@ namespace Quesadilla
 
             _solarSystems.HomeSolarSystemID = _solarSystems.Names[Configuration.HomeSystem];
 
-            watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.Chat));
-            watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.Chat));
-            watchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.Chat));
+            watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel));
+            watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel));
+            watchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.ChatIntel));
 
-            watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.Chat));
-            watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.Chat));
+            watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel));
+            watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel));
 
             watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local));
 
@@ -95,10 +95,18 @@ namespace Quesadilla
             if (Configuration.InitialPosition != null)
             {
                 Location = Configuration.InitialPosition;
+                if (Location.X > Screen.FromControl(this).Bounds.Width || Location.X < Screen.FromControl(this).Bounds.X ||
+                    Location.Y > Screen.FromControl(this).Bounds.Height || Location.Y < Screen.FromControl(this).Bounds.Y 
+                    )
+                {
+                    Location = new Point(0, 0);
+                }
+
                 TopMost = Configuration.StayOnTop;
                 Width = Configuration.WindowSize.X >= 100 ? Configuration.WindowSize.X : 100 ;
                 Height = Configuration.WindowSize.Y >= 100 ? Configuration.WindowSize.Y : 100;
             }
+
         }
         private SoundPlayer LoadSoundFromFile(string fileName)
         {
@@ -215,7 +223,7 @@ namespace Quesadilla
                 ActiveAlerts.Enqueue(NewAlert);
                 // do any extra processing 
 
-                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Configuration.AlertPopupSeconds, Configuration.AlertPopupOpacity, Configuration.AlertPopupOpacityStep, Configuration.AlertPopupLocation, Configuration.AlertPopupBackground);
+                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Configuration);
                 NewAlertWindow.Show(this);
 
                 SoundPlayer sound = LoadSoundFromFile(NewAlert.SoundFile);
@@ -323,6 +331,19 @@ namespace Quesadilla
                 alert.RouteText = PathToString(alert.Path);
                 NewAlerts.Enqueue(alert);
             }
+            if ( f.Count != 0)
+            {
+                if (alert.Path.TotalJumps < f.First().Path.TotalJumps)
+                {
+                    f.First().Path = alert.Path;
+                    f.First().AlertText = alert.AlertText;
+                    f.First().Entry= alert.Entry;
+                    f.First().Context = alert.Context;
+                    f.First().RouteText = alert.RouteText;
+                    f.First().SoundFile= alert.SoundFile;
+                    f.First().Context += "+++";
+                }
+            }
         }
         private void logFile_ProcessNewData(object sender, ProcessNewDataEventArgs e)
         {
@@ -358,7 +379,7 @@ namespace Quesadilla
                 if (!entry.ParseSuccess)
                     return;
                 HashSet<int> intSet = new HashSet<int>();
-                if (!Configuration.ignoreStrings.Any<Regex>((Func<Regex, bool>)(ignoreString => ignoreString.IsMatch(entry.LineContent))) && entry.LogType == LogFileType.Chat)
+                if (!Configuration.ignoreStrings.Any<Regex>((Func<Regex, bool>)(ignoreString => ignoreString.IsMatch(entry.LineContent))) && entry.LogType == LogFileType.ChatIntel)
                 {
                     // try and find systems mentioned in intel
                     foreach (SolarSystem solarSystem in

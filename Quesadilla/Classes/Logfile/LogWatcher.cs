@@ -57,7 +57,7 @@ namespace Quesadilla.Classes
                     this._fileEncoding = Encoding.ASCII;
                     this._logPath = LogWatcher.RootLogsPath + "\\Gamelogs";
                     break;
-                case LogFileType.Chat:
+                case LogFileType.ChatIntel:
                     this._fileEncoding = Encoding.Unicode;
                     this._logPath = LogWatcher.RootLogsPath + "\\Chatlogs";
                     break;
@@ -80,7 +80,7 @@ namespace Quesadilla.Classes
                 {
                     logger.Debug(changedLogFile.FullName);
 
-                    if (this._logFileType == LogFileType.Chat || this._logFileType == LogFileType.Game)
+                    if (this._logFileType == LogFileType.ChatIntel || this._logFileType == LogFileType.Game)
                     {
                         lock (this)
                         {
@@ -169,7 +169,7 @@ namespace Quesadilla.Classes
                                 foreach (string input in array)
                                 {
                                     LogEntry tempLogEntry = new LogEntry();
-                                    Match match = this._logFileType == LogFileType.Chat ? this._chatLogRegex.Match(input) : this._gameLogRegex.Match(input);
+                                    Match match = this._logFileType == LogFileType.ChatIntel ? this._chatLogRegex.Match(input) : this._gameLogRegex.Match(input);
                                     tempLogEntry.RawLine = input;
                                     tempLogEntry.FileName = fileInfo.Name;
                                     tempLogEntry.LogPrefix = this._systemChannelPrefix;
@@ -192,14 +192,14 @@ namespace Quesadilla.Classes
                                         tempLogEntry.LineContent = match.Groups["content"].ToString();
                                         tempLogEntry.EntryType = LogEntryType.ChatEvent;
                                         tempLogEntry.ParseSuccess = true;
-                                        if (this._logFileType == LogFileType.Chat)
+                                        if (this._logFileType == LogFileType.ChatIntel)
                                             tempLogEntry.PlayerName = match.Groups["name"].ToString();
                                     }
                                     else
                                     {
                                         tempLogEntry.LineContent = input;
                                         tempLogEntry.ParseSuccess = false;
-                                        tempLogEntry.EntryType = this._logFileType == LogFileType.Chat ? LogEntryType.UnknownChatLogEvent : LogEntryType.UnknownGameLogEvent;
+                                        tempLogEntry.EntryType = this._logFileType == LogFileType.ChatIntel ? LogEntryType.UnknownChatLogEvent : LogEntryType.UnknownGameLogEvent;
                                     }
                                     if (this._previousLogEntries.All<LogEntry>((Func<LogEntry, bool>)(logEntry => logEntry.LineContent != tempLogEntry.LineContent)))
                                     {
@@ -245,7 +245,7 @@ namespace Quesadilla.Classes
                 case LogFileType.Game:
                     filespec = "*.txt";
                     break;
-                case LogFileType.Chat:
+                case LogFileType.ChatIntel:
                     filespec = this._systemChannelPrefix + "*.txt";
                     break;
                 case LogFileType.Local:
@@ -419,7 +419,7 @@ namespace Quesadilla.Classes
                 case LogFileType.Game:
                     filespec = "*.txt";
                     break;
-                case LogFileType.Chat:
+                case LogFileType.ChatIntel:
                     filespec = this._systemChannelPrefix + "*.txt";
                     break;
                 case LogFileType.Local:

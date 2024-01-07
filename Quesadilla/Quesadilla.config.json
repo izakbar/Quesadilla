@@ -15,8 +15,8 @@
     }
   ],
   "ignoreSystems": [],
-  "InitialPosition": "-11, 886",
-  "WindowSize": "507, 314",
+  "InitialPosition": "8, 965",
+  "WindowSize": "464, 224",
   "StayOnTop": true,
   "IgnoreAsTooManyJumps": 15,
   "ExpireAlertSeconds": 500,
@@ -25,7 +25,7 @@
       "Enabled": true,
       "AlertType": 0,
       "AlertRangeType": 3,
-      "SoundFile": "xylophone.wav",
+      "SoundFile": "RedCoin2.wav",
       "TextDisplay": "Hostile {jumps} jumps from {character} in {tosystem} {route}",
       "Jumps1Number": 5,
       "Jumps1Comparison": 1,
@@ -35,10 +35,10 @@
       "CustomTriggerEverySeconds": null
     },
     {
-      "Enabled": false,
+      "Enabled": true,
       "AlertType": 0,
       "AlertRangeType": 4,
-      "SoundFile": "skamos66.wav",
+      "SoundFile": "RedCoin2.wav",
       "TextDisplay": "Hostile {jumps} jumps from {character} in {tosystem} {route}",
       "Jumps1Number": 5,
       "Jumps1Comparison": 1,
@@ -48,10 +48,10 @@
       "CustomTriggerEverySeconds": null
     },
     {
-      "Enabled": false,
+      "Enabled": true,
       "AlertType": 0,
       "AlertRangeType": 2,
-      "SoundFile": "skamos66.wav",
+      "SoundFile": "RedCoin3.wav",
       "TextDisplay": "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
       "Jumps1Number": 5,
       "Jumps1Comparison": 1,
@@ -61,10 +61,10 @@
       "CustomTriggerEverySeconds": null
     },
     {
-      "Enabled": false,
+      "Enabled": true,
       "AlertType": 0,
       "AlertRangeType": 1,
-      "SoundFile": "trumpet.wav",
+      "SoundFile": "RedCoin2.wav",
       "TextDisplay": "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
       "Jumps1Number": 5,
       "Jumps1Comparison": 1,
@@ -77,7 +77,7 @@
       "Enabled": true,
       "AlertType": 1,
       "AlertRangeType": 0,
-      "SoundFile": "tuba.wav",
+      "SoundFile": "Boo2.wav",
       "TextDisplay": "ESS robbery {log} reported by {reporter}",
       "Jumps1Number": null,
       "Jumps1Comparison": 0,
@@ -87,9 +87,13 @@
       "CustomTriggerEverySeconds": null
     }
   ],
-  "AlertPopupSeconds": 6,
+  "AlertPopupSeconds": 8,
   "AlertPopupOpacity": 99,
   "AlertPopupOpacityStep": 5,
   "AlertPopupLocation": 3,
-  "AlertPopupBackground": "background5.jpg"
+  "AlertPopupBackground": "background2.jpg",
+  "AlertPopupSystemNameColour": "Green",
+  "AlertPopupContextInfoColour": "Red",
+  "AlertPopupIntelLineColour": "SaddleBrown",
+  "AlertPopupAlertTextColour": "MistyRose"
 }
