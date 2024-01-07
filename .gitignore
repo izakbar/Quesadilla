@@ -50,3 +50,5 @@
 /packages/Newtonsoft.Json.13.0.3/lib
 /packages/Newtonsoft.Json.13.0.3
 /Quesadilla/bin/Debug
+/Quesadilla
+/Quesadilla/obj/Release/Quesadilla.csproj.AssemblyReference.cache
