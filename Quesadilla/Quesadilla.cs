@@ -6,6 +6,7 @@ using Quesadilla.Classes.Events;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.SolarSystems;
+using Quesadilla.Properties;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -42,11 +43,26 @@ namespace Quesadilla
         // TODO - config things - really need to go into config structure later
         public List<Character> CharacterList { get; set; }
 
+        private readonly NotifyIcon trayIcon;
+
         public Quesadilla()
         {
             InitializeComponent();
 
             Configuration = Config.Load(configuration_filename);
+
+            // Initialize tray
+            trayIcon = new NotifyIcon()
+            {
+                Icon = Properties.Resources.q,
+                ContextMenu = new ContextMenu(new MenuItem[]
+    {
+//                    new MenuItem("OPEN", new EventHandler(Open)),
+//                    new MenuItem("SETTINGS", new EventHandler(Settings)),
+//                    new MenuItem("EXIT", new EventHandler(Exit))
+    }),
+                Visible = true
+            };
 
             // stop main tick timer!
             mainTimer.Enabled = false;
@@ -90,7 +106,7 @@ namespace Quesadilla
             mainTimer.Enabled = true;
         }
 
-        private void Quesadilla_Load(object sender, EventArgs e)
+    private void Quesadilla_Load(object sender, EventArgs e)
         {
             if (Configuration.InitialPosition != null)
             {
