@@ -22,6 +22,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
 
 namespace Quesadilla
 {
@@ -38,12 +39,13 @@ namespace Quesadilla
 
         private string configuration_filename = "Quesadilla.config.json";
 
+        private MenuItem menuAlerts = new MenuItem("Alerts");
         public bool AlertShowing = false;
 
         // TODO - config things - really need to go into config structure later
         public List<Character> CharacterList { get; set; }
 
-        private readonly NotifyIcon trayIcon;
+        private NotifyIcon trayIcon;
 
         public Quesadilla()
         {
@@ -55,14 +57,18 @@ namespace Quesadilla
             trayIcon = new NotifyIcon()
             {
                 Icon = Properties.Resources.q,
-                ContextMenu = new ContextMenu(new MenuItem[]
-    {
-//                    new MenuItem("OPEN", new EventHandler(Open)),
-//                    new MenuItem("SETTINGS", new EventHandler(Settings)),
-//                    new MenuItem("EXIT", new EventHandler(Exit))
-    }),
+                ContextMenu = new ContextMenu(),
                 Visible = true
             };
+
+            RebuildAlertsMenu();
+
+            trayIcon.ContextMenu = new ContextMenu(new MenuItem[]
+            {
+                    menuAlerts,
+                    new MenuItem("-"),
+                    new MenuItem("Exit", new EventHandler(trayIconMenuClose)),
+            });
 
             // stop main tick timer!
             mainTimer.Enabled = false;
@@ -106,7 +112,18 @@ namespace Quesadilla
             mainTimer.Enabled = true;
         }
 
-    private void Quesadilla_Load(object sender, EventArgs e)
+        private void RebuildAlertsMenu()
+        {
+            menuAlerts.MenuItems.Clear();
+            foreach (var alertConfigItem in Configuration.AlertConfiguration)
+            {
+                MenuItem menuAlert = new MenuItem(alertConfigItem.FriendlyName);
+                menuAlert.Checked = alertConfigItem.Enabled;
+                menuAlerts.MenuItems.Add(menuAlert);
+            }
+        }
+
+        private void Quesadilla_Load(object sender, EventArgs e)
         {
             if (Configuration.InitialPosition != null)
             {
@@ -633,6 +650,22 @@ namespace Quesadilla
             Configuration.WindowSize = new Point(Width, Height);
             Configuration.StayOnTop = TopMost;
             Configuration.Save(configuration_filename);
+        }
+
+
+        private void trayIconMenuClose(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void trayMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

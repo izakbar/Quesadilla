@@ -59,6 +59,7 @@ namespace Quesadilla.Classes
                 c.AlertConfiguration = new List<AlertConfig>();
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
+                    FriendlyName = "All toons <= 5 jumps",
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.AllCharacters,
@@ -70,6 +71,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
+                    FriendlyName = "Izakbar <= 5 jumps",
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.OneCharacter,
@@ -82,6 +84,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
+                    FriendlyName = "Home system < 5 jumps",
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.Home,
@@ -93,7 +96,8 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    Enabled = true,
+                    FriendlyName = "1DQ1-A < 5 jumps",
+                    Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.System,
                     TextDisplay = "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
@@ -105,6 +109,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
+                    FriendlyName = "ESS robbery",
                     Enabled = true,
                     AlertType = AlertConfigType.Text,
                     TextDisplay = "ESS robbery {log} reported by {reporter}",

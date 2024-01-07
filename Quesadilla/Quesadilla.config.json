@@ -15,13 +15,14 @@
     }
   ],
   "ignoreSystems": [],
-  "InitialPosition": "8, 965",
-  "WindowSize": "464, 224",
+  "InitialPosition": "20, 923",
+  "WindowSize": "608, 346",
   "StayOnTop": true,
   "IgnoreAsTooManyJumps": 15,
   "ExpireAlertSeconds": 500,
   "AlertConfiguration": [
     {
+      "FriendlyName": "All toons <= 5 jumps",
       "Enabled": true,
       "AlertType": 0,
       "AlertRangeType": 3,
@@ -35,6 +36,7 @@
       "CustomTriggerEverySeconds": null
     },
     {
+      "FriendlyName": "Izakbar <= 5 jumps",
       "Enabled": true,
       "AlertType": 0,
       "AlertRangeType": 4,
@@ -48,6 +50,7 @@
       "CustomTriggerEverySeconds": null
     },
     {
+      "FriendlyName": "Home system < 5 jumps",
       "Enabled": true,
       "AlertType": 0,
       "AlertRangeType": 2,
@@ -61,7 +64,8 @@
       "CustomTriggerEverySeconds": null
     },
     {
-      "Enabled": true,
+      "FriendlyName": "1DQ1-A < 5 jumps",
+      "Enabled": false,
       "AlertType": 0,
       "AlertRangeType": 1,
       "SoundFile": "RedCoin2.wav",
@@ -74,6 +78,7 @@
       "CustomTriggerEverySeconds": null
     },
     {
+      "FriendlyName": "ESS robbery",
       "Enabled": true,
       "AlertType": 1,
       "AlertRangeType": 0,
@@ -92,7 +97,7 @@
   "AlertPopupOpacityStep": 5,
   "AlertPopupLocation": 3,
   "AlertPopupBackground": "background2.jpg",
-  "AlertPopupSystemNameColour": "Green",
+  "AlertPopupSystemNameColour": "Red",
   "AlertPopupContextInfoColour": "Red",
   "AlertPopupIntelLineColour": "SaddleBrown",
   "AlertPopupAlertTextColour": "MistyRose"
