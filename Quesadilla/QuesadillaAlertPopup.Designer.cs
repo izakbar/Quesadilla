@@ -38,6 +38,7 @@
             this.ContextInfo = new System.Windows.Forms.Label();
             this.IntelLine = new System.Windows.Forms.Label();
             this.timerOpacityClose = new System.Windows.Forms.Timer(this.components);
+            this.RegionName = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -79,19 +80,20 @@
             this.SystemName.BackColor = System.Drawing.Color.Transparent;
             this.SystemName.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SystemName.ForeColor = System.Drawing.Color.Red;
-            this.SystemName.Location = new System.Drawing.Point(210, 9);
+            this.SystemName.Location = new System.Drawing.Point(218, 9);
             this.SystemName.Name = "SystemName";
             this.SystemName.Size = new System.Drawing.Size(147, 31);
             this.SystemName.TabIndex = 2;
             this.SystemName.Text = "XXXXXXX";
-            this.SystemName.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.SystemName.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.SystemName.Click += new System.EventHandler(this.SystemName_Click);
             // 
             // ContextInfo
             // 
             this.ContextInfo.BackColor = System.Drawing.Color.Transparent;
             this.ContextInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ContextInfo.ForeColor = System.Drawing.Color.Red;
-            this.ContextInfo.Location = new System.Drawing.Point(165, 40);
+            this.ContextInfo.Location = new System.Drawing.Point(169, 47);
             this.ContextInfo.Name = "ContextInfo";
             this.ContextInfo.Size = new System.Drawing.Size(192, 19);
             this.ContextInfo.TabIndex = 3;
@@ -103,7 +105,7 @@
             this.IntelLine.BackColor = System.Drawing.Color.Transparent;
             this.IntelLine.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.IntelLine.ForeColor = System.Drawing.Color.SaddleBrown;
-            this.IntelLine.Location = new System.Drawing.Point(114, 59);
+            this.IntelLine.Location = new System.Drawing.Point(117, 64);
             this.IntelLine.Name = "IntelLine";
             this.IntelLine.Size = new System.Drawing.Size(243, 19);
             this.IntelLine.TabIndex = 4;
@@ -115,6 +117,19 @@
             this.timerOpacityClose.Interval = 75;
             this.timerOpacityClose.Tick += new System.EventHandler(this.timerOpacityClose_Tick);
             // 
+            // RegionName
+            // 
+            this.RegionName.BackColor = System.Drawing.Color.Transparent;
+            this.RegionName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RegionName.ForeColor = System.Drawing.Color.Lime;
+            this.RegionName.Location = new System.Drawing.Point(239, 37);
+            this.RegionName.Name = "RegionName";
+            this.RegionName.Size = new System.Drawing.Size(117, 13);
+            this.RegionName.TabIndex = 5;
+            this.RegionName.Text = "XXXXXXX";
+            this.RegionName.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.RegionName.UseCompatibleTextRendering = true;
+            // 
             // QuesadillaAlertPopup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -123,6 +138,7 @@
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(369, 149);
             this.ControlBox = false;
+            this.Controls.Add(this.RegionName);
             this.Controls.Add(this.IntelLine);
             this.Controls.Add(this.ContextInfo);
             this.Controls.Add(this.SystemName);
@@ -153,5 +169,6 @@
         private System.Windows.Forms.Label ContextInfo;
         private System.Windows.Forms.Label IntelLine;
         private System.Windows.Forms.Timer timerOpacityClose;
+        private System.Windows.Forms.Label RegionName;
     }
 }

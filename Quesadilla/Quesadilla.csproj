@@ -119,7 +119,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\CombatLine.cs" />
     <Compile Include="Classes\Configuration\PopupLocationType.cs" />
+    <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
+    <Compile Include="Classes\Resources\QuesadillaSound.cs" />
+    <Compile Include="Extensions\StringExtentions.cs" />
     <Compile Include="QuesadillaAlertPopup.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -288,6 +292,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="images\background5.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\background5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\background6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\background7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\background8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\background10.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\background9.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

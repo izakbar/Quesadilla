@@ -25,43 +25,9 @@ namespace Quesadilla
         private int _opacitystep;
         private PopupLocationType _location;
 
-        private Image LoadImageFromFile(string fileName)
-        {
-            Bitmap imageStream = null;
+        private const string ALERT_TEXT = "Alert";
 
-            switch (fileName)
-            {
-                case "background1.png":
-                    imageStream = Properties.Resources.background1;
-                    break;
-                case "background2.jpg":
-                    imageStream = Properties.Resources.background2;
-                    break;
-                case "background3.png":
-                    imageStream = Properties.Resources.background3;
-                    break;
-                case "background4.png":
-                    imageStream = Properties.Resources.background4;
-                    break;
-                case "background5.jpg":
-                    imageStream = Properties.Resources.background5;
-                    break;
-            }
-            if (imageStream != null)
-            {
-                return imageStream;
-            }
-
-            if (imageStream == null && File.Exists(fileName))
-            {
-                Image imageFile = Image.FromFile(fileName);
-                return imageFile;
-            }
-            return (Image)null;
-        }
-
-
-        public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration)
+        public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background)
         {
             InitializeComponent();
             _alert = alert;
@@ -75,15 +41,39 @@ namespace Quesadilla
             AlertText.Text = _alert.AlertText;
 
             SystemName.ForeColor = configuration.AlertPopupSystemNameColour;
-            SystemName.Text = _alert.Path.ToSystemName;
+            if (alert.Path != null)
+            {
+                SystemName.Text = _alert.Path.ToSystemName;
+            }
+            else
+            {
+                SystemName.Text = ALERT_TEXT;
+            }
+
+            RegionName.ForeColor = configuration.AlertPopupRegionNameColour;
+            if (alert.Path != null)
+            {
+                RegionName.Text = _alert.Path.ToSystemRegionName;
+            }
+            else
+            {
+                RegionName.Text = "";
+            }
 
             ContextInfo.ForeColor = configuration.AlertPopupContextInfoColour;
-            ContextInfo.Text = _alert.Path.TotalJumps.ToString() + " jump" + (_alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + _alert.Context;
+            if (alert.Path != null)
+            {
+                ContextInfo.Text = _alert.Path.TotalJumps.ToString() + " jump" + (_alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + _alert.Context;
+            }
+            else
+            {
+                ContextInfo.Text = alert.FriendlyName;
+            }
 
             IntelLine.ForeColor = configuration.AlertPopupIntelLineColour;
             IntelLine.Text = _alert.Entry.LineContent;
 
-            BackgroundImage = LoadImageFromFile(configuration.AlertPopupBackground);
+            BackgroundImage = background;
 
             // position on screen
             Screen screen = Screen.FromControl(this);
@@ -173,6 +163,14 @@ namespace Quesadilla
             if (Opacity <= 0)
             {
                 Close();
+            }
+        }
+
+        private void SystemName_Click(object sender, EventArgs e)
+        {
+            if ( SystemName.Text != ALERT_TEXT )
+            {
+                System.Diagnostics.Process.Start("https://evemaps.dotlan.net/map/" + RegionName.Text.Replace(" ","_") + "/" + SystemName.Text);
             }
         }
     }

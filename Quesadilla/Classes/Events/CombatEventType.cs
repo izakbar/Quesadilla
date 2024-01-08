@@ -9,6 +9,7 @@ namespace Quesadilla.Classes.Events
     public enum CombatEventType
     {
         Start,
+        Combat,
         Stop,
     }
 }

@@ -17,5 +17,6 @@ namespace Quesadilla.Classes.Queues
         public string RouteText { get; set; }
         public string Context { get; set; }
         public string SoundFile { get; set; }
+        public string FriendlyName { get; set; }
     }
 }

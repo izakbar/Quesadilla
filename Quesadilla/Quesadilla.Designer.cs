@@ -33,6 +33,8 @@
             this.mainTimer = new System.Windows.Forms.Timer(this.components);
             this.richTextBoxLogControl1 = new Serilog.Sinks.WinForms.RichTextBoxLogControl();
             this.alertsOutstanding = new System.Windows.Forms.TextBox();
+            this.ChatServerDown = new System.Windows.Forms.Label();
+            this.CombatFlag = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // mainTimer
@@ -65,11 +67,37 @@
             this.alertsOutstanding.Size = new System.Drawing.Size(44, 40);
             this.alertsOutstanding.TabIndex = 2;
             // 
+            // ChatServerDown
+            // 
+            this.ChatServerDown.AutoSize = true;
+            this.ChatServerDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ChatServerDown.ForeColor = System.Drawing.Color.Red;
+            this.ChatServerDown.Location = new System.Drawing.Point(61, -1);
+            this.ChatServerDown.Name = "ChatServerDown";
+            this.ChatServerDown.Size = new System.Drawing.Size(293, 37);
+            this.ChatServerDown.TabIndex = 3;
+            this.ChatServerDown.Text = "Chat Server Down";
+            this.ChatServerDown.Visible = false;
+            // 
+            // CombatFlag
+            // 
+            this.CombatFlag.AutoSize = true;
+            this.CombatFlag.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CombatFlag.ForeColor = System.Drawing.Color.Red;
+            this.CombatFlag.Location = new System.Drawing.Point(61, 36);
+            this.CombatFlag.Name = "CombatFlag";
+            this.CombatFlag.Size = new System.Drawing.Size(174, 37);
+            this.CombatFlag.TabIndex = 4;
+            this.CombatFlag.Text = "In Combat";
+            this.CombatFlag.Visible = false;
+            // 
             // Quesadilla
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(600, 365);
+            this.Controls.Add(this.CombatFlag);
+            this.Controls.Add(this.ChatServerDown);
             this.Controls.Add(this.alertsOutstanding);
             this.Controls.Add(this.richTextBoxLogControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -88,6 +116,8 @@
         private System.Windows.Forms.Timer mainTimer;
         private Serilog.Sinks.WinForms.RichTextBoxLogControl richTextBoxLogControl1;
         private System.Windows.Forms.TextBox alertsOutstanding;
+        private System.Windows.Forms.Label ChatServerDown;
+        private System.Windows.Forms.Label CombatFlag;
     }
 }
 

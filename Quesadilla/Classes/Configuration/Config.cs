@@ -31,14 +31,16 @@ namespace Quesadilla.Classes
                 c.StayOnTop = true;
                 c.IgnoreAsTooManyJumps = 15;
                 c.ExpireAlertSeconds = 500;
+                c.ExpireCombatSeconds = 1200;
 
                 c.AlertPopupSeconds = 8;
                 c.AlertPopupOpacity = 99;
                 c.AlertPopupOpacityStep = 5;
                 c.AlertPopupLocation = PopupLocationType.BottomLeft;
-                c.AlertPopupBackground = "background2.jpg";
+                c.AlertPopupBackground = "background2";
 
                 c.AlertPopupSystemNameColour = Color.Red;
+                c.AlertPopupRegionNameColour = Color.Red;
                 c.AlertPopupContextInfoColour = Color.Red;
                 c.AlertPopupIntelLineColour = Color.SaddleBrown;
                 c.AlertPopupAlertTextColour = Color.MistyRose;
@@ -64,7 +66,7 @@ namespace Quesadilla.Classes
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.AllCharacters,
                     TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem} {route}",
-                    SoundFile = "RedCoin2.wav",
+                    SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
                     Jumps2Comparison = AlertConfigJumpsComparison.None,
@@ -76,7 +78,7 @@ namespace Quesadilla.Classes
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.OneCharacter,
                     TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem} {route}",
-                    SoundFile = "RedCoin2.wav",
+                    SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
                     Jumps2Comparison = AlertConfigJumpsComparison.None,
@@ -89,7 +91,7 @@ namespace Quesadilla.Classes
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.Home,
                     TextDisplay = "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
-                    SoundFile = "RedCoin3.wav",
+                    SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
                     Jumps2Comparison = AlertConfigJumpsComparison.None,
@@ -101,7 +103,7 @@ namespace Quesadilla.Classes
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.System,
                     TextDisplay = "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
-                    SoundFile = "RedCoin2.wav",
+                    SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
                     Jumps2Comparison = AlertConfigJumpsComparison.None,
@@ -113,7 +115,7 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.Text,
                     TextDisplay = "ESS robbery {log} reported by {reporter}",
-                    SoundFile = "Boo2.wav",
+                    SoundFile = "Boo2",
                     TriggerText = "ess",
                 });
             }
@@ -135,6 +137,7 @@ namespace Quesadilla.Classes
         public bool StayOnTop { get; set; }
         public int IgnoreAsTooManyJumps { get; set; }
         public int ExpireAlertSeconds { get; set; }
+        public int ExpireCombatSeconds { get; set; }
         public List<AlertConfig> AlertConfiguration { get; set; }
 
         public int AlertPopupSeconds { get; set; }
@@ -143,6 +146,7 @@ namespace Quesadilla.Classes
         public PopupLocationType AlertPopupLocation { get; set; }
         public string AlertPopupBackground { get; set; }
         public Color AlertPopupSystemNameColour { get; set; }
+        public Color AlertPopupRegionNameColour { get; set; }
         public Color AlertPopupContextInfoColour { get; set; }
         public Color AlertPopupIntelLineColour { get; set; }
         public Color AlertPopupAlertTextColour { get; set; }

@@ -5,29 +5,41 @@ using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Queues;
+using Quesadilla.Classes.Resources;
 using Quesadilla.Classes.SolarSystems;
 using Quesadilla.Properties;
 using Serilog;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Text;
+using System.Globalization;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Media;
+using System.Reflection;
+using System.Resources;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
+using static Quesadilla.Extensions.StringExtensions;
+using Microsoft.Extensions.FileSystemGlobbing;
+using System.Security.Policy;
 
 namespace Quesadilla
 {
     public partial class Quesadilla : Form
     {
+
+        private readonly Regex _CombatRegexMissesYouCompletely = new Regex("(?<combatEntity>.*)\\smisses\\syou\\scompletely", RegexOptions.Compiled);
+        private readonly Regex _CombatRegexCombatData = new Regex("^<color=0x........><b>(?<combatAmount>.*)</b>\\s<color=0x........><font size=10>(?<combatContext>.*)</font>\\s<b><color=0xffffffff>(?<combatEntity>.*)</b><font size=10><color=0x77ffffff>\\s-\\s(?<combatText>.*)", RegexOptions.Compiled);
+
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
 
         private SolarSystemManager _solarSystems = new SolarSystemManager();
@@ -37,10 +49,19 @@ namespace Quesadilla
         private Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
         private Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
 
+        private List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
+        private List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
+
         private string configuration_filename = "Quesadilla.config.json";
 
-        private MenuItem menuAlerts = new MenuItem("Alerts");
+        private MenuItem menuAlerts = new MenuItem("Configured Alerts");
+        private MenuItem menuBackgrounds = new MenuItem("Popup Background");
+
         public bool AlertShowing = false;
+        private bool ChatServerStatus = true;
+        private bool InCombat = false;
+
+        private Dictionary<string, List<CombatLine>> _combat = new Dictionary<string, List<CombatLine>>();
 
         // TODO - config things - really need to go into config structure later
         public List<Character> CharacterList { get; set; }
@@ -50,6 +71,7 @@ namespace Quesadilla
         public Quesadilla()
         {
             InitializeComponent();
+            InitializeResources();
 
             Configuration = Config.Load(configuration_filename);
 
@@ -62,9 +84,11 @@ namespace Quesadilla
             };
 
             RebuildAlertsMenu();
+            RebuildBackgroundsMenu();
 
             trayIcon.ContextMenu = new ContextMenu(new MenuItem[]
             {
+                    menuBackgrounds,
                     menuAlerts,
                     new MenuItem("-"),
                     new MenuItem("Exit", new EventHandler(trayIconMenuClose)),
@@ -85,7 +109,10 @@ namespace Quesadilla
             watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel));
             watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel));
 
+            watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel));
+
             watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local));
+            watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game));
 
             // setup event handlers
             foreach (LogWatcher watcher in watchers)
@@ -112,14 +139,58 @@ namespace Quesadilla
             mainTimer.Enabled = true;
         }
 
+        private void InitializeResources()
+        {
+            // find all resources - put sounds into sound array, backgrounds in background
+            ResourceManager rm = Properties.Resources.ResourceManager;
+            ResourceSet rs = rm.GetResourceSet(new CultureInfo("en-US"), true, true);
+            if (rs != null)
+            {
+                foreach (var r in rs.Cast<DictionaryEntry>())
+                {
+                    string name = r.Key.ToString();
+                    if (r.Value is Image)
+                    {
+                        // if background - store in backgrounds
+                        if (name.StartsWith("background"))
+                        {
+                            Backgrounds.Add(new QuesadillaBackground()
+                            {
+                                BackgroundName = name,
+                                background = (Bitmap)r.Value,
+                            });
+                        }
+                    }
+                    if (r.Value is UnmanagedMemoryStream)
+                    {
+                        // sound file
+                        Sounds.Add(new QuesadillaSound()
+                        {
+                            SoundName = r.Key.ToString(),
+                            stream = (UnmanagedMemoryStream)r.Value,
+                        });
+                    }
+                }
+            }
+        }
         private void RebuildAlertsMenu()
         {
             menuAlerts.MenuItems.Clear();
             foreach (var alertConfigItem in Configuration.AlertConfiguration)
             {
-                MenuItem menuAlert = new MenuItem(alertConfigItem.FriendlyName);
+                MenuItem menuAlert = new MenuItem(alertConfigItem.FriendlyName, trayIconMenuAlertClick);
                 menuAlert.Checked = alertConfigItem.Enabled;
                 menuAlerts.MenuItems.Add(menuAlert);
+            }
+        }
+        private void RebuildBackgroundsMenu()
+        {
+            menuBackgrounds.MenuItems.Clear();
+            foreach (var background in Backgrounds.OrderBy(o => o.BackgroundName).ToList() )
+            {
+                MenuItem menuBackground = new MenuItem(background.BackgroundName, trayIconMenuBackgroundClick);
+                if ( Configuration.AlertPopupBackground == background.BackgroundName) menuBackground.Checked = true;
+                menuBackgrounds.MenuItems.Add(menuBackground);
             }
         }
 
@@ -146,82 +217,16 @@ namespace Quesadilla
 
             Stream soundStream = null;
 
-            switch (fileName)
+            if ( Sounds.Find(o => o.SoundName == fileName) != null )
             {
-                case "1up1.wav":
-                    soundStream = Properties.Resources._1up1;
-                    break;
-                case "Boo2.wav":
-                    soundStream = Properties.Resources.Boo2;
-                    break;
-                case "Coin.wav":
-                    soundStream = Properties.Resources.Coin;
-                    break;
-                case "KamekLaugh.wav":
-                    soundStream = Properties.Resources.KamekLaugh;
-                    break;
-                case "Powerup.wav":
-                    soundStream = Properties.Resources.Powerup;
-                    break;
-                case "RedCoin2.wav":
-                    soundStream = Properties.Resources.RedCoin2;
-                    break;
-                case "RedCoin3.wav":
-                    soundStream = Properties.Resources.RedCoin3;
-                    break;
-                case "StarCoin.wav":
-                    soundStream = Properties.Resources.StarCoin;
-                    break;
-                case "SuitFly.wav":
-                    soundStream = Properties.Resources.SuitFly;
-                    break;
-                case "SuitSpin.wav":
-                    soundStream = Properties.Resources.SuitSpin;
-                    break;
-                case "Whistle.wav":
-                    soundStream = Properties.Resources.Whistle;
-                    break;
-                case "tuba.wav":
-                    soundStream = Properties.Resources.tuba;
-                    break;
-                case "xylophone.wav":
-                    soundStream = Properties.Resources.xylophone;
-                    break;
-                case "oldtrombone.wav":
-                    soundStream = Properties.Resources.oldtrombone;
-                    break;
-                case "harpsichord.wav":
-                    soundStream = Properties.Resources.harpsichord;
-                    break;
-                case "button5.wav":
-                    soundStream = Properties.Resources.button5;
-                    break;
-                case "modsinglenote.wav":
-                    soundStream = Properties.Resources.modsinglenote;
-                    break;
-                case "flute.wav":
-                    soundStream = Properties.Resources.flute;
-                    break;
-                case "violin.wav":
-                    soundStream = Properties.Resources.violin;
-                    break;
-                case "skamos66.wav":
-                    soundStream = Properties.Resources.skamos66;
-                    break;
-                case "trumpet.wav":
-                    soundStream = Properties.Resources.trumpet;
-                    break;
-
-
-            }
-            if (soundStream != null)
-            {
-                SoundPlayer soundPlayer = new SoundPlayer((Stream)soundStream);
+                soundStream = (Stream)Sounds.Find(o => o.SoundName == fileName).stream;
+                soundStream.Seek(0, SeekOrigin.Begin);
+                SoundPlayer soundPlayer = new SoundPlayer(soundStream);
                 soundPlayer.Load();
                 return soundPlayer;
             }
 
-            if (soundStream == null && File.Exists(fileName))
+            if (File.Exists(fileName))
             {
                 using (FileStream fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
@@ -239,6 +244,24 @@ namespace Quesadilla
             }
             return (SoundPlayer)null;
         }
+        private Image LoadImageFromFile(string fileName)
+        {
+            Bitmap imageStream = null;
+
+            if (Backgrounds.Find(o => o.BackgroundName== fileName) != null)
+            {
+                imageStream = (Bitmap)Backgrounds.Find(o => o.BackgroundName == fileName).background;
+                return imageStream;
+            }
+
+            if (File.Exists(fileName))
+            {
+                Image imageFile = Image.FromFile(fileName);
+                return imageFile;
+            }
+            return (Image)null;
+        }
+
         private void mainTimer_Tick(object sender, EventArgs e)
         {
             foreach (LogWatcher watcher in watchers)
@@ -249,19 +272,17 @@ namespace Quesadilla
             // dequeue Alerts
             if ( NewAlerts.Count > 0 )
             {
-
                 var NewAlert = NewAlerts.Dequeue();
                 Log.Error(NewAlert.AlertText);
 
                 ActiveAlerts.Enqueue(NewAlert);
                 // do any extra processing 
 
-                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Configuration);
+                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Configuration, LoadImageFromFile(Configuration.AlertPopupBackground));
                 NewAlertWindow.Show(this);
 
                 SoundPlayer sound = LoadSoundFromFile(NewAlert.SoundFile);
                 if ( sound != null ) sound.Play();
-                
             }
 
             // Show number of recent alers
@@ -281,6 +302,20 @@ namespace Quesadilla
             {
                 alertsOutstanding.Text = "";
             }
+
+            // expire combats ?
+            foreach(var k in _combat.Keys)
+            {
+                if (_combat[k].Count > 0) {
+                    TimeSpan ts = DateTime.Now - _combat[k].First().TimeAdded ;
+                    if (ts.TotalSeconds > Configuration.ExpireCombatSeconds)
+                    {
+                        _combat[k].Remove(_combat[k].First());
+                    }
+                }
+            }
+
+            CombatFlag.Visible = InCombat;
         }
         private void AddNewCharacter(string characterName)
         {
@@ -335,24 +370,30 @@ namespace Quesadilla
         private string PathToString(PathInfo path)
         {
             string route = "";
-            foreach(int systemId in path.PathSystems)
+            if (path != null)
             {
-                if ( route.Length > 0 ) route += " -> ";
-                route += _solarSystems.SolarSystems[systemId].Name;
+                foreach (int systemId in path.PathSystems)
+                {
+                    if (route.Length > 0) route += " -> ";
+                    route += _solarSystems.SolarSystems[systemId].Name;
+                }
             }
-
             return route;
         }
         private string generateAlertText(LogEntry entry, PathInfo path, AlertConfig alert, string characterName)
         {
             string returnString = alert.TextDisplay;
-            returnString = returnString.Replace("{jumps}", path.TotalJumps.ToString());
+            if (path != null)
+            {
+                returnString = returnString.Replace("{jumps}", path.TotalJumps.ToString());
+                returnString = returnString.Replace("{route}", PathToString(path));
+                returnString = returnString.Replace("{tosystem}", _solarSystems.SolarSystems[path.ToSystemId].Name);
+                returnString = returnString.Replace("{region}", _solarSystems.SolarSystems[path.ToSystemId].RegionName);
+                returnString = returnString.Replace("{fromsystem}", _solarSystems.SolarSystems[path.FromSystemId].Name);
+            }
             returnString = returnString.Replace("{character}", characterName);
-            returnString = returnString.Replace("{tosystem}", _solarSystems.SolarSystems[path.ToSystemId].Name);
-            returnString = returnString.Replace("{fromsystem}", _solarSystems.SolarSystems[path.FromSystemId].Name);
             returnString = returnString.Replace("{text}", entry.LineContent);
             returnString = returnString.Replace("{reporter}", entry.PlayerName);
-            returnString = returnString.Replace("{route}", PathToString(path));
             return returnString;
         }
         private void EnqueueAlert(AlertQueueItem alert)
@@ -366,7 +407,7 @@ namespace Quesadilla
             }
             if ( f.Count != 0)
             {
-                if (alert.Path.TotalJumps < f.First().Path.TotalJumps)
+                if (alert.Path.TotalJumps < f.First().Path.TotalJumps )
                 {
                     f.First().Path = alert.Path;
                     f.First().AlertText = alert.AlertText;
@@ -374,13 +415,14 @@ namespace Quesadilla
                     f.First().Context = alert.Context;
                     f.First().RouteText = alert.RouteText;
                     f.First().SoundFile= alert.SoundFile;
-                    f.First().Context += "+++";
                 }
             }
         }
         private void logFile_ProcessNewData(object sender, ProcessNewDataEventArgs e)
         {
             LogEntry entry = e.LogEntry;
+            int alertCount = 0;
+
             if (entry == null || entry.PlayerName == "EVE System")
                 return;
             if (entry.EntryType != LogEntryType.ChatEvent && entry.EntryType != LogEntryType.UnknownChatLogEvent && entry.EntryType != LogEntryType.UnknownGameLogEvent)
@@ -417,7 +459,7 @@ namespace Quesadilla
                     // try and find systems mentioned in intel
                     foreach (SolarSystem solarSystem in
                         _solarSystems.SolarSystems.Values.Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => tempSystem.MatchNameRegex(entry.LineContent)))
-                        .Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => ! Configuration.ignoreSystems.Contains(this._solarSystems.Names[tempSystem.Name])))
+                        .Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => !Configuration.ignoreSystems.Contains(this._solarSystems.Names[tempSystem.Name])))
                         )
                         intSet.Add(_solarSystems.Names[solarSystem.Name]);
                 }
@@ -425,6 +467,7 @@ namespace Quesadilla
                 if (intSet.Count > 0)
                 {
                     Log.Information(entry.LineContent);
+                    entry.MatchedIds = intSet;
                     foreach (int toSystemId in intSet)
                     {
                         int homeSystemId = _solarSystems.HomeSolarSystemID;
@@ -441,21 +484,23 @@ namespace Quesadilla
                         // Range alerts
                         foreach (AlertConfig alert in Configuration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
                         {
-                            if (!tempTrigger.Enabled)
+                            return tempTrigger.Enabled;
+/*                            if (!tempTrigger.Enabled)
                                 return false;
                             return tempTrigger.AlertType == AlertConfigType.Range;
+*/
                         })))
                         {
                             bool sendAlert = false;
                             PathInfo path = new PathInfo();
                             string alertText = "";
 
-                            switch ( alert.AlertRangeType )
+                            switch (alert.AlertRangeType)
                             {
                                 case AlertConfigRangeType.Home:
-                                     path = homeSystemPathInfo;
-                                    sendAlert = checkJumpsRange(alert,path);
-                                    if ( sendAlert )
+                                    path = homeSystemPathInfo;
+                                    sendAlert = checkJumpsRange(alert, path);
+                                    if (sendAlert)
                                     {
                                         alertText = generateAlertText(entry, path, alert, "");
                                         Log.Debug("ALERT - " + alertText);
@@ -467,8 +512,10 @@ namespace Quesadilla
                                                 Path = path,
                                                 Context = homeSystemPathInfo.FromSystemName,
                                                 SoundFile = alert.SoundFile,
+                                                FriendlyName = alert.FriendlyName,
                                             }
                                             );
+                                        alertCount++;
                                     }
                                     break;
 
@@ -488,8 +535,10 @@ namespace Quesadilla
                                                 Path = path,
                                                 Context = path.FromSystemName,
                                                 SoundFile = alert.SoundFile,
+                                                FriendlyName = alert.FriendlyName,
                                             }
                                             );
+                                        alertCount++;
                                     }
                                     break;
                                 case AlertConfigRangeType.OneCharacter:
@@ -510,8 +559,10 @@ namespace Quesadilla
                                                     Path = path,
                                                     Context = x.CharacterName,
                                                     SoundFile = alert.SoundFile,
+                                                    FriendlyName = alert.FriendlyName,
                                                 }
                                                 );
+                                            alertCount++;
                                         }
                                     }
                                     break;
@@ -533,8 +584,35 @@ namespace Quesadilla
                                                     Path = path,
                                                     Context = x.CharacterName,
                                                     SoundFile = alert.SoundFile,
+                                                    FriendlyName = alert.FriendlyName,
                                                 }
                                                 );
+                                            alertCount++;
+                                        }
+                                    }
+                                    break;
+                                case AlertConfigRangeType.None:
+                                    // must be custom text
+                                    if (entry.LineContent.Contains(alert.TriggerText, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        foreach (var x in CharacterList)
+                                        {
+                                            path = _solarSystems.FindAndCachePath(x.LocationId, toSystemId);
+
+                                            alertText = generateAlertText(entry, path, alert, alert.TriggerText);
+                                            Log.Debug("ALERT - " + alertText);
+                                            EnqueueAlert(
+                                                new AlertQueueItem()
+                                                {
+                                                    AlertText = alertText,
+                                                    Entry = entry,
+                                                    Path = path,
+                                                    Context = alert.TriggerText,
+                                                    SoundFile = alert.SoundFile,
+                                                    FriendlyName = alert.FriendlyName,
+                                                }
+                                                );
+                                            alertCount++;
                                         }
                                     }
                                     break;
@@ -551,31 +629,40 @@ namespace Quesadilla
                     }
                     //                    if (this.CheckZoomTo(entry.LogPrefix)) this.ZoomTo(systemId1);
                 }
-                entry.MatchedIds = intSet;
-                this._newIntelQueue.Enqueue(entry);
+
+                // check against custom alerts (no system name needed) - only if no alerts generated
+                if (alertCount == 0)
+                {
+                    foreach (AlertConfig alert in Configuration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
+                    {
+                        if (!tempTrigger.Enabled)
+                            return false;
+                        return tempTrigger.AlertType == AlertConfigType.Text;
+                    })))
+                    {
+                        if (entry.LineContent.Contains(alert.TriggerText, StringComparison.OrdinalIgnoreCase))
+                        {
+                            
+                            string alertText = generateAlertText(entry, null, alert, alert.TriggerText);
+                            Log.Debug("ALERT - " + alertText);
+                            EnqueueAlert(
+                                new AlertQueueItem()
+                                {
+                                    AlertText = alertText,
+                                    Entry = entry,
+                                    Path = null,
+                                    Context = alert.TriggerText,
+                                    SoundFile = alert.SoundFile,
+                                    FriendlyName = alert.FriendlyName,
+                                }
+                                );
+                        }
+                    }
+                }
+
             }
         }
 
-        private void logFile_ProcessCombat(object sender, ProcessCombatEventArgs e)
-        {
-            /*
-                        if (e.CombatEvent == CombatEventType.Start)
-                        {
-                            foreach (ToolStripItem toolStripItem in this.anomalyMonitorMenuItem.DropDownItems.Cast<ToolStripMenuItem>().Where<ToolStripMenuItem>((Func<ToolStripMenuItem, bool>)(dropDownItem => dropDownItem.Text == e.CharacterName && dropDownItem.Checked)))
-                                this.WriteIntel("sys", " > Anomaly Monitor | Combat started: " + toolStripItem.Text);
-                        }
-                        else
-                        {
-                            if (e.CombatEvent != CombatEventType.Stop)
-                                return;
-                            foreach (ToolStripItem toolStripItem in this.anomalyMonitorMenuItem.DropDownItems.Cast<ToolStripMenuItem>().Where<ToolStripMenuItem>((Func<ToolStripMenuItem, bool>)(dropDownItem => dropDownItem.Text == e.CharacterName && dropDownItem.Checked)))
-                            {
-                                this.WriteIntel("sys", " > Anomaly Monitor | Combat finished: " + toolStripItem.Text);
-                                this.PlayAnomalyWatcherSound();
-                            }
-                        }
-            */
-        }
         private void _localWatcher_SystemChange(object sender, ProcessSystemChangeEventArgs e)
         {
             int foundSystemId = -1;
@@ -642,6 +729,8 @@ namespace Quesadilla
         private void _localWatcher_ChatServerChange(object sender, ProcessChatServerChangeEventArgs e)
         {
             Log.Information("Chat Server: " + (e.ChatServerUp == true ? "Up" : "Down"));
+            ChatServerStatus = e.ChatServerUp;
+            ChatServerDown.Visible = !e.ChatServerUp;
         }
 
         private void Quesadilla_FormClosing(object sender, FormClosingEventArgs e)
@@ -666,6 +755,85 @@ namespace Quesadilla
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
 
+        }
+        private void trayIconMenuAlertClick(object sender, EventArgs e)
+        {
+            // enable / disable config item
+            MenuItem m = (MenuItem)sender;
+            var configAlert = Configuration.AlertConfiguration.Find(o => o.FriendlyName == m.Text);
+            if ( configAlert != null)
+            {
+                m.Checked = ! m.Checked;
+                configAlert.Enabled = ! configAlert.Enabled;
+            }
+        }
+
+        private void trayIconMenuBackgroundClick(object sender, EventArgs e)
+        {
+            // enable clicked background
+            MenuItem m = (MenuItem)sender;
+            foreach(MenuItem z in menuBackgrounds.MenuItems)
+            {
+                z.Checked = false;
+            }
+            m.Checked = true;
+            Configuration.AlertPopupBackground = m.Text;
+        }
+        private void logFile_ProcessCombat(object sender, ProcessCombatEventArgs e)
+        {
+
+            string combatEntity = "";
+
+            //Log.Information("COMBAT:" + e.CombatEvent);
+            if (e.Entry != null)
+            {
+                InCombat = true;
+                if (!_combat.ContainsKey(e.Entry.CharacterName))
+                {
+                    _combat.Add(e.Entry.CharacterName, new List<CombatLine>()) ;
+                }
+                //Log.Information(e.Entry.LineContent);
+
+                Match match = _CombatRegexMissesYouCompletely.Match(e.Entry.LineContent);
+                if (match.Success)
+                {
+                    _combat[e.Entry.CharacterName].Add(new CombatLine() {
+                        TimeAdded = e.Entry.TimeAdded,
+                        Entity = match.Groups["combatEntity"].ToString(),
+                    });
+                }  else
+                {
+                    match = _CombatRegexCombatData.Match(e.Entry.LineContent);
+                    if (match.Success)
+                    {
+                        int dmgAmount = 0;
+                        int neutAmount = 0;
+
+                        var amount = match.Groups["combatAmount"].ToString();
+                        if (amount.Contains("GJ") )
+                        {
+                            neutAmount = Int32.Parse(amount.Replace(" GJ", "").Trim());
+                        } else
+                        {
+                            dmgAmount = Int32.Parse(amount.Trim());
+                        }
+
+                        _combat[e.Entry.CharacterName].Add(new CombatLine() {
+                            TimeAdded = e.Entry.TimeAdded,
+                            Entity = match.Groups["combatEntity"].ToString(),
+                            Text = match.Groups["combatText"].ToString(),
+                            NeutAmount = neutAmount,
+                            DamageAmount = dmgAmount,
+                        });
+                    }
+
+                }
+
+            } 
+            else
+            {
+                InCombat = false;
+            }
         }
     }
 }
