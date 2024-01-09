@@ -42,15 +42,20 @@ namespace Quesadilla.Classes
         public event EventHandler<ProcessChatServerChangeEventArgs> ChatServerChange;
 
         public bool Connection = true;
+        public bool Enabled = true;
+        public string FriendlyName = "";
 
         public string SystemChannelPrefix => this._systemChannelPrefix;
         public static string RootLogsPath { get; private set; }
         public LocalInfo InitialLocalInfo { get; set; }
 
-        public LogWatcher(string systemChannelPrefix, LogFileType logFileType, string logPath = "")
+        public LogWatcher(string systemChannelPrefix, LogFileType logFileType, string friendlyName, string logPath = "")
         {
-            this._systemChannelPrefix = systemChannelPrefix;
-            this._logFileType = logFileType;
+            FriendlyName = friendlyName;
+                
+            _systemChannelPrefix = systemChannelPrefix;
+            _logFileType = logFileType;
+
             if (LogWatcher.RootLogsPath == null)
                 LogWatcher.RootLogsPath = logPath.Length != 0 ? logPath : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "EVE\\logs");
 
@@ -77,6 +82,9 @@ namespace Quesadilla.Classes
 
         public void Tick()
         {
+            // do nothing if disabled
+            if (Enabled == false) return;
+
             foreach (FileInfo changedLogFile in this.GetChangedLogFiles())
             {
                 if (!this._interestingFiles.ContainsKey(changedLogFile.FullName))

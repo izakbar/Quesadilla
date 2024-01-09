@@ -45,6 +45,7 @@ namespace Quesadilla
         private MenuItem menuConfiguredAlerts = new MenuItem("Configured Alerts");
         private MenuItem menuBackgrounds = new MenuItem("Popup Background");
         private MenuItem menuLatestAlerts = new MenuItem("Latest Alerts");
+        private MenuItem menuLogWatchers = new MenuItem("Logfiles");
 
         public bool AlertShowing = false;
         private bool ChatServerStatus = true;
@@ -74,13 +75,13 @@ namespace Quesadilla
 
             RebuildAlertsMenu();
             RebuildBackgroundsMenu();
-
             RebuildLatestAlertsMenu();
 
             trayIcon.ContextMenu = new ContextMenu(new MenuItem[]
             {
                     menuBackgrounds,
                     menuConfiguredAlerts,
+                    menuLogWatchers,
                     menuLatestAlerts,
                     new MenuItem("-"),
                     new MenuItem("Exit", new EventHandler(trayIconMenuClose)),
@@ -94,17 +95,19 @@ namespace Quesadilla
 
             _solarSystems.HomeSolarSystemID = _solarSystems.Names[Configuration.HomeSystem];
 
-            watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel));
-            watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel));
-            watchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.ChatIntel));
+            watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel, "Catch Intel"));
+            watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel, "Fountain Intel"));
+            watchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.ChatIntel, "Period Basis Intel"));
 
-            watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel));
-            watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel));
+            watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel, "Querious Intel"));
+            watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel, "Delve Intel"));
 
-            watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel));
+            watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
 
-            watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local));
-            watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game));
+            watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
+            watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
+
+            RebuildLogfilesMenu();
 
             // setup event handlers
             foreach (LogWatcher watcher in watchers)
@@ -165,13 +168,23 @@ namespace Quesadilla
                 }
             }
         }
+        private void RebuildLogfilesMenu()
+        {
+            menuLogWatchers.MenuItems.Clear();
+            foreach (var watcher in watchers)
+            {
+                MenuItem menuLogfile = new MenuItem(watcher.FriendlyName, trayIconMenuLogfileClick);
+                menuLogfile.Checked = watcher.Enabled;
+                menuLogWatchers.MenuItems.Add(menuLogfile);
+            }
+        }
         private void RebuildLatestAlertsMenu()
         {
             menuLatestAlerts.MenuItems.Clear();
             foreach (var alert in ActiveAlerts.Reverse().Take(Configuration.ShowLastUnexpiredAlerts).ToList())
             {
                 string menuText = alert.Entry.TimeAdded.ToString("HH:mm") + " " + (alert.Path != null ? alert.Path.ToSystemName  : "") + " - " + alert.MenuText;
-                MenuItem menuAlert = new MenuItem(menuText, trayIconMenuAlertClick);
+                MenuItem menuAlert = new MenuItem(menuText);
                 menuLatestAlerts.MenuItems.Add(menuAlert);
             }
         }
@@ -783,13 +796,24 @@ namespace Quesadilla
             // enable / disable config item
             MenuItem m = (MenuItem)sender;
             var configAlert = Configuration.AlertConfiguration.Find(o => o.FriendlyName == m.Text);
-            if ( configAlert != null)
+            if (configAlert != null)
             {
-                m.Checked = ! m.Checked;
-                configAlert.Enabled = ! configAlert.Enabled;
+                m.Checked = !m.Checked;
+                configAlert.Enabled = !configAlert.Enabled;
             }
         }
-
+        private void trayIconMenuLogfileClick(object sender, EventArgs e)
+        {
+            // enable / disable config item
+            MenuItem m = (MenuItem)sender;
+            var watcher = watchers.Find(o => o.FriendlyName == m.Text);
+            //Configuration.AlertConfiguration.Find(o => o.FriendlyName == m.Text);
+            if (watcher != null)
+            {
+                m.Checked = !m.Checked;
+                watcher.Enabled = !watcher.Enabled;
+            }
+        }
         private void trayIconMenuBackgroundClick(object sender, EventArgs e)
         {
             // enable clicked background
