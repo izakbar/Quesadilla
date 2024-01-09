@@ -14,6 +14,7 @@ namespace Quesadilla.Classes.Queues
         public PathInfo Path {  get; set; }
         public LogEntry Entry { get; set; }
         public string AlertText { get; set; }
+        public string MenuText { get; set; }
         public string RouteText { get; set; }
         public string Context { get; set; }
         public string SoundFile { get; set; }

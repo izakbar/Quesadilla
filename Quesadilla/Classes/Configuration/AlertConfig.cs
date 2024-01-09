@@ -14,6 +14,7 @@ namespace Quesadilla.Classes.Configuration
         public AlertConfigRangeType AlertRangeType { get; set; }
         public string SoundFile { get; set; }
         public string TextDisplay { get; set; }
+        public string MenuDisplay { get; set; }
         public int? Jumps1Number { get; set; }
         public AlertConfigJumpsComparison Jumps1Comparison { get; set; }
         public int? Jumps2Number { get; set;}

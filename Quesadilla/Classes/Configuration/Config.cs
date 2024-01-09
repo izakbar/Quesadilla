@@ -45,6 +45,8 @@ namespace Quesadilla.Classes
                 c.AlertPopupIntelLineColour = Color.SaddleBrown;
                 c.AlertPopupAlertTextColour = Color.MistyRose;
 
+                c.ShowLastUnexpiredAlerts = 5;
+
             }
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
@@ -66,6 +68,7 @@ namespace Quesadilla.Classes
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.AllCharacters,
                     TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem} {route}",
+                    MenuDisplay = "{jumps} jumps from {character} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
@@ -78,6 +81,7 @@ namespace Quesadilla.Classes
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.OneCharacter,
                     TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem} {route}",
+                    MenuDisplay = "{jumps} jumps from {character} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
@@ -91,6 +95,7 @@ namespace Quesadilla.Classes
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.Home,
                     TextDisplay = "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
+                    MenuDisplay = "{jumps} jumps from {fromsystem} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
@@ -103,6 +108,7 @@ namespace Quesadilla.Classes
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.System,
                     TextDisplay = "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
+                    MenuDisplay = "{jumps} jumps from {fromsystem} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
                     Jumps1Number = 5,
@@ -115,6 +121,7 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.Text,
                     TextDisplay = "ESS robbery {log} reported by {reporter}",
+                    MenuDisplay = "ESS robbery {log} reported by {reporter}",
                     SoundFile = "Boo2",
                     TriggerText = "ess",
                 });
@@ -150,5 +157,7 @@ namespace Quesadilla.Classes
         public Color AlertPopupContextInfoColour { get; set; }
         public Color AlertPopupIntelLineColour { get; set; }
         public Color AlertPopupAlertTextColour { get; set; }
+
+        public int ShowLastUnexpiredAlerts { get; set; }
     }
 }

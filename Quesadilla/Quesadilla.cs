@@ -1,36 +1,24 @@
-﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Quesadilla.Classes;
+﻿using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.Resources;
 using Quesadilla.Classes.SolarSystems;
-using Quesadilla.Properties;
 using Serilog;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Drawing.Text;
 using System.Globalization;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
 using System.Media;
-using System.Reflection;
 using System.Resources;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
 using static Quesadilla.Extensions.StringExtensions;
-using Microsoft.Extensions.FileSystemGlobbing;
-using System.Security.Policy;
 
 namespace Quesadilla
 {
@@ -54,8 +42,9 @@ namespace Quesadilla
 
         private string configuration_filename = "Quesadilla.config.json";
 
-        private MenuItem menuAlerts = new MenuItem("Configured Alerts");
+        private MenuItem menuConfiguredAlerts = new MenuItem("Configured Alerts");
         private MenuItem menuBackgrounds = new MenuItem("Popup Background");
+        private MenuItem menuLatestAlerts = new MenuItem("Latest Alerts");
 
         public bool AlertShowing = false;
         private bool ChatServerStatus = true;
@@ -86,10 +75,13 @@ namespace Quesadilla
             RebuildAlertsMenu();
             RebuildBackgroundsMenu();
 
+            RebuildLatestAlertsMenu();
+
             trayIcon.ContextMenu = new ContextMenu(new MenuItem[]
             {
                     menuBackgrounds,
-                    menuAlerts,
+                    menuConfiguredAlerts,
+                    menuLatestAlerts,
                     new MenuItem("-"),
                     new MenuItem("Exit", new EventHandler(trayIconMenuClose)),
             });
@@ -173,14 +165,24 @@ namespace Quesadilla
                 }
             }
         }
+        private void RebuildLatestAlertsMenu()
+        {
+            menuLatestAlerts.MenuItems.Clear();
+            foreach (var alert in ActiveAlerts.Reverse().Take(Configuration.ShowLastUnexpiredAlerts).ToList())
+            {
+                string menuText = alert.Entry.TimeAdded.ToString("HH:mm") + " " + (alert.Path != null ? alert.Path.ToSystemName  : "") + " - " + alert.MenuText;
+                MenuItem menuAlert = new MenuItem(menuText, trayIconMenuAlertClick);
+                menuLatestAlerts.MenuItems.Add(menuAlert);
+            }
+        }
         private void RebuildAlertsMenu()
         {
-            menuAlerts.MenuItems.Clear();
+            menuConfiguredAlerts.MenuItems.Clear();
             foreach (var alertConfigItem in Configuration.AlertConfiguration)
             {
                 MenuItem menuAlert = new MenuItem(alertConfigItem.FriendlyName, trayIconMenuAlertClick);
                 menuAlert.Checked = alertConfigItem.Enabled;
-                menuAlerts.MenuItems.Add(menuAlert);
+                menuConfiguredAlerts.MenuItems.Add(menuAlert);
             }
         }
         private void RebuildBackgroundsMenu()
@@ -283,6 +285,8 @@ namespace Quesadilla
 
                 SoundPlayer sound = LoadSoundFromFile(NewAlert.SoundFile);
                 if ( sound != null ) sound.Play();
+
+                RebuildLatestAlertsMenu();
             }
 
             // Show number of recent alers
@@ -295,10 +299,11 @@ namespace Quesadilla
                 {
                     // expired so dequeue
                     a = ActiveAlerts.Dequeue();
+                    RebuildLatestAlertsMenu();
                 }
-
                 alertsOutstanding.Text = ActiveAlerts.Count.ToString();
-            } else
+            }
+            else
             {
                 alertsOutstanding.Text = "";
             }
@@ -380,9 +385,20 @@ namespace Quesadilla
             }
             return route;
         }
-        private string generateAlertText(LogEntry entry, PathInfo path, AlertConfig alert, string characterName)
+        private string generateAlertText(LogEntry entry, PathInfo path, AlertConfig alert, string characterName, int type)
         {
-            string returnString = alert.TextDisplay;
+            // type == 0 - Alert Text, 1 == Menu text
+            string returnString = "";
+            switch (type)
+            {
+                case 0:
+                    returnString = alert.TextDisplay;
+                    break;
+                case 1:
+                    returnString = alert.MenuDisplay;
+                    break;
+            }
+
             if (path != null)
             {
                 returnString = returnString.Replace("{jumps}", path.TotalJumps.ToString());
@@ -502,12 +518,13 @@ namespace Quesadilla
                                     sendAlert = checkJumpsRange(alert, path);
                                     if (sendAlert)
                                     {
-                                        alertText = generateAlertText(entry, path, alert, "");
+                                        alertText = generateAlertText(entry, path, alert, "",0);
                                         Log.Debug("ALERT - " + alertText);
                                         EnqueueAlert(
                                             new AlertQueueItem()
                                             {
                                                 AlertText = alertText,
+                                                MenuText = generateAlertText(entry, path, alert, "", 1),
                                                 Entry = entry,
                                                 Path = path,
                                                 Context = homeSystemPathInfo.FromSystemName,
@@ -525,12 +542,13 @@ namespace Quesadilla
                                     sendAlert = checkJumpsRange(alert, path);
                                     if (sendAlert)
                                     {
-                                        alertText = generateAlertText(entry, path, alert, "");
+                                        alertText = generateAlertText(entry, path, alert, "",0);
                                         Log.Debug("ALERT - " + alertText);
                                         EnqueueAlert(
                                             new AlertQueueItem()
                                             {
                                                 AlertText = alertText,
+                                                MenuText = generateAlertText(entry, path, alert, "", 1),
                                                 Entry = entry,
                                                 Path = path,
                                                 Context = path.FromSystemName,
@@ -549,12 +567,13 @@ namespace Quesadilla
                                         sendAlert = checkJumpsRange(alert, path);
                                         if (sendAlert)
                                         {
-                                            alertText = generateAlertText(entry, path, alert, x.CharacterName);
+                                            alertText = generateAlertText(entry, path, alert, x.CharacterName,0);
                                             Log.Debug("ALERT - " + alertText);
                                             EnqueueAlert(
                                                 new AlertQueueItem()
                                                 {
                                                     AlertText = alertText,
+                                                    MenuText = generateAlertText(entry, path, alert, x.CharacterName, 1),
                                                     Entry = entry,
                                                     Path = path,
                                                     Context = x.CharacterName,
@@ -574,12 +593,13 @@ namespace Quesadilla
                                         sendAlert = checkJumpsRange(alert, path);
                                         if (sendAlert)
                                         {
-                                            alertText = generateAlertText(entry, path, alert, x.CharacterName);
+                                            alertText = generateAlertText(entry, path, alert, x.CharacterName,0);
                                             Log.Debug("ALERT - " + alertText);
                                             EnqueueAlert(
                                                 new AlertQueueItem()
                                                 {
                                                     AlertText = alertText,
+                                                    MenuText = generateAlertText(entry, path, alert, x.CharacterName, 1),
                                                     Entry = entry,
                                                     Path = path,
                                                     Context = x.CharacterName,
@@ -599,12 +619,13 @@ namespace Quesadilla
                                         {
                                             path = _solarSystems.FindAndCachePath(x.LocationId, toSystemId);
 
-                                            alertText = generateAlertText(entry, path, alert, alert.TriggerText);
+                                            alertText = generateAlertText(entry, path, alert, alert.TriggerText,0);
                                             Log.Debug("ALERT - " + alertText);
                                             EnqueueAlert(
                                                 new AlertQueueItem()
                                                 {
                                                     AlertText = alertText,
+                                                    MenuText = generateAlertText(entry, path, alert, alert.TriggerText, 1),
                                                     Entry = entry,
                                                     Path = path,
                                                     Context = alert.TriggerText,
@@ -643,12 +664,13 @@ namespace Quesadilla
                         if (entry.LineContent.Contains(alert.TriggerText, StringComparison.OrdinalIgnoreCase))
                         {
                             
-                            string alertText = generateAlertText(entry, null, alert, alert.TriggerText);
+                            string alertText = generateAlertText(entry, null, alert, alert.TriggerText,0);
                             Log.Debug("ALERT - " + alertText);
                             EnqueueAlert(
                                 new AlertQueueItem()
                                 {
                                     AlertText = alertText,
+                                    MenuText = generateAlertText(entry, null, alert, alert.TriggerText, 1),
                                     Entry = entry,
                                     Path = null,
                                     Context = alert.TriggerText,
