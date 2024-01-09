@@ -35,6 +35,7 @@
             this.alertsOutstanding = new System.Windows.Forms.TextBox();
             this.ChatServerDown = new System.Windows.Forms.Label();
             this.CombatFlag = new System.Windows.Forms.Label();
+            this.combatOutstanding = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // mainTimer
@@ -49,10 +50,9 @@
             this.richTextBoxLogControl1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.richTextBoxLogControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.richTextBoxLogControl1.ForContext = "";
-            this.richTextBoxLogControl1.Location = new System.Drawing.Point(0, 227);
-            this.richTextBoxLogControl1.Margin = new System.Windows.Forms.Padding(2);
+            this.richTextBoxLogControl1.Location = new System.Drawing.Point(0, 352);
             this.richTextBoxLogControl1.Name = "richTextBoxLogControl1";
-            this.richTextBoxLogControl1.Size = new System.Drawing.Size(600, 138);
+            this.richTextBoxLogControl1.Size = new System.Drawing.Size(900, 210);
             this.richTextBoxLogControl1.TabIndex = 0;
             this.richTextBoxLogControl1.Text = "";
             // 
@@ -62,9 +62,10 @@
             this.alertsOutstanding.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.alertsOutstanding.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.alertsOutstanding.ForeColor = System.Drawing.Color.Crimson;
-            this.alertsOutstanding.Location = new System.Drawing.Point(0, -1);
+            this.alertsOutstanding.Location = new System.Drawing.Point(0, -2);
+            this.alertsOutstanding.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.alertsOutstanding.Name = "alertsOutstanding";
-            this.alertsOutstanding.Size = new System.Drawing.Size(44, 40);
+            this.alertsOutstanding.Size = new System.Drawing.Size(66, 60);
             this.alertsOutstanding.TabIndex = 2;
             // 
             // ChatServerDown
@@ -72,9 +73,10 @@
             this.ChatServerDown.AutoSize = true;
             this.ChatServerDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ChatServerDown.ForeColor = System.Drawing.Color.Red;
-            this.ChatServerDown.Location = new System.Drawing.Point(61, -1);
+            this.ChatServerDown.Location = new System.Drawing.Point(92, -2);
+            this.ChatServerDown.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.ChatServerDown.Name = "ChatServerDown";
-            this.ChatServerDown.Size = new System.Drawing.Size(293, 37);
+            this.ChatServerDown.Size = new System.Drawing.Size(434, 55);
             this.ChatServerDown.TabIndex = 3;
             this.ChatServerDown.Text = "Chat Server Down";
             this.ChatServerDown.Visible = false;
@@ -84,24 +86,38 @@
             this.CombatFlag.AutoSize = true;
             this.CombatFlag.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CombatFlag.ForeColor = System.Drawing.Color.Red;
-            this.CombatFlag.Location = new System.Drawing.Point(61, 36);
+            this.CombatFlag.Location = new System.Drawing.Point(92, 55);
+            this.CombatFlag.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.CombatFlag.Name = "CombatFlag";
-            this.CombatFlag.Size = new System.Drawing.Size(174, 37);
+            this.CombatFlag.Size = new System.Drawing.Size(255, 55);
             this.CombatFlag.TabIndex = 4;
             this.CombatFlag.Text = "In Combat";
             this.CombatFlag.Visible = false;
             // 
+            // combatOutstanding
+            // 
+            this.combatOutstanding.BackColor = System.Drawing.SystemColors.Control;
+            this.combatOutstanding.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.combatOutstanding.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.combatOutstanding.ForeColor = System.Drawing.Color.Blue;
+            this.combatOutstanding.Location = new System.Drawing.Point(0, 68);
+            this.combatOutstanding.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.combatOutstanding.Name = "combatOutstanding";
+            this.combatOutstanding.Size = new System.Drawing.Size(66, 60);
+            this.combatOutstanding.TabIndex = 5;
+            // 
             // Quesadilla
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(600, 365);
+            this.ClientSize = new System.Drawing.Size(900, 562);
+            this.Controls.Add(this.combatOutstanding);
             this.Controls.Add(this.CombatFlag);
             this.Controls.Add(this.ChatServerDown);
             this.Controls.Add(this.alertsOutstanding);
             this.Controls.Add(this.richTextBoxLogControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.Name = "Quesadilla";
             this.Text = "Quesadilla";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Quesadilla_FormClosing);
@@ -118,6 +134,7 @@
         private System.Windows.Forms.TextBox alertsOutstanding;
         private System.Windows.Forms.Label ChatServerDown;
         private System.Windows.Forms.Label CombatFlag;
+        private System.Windows.Forms.TextBox combatOutstanding;
     }
 }
 

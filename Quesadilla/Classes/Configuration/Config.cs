@@ -26,6 +26,7 @@ namespace Quesadilla.Classes
             {
                 c = new Config();
                 c.TickMiliseconds = 500;
+                c.HowManyTicksBeforeCleardown = 10;
                 c.HomeSystem = "K7D-II";
                 c.InitialPosition = new Point(0, 0);
                 c.WindowSize = new Point(300, 100);
@@ -121,8 +122,8 @@ namespace Quesadilla.Classes
                     FriendlyName = "ESS robbery",
                     Enabled = true,
                     AlertType = AlertConfigType.Text,
-                    TextDisplay = "ESS robbery {log} reported by {reporter}",
-                    MenuDisplay = "ESS robbery {log} reported by {reporter}",
+                    TextDisplay = "ESS robbery {text} reported by {reporter}",
+                    MenuDisplay = "ESS robbery {text} reported by {reporter}",
                     SoundFile = "Boo2",
                     TriggerText = "ess",
                 });
@@ -137,6 +138,7 @@ namespace Quesadilla.Classes
             File.WriteAllText(filename, json);
         }
         public int TickMiliseconds {  get; set; }
+        public int HowManyTicksBeforeCleardown { get; set; }
         public string HomeSystem { get; set; }
         public List<Regex> ignoreStrings { get; set; }
         public List<int> ignoreSystems { get; set; }

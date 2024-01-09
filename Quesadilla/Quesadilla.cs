@@ -50,6 +50,7 @@ namespace Quesadilla
         public bool AlertShowing = false;
         private bool ChatServerStatus = true;
         private bool InCombat = false;
+        private int TicksSinceLastCleardown = 0;
 
         private Dictionary<string, List<CombatLine>> _combat = new Dictionary<string, List<CombatLine>>();
 
@@ -303,38 +304,51 @@ namespace Quesadilla
                 RebuildLatestAlertsMenu();
             }
 
-            // Show number of recent alers
-            if ( ActiveAlerts.Count > 0 )
-            {
-                // check if we should expire first entry
-                var a = ActiveAlerts.First();
-                var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
-                if ( diffInSeconds > Configuration.ExpireAlertSeconds )
-                {
-                    // expired so dequeue
-                    a = ActiveAlerts.Dequeue();
-                    RebuildLatestAlertsMenu();
-                }
-                alertsOutstanding.Text = ActiveAlerts.Count.ToString();
-            }
-            else
-            {
-                alertsOutstanding.Text = "";
-            }
 
-            // expire combats ?
-            foreach(var k in _combat.Keys)
+            // do cleardown/rebuild of alerts menu - if number of ticks passed
+            if (++TicksSinceLastCleardown > Configuration.HowManyTicksBeforeCleardown)
             {
-                if (_combat[k].Count > 0) {
-                    TimeSpan ts = DateTime.Now - _combat[k].First().TimeAdded ;
-                    if (ts.TotalSeconds > Configuration.ExpireCombatSeconds)
+                // Show number of recent alerts
+                if (ActiveAlerts.Count > 0)
+                {
+                    // check if we should expire first entry
+                    var a = ActiveAlerts.First();
+                    var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
+                    if (diffInSeconds > Configuration.ExpireAlertSeconds)
                     {
-                        _combat[k].Remove(_combat[k].First());
+                        // expired so dequeue
+                        a = ActiveAlerts.Dequeue();
+                        RebuildLatestAlertsMenu();
+                    }
+                    alertsOutstanding.Text = ActiveAlerts.Count.ToString();
+                }
+                else
+                {
+                    alertsOutstanding.Text = "";
+                }
+
+                // expire combats ?
+                foreach (var k in _combat.Keys)
+                {
+                    if (_combat[k].Count > 0)
+                    {
+                        TimeSpan ts = DateTime.Now - _combat[k].First().TimeAdded;
+                        if (ts.TotalSeconds > Configuration.ExpireCombatSeconds)
+                        {
+                            _combat[k].Remove(_combat[k].First());
+                        }
                     }
                 }
             }
 
             CombatFlag.Visible = InCombat;
+            if (InCombat)
+            {
+                combatOutstanding.Text = _combat.Count.ToString();
+            } else
+            {
+                combatOutstanding.Text = "";
+            }
         }
         private void AddNewCharacter(string characterName)
         {
@@ -873,7 +887,6 @@ namespace Quesadilla
                             DamageAmount = dmgAmount,
                         });
                     }
-
                 }
 
             } 
