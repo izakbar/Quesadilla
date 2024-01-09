@@ -25,6 +25,7 @@ namespace Quesadilla.Classes
             if (c is null)
             {
                 c = new Config();
+                c.TickMiliseconds = 500;
                 c.HomeSystem = "K7D-II";
                 c.InitialPosition = new Point(0, 0);
                 c.WindowSize = new Point(300, 100);
@@ -135,7 +136,7 @@ namespace Quesadilla.Classes
             var json = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(filename, json);
         }
-
+        public int TickMiliseconds {  get; set; }
         public string HomeSystem { get; set; }
         public List<Regex> ignoreStrings { get; set; }
         public List<int> ignoreSystems { get; set; }

@@ -89,6 +89,7 @@ namespace Quesadilla
 
             // stop main tick timer!
             mainTimer.Enabled = false;
+            mainTimer.Interval = Configuration.TickMiliseconds;
 
             CharacterList = new List<Character>();
             _solarSystems.ReadSolarSystems("Quesadilla.Systems.Json");
