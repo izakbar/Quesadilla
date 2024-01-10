@@ -41,11 +41,14 @@ namespace Quesadilla
         private List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
 
         private string configuration_filename = "Quesadilla.config.json";
+        private int _intelSizeMax = 200;
+        private int _intelSizeMin = 48;
 
         private MenuItem menuConfiguredAlerts = new MenuItem("Configured Alerts");
         private MenuItem menuBackgrounds = new MenuItem("Popup Background");
         private MenuItem menuLatestAlerts = new MenuItem("Latest Alerts");
         private MenuItem menuLogWatchers = new MenuItem("Logfiles");
+        private MenuItem menuConfiguration = new MenuItem("Configuration");
 
         public bool AlertShowing = false;
         private bool ChatServerStatus = true;
@@ -80,13 +83,14 @@ namespace Quesadilla
 
             trayIcon.ContextMenu = new ContextMenu(new MenuItem[]
             {
-                    menuBackgrounds,
-                    menuConfiguredAlerts,
-                    menuLogWatchers,
+                    menuConfiguration,
                     menuLatestAlerts,
                     new MenuItem("-"),
                     new MenuItem("Exit", new EventHandler(trayIconMenuClose)),
             });
+            menuConfiguration.MenuItems.Add(menuBackgrounds);
+            menuConfiguration.MenuItems.Add(menuConfiguredAlerts);
+            menuConfiguration.MenuItems.Add(menuLogWatchers);
 
             // stop main tick timer!
             mainTimer.Enabled = false;
@@ -228,6 +232,7 @@ namespace Quesadilla
                 Height = Configuration.WindowSize.Y >= 100 ? Configuration.WindowSize.Y : 100;
             }
 
+            buttonIntelSize_Click(null, null);
         }
         private SoundPlayer LoadSoundFromFile(string fileName)
         {
@@ -796,6 +801,10 @@ namespace Quesadilla
         {
             Application.Exit();
         }
+        private void trayIconMenuConfiguration(object sender, EventArgs e)
+        {
+            //
+        }
 
         private void trayMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
@@ -894,6 +903,25 @@ namespace Quesadilla
             {
                 InCombat = false;
             }
+        }
+
+        private void buttonIntelSize_Click(object sender, EventArgs e)
+        {
+            if ( intelLog.Height == _intelSizeMin )
+            {
+                // max it big
+                intelLog.Height = _intelSizeMax;
+                buttonIntelSize.Text = "▼";
+            }
+            else
+            {
+                // make it small
+                intelLog.Height = _intelSizeMin;
+                buttonIntelSize.Text = "▲";
+            }
+            buttonIntelSize.Top = intelLog.Top + 2;
+            buttonIntelSize.Left = intelLog.Width - buttonIntelSize.Width - 2;
+            intelLog.ScrollToCaret();
         }
     }
 }
