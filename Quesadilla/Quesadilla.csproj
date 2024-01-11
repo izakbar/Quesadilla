@@ -309,9 +309,6 @@
     <None Include="images\background4.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="images\background5.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="images\background5.png" />
   </ItemGroup>
   <ItemGroup>
