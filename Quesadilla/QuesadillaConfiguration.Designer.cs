@@ -36,7 +36,15 @@
             this.buttonCancel = new System.Windows.Forms.Button();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.alertDemo = new System.Windows.Forms.PictureBox();
+            this.colourPicker = new System.Windows.Forms.ColorDialog();
+            this.buttonPickSystemColour = new System.Windows.Forms.Button();
+            this.buttonPickContextColour = new System.Windows.Forms.Button();
+            this.buttonPickRegionColour = new System.Windows.Forms.Button();
+            this.buttonPickIntelLineColour = new System.Windows.Forms.Button();
+            this.buttonPickAlertTextColour = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.alertDemo)).BeginInit();
             this.SuspendLayout();
             // 
             // cmbHomeSystem
@@ -44,7 +52,7 @@
             this.cmbHomeSystem.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.cmbHomeSystem.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cmbHomeSystem.FormattingEnabled = true;
-            this.cmbHomeSystem.Location = new System.Drawing.Point(872, 12);
+            this.cmbHomeSystem.Location = new System.Drawing.Point(127, 253);
             this.cmbHomeSystem.Name = "cmbHomeSystem";
             this.cmbHomeSystem.Size = new System.Drawing.Size(158, 28);
             this.cmbHomeSystem.TabIndex = 0;
@@ -52,7 +60,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(757, 15);
+            this.label1.Location = new System.Drawing.Point(12, 256);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(109, 20);
             this.label1.TabIndex = 1;
@@ -61,7 +69,7 @@
             // cbStayOnTop
             // 
             this.cbStayOnTop.AutoSize = true;
-            this.cbStayOnTop.Location = new System.Drawing.Point(914, 46);
+            this.cbStayOnTop.Location = new System.Drawing.Point(452, 257);
             this.cbStayOnTop.Name = "cbStayOnTop";
             this.cbStayOnTop.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.cbStayOnTop.Size = new System.Drawing.Size(116, 24);
@@ -107,11 +115,76 @@
             this.pictureBox1.TabIndex = 5;
             this.pictureBox1.TabStop = false;
             // 
+            // alertDemo
+            // 
+            this.alertDemo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.alertDemo.Location = new System.Drawing.Point(12, 15);
+            this.alertDemo.Name = "alertDemo";
+            this.alertDemo.Size = new System.Drawing.Size(556, 232);
+            this.alertDemo.TabIndex = 6;
+            this.alertDemo.TabStop = false;
+            // 
+            // buttonPickSystemColour
+            // 
+            this.buttonPickSystemColour.Location = new System.Drawing.Point(574, 41);
+            this.buttonPickSystemColour.Name = "buttonPickSystemColour";
+            this.buttonPickSystemColour.Size = new System.Drawing.Size(187, 40);
+            this.buttonPickSystemColour.TabIndex = 8;
+            this.buttonPickSystemColour.Text = "System name colour";
+            this.buttonPickSystemColour.UseVisualStyleBackColor = true;
+            this.buttonPickSystemColour.Click += new System.EventHandler(this.buttonPickSystemColour_Click);
+            // 
+            // buttonPickContextColour
+            // 
+            this.buttonPickContextColour.Location = new System.Drawing.Point(574, 87);
+            this.buttonPickContextColour.Name = "buttonPickContextColour";
+            this.buttonPickContextColour.Size = new System.Drawing.Size(187, 40);
+            this.buttonPickContextColour.TabIndex = 9;
+            this.buttonPickContextColour.Text = "Context Info Colour";
+            this.buttonPickContextColour.UseVisualStyleBackColor = true;
+            this.buttonPickContextColour.Click += new System.EventHandler(this.buttonPickContextColour_Click);
+            // 
+            // buttonPickRegionColour
+            // 
+            this.buttonPickRegionColour.Location = new System.Drawing.Point(776, 63);
+            this.buttonPickRegionColour.Name = "buttonPickRegionColour";
+            this.buttonPickRegionColour.Size = new System.Drawing.Size(187, 40);
+            this.buttonPickRegionColour.TabIndex = 10;
+            this.buttonPickRegionColour.Text = "Region name colour";
+            this.buttonPickRegionColour.UseVisualStyleBackColor = true;
+            this.buttonPickRegionColour.Click += new System.EventHandler(this.buttonPickRegionColour_Click);
+            // 
+            // buttonPickIntelLineColour
+            // 
+            this.buttonPickIntelLineColour.Location = new System.Drawing.Point(776, 109);
+            this.buttonPickIntelLineColour.Name = "buttonPickIntelLineColour";
+            this.buttonPickIntelLineColour.Size = new System.Drawing.Size(187, 40);
+            this.buttonPickIntelLineColour.TabIndex = 11;
+            this.buttonPickIntelLineColour.Text = "Intel Line Colour";
+            this.buttonPickIntelLineColour.UseVisualStyleBackColor = true;
+            this.buttonPickIntelLineColour.Click += new System.EventHandler(this.buttonPickIntelLineColour_Click);
+            // 
+            // buttonPickAlertTextColour
+            // 
+            this.buttonPickAlertTextColour.Location = new System.Drawing.Point(574, 207);
+            this.buttonPickAlertTextColour.Name = "buttonPickAlertTextColour";
+            this.buttonPickAlertTextColour.Size = new System.Drawing.Size(187, 40);
+            this.buttonPickAlertTextColour.TabIndex = 12;
+            this.buttonPickAlertTextColour.Text = "Alert Text Colour";
+            this.buttonPickAlertTextColour.UseVisualStyleBackColor = true;
+            this.buttonPickAlertTextColour.Click += new System.EventHandler(this.buttonPickAlertTextColour_Click);
+            // 
             // QuesadillaConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1042, 946);
+            this.Controls.Add(this.buttonPickAlertTextColour);
+            this.Controls.Add(this.buttonPickIntelLineColour);
+            this.Controls.Add(this.buttonPickRegionColour);
+            this.Controls.Add(this.buttonPickContextColour);
+            this.Controls.Add(this.buttonPickSystemColour);
+            this.Controls.Add(this.alertDemo);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonSave);
@@ -123,6 +196,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.QuesadillaConfiguration_FormClosing);
             this.Load += new System.EventHandler(this.QuesadillaConfiguration_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.alertDemo)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -137,5 +211,12 @@
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox alertDemo;
+        private System.Windows.Forms.ColorDialog colourPicker;
+        private System.Windows.Forms.Button buttonPickSystemColour;
+        private System.Windows.Forms.Button buttonPickContextColour;
+        private System.Windows.Forms.Button buttonPickRegionColour;
+        private System.Windows.Forms.Button buttonPickIntelLineColour;
+        private System.Windows.Forms.Button buttonPickAlertTextColour;
     }
 }

@@ -32,7 +32,7 @@ namespace Quesadilla
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
 
         public SolarSystemManager _solarSystems = new SolarSystemManager();
-        private Config Configuration = new Config();
+        public Config Configuration = new Config();
         private List<LogWatcher> watchers = new List<LogWatcher>();
 
         private Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
@@ -41,7 +41,7 @@ namespace Quesadilla
         private List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
         private List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
 
-        private string configuration_filename = "Quesadilla.config.json";
+        public string configuration_filename = "Quesadilla.config.json";
         private int _intelSizeMax = 200;
         private int _intelSizeMin = 48;
 
@@ -304,7 +304,7 @@ namespace Quesadilla
             }
             return (SoundPlayer)null;
         }
-        private Image LoadImageFromFile(string fileName)
+        public Image LoadImageFromFile(string fileName)
         {
             Bitmap imageStream = null;
 

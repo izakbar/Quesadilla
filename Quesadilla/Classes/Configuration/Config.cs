@@ -14,6 +14,68 @@ namespace Quesadilla.Classes
 {
     public class Config
     {
+
+        public Config Duplicate()
+        {
+            Config c = new Config()
+            {
+                TickMiliseconds = TickMiliseconds,
+                HowManyTicksBeforeCleardown = HowManyTicksBeforeCleardown,
+                AlertPopupOpacityStep = AlertPopupOpacityStep,
+                AlertPopupOpacity = AlertPopupOpacity,
+                AlertPopupAlertTextColour = AlertPopupAlertTextColour,
+                AlertPopupBackground = AlertPopupBackground,
+                AlertPopupContextInfoColour = AlertPopupContextInfoColour,
+                AlertPopupIntelLineColour = AlertPopupIntelLineColour,
+                AlertPopupLocation = AlertPopupLocation,
+                AlertPopupRegionNameColour = AlertPopupRegionNameColour,
+                AlertPopupSeconds = AlertPopupSeconds,
+                AlertPopupSystemNameColour = AlertPopupSystemNameColour,
+                ExpireAlertSeconds = ExpireAlertSeconds,
+                ShowLastUnexpiredAlerts = ShowLastUnexpiredAlerts,
+                IgnoreAsTooManyJumps = IgnoreAsTooManyJumps,
+                ExpireCombatSeconds = ExpireCombatSeconds,
+                HomeSystem = HomeSystem,
+                InitialPosition = InitialPosition,
+                StayOnTop = StayOnTop,
+                WindowSize = WindowSize,
+            };
+
+            c.ignoreStrings = new List<Regex>();
+            c.ignoreSystems = new List<int>();
+            c.AlertConfiguration = new List<AlertConfig>();
+
+            foreach (var s in ignoreStrings)
+            {
+                c.ignoreStrings.Add(s);
+            }
+            foreach (var s in ignoreSystems)
+            {
+                c.ignoreSystems.Add(s);
+            }
+            foreach(var a in AlertConfiguration)
+            {
+                c.AlertConfiguration.Add(new AlertConfig()
+                {
+                    AlertRangeType = a.AlertRangeType,
+                    AlertType = a.AlertType,
+                    CustomTriggerEverySeconds = a.CustomTriggerEverySeconds,
+                    Enabled = a.Enabled,
+                    FriendlyName = a.FriendlyName,
+                    Jumps1Comparison = a.Jumps1Comparison,
+                    MenuDisplay = a.MenuDisplay,
+                    TextDisplay = a.TextDisplay,
+                    Jumps1Number = a.Jumps1Number,
+                    Jumps2Comparison = a.Jumps2Comparison,
+                    SoundFile = a.SoundFile,
+                    Jumps2Number = a.Jumps2Number,
+                    TriggerText = a.TriggerText
+                });
+            }
+            return (c);
+        }
+
+
         public static Config Load(string filename)
         {
             var c = new Config();
