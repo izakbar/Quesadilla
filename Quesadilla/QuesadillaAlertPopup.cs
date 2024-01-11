@@ -125,6 +125,7 @@ namespace Quesadilla
             timerAlertWindow.Interval = _seconds*1000;
             timerAlertWindow.Enabled = true;
             timerOpacityOpen.Enabled = true;
+            ShowInTaskbar = false;
         }
 
         private void CloseWindow()

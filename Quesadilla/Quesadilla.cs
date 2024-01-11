@@ -17,6 +17,7 @@ using System.Linq;
 using System.Media;
 using System.Resources;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 using static Quesadilla.Extensions.StringExtensions;
 
@@ -30,7 +31,7 @@ namespace Quesadilla
 
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
 
-        private SolarSystemManager _solarSystems = new SolarSystemManager();
+        public SolarSystemManager _solarSystems = new SolarSystemManager();
         private Config Configuration = new Config();
         private List<LogWatcher> watchers = new List<LogWatcher>();
 
@@ -49,11 +50,17 @@ namespace Quesadilla
         private MenuItem menuLatestAlerts = new MenuItem("Latest Alerts");
         private MenuItem menuLogWatchers = new MenuItem("Logfiles");
         private MenuItem menuConfiguration = new MenuItem("Configuration");
+        private MenuItem menuConfigurationWindow = new MenuItem("Edit Configuration");
+        private MenuItem menuConfigurationAlwaysOnTop = new MenuItem("Always on top");
 
         public bool AlertShowing = false;
         private bool ChatServerStatus = true;
         private bool InCombat = false;
+        private bool ConfigurationWindowOpen = false;
         private int TicksSinceLastCleardown = 0;
+
+        private Thread splashScreenThread;
+        private QuesadillaSplashScreen splashScreen;
 
         private Dictionary<string, List<CombatLine>> _combat = new Dictionary<string, List<CombatLine>>();
 
@@ -64,6 +71,10 @@ namespace Quesadilla
 
         public Quesadilla()
         {
+            splashScreenThread = new Thread(new ThreadStart(ShowSplashScreen));
+            splashScreenThread.Start();
+            Thread.Sleep(2000);
+
             InitializeComponent();
             InitializeResources();
 
@@ -77,10 +88,6 @@ namespace Quesadilla
                 Visible = true
             };
 
-            RebuildAlertsMenu();
-            RebuildBackgroundsMenu();
-            RebuildLatestAlertsMenu();
-
             trayIcon.ContextMenu = new ContextMenu(new MenuItem[]
             {
                     menuConfiguration,
@@ -89,19 +96,21 @@ namespace Quesadilla
                     new MenuItem("Exit", new EventHandler(trayIconMenuClose)),
             });
 
-            menuConfiguration.MenuItems.Add(new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = Configuration.StayOnTop,});
+            menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
+            menuConfiguration.MenuItems.Add(new MenuItem("-"));
+
+            menuConfiguration.MenuItems.Add(menuConfigurationAlwaysOnTop = new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = Configuration.StayOnTop,});
             menuConfiguration.MenuItems.Add(menuBackgrounds);
             menuConfiguration.MenuItems.Add(menuConfiguredAlerts);
             menuConfiguration.MenuItems.Add(menuLogWatchers);
 
             // stop main tick timer!
             mainTimer.Enabled = false;
-            mainTimer.Interval = Configuration.TickMiliseconds;
 
             CharacterList = new List<Character>();
             _solarSystems.ReadSolarSystems("Quesadilla.Systems.Json");
 
-            _solarSystems.HomeSolarSystemID = _solarSystems.Names[Configuration.HomeSystem];
+            ReloadConfiguration();
 
             watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel, "Catch Intel"));
             watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel, "Fountain Intel"));
@@ -142,6 +151,12 @@ namespace Quesadilla
 
             // start main tick timer
             mainTimer.Enabled = true;
+
+        }
+
+        private void ShowSplashScreen()
+        {
+            Application.Run(splashScreen = new QuesadillaSplashScreen());
         }
 
         private void InitializeResources()
@@ -157,7 +172,7 @@ namespace Quesadilla
                     if (r.Value is Image)
                     {
                         // if background - store in backgrounds
-                        if (name.StartsWith("background"))
+                        if (name.StartsWith("background") || name.StartsWith("bg_") )
                         {
                             Backgrounds.Add(new QuesadillaBackground()
                             {
@@ -218,25 +233,44 @@ namespace Quesadilla
                 menuBackgrounds.MenuItems.Add(menuBackground);
             }
         }
-
-        private void Quesadilla_Load(object sender, EventArgs e)
+        public void ReloadConfiguration()
         {
+            RebuildAlertsMenu();
+            RebuildBackgroundsMenu();
+            RebuildLatestAlertsMenu();
+
             if (Configuration.InitialPosition != null)
             {
-                Location = Configuration.InitialPosition;
-                if (Location.X > Screen.FromControl(this).Bounds.Width || Location.X < Screen.FromControl(this).Bounds.X ||
-                    Location.Y > Screen.FromControl(this).Bounds.Height || Location.Y < Screen.FromControl(this).Bounds.Y 
+                this.Location = Configuration.InitialPosition;
+                if (this.Location.X > Screen.FromControl(this).Bounds.Width || this.Location.X < Screen.FromControl(this).Bounds.X ||
+                    this.Location.Y > Screen.FromControl(this).Bounds.Height || this.Location.Y < Screen.FromControl(this).Bounds.Y
                     )
                 {
-                    Location = new Point(0, 0);
+                    this.Location = new Point(0, 0);
                 }
 
-                TopMost = Configuration.StayOnTop;
-                Width = Configuration.WindowSize.X >= 100 ? Configuration.WindowSize.X : 100 ;
+                Width = Configuration.WindowSize.X >= 100 ? Configuration.WindowSize.X : 100;
                 Height = Configuration.WindowSize.Y >= 100 ? Configuration.WindowSize.Y : 100;
             }
 
+            TopMost = Configuration.StayOnTop;
+            menuConfigurationAlwaysOnTop.Checked = Configuration.StayOnTop;
+
+            _solarSystems.HomeSolarSystemID = _solarSystems.Names[Configuration.HomeSystem];
+
+            mainTimer.Interval = Configuration.TickMiliseconds;
+
+        }
+        private void Quesadilla_Load(object sender, EventArgs e)
+        {
+            ReloadConfiguration();
             buttonIntelSize_Click(null, null);
+
+            splashScreenThread.Interrupt();
+            Thread.Sleep(100);
+            splashScreenThread.Abort();
+            Thread.Sleep(500);
+            splashScreen = null;
         }
         private SoundPlayer LoadSoundFromFile(string fileName)
         {
@@ -832,6 +866,18 @@ namespace Quesadilla
                 configAlert.Enabled = !configAlert.Enabled;
             }
         }
+
+
+        private void trayIconMenuConfigurationClick(object sender, EventArgs e)
+        {
+            if (!ConfigurationWindowOpen)
+            {
+                var ConfigurationWindow = new QuesadillaConfiguration(Configuration, menuConfigurationWindow, this);
+                ((MenuItem)sender).Enabled = !((MenuItem)sender).Enabled;
+                ConfigurationWindow.Show(this);
+            }
+        }
+
         private void trayIconMenuLogfileClick(object sender, EventArgs e)
         {
             // enable / disable config item
