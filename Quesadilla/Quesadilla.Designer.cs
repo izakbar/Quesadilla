@@ -35,7 +35,6 @@
             this.alertsOutstanding = new System.Windows.Forms.TextBox();
             this.ChatServerDown = new System.Windows.Forms.Label();
             this.CombatFlag = new System.Windows.Forms.Label();
-            this.combatOutstanding = new System.Windows.Forms.TextBox();
             this.buttonIntelSize = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -96,18 +95,6 @@
             this.CombatFlag.Text = "In Combat";
             this.CombatFlag.Visible = false;
             // 
-            // combatOutstanding
-            // 
-            this.combatOutstanding.BackColor = System.Drawing.SystemColors.Control;
-            this.combatOutstanding.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.combatOutstanding.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.combatOutstanding.ForeColor = System.Drawing.Color.Blue;
-            this.combatOutstanding.Location = new System.Drawing.Point(0, 68);
-            this.combatOutstanding.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.combatOutstanding.Name = "combatOutstanding";
-            this.combatOutstanding.Size = new System.Drawing.Size(66, 60);
-            this.combatOutstanding.TabIndex = 5;
-            // 
             // buttonIntelSize
             // 
             this.buttonIntelSize.BackColor = System.Drawing.Color.Transparent;
@@ -126,7 +113,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1116, 562);
             this.Controls.Add(this.buttonIntelSize);
-            this.Controls.Add(this.combatOutstanding);
             this.Controls.Add(this.CombatFlag);
             this.Controls.Add(this.ChatServerDown);
             this.Controls.Add(this.alertsOutstanding);
@@ -151,7 +137,6 @@
         private System.Windows.Forms.TextBox alertsOutstanding;
         private System.Windows.Forms.Label ChatServerDown;
         private System.Windows.Forms.Label CombatFlag;
-        private System.Windows.Forms.TextBox combatOutstanding;
         private System.Windows.Forms.Button buttonIntelSize;
     }
 }

@@ -88,6 +88,8 @@ namespace Quesadilla
                     new MenuItem("-"),
                     new MenuItem("Exit", new EventHandler(trayIconMenuClose)),
             });
+
+            menuConfiguration.MenuItems.Add(new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = Configuration.StayOnTop,});
             menuConfiguration.MenuItems.Add(menuBackgrounds);
             menuConfiguration.MenuItems.Add(menuConfiguredAlerts);
             menuConfiguration.MenuItems.Add(menuLogWatchers);
@@ -107,6 +109,8 @@ namespace Quesadilla
 
             watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel, "Querious Intel"));
             watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel, "Delve Intel"));
+
+            watchers.Add(new LogWatcher("Quer_Catch", Classes.Logfile.LogFileType.ChatIntel, "Querious/Catch Intel"));
 
             watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
 
@@ -347,13 +351,7 @@ namespace Quesadilla
             }
 
             CombatFlag.Visible = InCombat;
-            if (InCombat)
-            {
-                combatOutstanding.Text = _combat.Count.ToString();
-            } else
-            {
-                combatOutstanding.Text = "";
-            }
+
         }
         private void AddNewCharacter(string characterName)
         {
@@ -801,6 +799,14 @@ namespace Quesadilla
         {
             Application.Exit();
         }
+        private void trayIconMenuAlwaysOnTop(object sender, EventArgs e)
+        {
+            Configuration.StayOnTop = !Configuration.StayOnTop;
+            TopMost = Configuration.StayOnTop;
+            ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
+        }
+
+
         private void trayIconMenuConfiguration(object sender, EventArgs e)
         {
             //
