@@ -116,7 +116,12 @@
             // 
             this.chartDPS.BackColor = System.Drawing.Color.Transparent;
             this.chartDPS.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.DashDot;
+            chartArea1.AxisX.InterlacedColor = System.Drawing.Color.Lime;
+            chartArea1.AxisX.LabelStyle.ForeColor = System.Drawing.Color.Tomato;
             chartArea1.AxisX.MajorGrid.Enabled = false;
+            chartArea1.AxisY.IsLabelAutoFit = false;
+            chartArea1.AxisY.LabelStyle.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            chartArea1.AxisY.LabelStyle.ForeColor = System.Drawing.Color.Tomato;
             chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.Silver;
             chartArea1.BackColor = System.Drawing.Color.Transparent;
             chartArea1.Name = "ChartArea1";

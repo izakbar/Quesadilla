@@ -1145,7 +1145,7 @@ namespace Quesadilla
                 CreateParams cp = base.CreateParams;
                 // Set the form click-through
                 cp.ExStyle |= 
-                    //0x80000 /* WS_EX_LAYERED */ | 
+                    0x80000 /* WS_EX_LAYERED */ | 
                     0x20 /* WS_EX_TRANSPARENT */
                     ;
                 return cp;
