@@ -19,6 +19,7 @@ using System.Resources;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using static Quesadilla.Extensions.StringExtensions;
 
 namespace Quesadilla
@@ -52,7 +53,8 @@ namespace Quesadilla
         private MenuItem menuConfiguration = new MenuItem("Configuration");
         private MenuItem menuConfigurationWindow = new MenuItem("Edit Configuration");
         private MenuItem menuConfigurationAlwaysOnTop = new MenuItem("Always on top");
-
+        private MenuItem menuConfigurationTransparent = new MenuItem("Transparent");
+        
         public bool AlertShowing = false;
         private bool ChatServerStatus = true;
         private bool InCombat = false;
@@ -62,7 +64,11 @@ namespace Quesadilla
         private Thread splashScreenThread;
         private QuesadillaSplashScreen splashScreen;
 
+        private Color OriginalBackgroundColour;
+
         private Dictionary<string, List<CombatLine>> _combat = new Dictionary<string, List<CombatLine>>();
+
+        private Dictionary<int, CombatGraphData> _combatGraphData = new Dictionary<int, CombatGraphData>();
 
         // TODO - config things - really need to go into config structure later
         public List<Character> CharacterList { get; set; }
@@ -74,6 +80,8 @@ namespace Quesadilla
             splashScreenThread = new Thread(new ThreadStart(ShowSplashScreen));
             splashScreenThread.Start();
             Thread.Sleep(2000);
+
+            OriginalBackgroundColour = BackColor;
 
             InitializeComponent();
             InitializeResources();
@@ -100,6 +108,7 @@ namespace Quesadilla
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
 
             menuConfiguration.MenuItems.Add(menuConfigurationAlwaysOnTop = new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = Configuration.StayOnTop, });
+            menuConfiguration.MenuItems.Add(menuConfigurationTransparent = new MenuItem("Transparent", trayIconMenuTransparent) { Checked = false, });
             menuConfiguration.MenuItems.Add(menuBackgrounds);
             menuConfiguration.MenuItems.Add(menuConfiguredAlerts);
             menuConfiguration.MenuItems.Add(menuLogWatchers);
@@ -841,6 +850,21 @@ namespace Quesadilla
             TopMost = Configuration.StayOnTop;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
         }
+        private void trayIconMenuTransparent(object sender, EventArgs e)
+        {
+            ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
+            switch (((MenuItem)sender).Checked )
+            {
+                case true:
+                    this.TransparencyKey = this.BackColor = Color.AliceBlue;
+                    // the color key to transparent, choose a color that you don't use
+                    break;
+                case false:
+                    this.TransparencyKey = Color.AliceBlue;
+                    this.BackColor = OriginalBackgroundColour;
+                    break;
+            }
+        }
 
 
         private void trayIconMenuConfiguration(object sender, EventArgs e)
@@ -952,6 +976,7 @@ namespace Quesadilla
                             Text = match.Groups["combatText"].ToString(),
                             NeutAmount = neutAmount,
                             DamageAmount = dmgAmount,
+                            Received = match.Groups["combatContext"].ToString() == "from" ? true : false,
                         });
                     }
                 }
@@ -983,35 +1008,148 @@ namespace Quesadilla
         }
         private void UpdateDPSGraph()
         {
-            int maxSpan = 500;
+            int maxPoints = Configuration.GraphCombatMaxPoints;
+            int minSpanSize = Configuration.GraphCombatMinPointSeconds;
 
             // default to total dps
             chartDPS.Series.Clear();
             var firstToon = _combat.Keys.First().ToString();
-            var toon1 = chartDPS.Series.Add(firstToon);
-            toon1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            toon1.Points.Clear();
-            DateTime start = _combat[firstToon].First().TimeAdded;
-            TimeSpan duration = _combat[firstToon].Last().TimeAdded - start;
-            var span = Math.Truncate(duration.TotalMilliseconds > maxSpan*1000 ? duration.TotalSeconds / maxSpan / 1000 : 1000);
+            var toon1Received = chartDPS.Series.Add(firstToon + " in");
+            toon1Received.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1Received.Points.Clear();
+            toon1Received.Color = Color.Red;
 
-            DateTime pointTimeStart = start;
-            DateTime pointTimeEnd = start;
-            DateTime pointTimeLast = start;
+            var toon1Given = chartDPS.Series.Add(firstToon + " out");
+            toon1Given.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1Given.Points.Clear();
+            toon1Given.Color = Color.Green;
 
-            float totalDamageIn = 0;
-            float totalDamageOut = 0;
-            float totalNeutIn = 0;
-            float totalNeutOut = 0;
-
-            while ( pointTimeStart <= _combat[firstToon].Last().TimeAdded )
+            DateTime start = DateTime.Now;
+            DateTime end = start;
+            if (_combat[firstToon].Count > 0)
             {
-                pointTimeEnd = pointTimeStart.AddMilliseconds(span);
+                start = _combat[firstToon].First().TimeAdded;
+                end = _combat[firstToon].Last().TimeAdded;
+            }
+            TimeSpan totalTime = end - start;
 
-                var ThisStep = _combat[firstToon].Where(x => x.TimeAdded >= pointTimeStart && x.TimeAdded <= pointTimeEnd).ToList();
+            DateTime curr = start;
+            // check range
+            if (totalTime.TotalSeconds > Configuration.GraphCombatSeconds)
+            {
+                curr = end.AddSeconds(-1 * Configuration.GraphCombatSeconds);
+                totalTime = end - curr;
+            }
 
-                pointTimeStart = pointTimeEnd;
+            var span = Math.Truncate(totalTime.TotalSeconds > maxPoints ? totalTime.TotalSeconds / maxPoints : 1);
+            if (span < minSpanSize) span = minSpanSize;
+
+            _combatGraphData.Clear();
+            // setup second slots
+            foreach (var c in _combat[firstToon].OrderBy(o => o.TimeAdded).ToList())
+            {
+                var slot = (int)Math.Truncate((c.TimeAdded - start).TotalSeconds);
+                if (!_combatGraphData.ContainsKey(slot))
+                {
+                    // slot does not exist - create
+                    _combatGraphData[slot] = new CombatGraphData()
+                    {
+                        DamageGiven = 0,
+                        DamageReceived = 0,
+                        NeutsGiven = 0,
+                        NeutsReceived = 0,
+                    };
+                }
+                if (c.Received)
+                {
+                    _combatGraphData[slot].DamageReceived += c.DamageAmount;
+                    _combatGraphData[slot].NeutsReceived += c.NeutAmount;
+                }
+                else
+                {
+                    _combatGraphData[slot].DamageGiven += c.DamageAmount;
+                    _combatGraphData[slot].NeutsGiven += c.NeutAmount;
+                }
+            }
+
+            // now go thru from start -> end in slot seconds
+
+            var graphStartXp = (int)Math.Truncate((curr - start).TotalSeconds);
+            if (graphStartXp < 0) graphStartXp = 0;
+            var graphEndXp = (int)Math.Truncate((end - start).TotalSeconds);
+
+            chartDPS.ChartAreas[0].AxisX.Minimum = graphStartXp + span + 1 > graphEndXp ? graphStartXp : graphStartXp + span + 1;
+            chartDPS.ChartAreas[0].AxisX.Maximum = graphEndXp;
+            chartDPS.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
+
+            while (curr <= end)
+            {
+                // curr is mid point of damage
+                // need to calc prev and next point - based on stepsize
+                var p = (int)Math.Truncate((curr.AddSeconds(span * -1) - start).TotalSeconds);
+                if (p < 0) p = 0;
+                var n = (int)Math.Truncate((curr.AddSeconds(span) - start).TotalSeconds);
+                // bounds check n ?
+
+                var seconds = (int)Math.Truncate((curr - start).TotalSeconds);
+
+                double dReceived = 0;
+                double dGiven = 0;
+                double nReceived = 0;
+                double nGiven = 0;
+                curr = curr.AddSeconds(span);
+                for (var i = p; i <= n; i++)
+                {
+                    if (_combatGraphData.ContainsKey(i))
+                    {
+                        dReceived += _combatGraphData[i].DamageReceived;
+                        dGiven += _combatGraphData[i].DamageGiven;
+                        nReceived += _combatGraphData[i].NeutsReceived;
+                        nGiven += _combatGraphData[i].NeutsGiven;
+                    }
+                }
+                if (seconds > 0)
+                {
+                    toon1Received.Points.AddXY(seconds, dReceived / (span * 2 + 1));
+                    toon1Given.Points.AddXY(seconds, dGiven / (span * 2 + 1));
+                }
+            }
+
+            /*
+            // dump to csv
+            using (var file = File.CreateText("data1.csv"))
+            {
+                foreach (var a in _combatGraphData.Keys)
+                {
+                    file.WriteLine(a + "," + _combatGraphData[a].ToCSV());
+                }
+            }
+            using (var file = File.CreateText("data2.csv"))
+            {
+                foreach (var a in toon1Received.Points)
+                {
+                    file.WriteLine(a.XValue.ToString() + ","+ a.YValues[0].ToString() + "," + graphStartXp.ToString() + "," + graphEndXp.ToString());
+                }
+            }
+            */
+        }
+
+        private void chartDPS_Click(object sender, EventArgs e)
+        {
+
+        }
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                // Set the form click-through
+                cp.ExStyle |= 
+                    //0x80000 /* WS_EX_LAYERED */ | 
+                    0x20 /* WS_EX_TRANSPARENT */
+                    ;
+                return cp;
             }
         }
-    } 
+    }
 }

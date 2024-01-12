@@ -120,6 +120,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\CombatGraphData.cs" />
     <Compile Include="Classes\CombatLine.cs" />
     <Compile Include="Classes\Configuration\PopupLocationType.cs" />
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />

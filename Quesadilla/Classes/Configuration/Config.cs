@@ -96,6 +96,9 @@ namespace Quesadilla.Classes
                 c.IgnoreAsTooManyJumps = 15;
                 c.ExpireAlertSeconds = 500;
                 c.ExpireCombatSeconds = 1200;
+                c.GraphCombatSeconds = 180;
+                c.GraphCombatMaxPoints = 30;
+                c.GraphCombatMinPointSeconds = 5;
 
                 c.AlertPopupSeconds = 8;
                 c.AlertPopupOpacity = 99;
@@ -199,6 +202,8 @@ namespace Quesadilla.Classes
             var json = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(filename, json);
         }
+
+
         public int TickMiliseconds {  get; set; }
         public int HowManyTicksBeforeCleardown { get; set; }
         public string HomeSystem { get; set; }
@@ -210,6 +215,9 @@ namespace Quesadilla.Classes
         public int IgnoreAsTooManyJumps { get; set; }
         public int ExpireAlertSeconds { get; set; }
         public int ExpireCombatSeconds { get; set; }
+        public int GraphCombatSeconds { get; set; }
+        public int GraphCombatMaxPoints { get; set; }
+        public int GraphCombatMinPointSeconds { get; set; }
         public List<AlertConfig> AlertConfiguration { get; set; }
 
         public int AlertPopupSeconds { get; set; }
