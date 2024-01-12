@@ -34,16 +34,14 @@ namespace Quesadilla
         private void SetSystem(ComboBox cmb, string systemName)
         {
             cmb.Items.Clear();
-
-            /*
-            foreach(var s in _solarSystemManager.SolarSystems)
-            {
-                cmb.Items.Add(s.Value.Name);
-            }
-            */
-
             cmb.DataSource = _mainForm._solarSystems.Names.Keys.OrderBy(x => x).ToList();
             cmb.Text = systemName;
+        }
+        private void SetBackground(ComboBox cmb, string background)
+        {
+            cmb.Items.Clear();
+            cmb.DataSource = _mainForm.Backgrounds.Select(o => o.BackgroundName).ToList();
+            cmb.Text = background;
         }
         private void QuesadillaConfiguration_Load(object sender, EventArgs e)
         {
@@ -78,6 +76,26 @@ namespace Quesadilla
                 },
             };
             ShowAlertBitmap();
+            trackOpacity.Value = _configuration.AlertPopupOpacity;
+            trackPopupTime.Value = _configuration.AlertPopupSeconds;
+
+            SetBackground(cmbBackground, _configuration.AlertPopupBackground);
+            lblOpacity.Text = _configuration.AlertPopupOpacity.ToString();
+            lblPopupSeconds.Text = _configuration.AlertPopupSeconds.ToString();
+
+            switch (_configuration.AlertPopupLocation)
+            {
+                case Classes.Configuration.PopupLocationType.Center:
+                    radioAlertCentre.Checked = true; break;
+                case Classes.Configuration.PopupLocationType.TopLeft:
+                    radioAlertTopLeft.Checked = true; break;
+                case Classes.Configuration.PopupLocationType.TopRight:
+                    radioAlertTopRight.Checked = true; break;
+                case Classes.Configuration.PopupLocationType.BottomLeft:
+                    radioAlertBottomLeft.Checked = true;break;
+                case Classes.Configuration.PopupLocationType.BottomRight:
+                    radioAlertBottomRight.Checked = true;break;
+            }
         }
         private Bitmap GetControlImage(Control ctl)
         {
@@ -179,6 +197,50 @@ namespace Quesadilla
         {
             _configuration.AlertPopupAlertTextColour = ChooseColour(_configuration.AlertPopupAlertTextColour);
             ShowAlertBitmap();
+        }
+
+        private void cmbBackground_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupBackground = cmbBackground.Text;
+            ShowAlertBitmap();
+        }
+
+        private void trackOpacity_Scroll(object sender, EventArgs e)
+        {
+            _alertPopup.Opacity = ((TrackBar)sender).Value;
+            _configuration.AlertPopupOpacity = ((TrackBar)sender).Value;
+            lblOpacity.Text = ((TrackBar)sender).Value.ToString();
+        }
+
+        private void trackPopupTime_Scroll(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupSeconds = ((TrackBar)sender).Value;
+            lblPopupSeconds.Text = ((TrackBar)sender).Value.ToString();
+        }
+
+        private void radioAlertTopLeft_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.TopLeft;
+        }
+
+        private void radioAlertTopRight_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.TopRight;
+        }
+
+        private void radioAlertBottomLeft_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.BottomLeft;
+        }
+
+        private void radioAlertBottomRight_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.BottomRight;
+        }
+
+        private void radioAlertCentre_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.Center;
         }
     }
 }

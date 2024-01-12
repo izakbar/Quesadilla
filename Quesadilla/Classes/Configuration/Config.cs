@@ -91,7 +91,7 @@ namespace Quesadilla.Classes
                 c.HowManyTicksBeforeCleardown = 10;
                 c.HomeSystem = "K7D-II";
                 c.InitialPosition = new Point(0, 0);
-                c.WindowSize = new Point(300, 100);
+                c.WindowSize = new Point(760, 404);
                 c.StayOnTop = true;
                 c.IgnoreAsTooManyJumps = 15;
                 c.ExpireAlertSeconds = 500;

@@ -39,7 +39,7 @@ namespace Quesadilla
         private Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
 
         private List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
-        private List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
+        public List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
 
         public string configuration_filename = "Quesadilla.config.json";
         private int _intelSizeMax = 200;
@@ -99,7 +99,7 @@ namespace Quesadilla
             menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
 
-            menuConfiguration.MenuItems.Add(menuConfigurationAlwaysOnTop = new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = Configuration.StayOnTop,});
+            menuConfiguration.MenuItems.Add(menuConfigurationAlwaysOnTop = new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = Configuration.StayOnTop, });
             menuConfiguration.MenuItems.Add(menuBackgrounds);
             menuConfiguration.MenuItems.Add(menuConfiguredAlerts);
             menuConfiguration.MenuItems.Add(menuLogWatchers);
@@ -172,7 +172,7 @@ namespace Quesadilla
                     if (r.Value is Image)
                     {
                         // if background - store in backgrounds
-                        if (name.StartsWith("background") || name.StartsWith("bg_") )
+                        if (name.StartsWith("background") || name.StartsWith("bg_"))
                         {
                             Backgrounds.Add(new QuesadillaBackground()
                             {
@@ -208,7 +208,7 @@ namespace Quesadilla
             menuLatestAlerts.MenuItems.Clear();
             foreach (var alert in ActiveAlerts.Reverse().Take(Configuration.ShowLastUnexpiredAlerts).ToList())
             {
-                string menuText = alert.Entry.TimeAdded.ToString("HH:mm") + " " + (alert.Path != null ? alert.Path.ToSystemName  : "") + " - " + alert.MenuText;
+                string menuText = alert.Entry.TimeAdded.ToString("HH:mm") + " " + (alert.Path != null ? alert.Path.ToSystemName : "") + " - " + alert.MenuText;
                 MenuItem menuAlert = new MenuItem(menuText);
                 menuLatestAlerts.MenuItems.Add(menuAlert);
             }
@@ -226,10 +226,10 @@ namespace Quesadilla
         private void RebuildBackgroundsMenu()
         {
             menuBackgrounds.MenuItems.Clear();
-            foreach (var background in Backgrounds.OrderBy(o => o.BackgroundName).ToList() )
+            foreach (var background in Backgrounds.OrderBy(o => o.BackgroundName).ToList())
             {
                 MenuItem menuBackground = new MenuItem(background.BackgroundName, trayIconMenuBackgroundClick);
-                if ( Configuration.AlertPopupBackground == background.BackgroundName) menuBackground.Checked = true;
+                if (Configuration.AlertPopupBackground == background.BackgroundName) menuBackground.Checked = true;
                 menuBackgrounds.MenuItems.Add(menuBackground);
             }
         }
@@ -249,8 +249,8 @@ namespace Quesadilla
                     this.Location = new Point(0, 0);
                 }
 
-                Width = Configuration.WindowSize.X >= 100 ? Configuration.WindowSize.X : 100;
-                Height = Configuration.WindowSize.Y >= 100 ? Configuration.WindowSize.Y : 100;
+                //Width = Configuration.WindowSize.X >= 100 ? Configuration.WindowSize.X : 100;
+                //Height = Configuration.WindowSize.Y >= 100 ? Configuration.WindowSize.Y : 100;
             }
 
             TopMost = Configuration.StayOnTop;
@@ -277,7 +277,7 @@ namespace Quesadilla
 
             Stream soundStream = null;
 
-            if ( Sounds.Find(o => o.SoundName == fileName) != null )
+            if (Sounds.Find(o => o.SoundName == fileName) != null)
             {
                 soundStream = (Stream)Sounds.Find(o => o.SoundName == fileName).stream;
                 soundStream.Seek(0, SeekOrigin.Begin);
@@ -308,7 +308,7 @@ namespace Quesadilla
         {
             Bitmap imageStream = null;
 
-            if (Backgrounds.Find(o => o.BackgroundName== fileName) != null)
+            if (Backgrounds.Find(o => o.BackgroundName == fileName) != null)
             {
                 imageStream = (Bitmap)Backgrounds.Find(o => o.BackgroundName == fileName).background;
                 return imageStream;
@@ -330,7 +330,7 @@ namespace Quesadilla
             }
 
             // dequeue Alerts
-            if ( NewAlerts.Count > 0 )
+            if (NewAlerts.Count > 0)
             {
                 var NewAlert = NewAlerts.Dequeue();
                 Log.Error(NewAlert.AlertText);
@@ -342,7 +342,7 @@ namespace Quesadilla
                 NewAlertWindow.Show(this);
 
                 SoundPlayer sound = LoadSoundFromFile(NewAlert.SoundFile);
-                if ( sound != null ) sound.Play();
+                if (sound != null) sound.Play();
 
                 RebuildLatestAlertsMenu();
             }
@@ -385,6 +385,7 @@ namespace Quesadilla
             }
 
             CombatFlag.Visible = InCombat;
+            chartDPS.Visible = InCombat;
 
         }
         private void AddNewCharacter(string characterName)
@@ -400,9 +401,10 @@ namespace Quesadilla
         }
         private bool checkJumpsRange(AlertConfig alert, PathInfo path)
         {
-            bool checkJumpsRangeComparison(int jumps, AlertConfigJumpsComparison comparison, int? comparisonNumber) { 
-                if ( comparison == AlertConfigJumpsComparison.None) return true;
-                if ( comparisonNumber is null ) return false;
+            bool checkJumpsRangeComparison(int jumps, AlertConfigJumpsComparison comparison, int? comparisonNumber)
+            {
+                if (comparison == AlertConfigJumpsComparison.None) return true;
+                if (comparisonNumber is null) return false;
 
                 switch (comparison)
                 {
@@ -421,7 +423,7 @@ namespace Quesadilla
                     case AlertConfigJumpsComparison.GreaterThanEqual:
                         if (jumps >= comparisonNumber) return true;
                         break;
-                    default: 
+                    default:
                         return false;
                         break;
                 }
@@ -430,10 +432,10 @@ namespace Quesadilla
             bool shouldAlert = false;
             if (!alert.Enabled) return false;
 
-            shouldAlert = 
-                checkJumpsRangeComparison(path.TotalJumps, alert.Jumps1Comparison, alert.Jumps1Number) && 
+            shouldAlert =
+                checkJumpsRangeComparison(path.TotalJumps, alert.Jumps1Comparison, alert.Jumps1Number) &&
                 checkJumpsRangeComparison(path.TotalJumps, alert.Jumps2Comparison, alert.Jumps2Number) &&
-                path.TotalJumps < Configuration.IgnoreAsTooManyJumps ;
+                path.TotalJumps < Configuration.IgnoreAsTooManyJumps;
 
             return shouldAlert;
         }
@@ -486,16 +488,16 @@ namespace Quesadilla
                 alert.RouteText = PathToString(alert.Path);
                 NewAlerts.Enqueue(alert);
             }
-            if ( f.Count != 0)
+            if (f.Count != 0)
             {
-                if (alert.Path.TotalJumps < f.First().Path.TotalJumps )
+                if (alert.Path.TotalJumps < f.First().Path.TotalJumps)
                 {
                     f.First().Path = alert.Path;
                     f.First().AlertText = alert.AlertText;
-                    f.First().Entry= alert.Entry;
+                    f.First().Entry = alert.Entry;
                     f.First().Context = alert.Context;
                     f.First().RouteText = alert.RouteText;
-                    f.First().SoundFile= alert.SoundFile;
+                    f.First().SoundFile = alert.SoundFile;
                 }
             }
         }
@@ -566,10 +568,10 @@ namespace Quesadilla
                         foreach (AlertConfig alert in Configuration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
                         {
                             return tempTrigger.Enabled;
-/*                            if (!tempTrigger.Enabled)
-                                return false;
-                            return tempTrigger.AlertType == AlertConfigType.Range;
-*/
+                            /*                            if (!tempTrigger.Enabled)
+                                                            return false;
+                                                        return tempTrigger.AlertType == AlertConfigType.Range;
+                            */
                         })))
                         {
                             bool sendAlert = false;
@@ -583,7 +585,7 @@ namespace Quesadilla
                                     sendAlert = checkJumpsRange(alert, path);
                                     if (sendAlert)
                                     {
-                                        alertText = generateAlertText(entry, path, alert, "",0);
+                                        alertText = generateAlertText(entry, path, alert, "", 0);
                                         Log.Debug("ALERT - " + alertText);
                                         EnqueueAlert(
                                             new AlertQueueItem()
@@ -607,7 +609,7 @@ namespace Quesadilla
                                     sendAlert = checkJumpsRange(alert, path);
                                     if (sendAlert)
                                     {
-                                        alertText = generateAlertText(entry, path, alert, "",0);
+                                        alertText = generateAlertText(entry, path, alert, "", 0);
                                         Log.Debug("ALERT - " + alertText);
                                         EnqueueAlert(
                                             new AlertQueueItem()
@@ -632,7 +634,7 @@ namespace Quesadilla
                                         sendAlert = checkJumpsRange(alert, path);
                                         if (sendAlert)
                                         {
-                                            alertText = generateAlertText(entry, path, alert, x.CharacterName,0);
+                                            alertText = generateAlertText(entry, path, alert, x.CharacterName, 0);
                                             Log.Debug("ALERT - " + alertText);
                                             EnqueueAlert(
                                                 new AlertQueueItem()
@@ -658,7 +660,7 @@ namespace Quesadilla
                                         sendAlert = checkJumpsRange(alert, path);
                                         if (sendAlert)
                                         {
-                                            alertText = generateAlertText(entry, path, alert, x.CharacterName,0);
+                                            alertText = generateAlertText(entry, path, alert, x.CharacterName, 0);
                                             Log.Debug("ALERT - " + alertText);
                                             EnqueueAlert(
                                                 new AlertQueueItem()
@@ -684,7 +686,7 @@ namespace Quesadilla
                                         {
                                             path = _solarSystems.FindAndCachePath(x.LocationId, toSystemId);
 
-                                            alertText = generateAlertText(entry, path, alert, alert.TriggerText,0);
+                                            alertText = generateAlertText(entry, path, alert, alert.TriggerText, 0);
                                             Log.Debug("ALERT - " + alertText);
                                             EnqueueAlert(
                                                 new AlertQueueItem()
@@ -728,8 +730,8 @@ namespace Quesadilla
                     {
                         if (entry.LineContent.Contains(alert.TriggerText, StringComparison.OrdinalIgnoreCase))
                         {
-                            
-                            string alertText = generateAlertText(entry, null, alert, alert.TriggerText,0);
+
+                            string alertText = generateAlertText(entry, null, alert, alert.TriggerText, 0);
                             Log.Debug("ALERT - " + alertText);
                             EnqueueAlert(
                                 new AlertQueueItem()
@@ -894,7 +896,7 @@ namespace Quesadilla
         {
             // enable clicked background
             MenuItem m = (MenuItem)sender;
-            foreach(MenuItem z in menuBackgrounds.MenuItems)
+            foreach (MenuItem z in menuBackgrounds.MenuItems)
             {
                 z.Checked = false;
             }
@@ -912,18 +914,20 @@ namespace Quesadilla
                 InCombat = true;
                 if (!_combat.ContainsKey(e.Entry.CharacterName))
                 {
-                    _combat.Add(e.Entry.CharacterName, new List<CombatLine>()) ;
+                    _combat.Add(e.Entry.CharacterName, new List<CombatLine>());
                 }
                 //Log.Information(e.Entry.LineContent);
 
                 Match match = _CombatRegexMissesYouCompletely.Match(e.Entry.LineContent);
                 if (match.Success)
                 {
-                    _combat[e.Entry.CharacterName].Add(new CombatLine() {
+                    _combat[e.Entry.CharacterName].Add(new CombatLine()
+                    {
                         TimeAdded = e.Entry.TimeAdded,
                         Entity = match.Groups["combatEntity"].ToString(),
                     });
-                }  else
+                }
+                else
                 {
                     match = _CombatRegexCombatData.Match(e.Entry.LineContent);
                     if (match.Success)
@@ -932,15 +936,17 @@ namespace Quesadilla
                         int neutAmount = 0;
 
                         var amount = match.Groups["combatAmount"].ToString();
-                        if (amount.Contains("GJ") )
+                        if (amount.Contains("GJ"))
                         {
                             neutAmount = Int32.Parse(amount.Replace(" GJ", "").Trim());
-                        } else
+                        }
+                        else
                         {
                             dmgAmount = Int32.Parse(amount.Trim());
                         }
 
-                        _combat[e.Entry.CharacterName].Add(new CombatLine() {
+                        _combat[e.Entry.CharacterName].Add(new CombatLine()
+                        {
                             TimeAdded = e.Entry.TimeAdded,
                             Entity = match.Groups["combatEntity"].ToString(),
                             Text = match.Groups["combatText"].ToString(),
@@ -949,8 +955,8 @@ namespace Quesadilla
                         });
                     }
                 }
-
-            } 
+                UpdateDPSGraph();
+            }
             else
             {
                 InCombat = false;
@@ -959,7 +965,7 @@ namespace Quesadilla
 
         private void buttonIntelSize_Click(object sender, EventArgs e)
         {
-            if ( intelLog.Height == _intelSizeMin )
+            if (intelLog.Height == _intelSizeMin)
             {
                 // max it big
                 intelLog.Height = _intelSizeMax;
@@ -975,5 +981,37 @@ namespace Quesadilla
             buttonIntelSize.Left = intelLog.Width - buttonIntelSize.Width - 2;
             intelLog.ScrollToCaret();
         }
-    }
+        private void UpdateDPSGraph()
+        {
+            int maxSpan = 500;
+
+            // default to total dps
+            chartDPS.Series.Clear();
+            var firstToon = _combat.Keys.First().ToString();
+            var toon1 = chartDPS.Series.Add(firstToon);
+            toon1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            toon1.Points.Clear();
+            DateTime start = _combat[firstToon].First().TimeAdded;
+            TimeSpan duration = _combat[firstToon].Last().TimeAdded - start;
+            var span = Math.Truncate(duration.TotalMilliseconds > maxSpan*1000 ? duration.TotalSeconds / maxSpan / 1000 : 1000);
+
+            DateTime pointTimeStart = start;
+            DateTime pointTimeEnd = start;
+            DateTime pointTimeLast = start;
+
+            float totalDamageIn = 0;
+            float totalDamageOut = 0;
+            float totalNeutIn = 0;
+            float totalNeutOut = 0;
+
+            while ( pointTimeStart <= _combat[firstToon].Last().TimeAdded )
+            {
+                pointTimeEnd = pointTimeStart.AddMilliseconds(span);
+
+                var ThisStep = _combat[firstToon].Where(x => x.TimeAdded >= pointTimeStart && x.TimeAdded <= pointTimeEnd).ToList();
+
+                pointTimeStart = pointTimeEnd;
+            }
+        }
+    } 
 }
