@@ -18,6 +18,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Media;
+using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -49,6 +50,7 @@ namespace Quesadilla
         public string configuration_filename = "Quesadilla.config.json";
         private int _intelSizeMax = 200;
         private int _intelSizeMin = 48;
+        private int _windowExtraHeight = 80;
 
         private MenuItem menuConfiguredAlerts = new MenuItem("Configured Alerts");
         private MenuItem menuBackgrounds = new MenuItem("Popup Background");
@@ -155,7 +157,7 @@ namespace Quesadilla
 
             watchers.Add(new LogWatcher("Quer_Catch", Classes.Logfile.LogFileType.ChatIntel, "Querious/Catch Intel"));
 
-            watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
+//            watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
              
             watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
             watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
@@ -310,6 +312,10 @@ namespace Quesadilla
             splashScreenThread.Abort();
             Thread.Sleep(500);
             splashScreen = null;
+
+            Version version = Assembly.GetEntryAssembly().GetName().Version;
+            this.Text = "Quesadill v" + version.ToString();
+
         }
         private SoundPlayer LoadSoundFromFile(string fileName)
         {
@@ -1114,12 +1120,14 @@ namespace Quesadilla
             {
                 // max it big
                 intelLog.Height = _intelSizeMax;
+                Height = intelLog.Height + _windowExtraHeight;
                 buttonIntelSize.Text = "▼";
             }
             else
             {
                 // make it small
                 intelLog.Height = _intelSizeMin;
+                Height = intelLog.Height + _windowExtraHeight;
                 buttonIntelSize.Text = "▲";
             }
             buttonIntelSize.Top = intelLog.Top + 2;

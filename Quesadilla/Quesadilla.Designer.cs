@@ -64,20 +64,22 @@
             // 
             this.alertsOutstanding.BackColor = System.Drawing.SystemColors.Control;
             this.alertsOutstanding.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.alertsOutstanding.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.alertsOutstanding.ForeColor = System.Drawing.Color.Crimson;
+            this.alertsOutstanding.Enabled = false;
+            this.alertsOutstanding.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.alertsOutstanding.ForeColor = System.Drawing.Color.PaleVioletRed;
             this.alertsOutstanding.Location = new System.Drawing.Point(0, -1);
             this.alertsOutstanding.Margin = new System.Windows.Forms.Padding(4);
             this.alertsOutstanding.Name = "alertsOutstanding";
-            this.alertsOutstanding.Size = new System.Drawing.Size(59, 40);
+            this.alertsOutstanding.Size = new System.Drawing.Size(59, 28);
             this.alertsOutstanding.TabIndex = 2;
+            this.alertsOutstanding.Text = "       ";
             // 
             // ChatServerDown
             // 
             this.ChatServerDown.AutoSize = true;
             this.ChatServerDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ChatServerDown.ForeColor = System.Drawing.Color.Red;
-            this.ChatServerDown.Location = new System.Drawing.Point(12, 80);
+            this.ChatServerDown.Location = new System.Drawing.Point(226, -1);
             this.ChatServerDown.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.ChatServerDown.Name = "ChatServerDown";
             this.ChatServerDown.Size = new System.Drawing.Size(154, 20);
@@ -90,7 +92,7 @@
             this.CombatFlag.AutoSize = true;
             this.CombatFlag.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CombatFlag.ForeColor = System.Drawing.Color.Red;
-            this.CombatFlag.Location = new System.Drawing.Point(831, 191);
+            this.CombatFlag.Location = new System.Drawing.Point(67, -1);
             this.CombatFlag.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.CombatFlag.Name = "CombatFlag";
             this.CombatFlag.Size = new System.Drawing.Size(92, 20);
@@ -113,15 +115,15 @@
             // 
             // lblCurrentClient
             // 
-            this.lblCurrentClient.AutoSize = true;
             this.lblCurrentClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCurrentClient.ForeColor = System.Drawing.Color.Red;
-            this.lblCurrentClient.Location = new System.Drawing.Point(13, 100);
+            this.lblCurrentClient.ForeColor = System.Drawing.Color.Blue;
+            this.lblCurrentClient.Location = new System.Drawing.Point(634, 1);
             this.lblCurrentClient.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblCurrentClient.Name = "lblCurrentClient";
-            this.lblCurrentClient.Size = new System.Drawing.Size(120, 20);
+            this.lblCurrentClient.Size = new System.Drawing.Size(358, 26);
             this.lblCurrentClient.TabIndex = 7;
             this.lblCurrentClient.Text = "Current Client";
+            this.lblCurrentClient.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.lblCurrentClient.Visible = false;
             // 
             // Quesadilla

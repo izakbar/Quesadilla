@@ -196,12 +196,13 @@ namespace Quesadilla
                 {
                     if (_main._combat[Toon].Count > 0)
                     {
-                        start = _main._combat[Toon].First().TimeAdded;
-                        end = _main._combat[Toon].Last().TimeAdded;
+                        if (_main._combat[currToon].First().TimeAdded < start) start = _main._combat[currToon].First().TimeAdded;
+                        if (_main._combat[currToon].Last().TimeAdded > end) end = _main._combat[currToon].Last().TimeAdded;
                     }
                 }
             }
             TimeSpan totalTime = end - start;
+
 
             DateTime curr = start;
             // check range
@@ -214,30 +215,36 @@ namespace Quesadilla
             var span = Math.Truncate(totalTime.TotalSeconds > maxPoints ? totalTime.TotalSeconds / maxPoints : 1);
             if (span < minSpanSize) span = minSpanSize;
 
-            // setup second slots
-            foreach (var c in _main._combat[Toon].OrderBy(o => o.TimeAdded).ToList())
+            foreach (var currToon in _main._combat.Keys)
             {
-                var slot = (int)Math.Truncate((c.TimeAdded - start).TotalSeconds);
-                if (!_combatGraphData.ContainsKey(slot))
+                if (currToon == Toon || Toon == "*ALL*")
                 {
-                    // slot does not exist - create
-                    _combatGraphData[slot] = new CombatGraphData()
+                    // setup second slots
+                    foreach (var c in _main._combat[currToon].OrderBy(o => o.TimeAdded).ToList())
                     {
-                        DamageGiven = 0,
-                        DamageReceived = 0,
-                        NeutsGiven = 0,
-                        NeutsReceived = 0,
-                    };
-                }
-                if (c.Received)
-                {
-                    _combatGraphData[slot].DamageReceived += c.DamageAmount;
-                    _combatGraphData[slot].NeutsReceived += c.NeutAmount;
-                }
-                else
-                {
-                    _combatGraphData[slot].DamageGiven += c.DamageAmount;
-                    _combatGraphData[slot].NeutsGiven += c.NeutAmount;
+                        var slot = (int)Math.Truncate((c.TimeAdded - start).TotalSeconds);
+                        if (!_combatGraphData.ContainsKey(slot))
+                        {
+                            // slot does not exist - create
+                            _combatGraphData[slot] = new CombatGraphData()
+                            {
+                                DamageGiven = 0,
+                                DamageReceived = 0,
+                                NeutsGiven = 0,
+                                NeutsReceived = 0,
+                            };
+                        }
+                        if (c.Received)
+                        {
+                            _combatGraphData[slot].DamageReceived += c.DamageAmount;
+                            _combatGraphData[slot].NeutsReceived += c.NeutAmount;
+                        }
+                        else
+                        {
+                            _combatGraphData[slot].DamageGiven += c.DamageAmount;
+                            _combatGraphData[slot].NeutsGiven += c.NeutAmount;
+                        }
+                    }
                 }
             }
 
