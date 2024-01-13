@@ -28,6 +28,7 @@ namespace Quesadilla.Classes
                 AlertPopupContextInfoColour = AlertPopupContextInfoColour,
                 AlertPopupIntelLineColour = AlertPopupIntelLineColour,
                 AlertPopupLocation = AlertPopupLocation,
+                DPSLocation = DPSLocation,
                 AlertPopupRegionNameColour = AlertPopupRegionNameColour,
                 AlertPopupSeconds = AlertPopupSeconds,
                 AlertPopupSystemNameColour = AlertPopupSystemNameColour,
@@ -38,7 +39,13 @@ namespace Quesadilla.Classes
                 HomeSystem = HomeSystem,
                 InitialPosition = InitialPosition,
                 StayOnTop = StayOnTop,
+                DPSGraphStayOnTop = DPSGraphStayOnTop,
+                DPSGraphTransparent= DPSGraphTransparent,
+                DPSGraphAllToons = DPSGraphAllToons,
                 WindowSize = WindowSize,
+                GraphCombatMaxPoints = GraphCombatMaxPoints,
+                GraphCombatMinPointSeconds = GraphCombatMinPointSeconds,
+                GraphCombatSeconds = GraphCombatSeconds,
             };
 
             c.ignoreStrings = new List<Regex>();
@@ -93,17 +100,21 @@ namespace Quesadilla.Classes
                 c.InitialPosition = new Point(0, 0);
                 c.WindowSize = new Point(760, 404);
                 c.StayOnTop = true;
+                c.DPSGraphStayOnTop = true;
+                c.DPSGraphTransparent = false;
+                c.DPSGraphAllToons = true;
                 c.IgnoreAsTooManyJumps = 15;
                 c.ExpireAlertSeconds = 500;
                 c.ExpireCombatSeconds = 1200;
                 c.GraphCombatSeconds = 180;
                 c.GraphCombatMaxPoints = 30;
-                c.GraphCombatMinPointSeconds = 5;
+                c.GraphCombatMinPointSeconds = 10;
 
                 c.AlertPopupSeconds = 8;
                 c.AlertPopupOpacity = 99;
                 c.AlertPopupOpacityStep = 5;
                 c.AlertPopupLocation = PopupLocationType.BottomLeft;
+                c.DPSLocation = PopupLocationType.BottomRight;
                 c.AlertPopupBackground = "background2";
 
                 c.AlertPopupSystemNameColour = Color.Red;
@@ -212,6 +223,9 @@ namespace Quesadilla.Classes
         public Point InitialPosition { get; set; }
         public Point WindowSize { get; set; }
         public bool StayOnTop { get; set; }
+        public bool DPSGraphStayOnTop { get; set; }
+        public bool DPSGraphTransparent { get; set; }
+        public bool DPSGraphAllToons { get; set; }
         public int IgnoreAsTooManyJumps { get; set; }
         public int ExpireAlertSeconds { get; set; }
         public int ExpireCombatSeconds { get; set; }
@@ -224,6 +238,7 @@ namespace Quesadilla.Classes
         public int AlertPopupOpacity { get; set; }
         public int AlertPopupOpacityStep { get; set; }
         public PopupLocationType AlertPopupLocation { get; set; }
+        public PopupLocationType DPSLocation { get; set; }
         public string AlertPopupBackground { get; set; }
         public Color AlertPopupSystemNameColour { get; set; }
         public Color AlertPopupRegionNameColour { get; set; }

@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -28,7 +29,7 @@ namespace Quesadilla
     {
 
         private readonly Regex _CombatRegexMissesYouCompletely = new Regex("(?<combatEntity>.*)\\smisses\\syou\\scompletely", RegexOptions.Compiled);
-        private readonly Regex _CombatRegexCombatData = new Regex("^<color=0x........><b>(?<combatAmount>.*)</b>\\s<color=0x........><font size=10>(?<combatContext>.*)</font>\\s<b><color=0xffffffff>(?<combatEntity>.*)</b><font size=10><color=0x77ffffff>\\s-\\s(?<combatText>.*)", RegexOptions.Compiled);
+        private readonly Regex _CombatRegexCombatData = new Regex("^<color=0x........><b>(?<combatAmount>.*)</b>\\s*<color=0x........><font size=10>\\s*(?<combatContext>.*)\\s*</font>\\s*<b><color=0xffffffff>(?<combatEntity>.*)</b>(<font size=10>|<color=0x77ffffff>)*\\s-\\s(?<combatText>.*)", RegexOptions.Compiled);
 
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
 
@@ -53,22 +54,24 @@ namespace Quesadilla
         private MenuItem menuConfiguration = new MenuItem("Configuration");
         private MenuItem menuConfigurationWindow = new MenuItem("Edit Configuration");
         private MenuItem menuConfigurationAlwaysOnTop = new MenuItem("Always on top");
-        private MenuItem menuConfigurationTransparent = new MenuItem("Transparent");
+        private MenuItem menuConfigurationDPSAlwaysOnTop = new MenuItem("DPS Always on top");
+        private MenuItem menuConfigurationDPSTransparent = new MenuItem("DPS Transparent");
         
         public bool AlertShowing = false;
+
         private bool ChatServerStatus = true;
         private bool InCombat = false;
+        private bool CombatAdded = false;
         private bool ConfigurationWindowOpen = false;
         private int TicksSinceLastCleardown = 0;
 
         private Thread splashScreenThread;
         private QuesadillaSplashScreen splashScreen;
+        public QuesadillaDPSGraph DPSGraphWindow = null;
 
         private Color OriginalBackgroundColour;
 
-        private Dictionary<string, List<CombatLine>> _combat = new Dictionary<string, List<CombatLine>>();
-
-        private Dictionary<int, CombatGraphData> _combatGraphData = new Dictionary<int, CombatGraphData>();
+        public Dictionary<string, List<CombatLine>> _combat = new Dictionary<string, List<CombatLine>>();
 
         // TODO - config things - really need to go into config structure later
         public List<Character> CharacterList { get; set; }
@@ -108,7 +111,10 @@ namespace Quesadilla
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
 
             menuConfiguration.MenuItems.Add(menuConfigurationAlwaysOnTop = new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = Configuration.StayOnTop, });
-            menuConfiguration.MenuItems.Add(menuConfigurationTransparent = new MenuItem("Transparent", trayIconMenuTransparent) { Checked = false, });
+
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSAlwaysOnTop = new MenuItem("DPS Always on top", trayIconMenuDPSAlwaysOnTop) { Checked = Configuration.DPSGraphStayOnTop, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSTransparent = new MenuItem("DPS Transparent", trayIconMenuDPSTransparent) { Checked = Configuration.DPSGraphTransparent, });
+
             menuConfiguration.MenuItems.Add(menuBackgrounds);
             menuConfiguration.MenuItems.Add(menuConfiguredAlerts);
             menuConfiguration.MenuItems.Add(menuLogWatchers);
@@ -131,7 +137,7 @@ namespace Quesadilla
             watchers.Add(new LogWatcher("Quer_Catch", Classes.Logfile.LogFileType.ChatIntel, "Querious/Catch Intel"));
 
             watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
-
+             
             watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
             watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
 
@@ -392,10 +398,12 @@ namespace Quesadilla
                     }
                 }
             }
-
             CombatFlag.Visible = InCombat;
-            chartDPS.Visible = InCombat;
-
+            if ( CombatAdded )
+            {
+                if (DPSGraphWindow != null) DPSGraphWindow.UpdateDPSGraph();
+                CombatAdded = false;
+            }
         }
         private void AddNewCharacter(string characterName)
         {
@@ -850,19 +858,32 @@ namespace Quesadilla
             TopMost = Configuration.StayOnTop;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
         }
-        private void trayIconMenuTransparent(object sender, EventArgs e)
+        private void trayIconMenuDPSAlwaysOnTop(object sender, EventArgs e)
+        {
+            Configuration.DPSGraphStayOnTop = !Configuration.DPSGraphStayOnTop;
+            ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
+            if (DPSGraphWindow != null) DPSGraphWindow.TopMost = Configuration.DPSGraphStayOnTop;
+        }
+        private void trayIconMenuDPSTransparent(object sender, EventArgs e)
         {
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
-            switch (((MenuItem)sender).Checked )
+            Configuration.DPSGraphTransparent = ((MenuItem)sender).Checked;
+
+            if (DPSGraphWindow != null)
             {
-                case true:
-                    this.TransparencyKey = this.BackColor = Color.AliceBlue;
-                    // the color key to transparent, choose a color that you don't use
-                    break;
-                case false:
-                    this.TransparencyKey = Color.AliceBlue;
-                    this.BackColor = OriginalBackgroundColour;
-                    break;
+                switch (((MenuItem)sender).Checked)
+                {
+                    case true:
+                        DPSGraphWindow.TransparencyKey = DPSGraphWindow.BackColor = DPSGraphWindow.TransparentColour;
+                        DPSGraphWindow.Text = "";
+                        // the color key to transparent, choose a color that you don't use
+                        break;
+                    case false:
+                        DPSGraphWindow.TransparencyKey = DPSGraphWindow.TransparentColour;
+                        DPSGraphWindow.BackColor = OriginalBackgroundColour;
+                        DPSGraphWindow.Text = "Queadilla DPS";
+                        break;
+                }
             }
         }
 
@@ -935,6 +956,12 @@ namespace Quesadilla
             //Log.Information("COMBAT:" + e.CombatEvent);
             if (e.Entry != null)
             {
+                if ( InCombat == false )
+                {
+                    DPSGraphWindow = new QuesadillaDPSGraph(this);
+                    DPSGraphWindow.Show();
+                }
+
                 InCombat = true;
                 if (!_combat.ContainsKey(e.Entry.CharacterName))
                 {
@@ -951,40 +978,48 @@ namespace Quesadilla
                         Entity = match.Groups["combatEntity"].ToString(),
                     });
                 }
-                else
+                match = _CombatRegexCombatData.Match(e.Entry.LineContent);
+                if (match.Success)
                 {
-                    match = _CombatRegexCombatData.Match(e.Entry.LineContent);
-                    if (match.Success)
+                    int dmgAmount = 0;
+                    int neutAmount = 0;
+
+                    var amount = match.Groups["combatAmount"].ToString();
+                    if (amount.Contains("GJ"))
                     {
-                        int dmgAmount = 0;
-                        int neutAmount = 0;
-
-                        var amount = match.Groups["combatAmount"].ToString();
-                        if (amount.Contains("GJ"))
-                        {
-                            neutAmount = Int32.Parse(amount.Replace(" GJ", "").Trim());
-                        }
-                        else
-                        {
-                            dmgAmount = Int32.Parse(amount.Trim());
-                        }
-
-                        _combat[e.Entry.CharacterName].Add(new CombatLine()
-                        {
-                            TimeAdded = e.Entry.TimeAdded,
-                            Entity = match.Groups["combatEntity"].ToString(),
-                            Text = match.Groups["combatText"].ToString(),
-                            NeutAmount = neutAmount,
-                            DamageAmount = dmgAmount,
-                            Received = match.Groups["combatContext"].ToString() == "from" ? true : false,
-                        });
+                        neutAmount = Int32.Parse(amount.Replace(" GJ", "").Trim());
                     }
+                    else
+                    {
+                        dmgAmount = Int32.Parse(amount.Trim());
+                    }
+
+                    bool received = true;
+                    if ( match.Groups["combatContext"].ToString() == "to" )
+                    {
+                        received = false;
+                    }
+                    _combat[e.Entry.CharacterName].Add(new CombatLine()
+                    {
+                        TimeAdded = e.Entry.TimeAdded,
+                        Entity = match.Groups["combatEntity"].ToString(),
+                        Text = match.Groups["combatText"].ToString(),
+                        NeutAmount = neutAmount,
+                        DamageAmount = dmgAmount,
+                        Received = received,
+                    });
                 }
-                UpdateDPSGraph();
+                CombatAdded = true;
             }
             else
             {
                 InCombat = false;
+                if (DPSGraphWindow != null )
+                {
+                    DPSGraphWindow.Close();
+                    DPSGraphWindow = null;
+                };
+
             }
         }
 
@@ -1006,133 +1041,6 @@ namespace Quesadilla
             buttonIntelSize.Left = intelLog.Width - buttonIntelSize.Width - 2;
             intelLog.ScrollToCaret();
         }
-        private void UpdateDPSGraph()
-        {
-            int maxPoints = Configuration.GraphCombatMaxPoints;
-            int minSpanSize = Configuration.GraphCombatMinPointSeconds;
-
-            // default to total dps
-            chartDPS.Series.Clear();
-            var firstToon = _combat.Keys.First().ToString();
-            var toon1Received = chartDPS.Series.Add(firstToon + " in");
-            toon1Received.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            toon1Received.Points.Clear();
-            toon1Received.Color = Color.Red;
-
-            var toon1Given = chartDPS.Series.Add(firstToon + " out");
-            toon1Given.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            toon1Given.Points.Clear();
-            toon1Given.Color = Color.Green;
-
-            DateTime start = DateTime.Now;
-            DateTime end = start;
-            if (_combat[firstToon].Count > 0)
-            {
-                start = _combat[firstToon].First().TimeAdded;
-                end = _combat[firstToon].Last().TimeAdded;
-            }
-            TimeSpan totalTime = end - start;
-
-            DateTime curr = start;
-            // check range
-            if (totalTime.TotalSeconds > Configuration.GraphCombatSeconds)
-            {
-                curr = end.AddSeconds(-1 * Configuration.GraphCombatSeconds);
-                totalTime = end - curr;
-            }
-
-            var span = Math.Truncate(totalTime.TotalSeconds > maxPoints ? totalTime.TotalSeconds / maxPoints : 1);
-            if (span < minSpanSize) span = minSpanSize;
-
-            _combatGraphData.Clear();
-            // setup second slots
-            foreach (var c in _combat[firstToon].OrderBy(o => o.TimeAdded).ToList())
-            {
-                var slot = (int)Math.Truncate((c.TimeAdded - start).TotalSeconds);
-                if (!_combatGraphData.ContainsKey(slot))
-                {
-                    // slot does not exist - create
-                    _combatGraphData[slot] = new CombatGraphData()
-                    {
-                        DamageGiven = 0,
-                        DamageReceived = 0,
-                        NeutsGiven = 0,
-                        NeutsReceived = 0,
-                    };
-                }
-                if (c.Received)
-                {
-                    _combatGraphData[slot].DamageReceived += c.DamageAmount;
-                    _combatGraphData[slot].NeutsReceived += c.NeutAmount;
-                }
-                else
-                {
-                    _combatGraphData[slot].DamageGiven += c.DamageAmount;
-                    _combatGraphData[slot].NeutsGiven += c.NeutAmount;
-                }
-            }
-
-            // now go thru from start -> end in slot seconds
-
-            var graphStartXp = (int)Math.Truncate((curr - start).TotalSeconds);
-            if (graphStartXp < 0) graphStartXp = 0;
-            var graphEndXp = (int)Math.Truncate((end - start).TotalSeconds);
-
-            chartDPS.ChartAreas[0].AxisX.Minimum = graphStartXp + span + 1 > graphEndXp ? graphStartXp : graphStartXp + span + 1;
-            chartDPS.ChartAreas[0].AxisX.Maximum = graphEndXp;
-            chartDPS.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
-
-            while (curr <= end)
-            {
-                // curr is mid point of damage
-                // need to calc prev and next point - based on stepsize
-                var p = (int)Math.Truncate((curr.AddSeconds(span * -1) - start).TotalSeconds);
-                if (p < 0) p = 0;
-                var n = (int)Math.Truncate((curr.AddSeconds(span) - start).TotalSeconds);
-                // bounds check n ?
-
-                var seconds = (int)Math.Truncate((curr - start).TotalSeconds);
-
-                double dReceived = 0;
-                double dGiven = 0;
-                double nReceived = 0;
-                double nGiven = 0;
-                curr = curr.AddSeconds(span);
-                for (var i = p; i <= n; i++)
-                {
-                    if (_combatGraphData.ContainsKey(i))
-                    {
-                        dReceived += _combatGraphData[i].DamageReceived;
-                        dGiven += _combatGraphData[i].DamageGiven;
-                        nReceived += _combatGraphData[i].NeutsReceived;
-                        nGiven += _combatGraphData[i].NeutsGiven;
-                    }
-                }
-                if (seconds > 0)
-                {
-                    toon1Received.Points.AddXY(seconds, dReceived / (span * 2 + 1));
-                    toon1Given.Points.AddXY(seconds, dGiven / (span * 2 + 1));
-                }
-            }
-
-            /*
-            // dump to csv
-            using (var file = File.CreateText("data1.csv"))
-            {
-                foreach (var a in _combatGraphData.Keys)
-                {
-                    file.WriteLine(a + "," + _combatGraphData[a].ToCSV());
-                }
-            }
-            using (var file = File.CreateText("data2.csv"))
-            {
-                foreach (var a in toon1Received.Points)
-                {
-                    file.WriteLine(a.XValue.ToString() + ","+ a.YValues[0].ToString() + "," + graphStartXp.ToString() + "," + graphEndXp.ToString());
-                }
-            }
-            */
-        }
 
         private void chartDPS_Click(object sender, EventArgs e)
         {
@@ -1144,12 +1052,18 @@ namespace Quesadilla
             {
                 CreateParams cp = base.CreateParams;
                 // Set the form click-through
-                cp.ExStyle |= 
-                    0x80000 /* WS_EX_LAYERED */ | 
-                    0x20 /* WS_EX_TRANSPARENT */
-                    ;
+
+//                cp.ExStyle |= 
+//                    0x80000 /* WS_EX_LAYERED */ | 
+//                    0x20 /* WS_EX_TRANSPARENT */
+//                    ;
                 return cp;
             }
+        }
+
+        private void intelLog_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

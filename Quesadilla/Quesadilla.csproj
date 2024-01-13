@@ -175,6 +175,12 @@
     <Compile Include="QuesadillaConfiguration.Designer.cs">
       <DependentUpon>QuesadillaConfiguration.cs</DependentUpon>
     </Compile>
+    <Compile Include="QuesadillaDPSGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuesadillaDPSGraph.Designer.cs">
+      <DependentUpon>QuesadillaDPSGraph.cs</DependentUpon>
+    </Compile>
     <Compile Include="QuesadillaSplashScreen.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -199,6 +205,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="QuesadillaConfiguration.resx">
       <DependentUpon>QuesadillaConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="QuesadillaDPSGraph.resx">
+      <DependentUpon>QuesadillaDPSGraph.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="QuesadillaSplashScreen.resx">
       <DependentUpon>QuesadillaSplashScreen.cs</DependentUpon>

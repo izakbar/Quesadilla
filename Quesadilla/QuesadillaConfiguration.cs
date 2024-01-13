@@ -46,7 +46,6 @@ namespace Quesadilla
         private void QuesadillaConfiguration_Load(object sender, EventArgs e)
         {
             SetSystem(cmbHomeSystem, _configuration.HomeSystem);
-            cbStayOnTop.Checked = _configuration.StayOnTop;
             _dummyAlert = new AlertQueueItem()
             {
                 AlertText = "X-x-X-x-X-x-X-x-X-x-X-x-X-x-X-x-X-x-X-x-X",
@@ -86,7 +85,7 @@ namespace Quesadilla
             switch (_configuration.AlertPopupLocation)
             {
                 case Classes.Configuration.PopupLocationType.Center:
-                    radioAlertCentre.Checked = true; break;
+                    radioAlertCenter.Checked = true; break;
                 case Classes.Configuration.PopupLocationType.TopLeft:
                     radioAlertTopLeft.Checked = true; break;
                 case Classes.Configuration.PopupLocationType.TopRight:
@@ -96,6 +95,24 @@ namespace Quesadilla
                 case Classes.Configuration.PopupLocationType.BottomRight:
                     radioAlertBottomRight.Checked = true;break;
             }
+
+            switch (_configuration.DPSLocation)
+            {
+                case Classes.Configuration.PopupLocationType.Center:
+                    radioDPSCenter.Checked = true; break;
+                case Classes.Configuration.PopupLocationType.TopLeft:
+                    radioDPSTopLeft.Checked = true; break;
+                case Classes.Configuration.PopupLocationType.TopRight:
+                    radioDPSTopRight.Checked = true; break;
+                case Classes.Configuration.PopupLocationType.BottomLeft:
+                    radioDPSBottomLeft.Checked = true; break;
+                case Classes.Configuration.PopupLocationType.BottomRight:
+                    radioDPSBottomRight.Checked = true; break;
+            }
+
+            cbDPSStayOnTop.Checked = _configuration.DPSGraphStayOnTop;
+            cbDPSTransparent.Checked = _configuration.DPSGraphTransparent;
+            cbStayOnTop.Checked = _configuration.StayOnTop;
         }
         private Bitmap GetControlImage(Control ctl)
         {
@@ -241,6 +258,51 @@ namespace Quesadilla
         private void radioAlertCentre_CheckedChanged(object sender, EventArgs e)
         {
             _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.Center;
+        }
+
+        private void cbDPSStayOnTop_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.DPSGraphStayOnTop = cbDPSStayOnTop.Checked;
+        }
+
+        private void cbStayOnTop_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.StayOnTop = cbStayOnTop.Checked;
+        }
+
+        private void cbDPSTransparent_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.DPSGraphTransparent= cbDPSTransparent.Checked;
+        }
+
+        private void radioDPSTopLeft_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.DPSLocation = Classes.Configuration.PopupLocationType.TopLeft;
+        }
+
+        private void radioDPSTopRight_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.DPSLocation = Classes.Configuration.PopupLocationType.TopRight;
+        }
+
+        private void radioDPSCenter_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.DPSLocation = Classes.Configuration.PopupLocationType.Center;
+        }
+
+        private void radioDPSBottomLeft_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.DPSLocation = Classes.Configuration.PopupLocationType.BottomLeft;
+        }
+
+        private void radioDPSBottomRight_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.DPSLocation = Classes.Configuration.PopupLocationType.BottomRight;
+        }
+
+        private void cbDPSAll_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.DPSGraphAllToons= cbDPSAll.Checked;
         }
     }
 }
