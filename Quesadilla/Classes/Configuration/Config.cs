@@ -41,7 +41,9 @@ namespace Quesadilla.Classes
                 StayOnTop = StayOnTop,
                 DPSGraphStayOnTop = DPSGraphStayOnTop,
                 DPSGraphTransparent= DPSGraphTransparent,
-                DPSGraphAllToons = DPSGraphAllToons,
+                DPSShowWindow = DPSShowWindow,
+                DPSSaveCSV = DPSSaveCSV,
+                DPSAllToons = DPSAllToons,
                 WindowSize = WindowSize,
                 GraphCombatMaxPoints = GraphCombatMaxPoints,
                 GraphCombatMinPointSeconds = GraphCombatMinPointSeconds,
@@ -102,7 +104,9 @@ namespace Quesadilla.Classes
                 c.StayOnTop = true;
                 c.DPSGraphStayOnTop = true;
                 c.DPSGraphTransparent = false;
-                c.DPSGraphAllToons = true;
+                c.DPSShowWindow = true;
+                c.DPSSaveCSV = false;
+                c.DPSAllToons = false;
                 c.IgnoreAsTooManyJumps = 15;
                 c.ExpireAlertSeconds = 500;
                 c.ExpireCombatSeconds = 1200;
@@ -141,7 +145,7 @@ namespace Quesadilla.Classes
                 c.AlertConfiguration = new List<AlertConfig>();
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "All toons <= 5 jumps",
+                    FriendlyName = "All online toons <= 5 jumps",
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.AllOnlineCharacters,
@@ -154,8 +158,8 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "Izakbar <= 5 jumps",
-                    Enabled = true,
+                    FriendlyName = "Izakbar (if online) <= 5 jumps",
+                    Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.OneOnlineCharacter,
                     TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem} {route}",
@@ -196,7 +200,7 @@ namespace Quesadilla.Classes
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
                     FriendlyName = "ESS robbery",
-                    Enabled = true,
+                    Enabled = false,
                     AlertType = AlertConfigType.Text,
                     TextDisplay = "ESS robbery {text} reported by {reporter}",
                     MenuDisplay = "ESS robbery {text} reported by {reporter}",
@@ -225,7 +229,9 @@ namespace Quesadilla.Classes
         public bool StayOnTop { get; set; }
         public bool DPSGraphStayOnTop { get; set; }
         public bool DPSGraphTransparent { get; set; }
-        public bool DPSGraphAllToons { get; set; }
+        public bool DPSShowWindow { get; set; }
+        public bool DPSAllToons { get; set; }
+        public bool DPSSaveCSV { get; set; }
         public int IgnoreAsTooManyJumps { get; set; }
         public int ExpireAlertSeconds { get; set; }
         public int ExpireCombatSeconds { get; set; }

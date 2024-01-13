@@ -107,9 +107,14 @@ namespace Quesadilla
             // default to total dps
             chartDPS.Series.Clear();
 
-            var Toon = _main._combat.Keys.First().ToString();
-            DateTime LastCombat = DateTime.Now.AddDays(-1);
+            string Toon = "";
 
+            /*
+            // pick first toon in list;
+            Toon = _main._combat.Keys.First().ToString();
+
+            // pick last active dps
+            DateTime LastCombat = DateTime.Now.AddDays(-1);
             if ( _main._combat.Keys.Count > 1 )
             {
                 // find toon with latest combat on
@@ -125,6 +130,27 @@ namespace Quesadilla
                     }
                 }
             }
+            */
+
+            // but wait - what if we have a currently active toon ?
+            if ( _main.CurrentActiveToon != null && _main.CurrentActiveToon != "" )
+            {
+                Toon = _main.CurrentActiveToon;
+            }
+
+            if ( Toon == null || Toon == "" || !_main._combat.ContainsKey(Toon))
+            {
+                chartDPS.Visible = false;
+                return;
+            } else
+            {
+                chartDPS.Visible = true;
+            }
+
+            if ( _main.Configuration.DPSAllToons )
+            {
+                Toon = "*ALL*";
+            }
 
             var toon1Received = chartDPS.Series.Add(Toon + " IN");
             toon1Received.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
@@ -134,7 +160,7 @@ namespace Quesadilla
             toon1Received.BorderWidth = LineSize;
             toon1Received.BorderDashStyle = ChartDashStyle.Solid;
 
-            var toon1Given = chartDPS.Series.Add(Toon + " OUT");
+            var toon1Given = chartDPS.Series.Add("OUT");
             toon1Given.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1Given.Points.Clear();
             toon1Given.Color = Color.Green;
@@ -142,7 +168,7 @@ namespace Quesadilla
             toon1Given.BorderWidth = LineSize;
             toon1Given.BorderDashStyle = ChartDashStyle.Solid;
 
-            var toon1NeutReceived = chartDPS.Series.Add(Toon + " NeutOUT");
+            var toon1NeutReceived = chartDPS.Series.Add("NeutIN");
             toon1NeutReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1NeutReceived.Points.Clear();
             toon1NeutReceived.Color = Color.Orange;
@@ -150,10 +176,10 @@ namespace Quesadilla
             toon1NeutReceived.BorderWidth = LineSize;
             toon1NeutReceived.BorderDashStyle = ChartDashStyle.Solid;
 
-            var toon1NeutGiven = chartDPS.Series.Add(Toon + " NeutIN");
+            var toon1NeutGiven = chartDPS.Series.Add("NeutOUT");
             toon1NeutGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1NeutGiven.Points.Clear();
-            toon1NeutGiven.Color = Color.Yellow;
+            toon1NeutGiven.Color = Color.YellowGreen;
             toon1NeutGiven.YAxisType = AxisType.Secondary;
             toon1NeutGiven.BorderWidth = LineSize;
             toon1NeutGiven.BorderDashStyle = ChartDashStyle.Solid;
@@ -162,10 +188,18 @@ namespace Quesadilla
 
             DateTime start = DateTime.Now;
             DateTime end = start;
-            if (_main._combat[Toon].Count > 0)
+
+            // work out start/end times of combat - for cuirrent/all toons
+            foreach (var currToon in _main._combat.Keys)
             {
-                start = _main._combat[Toon].First().TimeAdded;
-                end = _main._combat[Toon].Last().TimeAdded;
+                if (currToon == Toon || Toon == "*ALL*")
+                {
+                    if (_main._combat[Toon].Count > 0)
+                    {
+                        start = _main._combat[Toon].First().TimeAdded;
+                        end = _main._combat[Toon].Last().TimeAdded;
+                    }
+                }
             }
             TimeSpan totalTime = end - start;
 
@@ -253,23 +287,26 @@ namespace Quesadilla
                 }
             }
 
-            /*
             // dump to csv
-            using (var file = File.CreateText("data1.csv"))
+            if (_main.Configuration.DPSSaveCSV)
             {
-                foreach (var a in _combatGraphData.Keys)
+                using (var file = File.CreateText(Toon + "_raw_combat.csv"))
                 {
-                    file.WriteLine(a + "," + _combatGraphData[a].ToCSV());
+                    foreach (var a in _combatGraphData.Keys)
+                    {
+                        file.WriteLine(a + "," + _combatGraphData[a].ToCSV());
+                    }
                 }
-            }
-            using (var file = File.CreateText("data2.csv"))
-            {
-                foreach (var a in toon1Received.Points)
+/*
+ using (var file = File.CreateText(Toon + "_raw_combat.csv"))
                 {
-                    file.WriteLine(a.XValue.ToString() + "," + a.YValues[0].ToString() + "," + graphStartXp.ToString() + "," + graphEndXp.ToString());
+                    foreach (var a in toon1Received.Points)
+                    {
+                        file.WriteLine(a.XValue.ToString() + "," + a.YValues[0].ToString() + "," + graphStartXp.ToString() + "," + graphEndXp.ToString());
+                    }
                 }
+*/
             }
-            */
         }
 
         private void chartDPS_Click(object sender, EventArgs e)

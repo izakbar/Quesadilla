@@ -112,6 +112,7 @@ namespace Quesadilla
 
             cbDPSStayOnTop.Checked = _configuration.DPSGraphStayOnTop;
             cbDPSTransparent.Checked = _configuration.DPSGraphTransparent;
+            cbDPSShowWindow.Checked = _configuration.DPSShowWindow;
             cbStayOnTop.Checked = _configuration.StayOnTop;
         }
         private Bitmap GetControlImage(Control ctl)
@@ -300,9 +301,14 @@ namespace Quesadilla
             _configuration.DPSLocation = Classes.Configuration.PopupLocationType.BottomRight;
         }
 
-        private void cbDPSAll_CheckedChanged(object sender, EventArgs e)
+        private void cbDPSShowWindow_CheckedChanged(object sender, EventArgs e)
         {
-            _configuration.DPSGraphAllToons= cbDPSAll.Checked;
+            _configuration.DPSShowWindow= cbDPSShowWindow.Checked;
+        }
+
+        private void cbDPSAllToons_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.DPSAllToons= cbDPSAllToons.Checked;
         }
     }
 }

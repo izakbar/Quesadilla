@@ -56,10 +56,15 @@ namespace Quesadilla
         private MenuItem menuLogWatchers = new MenuItem("Logfiles");
         private MenuItem menuConfiguration = new MenuItem("Configuration");
         private MenuItem menuConfigurationWindow = new MenuItem("Edit Configuration");
+
         private MenuItem menuConfigurationAlwaysOnTop = new MenuItem("Always on top");
-        private MenuItem menuConfigurationDPSAlwaysOnTop = new MenuItem("DPS Always on top");
+
+        private MenuItem menuConfigurationDPSShowDPS = new MenuItem("Show DPS");
+        private MenuItem menuConfigurationDPSStayOnTop = new MenuItem("DPS Always on top");
         private MenuItem menuConfigurationDPSTransparent = new MenuItem("DPS Transparent");
-        
+        private MenuItem menuConfigurationDPSSaveCSV = new MenuItem("DPS Save CSV");
+        private MenuItem menuConfigurationDPSShowAll = new MenuItem("DPS Combine");
+
         public bool AlertShowing = false;
 
         private bool ChatServerStatus = true;
@@ -78,6 +83,9 @@ namespace Quesadilla
         private Color OriginalBackgroundColour;
 
         public Dictionary<string, List<CombatLine>> _combat = new Dictionary<string, List<CombatLine>>();
+
+        private List<ProcessInfo>knowProcesses = new List<ProcessInfo>();
+        public string CurrentActiveToon;
 
         // TODO - config things - really need to go into config structure later
         public List<Character> CharacterList { get; set; }
@@ -120,8 +128,11 @@ namespace Quesadilla
 
             menuConfiguration.MenuItems.Add(menuConfigurationAlwaysOnTop = new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = Configuration.StayOnTop, });
 
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSAlwaysOnTop = new MenuItem("DPS Always on top", trayIconMenuDPSAlwaysOnTop) { Checked = Configuration.DPSGraphStayOnTop, });
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSTransparent = new MenuItem("DPS Transparent", trayIconMenuDPSTransparent) { Checked = Configuration.DPSGraphTransparent, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSShowDPS = new MenuItem("Show DPS", trayIconMenuDPSShowWindow) { Checked = Configuration.DPSShowWindow, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSStayOnTop = new MenuItem("DPS Always on top", trayIconMenuDPSAlwaysOnTop) { Checked = Configuration.DPSGraphStayOnTop, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSTransparent =  new MenuItem("DPS Transparent", trayIconMenuDPSTransparent) { Checked = Configuration.DPSGraphTransparent, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSSaveCSV = new MenuItem("DPS Save CSV", trayIconMenuDPSSaveCSV) { Checked = Configuration.DPSSaveCSV, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSShowAll = new MenuItem("DPS Combine", trayIconMenuDPSAllToons) { Checked = Configuration.DPSAllToons, });
 
             menuConfiguration.MenuItems.Add(menuBackgrounds);
             menuConfiguration.MenuItems.Add(menuConfiguredAlerts);
@@ -278,6 +289,11 @@ namespace Quesadilla
 
             TopMost = Configuration.StayOnTop;
             menuConfigurationAlwaysOnTop.Checked = Configuration.StayOnTop;
+            menuConfigurationDPSShowDPS.Checked = Configuration.DPSShowWindow;
+            menuConfigurationDPSStayOnTop.Checked = Configuration.DPSGraphStayOnTop;
+            menuConfigurationDPSTransparent.Checked = Configuration.DPSGraphTransparent;
+            menuConfigurationDPSSaveCSV.Checked = Configuration.DPSSaveCSV;
+            menuConfigurationDPSShowAll.Checked = Configuration.DPSAllToons;
 
             _solarSystems.HomeSolarSystemID = _solarSystems.Names[Configuration.HomeSystem];
 
@@ -408,16 +424,16 @@ namespace Quesadilla
             }
 
             UpdateEveProcesses();
-            var ptr = GetForegroundWindowHandle();
-            if ( ptr != IntPtr.Zero )
-            {
-                string foregroundWindowTitle = null;
-            }
-
 
             CombatFlag.Visible = InCombat;
             if ( CombatAdded )
             {
+                if (Configuration.DPSShowWindow && DPSGraphWindow == null)
+                {
+                    DPSGraphWindow = new QuesadillaDPSGraph(this);
+                    DPSGraphWindow.Show();
+                }
+
                 if (DPSGraphWindow != null)
                 {
                     DPSGraphWindow.UpdateDPSGraph();
@@ -899,12 +915,36 @@ namespace Quesadilla
             TopMost = Configuration.StayOnTop;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
         }
+        private void trayIconMenuDPSShowWindow(object sender, EventArgs e)
+        {
+            Configuration.DPSShowWindow = !Configuration.DPSShowWindow;
+            ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
+            if (DPSGraphWindow != null)
+            {
+                if (!((MenuItem)sender).Checked)
+                {
+                    DPSGraphWindow.Close();
+                    DPSGraphWindow = null;
+                }
+            }
+        }
         private void trayIconMenuDPSAlwaysOnTop(object sender, EventArgs e)
         {
             Configuration.DPSGraphStayOnTop = !Configuration.DPSGraphStayOnTop;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
             if (DPSGraphWindow != null) DPSGraphWindow.TopMost = Configuration.DPSGraphStayOnTop;
         }
+        private void trayIconMenuDPSSaveCSV(object sender, EventArgs e)
+        {
+            Configuration.DPSSaveCSV = !Configuration.DPSSaveCSV;
+            ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
+        }
+        private void trayIconMenuDPSAllToons(object sender, EventArgs e)
+        {
+            Configuration.DPSAllToons = !Configuration.DPSAllToons;
+            ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
+        }
+       
         private void trayIconMenuDPSTransparent(object sender, EventArgs e)
         {
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
@@ -997,7 +1037,7 @@ namespace Quesadilla
             //Log.Information("COMBAT:" + e.CombatEvent);
             if (e.Entry != null)
             {
-                if ( InCombat == false )
+                if ( InCombat == false && Configuration.DPSShowWindow)
                 {
                     DPSGraphWindow = new QuesadillaDPSGraph(this);
                     DPSGraphWindow.Show();
@@ -1114,13 +1154,17 @@ namespace Quesadilla
         private void UpdateEveProcesses()
         {
             this._processMonitor.GetUpdatedProcesses(out List<ProcessInfo> addedProcesses, out List<ProcessInfo> updatedProcesses, out List<ProcessInfo> removedProcesses);
-            
+            string previousToon = CurrentActiveToon;
+
+            string foregroundWindowTitle = null;
+            var ptr = GetForegroundWindowHandle();
+
             // new / updated clients - ensure they are added 
-            foreach(var a in addedProcesses.Union(updatedProcesses) )
+            foreach (var a in addedProcesses.Union(updatedProcesses))
             {
                 var clientName = a.Title.Replace("EVE - ", "");
                 var c = CharacterList.Find(o => o.CharacterName.Equals(clientName));
-                if ( c == null ) { }
+                if (c == null) { }
                 {
                     c = new Character()
                     {
@@ -1144,6 +1188,49 @@ namespace Quesadilla
                 }
                 c.IsClientActive = false;
             }
+
+            if (ptr != null )
+            {
+                foregroundWindowTitle = this._processMonitor.GetTitleOfKnownProcess(ptr);
+                if (foregroundWindowTitle != null)
+                {
+                    lblCurrentClient.Visible = true;
+                    CurrentActiveToon = foregroundWindowTitle.Replace("EVE - ", "");
+                    lblCurrentClient.Text = CurrentActiveToon;
+
+                    if (previousToon == null || previousToon == "" || previousToon != CurrentActiveToon)
+                    {
+                        if (Configuration.DPSShowWindow && DPSGraphWindow != null)
+                        {
+                            if (CurrentActiveToon == null || CurrentActiveToon == "")
+                            {
+                                DPSGraphWindow.Hide();
+                            }
+                            else
+                            {
+                                CombatAdded = true;
+                                DPSGraphWindow.UpdateDPSGraph();
+                                DPSGraphWindow.Show();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (Configuration.DPSShowWindow && DPSGraphWindow != null)
+                    {
+                        DPSGraphWindow.Hide();
+                    }
+                }
+            }
+
+            if ( foregroundWindowTitle == null )
+            {
+                lblCurrentClient.Visible = false;
+                CurrentActiveToon = "";
+                lblCurrentClient.Text = CurrentActiveToon;
+            }
+
         }
     }
 }

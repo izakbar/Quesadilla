@@ -37,6 +37,7 @@
             this.alliance = new System.Windows.Forms.PictureBox();
             this.izakbar = new System.Windows.Forms.PictureBox();
             this.timerOpen = new System.Windows.Forms.Timer(this.components);
+            this.VersionNumber = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.paulmart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.corp)).BeginInit();
@@ -122,12 +123,22 @@
             this.timerOpen.Interval = 50;
             this.timerOpen.Tick += new System.EventHandler(this.timerOpen_Tick);
             // 
+            // VersionNumber
+            // 
+            this.VersionNumber.AutoSize = true;
+            this.VersionNumber.Location = new System.Drawing.Point(28, 26);
+            this.VersionNumber.Name = "VersionNumber";
+            this.VersionNumber.Size = new System.Drawing.Size(55, 16);
+            this.VersionNumber.TabIndex = 8;
+            this.VersionNumber.Text = "XXXXXX";
+            // 
             // QuesadillaSplashScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(815, 386);
             this.ControlBox = false;
+            this.Controls.Add(this.VersionNumber);
             this.Controls.Add(this.izakbar);
             this.Controls.Add(this.alliance);
             this.Controls.Add(this.pictureBox1);
@@ -147,6 +158,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.alliance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.izakbar)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -159,5 +171,6 @@
         private System.Windows.Forms.PictureBox alliance;
         private System.Windows.Forms.PictureBox izakbar;
         private System.Windows.Forms.Timer timerOpen;
+        private System.Windows.Forms.Label VersionNumber;
     }
 }

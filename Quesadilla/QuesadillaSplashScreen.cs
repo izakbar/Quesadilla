@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -59,6 +60,9 @@ namespace Quesadilla
             Left = (screen.WorkingArea.Width / 2) - (Width / 2);
             Top = (screen.WorkingArea.Height / 2) - (Height / 2);
             ShowInTaskbar = false;
+
+            Version version = Assembly.GetEntryAssembly().GetName().Version;
+            VersionNumber.Text = version.ToString();
         }
     }
 }

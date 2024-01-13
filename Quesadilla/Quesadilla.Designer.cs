@@ -36,6 +36,7 @@
             this.ChatServerDown = new System.Windows.Forms.Label();
             this.CombatFlag = new System.Windows.Forms.Label();
             this.buttonIntelSize = new System.Windows.Forms.Button();
+            this.lblCurrentClient = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // mainTimer
@@ -66,7 +67,7 @@
             this.alertsOutstanding.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.alertsOutstanding.ForeColor = System.Drawing.Color.Crimson;
             this.alertsOutstanding.Location = new System.Drawing.Point(0, -1);
-            this.alertsOutstanding.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.alertsOutstanding.Margin = new System.Windows.Forms.Padding(4);
             this.alertsOutstanding.Name = "alertsOutstanding";
             this.alertsOutstanding.Size = new System.Drawing.Size(59, 40);
             this.alertsOutstanding.TabIndex = 2;
@@ -110,11 +111,25 @@
             this.buttonIntelSize.UseVisualStyleBackColor = false;
             this.buttonIntelSize.Click += new System.EventHandler(this.buttonIntelSize_Click);
             // 
+            // lblCurrentClient
+            // 
+            this.lblCurrentClient.AutoSize = true;
+            this.lblCurrentClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCurrentClient.ForeColor = System.Drawing.Color.Red;
+            this.lblCurrentClient.Location = new System.Drawing.Point(13, 100);
+            this.lblCurrentClient.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblCurrentClient.Name = "lblCurrentClient";
+            this.lblCurrentClient.Size = new System.Drawing.Size(120, 20);
+            this.lblCurrentClient.TabIndex = 7;
+            this.lblCurrentClient.Text = "Current Client";
+            this.lblCurrentClient.Visible = false;
+            // 
             // Quesadilla
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(992, 449);
+            this.Controls.Add(this.lblCurrentClient);
             this.Controls.Add(this.buttonIntelSize);
             this.Controls.Add(this.CombatFlag);
             this.Controls.Add(this.ChatServerDown);
@@ -140,6 +155,7 @@
         private System.Windows.Forms.Label ChatServerDown;
         private System.Windows.Forms.Label CombatFlag;
         private System.Windows.Forms.Button buttonIntelSize;
+        private System.Windows.Forms.Label lblCurrentClient;
     }
 }
 
