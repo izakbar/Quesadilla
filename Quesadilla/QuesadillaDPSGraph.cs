@@ -89,6 +89,7 @@ namespace Quesadilla
             {
                 this.chartDPS.BackColor = this.BackColor;
                 ShowInTaskbar = false;
+                this.chartDPS.AntiAliasing = AntiAliasingStyles.None;
             }
         }
 

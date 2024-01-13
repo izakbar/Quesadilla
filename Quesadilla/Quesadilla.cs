@@ -2,6 +2,7 @@
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.Logfile;
+using Quesadilla.Classes.Processes;
 using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.Resources;
 using Quesadilla.Classes.SolarSystems;
@@ -9,6 +10,7 @@ using Serilog;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
@@ -17,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Media;
 using System.Resources;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -29,7 +32,7 @@ namespace Quesadilla
     {
 
         private readonly Regex _CombatRegexMissesYouCompletely = new Regex("(?<combatEntity>.*)\\smisses\\syou\\scompletely", RegexOptions.Compiled);
-        private readonly Regex _CombatRegexCombatData = new Regex("^<color=0x........><b>(?<combatAmount>.*)</b>\\s*<color=0x........><font size=10>\\s*(?<combatContext>.*)\\s*</font>\\s*<b><color=0xffffffff>(?<combatEntity>.*)</b>(<font size=10>|<color=0x77ffffff>)*\\s-\\s(?<combatText>.*)", RegexOptions.Compiled);
+        private readonly Regex _CombatRegexCombatData = new Regex("^<color=0x(?<combatColour>........)><b>(?<combatAmount>.*)</b>\\s*<color=0x........><font size=10>\\s*(?<combatContext>.*)\\s*</font>\\s*<b><color=0xffffffff>(?<combatEntity>.*)</b>(<font size=10>|<color=0x77ffffff>)*\\s-\\s(?<combatText>.*)", RegexOptions.Compiled);
 
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
 
@@ -62,6 +65,9 @@ namespace Quesadilla
         private bool ChatServerStatus = true;
         private bool InCombat = false;
         private bool CombatAdded = false;
+
+        private string combatNeutOut = "ff7fffff";
+
         private bool ConfigurationWindowOpen = false;
         private int TicksSinceLastCleardown = 0;
 
@@ -77,6 +83,8 @@ namespace Quesadilla
         public List<Character> CharacterList { get; set; }
 
         private NotifyIcon trayIcon;
+
+        private ProcessMonitor _processMonitor = new ProcessMonitor();
 
         public Quesadilla()
         {
@@ -398,12 +406,30 @@ namespace Quesadilla
                     }
                 }
             }
+
+            UpdateEveProcesses();
+            var ptr = GetForegroundWindowHandle();
+            if ( ptr != IntPtr.Zero )
+            {
+                string foregroundWindowTitle = null;
+            }
+
+
             CombatFlag.Visible = InCombat;
             if ( CombatAdded )
             {
-                if (DPSGraphWindow != null) DPSGraphWindow.UpdateDPSGraph();
+                if (DPSGraphWindow != null)
+                {
+                    DPSGraphWindow.UpdateDPSGraph();
+                }
                 CombatAdded = false;
             }
+        }
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
+        public IntPtr GetForegroundWindowHandle()
+        {
+            return GetForegroundWindow();
         }
         private void AddNewCharacter(string characterName)
         {
@@ -413,6 +439,7 @@ namespace Quesadilla
             this.CharacterList.Add(new Character()
             {
                 CharacterName = characterName.Trim(),
+                IsClientActive = false,
             });
             Log.Information("New character found: " + characterName);
         }
@@ -644,6 +671,7 @@ namespace Quesadilla
                                     }
                                     break;
                                 case AlertConfigRangeType.OneCharacter:
+                                case AlertConfigRangeType.OneOnlineCharacter:
                                     // check against one specific character
                                     foreach (var x in CharacterList.Where(o => o.CharacterName == alert.TriggerText))
                                     {
@@ -653,7 +681,12 @@ namespace Quesadilla
                                         {
                                             alertText = generateAlertText(entry, path, alert, x.CharacterName, 0);
                                             Log.Debug("ALERT - " + alertText);
-                                            EnqueueAlert(
+                                            if (
+                                                alert.AlertRangeType == AlertConfigRangeType.OneCharacter ||
+                                                alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
+                                                )
+                                            {
+                                                EnqueueAlert(
                                                 new AlertQueueItem()
                                                 {
                                                     AlertText = alertText,
@@ -665,11 +698,13 @@ namespace Quesadilla
                                                     FriendlyName = alert.FriendlyName,
                                                 }
                                                 );
-                                            alertCount++;
+                                                alertCount++;
+                                            }
                                         }
                                     }
                                     break;
                                 case AlertConfigRangeType.AllCharacters:
+                                case AlertConfigRangeType.AllOnlineCharacters:
                                     // check against all characters
                                     foreach (var x in CharacterList)
                                     {
@@ -679,7 +714,12 @@ namespace Quesadilla
                                         {
                                             alertText = generateAlertText(entry, path, alert, x.CharacterName, 0);
                                             Log.Debug("ALERT - " + alertText);
-                                            EnqueueAlert(
+                                            if (
+                                                alert.AlertRangeType == AlertConfigRangeType.AllCharacters ||
+                                                alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive
+                                                )
+                                            {
+                                                EnqueueAlert(
                                                 new AlertQueueItem()
                                                 {
                                                     AlertText = alertText,
@@ -691,7 +731,8 @@ namespace Quesadilla
                                                     FriendlyName = alert.FriendlyName,
                                                 }
                                                 );
-                                            alertCount++;
+                                                alertCount++;
+                                            }
                                         }
                                     }
                                     break;
@@ -985,20 +1026,24 @@ namespace Quesadilla
                     int neutAmount = 0;
 
                     var amount = match.Groups["combatAmount"].ToString();
+                    bool received = true;
                     if (amount.Contains("GJ"))
                     {
                         neutAmount = Int32.Parse(amount.Replace(" GJ", "").Trim());
+                        if (match.Groups["combatColour"].ToString().Equals(combatNeutOut))
+                        {
+                            received = false;
+                        }
                     }
                     else
                     {
                         dmgAmount = Int32.Parse(amount.Trim());
+                        if (match.Groups["combatContext"].ToString() == "to")
+                        {
+                            received = false;
+                        }
                     }
 
-                    bool received = true;
-                    if ( match.Groups["combatContext"].ToString() == "to" )
-                    {
-                        received = false;
-                    }
                     _combat[e.Entry.CharacterName].Add(new CombatLine()
                     {
                         TimeAdded = e.Entry.TimeAdded,
@@ -1064,6 +1109,41 @@ namespace Quesadilla
         private void intelLog_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void UpdateEveProcesses()
+        {
+            this._processMonitor.GetUpdatedProcesses(out List<ProcessInfo> addedProcesses, out List<ProcessInfo> updatedProcesses, out List<ProcessInfo> removedProcesses);
+            
+            // new / updated clients - ensure they are added 
+            foreach(var a in addedProcesses.Union(updatedProcesses) )
+            {
+                var clientName = a.Title.Replace("EVE - ", "");
+                var c = CharacterList.Find(o => o.CharacterName.Equals(clientName));
+                if ( c == null ) { }
+                {
+                    c = new Character()
+                    {
+                        CharacterName = clientName,
+                    };
+                }
+                c.IsClientActive = true;
+            }
+
+            // removed clients - ensure they are set inactive
+            foreach (var a in removedProcesses)
+            {
+                var clientName = a.Title.Replace("EVE - ", "");
+                var c = CharacterList.Find(o => o.CharacterName.Equals(clientName));
+                if (c == null) { }
+                {
+                    c = new Character()
+                    {
+                        CharacterName = clientName,
+                    };
+                }
+                c.IsClientActive = false;
+            }
         }
     }
 }

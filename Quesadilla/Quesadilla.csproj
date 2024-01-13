@@ -123,6 +123,8 @@
     <Compile Include="Classes\CombatGraphData.cs" />
     <Compile Include="Classes\CombatLine.cs" />
     <Compile Include="Classes\Configuration\PopupLocationType.cs" />
+    <Compile Include="Classes\Processes\ProcessInfo.cs" />
+    <Compile Include="Classes\Processes\ProcessMonitor.cs" />
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
     <Compile Include="Classes\Resources\QuesadillaSound.cs" />
     <Compile Include="Extensions\StringExtentions.cs" />
