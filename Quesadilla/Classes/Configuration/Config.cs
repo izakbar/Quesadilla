@@ -96,7 +96,7 @@ namespace Quesadilla.Classes
             if (c is null)
             {
                 c = new Config();
-                c.TickMiliseconds = 650;
+                c.TickMiliseconds = 505;
                 c.HowManyTicksBeforeCleardown = 8;
                 c.HomeSystem = "K7D-II";
                 c.InitialPosition = new Point(0, 0);

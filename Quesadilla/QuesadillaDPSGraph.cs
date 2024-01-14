@@ -194,7 +194,7 @@ namespace Quesadilla
             {
                 if (currToon == Toon || Toon == "*ALL*")
                 {
-                    if (_main._combat[Toon].Count > 0)
+                    if (_main._combat[currToon].Count > 0)
                     {
                         if (_main._combat[currToon].First().TimeAdded < start) start = _main._combat[currToon].First().TimeAdded;
                         if (_main._combat[currToon].Last().TimeAdded > end) end = _main._combat[currToon].Last().TimeAdded;
@@ -324,6 +324,11 @@ namespace Quesadilla
         private void QuesadillaDPSGraph_FormClosed(object sender, FormClosedEventArgs e)
         {
             _main.DPSGraphWindow = null;
+        }
+
+        protected override bool ShowWithoutActivation
+        {
+            get { return true; }
         }
 
         protected override CreateParams CreateParams

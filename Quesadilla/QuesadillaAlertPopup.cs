@@ -174,5 +174,11 @@ namespace Quesadilla
                 System.Diagnostics.Process.Start("https://evemaps.dotlan.net/map/" + RegionName.Text.Replace(" ","_") + "/" + SystemName.Text);
             }
         }
+
+        protected override bool ShowWithoutActivation
+        {
+            get { return true; }
+        }
+
     }
 }

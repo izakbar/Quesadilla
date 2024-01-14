@@ -113,6 +113,7 @@ namespace Quesadilla
             cbDPSStayOnTop.Checked = _configuration.DPSGraphStayOnTop;
             cbDPSTransparent.Checked = _configuration.DPSGraphTransparent;
             cbDPSShowWindow.Checked = _configuration.DPSShowWindow;
+            cbDPSAllToons.Checked = _configuration.DPSAllToons;
             cbStayOnTop.Checked = _configuration.StayOnTop;
         }
         private Bitmap GetControlImage(Control ctl)
