@@ -47,6 +47,7 @@ namespace Quesadilla.Classes.SolarSystems
             }
 
             Log.Debug("Pathid " + pathInfo.PathId + " does not exist - building");
+            if (fromSystemId == 0) return (null); 
             SolarSystem fromSystem = SolarSystems[fromSystemId];
             SolarSystem toSystem = SolarSystems[toSystemId];
             SolarSystemNode fromSystemNode = new SolarSystemNode()
@@ -60,6 +61,7 @@ namespace Quesadilla.Classes.SolarSystems
                     ToSystemId = fromSystemId,
                     FromSystemName = fromSystem.Name,
                     ToSystemName = toSystem.Name,
+                    ToSystemRegionName = toSystem.RegionName,
                     PathSystems = new List<int>() { fromSystemId }
                 }
             };
@@ -98,6 +100,7 @@ namespace Quesadilla.Classes.SolarSystems
                                 ToSystemId = connection.ToSystemId,
                                 FromSystemName = fromSystem.Name,
                                 ToSystemName = SolarSystems[connection.ToSystemId].Name,
+                                ToSystemRegionName = SolarSystems[connection.ToSystemId].RegionName,
                                 PathSystems = new List<int>(checkingSystem.PathData.PathSystems),
                             }
                         };

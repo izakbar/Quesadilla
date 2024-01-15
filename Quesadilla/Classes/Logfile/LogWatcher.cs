@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Configuration;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -32,22 +33,29 @@ namespace Quesadilla.Classes
         private readonly Regex _localListener = new Regex("Listener\\:\\s*(?<name>.*)", RegexOptions.Compiled);
         private readonly Regex _localInitialSystem = new Regex("Channel\\sID:\\s*\\(\\(\\'solarsystemid2\\',\\s(?<initialsystem>[0-9]{8})", RegexOptions.Compiled);
 
-        private readonly Regex CHAT_CONNECTION_LOST_MESSAGE  = new Regex("Connection to chat server lost", RegexOptions.Compiled);
-        private readonly Regex CHAT_CONNECTION_RESTORED_MESSAGE = new Regex("Reconnected to chat server", RegexOptions.Compiled);
+        private readonly Regex CHAT_CONNECTION_LOST_MESSAGE  = new Regex("EVE\\sSystem\\s>\\sConnection\\sto\\schat\\sserver\\slost.*", RegexOptions.Compiled); 
+        private readonly Regex CHAT_CONNECTION_RESTORED_MESSAGE = new Regex("EVE\\sSystem\\s>\\sReconnected\\sto\\schat\\sserver.*", RegexOptions.Compiled);
 
         public event EventHandler<ProcessNewDataEventArgs> ProcessNewData;
         public event EventHandler<ProcessCombatEventArgs> ProcessCombat;
         public event EventHandler<ProcessSystemChangeEventArgs> SystemChange;
         public event EventHandler<ProcessChatServerChangeEventArgs> ChatServerChange;
 
+        public bool Connection = true;
+        public bool Enabled = true;
+        public string FriendlyName = "";
+
         public string SystemChannelPrefix => this._systemChannelPrefix;
         public static string RootLogsPath { get; private set; }
         public LocalInfo InitialLocalInfo { get; set; }
 
-        public LogWatcher(string systemChannelPrefix, LogFileType logFileType, string logPath = "")
+        public LogWatcher(string systemChannelPrefix, LogFileType logFileType, string friendlyName, string logPath = "")
         {
-            this._systemChannelPrefix = systemChannelPrefix;
-            this._logFileType = logFileType;
+            FriendlyName = friendlyName;
+                
+            _systemChannelPrefix = systemChannelPrefix;
+            _logFileType = logFileType;
+
             if (LogWatcher.RootLogsPath == null)
                 LogWatcher.RootLogsPath = logPath.Length != 0 ? logPath : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "EVE\\logs");
 
@@ -57,7 +65,7 @@ namespace Quesadilla.Classes
                     this._fileEncoding = Encoding.ASCII;
                     this._logPath = LogWatcher.RootLogsPath + "\\Gamelogs";
                     break;
-                case LogFileType.Chat:
+                case LogFileType.ChatIntel:
                     this._fileEncoding = Encoding.Unicode;
                     this._logPath = LogWatcher.RootLogsPath + "\\Chatlogs";
                     break;
@@ -74,13 +82,16 @@ namespace Quesadilla.Classes
 
         public void Tick()
         {
+            // do nothing if disabled
+            if (Enabled == false) return;
+
             foreach (FileInfo changedLogFile in this.GetChangedLogFiles())
             {
                 if (!this._interestingFiles.ContainsKey(changedLogFile.FullName))
                 {
                     logger.Debug(changedLogFile.FullName);
 
-                    if (this._logFileType == LogFileType.Chat || this._logFileType == LogFileType.Game)
+                    if (this._logFileType == LogFileType.ChatIntel || this._logFileType == LogFileType.Game)
                     {
                         lock (this)
                         {
@@ -111,11 +122,11 @@ namespace Quesadilla.Classes
             }
             if (this._logFileType == LogFileType.Game)
             {
-                foreach (KeyValuePair<string, InterestingFile> keyValuePair in this._interestingFiles.Where<KeyValuePair<string, InterestingFile>>((Func<KeyValuePair<string, InterestingFile>, bool>)(interestingFile => interestingFile.Value.InCombat && !interestingFile.Value.TimeOutTriggered && interestingFile.Value.LastCombat < DateTime.Now.AddSeconds(-30.0))))
+                foreach (KeyValuePair<string, InterestingFile> keyValuePair in this._interestingFiles.Where<KeyValuePair<string, InterestingFile>>((Func<KeyValuePair<string, InterestingFile>, bool>)(interestingFile => interestingFile.Value.InCombat && !interestingFile.Value.TimeOutTriggered && interestingFile.Value.LastCombat < DateTime.Now.AddSeconds(-120.0))))
                 {
                     keyValuePair.Value.TimeOutTriggered = true;
                     keyValuePair.Value.InCombat = false;
-                    this.OnCombat(keyValuePair.Value.FileName, keyValuePair.Value.CharName, CombatEventType.Stop);
+                    this.OnCombat(keyValuePair.Value.FileName, keyValuePair.Value.CharName, CombatEventType.Stop, null);
                 }
             }
             foreach (string key in this._interestingFiles.Where<KeyValuePair<string, InterestingFile>>((Func<KeyValuePair<string, InterestingFile>, bool>)(interestingFile => interestingFile.Value.LastUpdate < DateTime.Now.AddMinutes(-120.0))).Select<KeyValuePair<string, InterestingFile>, string>((Func<KeyValuePair<string, InterestingFile>, string>)(interestingFile => interestingFile.Key)).ToList<string>())
@@ -169,37 +180,42 @@ namespace Quesadilla.Classes
                                 foreach (string input in array)
                                 {
                                     LogEntry tempLogEntry = new LogEntry();
-                                    Match match = this._logFileType == LogFileType.Chat ? this._chatLogRegex.Match(input) : this._gameLogRegex.Match(input);
+                                    Match match = this._logFileType == LogFileType.ChatIntel ? this._chatLogRegex.Match(input) : this._gameLogRegex.Match(input);
                                     tempLogEntry.RawLine = input;
                                     tempLogEntry.FileName = fileInfo.Name;
                                     tempLogEntry.LogPrefix = this._systemChannelPrefix;
                                     tempLogEntry.TimeAdded = DateTime.Now;
                                     tempLogEntry.LogType = this._logFileType;
                                     tempLogEntry.CharacterName = interestingFile.Value.CharName;
-                                    if (this._logFileType == LogFileType.Game && this._gameLogCombatRegex.IsMatch(input))
-                                    {
-                                        if (!this._interestingFiles[interestingFile.Key].InCombat)
-                                        {
-                                            this._interestingFiles[interestingFile.Key].InCombat = true;
-                                            this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Start);
-                                        }
-                                        this._interestingFiles[interestingFile.Key].TimeOutTriggered = false;
-                                        this._interestingFiles[interestingFile.Key].LastCombat = this._interestingFiles[interestingFile.Key].LastUpdate;
-                                    }
+
                                     if (match.Success)
                                     {
                                         tempLogEntry.LogTime = match.Groups["time"].ToString();
                                         tempLogEntry.LineContent = match.Groups["content"].ToString();
                                         tempLogEntry.EntryType = LogEntryType.ChatEvent;
                                         tempLogEntry.ParseSuccess = true;
-                                        if (this._logFileType == LogFileType.Chat)
+                                        if (this._logFileType == LogFileType.ChatIntel)
                                             tempLogEntry.PlayerName = match.Groups["name"].ToString();
                                     }
                                     else
                                     {
                                         tempLogEntry.LineContent = input;
                                         tempLogEntry.ParseSuccess = false;
-                                        tempLogEntry.EntryType = this._logFileType == LogFileType.Chat ? LogEntryType.UnknownChatLogEvent : LogEntryType.UnknownGameLogEvent;
+                                        tempLogEntry.EntryType = this._logFileType == LogFileType.ChatIntel ? LogEntryType.UnknownChatLogEvent : LogEntryType.UnknownGameLogEvent;
+                                    }
+
+                                    if (this._logFileType == LogFileType.Game && this._gameLogCombatRegex.IsMatch(input))
+                                    {
+                                        if (!this._interestingFiles[interestingFile.Key].InCombat)
+                                        {
+                                            this._interestingFiles[interestingFile.Key].InCombat = true;
+                                            this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Start, tempLogEntry);
+                                        } else
+                                        {
+                                            this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Combat, tempLogEntry);
+                                        }
+                                        this._interestingFiles[interestingFile.Key].TimeOutTriggered = false;
+                                        this._interestingFiles[interestingFile.Key].LastCombat = this._interestingFiles[interestingFile.Key].LastUpdate;
                                     }
                                     if (this._previousLogEntries.All<LogEntry>((Func<LogEntry, bool>)(logEntry => logEntry.LineContent != tempLogEntry.LineContent)))
                                     {
@@ -245,7 +261,7 @@ namespace Quesadilla.Classes
                 case LogFileType.Game:
                     filespec = "*.txt";
                     break;
-                case LogFileType.Chat:
+                case LogFileType.ChatIntel:
                     filespec = this._systemChannelPrefix + "*.txt";
                     break;
                 case LogFileType.Local:
@@ -419,7 +435,7 @@ namespace Quesadilla.Classes
                 case LogFileType.Game:
                     filespec = "*.txt";
                     break;
-                case LogFileType.Chat:
+                case LogFileType.ChatIntel:
                     filespec = this._systemChannelPrefix + "*.txt";
                     break;
                 case LogFileType.Local:
@@ -464,12 +480,12 @@ namespace Quesadilla.Classes
                 return;
             this.ProcessNewData((object)this, new ProcessNewDataEventArgs(entry, this._systemChannelPrefix));
         }
-        private void OnCombat(string logFileName, string characterName, CombatEventType combatEvent)
+        private void OnCombat(string logFileName, string characterName, CombatEventType combatEvent, LogEntry entry)
         {
-            logger.Debug(combatEvent.ToString());
+            logger.Debug(combatEvent.ToString() + "-" + (entry != null ? entry.LineContent: "") );
             if (this.ProcessCombat == null)
                 return;
-            this.ProcessCombat((object)this, new ProcessCombatEventArgs(logFileName, characterName, combatEvent));
+            this.ProcessCombat((object)this, new ProcessCombatEventArgs(logFileName, characterName, combatEvent, entry));
         }
         private void OnSystemChange(string systemName, string charName)
         {

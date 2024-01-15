@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Quesadilla.Classes.Logfile;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,11 +12,14 @@ namespace Quesadilla.Classes.Events
         public ProcessCombatEventArgs(
           string logFileName,
           string characterName,
-          CombatEventType combatEvent)
+          CombatEventType combatEvent,
+          LogEntry entry
+            )
         {
             this.LogFileName = logFileName;
             this.CharacterName = characterName;
             this.CombatEvent = combatEvent;
+            this.Entry = entry;
         }
 
         public string LogFileName { get; set; }
@@ -23,5 +27,6 @@ namespace Quesadilla.Classes.Events
         public string CharacterName { get; set; }
 
         public CombatEventType CombatEvent { get; set; }
+        public LogEntry Entry { get; set; }
     }
 }

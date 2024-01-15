@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Queues;
 using System;
@@ -24,62 +25,81 @@ namespace Quesadilla
         private int _opacitystep;
         private PopupLocationType _location;
 
-        private Image LoadImageFromFile(string fileName)
-        {
-            Bitmap imageStream = null;
+        private const string ALERT_TEXT = "Alert";
+        private const string FACTION_TEXT = "Faction Spawn";
 
-            switch (fileName)
-            {
-                case "background1.png":
-                    imageStream = Properties.Resources.background1;
-                    break;
-                case "background2.jpg":
-                    imageStream = Properties.Resources.background2;
-                    break;
-                case "background3.png":
-                    imageStream = Properties.Resources.background3;
-                    break;
-                case "background4.png":
-                    imageStream = Properties.Resources.background4;
-                    break;
-                case "background5.jpg":
-                    imageStream = Properties.Resources.background5;
-                    break;
-            }
-            if (imageStream != null)
-            {
-                return imageStream;
-            }
-
-            if (imageStream == null && File.Exists(fileName))
-            {
-                Image imageFile = Image.FromFile(fileName);
-                return imageFile;
-            }
-            return (Image)null;
-        }
-
-
-        public QuesadillaAlertPopup(AlertQueueItem alert, int seconds, int opacity, int opacitystep, PopupLocationType location, string background)
+        public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background)
         {
             InitializeComponent();
             _alert = alert;
-            _seconds = seconds;
-            _opacity = opacity;
-            _opacitystep = opacitystep;
+            _seconds = configuration.AlertPopupSeconds;
+            _opacity = configuration.AlertPopupOpacity;
+            _opacitystep = configuration.AlertPopupOpacityStep;
 
             Opacity = 0;
 
+            AlertText.ForeColor = configuration.AlertPopupAlertTextColour;
             AlertText.Text = _alert.AlertText;
-            SystemName.Text = _alert.Path.ToSystemName;
-            ContextInfo.Text = _alert.Path.TotalJumps.ToString() + " jump" + (_alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + _alert.Context;
-            IntelLine.Text = _alert.Entry.LineContent;
 
-            BackgroundImage = LoadImageFromFile(background);
+            SystemName.ForeColor = configuration.AlertPopupSystemNameColour;
+            if (alert.Path != null)
+            {
+                SystemName.Text = _alert.Path.ToSystemName;
+            }
+            else
+            {
+                if (alert.isFaction)
+                {
+                    SystemName.Text = FACTION_TEXT;
+                }
+                else
+                {
+                    SystemName.Text = ALERT_TEXT;
+                }
+            }
+
+            RegionName.ForeColor = configuration.AlertPopupRegionNameColour;
+            if (alert.Path != null)
+            {
+                RegionName.Text = _alert.Path.ToSystemRegionName;
+            }
+            else
+            {
+                RegionName.Text = "";
+            }
+
+            ContextInfo.ForeColor = configuration.AlertPopupContextInfoColour;
+            if (alert.Path != null && ! alert.isFaction)
+            {
+                ContextInfo.Text = _alert.Path.TotalJumps.ToString() + " jump" + (_alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + _alert.Context;
+            }
+            else
+            {
+                if (alert.isFaction)
+                {
+                    ContextInfo.Text = alert.Context;
+                }
+                else
+                {
+                    ContextInfo.Text = alert.FriendlyName;
+                }
+            }
+
+            IntelLine.ForeColor = configuration.AlertPopupIntelLineColour;
+            if (alert.isFaction)
+            {
+                IntelLine.Text = FACTION_TEXT;
+            }
+            else
+            {
+                IntelLine.Text = _alert.Entry.LineContent;
+            }
+
+            BackgroundImage = background;
 
             // position on screen
             Screen screen = Screen.FromControl(this);
-            switch (location)
+            switch (configuration.AlertPopupLocation)
             {
                 case PopupLocationType.TopLeft:
                     Location = new Point()
@@ -127,6 +147,7 @@ namespace Quesadilla
             timerAlertWindow.Interval = _seconds*1000;
             timerAlertWindow.Enabled = true;
             timerOpacityOpen.Enabled = true;
+            ShowInTaskbar = false;
         }
 
         private void CloseWindow()
@@ -155,6 +176,7 @@ namespace Quesadilla
 
         private void QuesadillaAlertPopup_Click(object sender, EventArgs e)
         {
+            Opacity = 0;
             CloseWindow();
         }
 
@@ -166,5 +188,19 @@ namespace Quesadilla
                 Close();
             }
         }
+
+        private void SystemName_Click(object sender, EventArgs e)
+        {
+            if ( SystemName.Text != ALERT_TEXT )
+            {
+                System.Diagnostics.Process.Start("https://evemaps.dotlan.net/map/" + RegionName.Text.Replace(" ","_") + "/" + SystemName.Text);
+            }
+        }
+
+        protected override bool ShowWithoutActivation
+        {
+            get { return true; }
+        }
+
     }
 }

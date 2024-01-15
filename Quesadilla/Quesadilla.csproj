@@ -12,6 +12,24 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>\\dsmfluf3\Development\EVE\Quesadilla\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Unc</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <InstallUrl>\\dsmfluf3\Development\EVE\Quesadilla\</InstallUrl>
+    <ProductName>Quesadilla</ProductName>
+    <WebPage>publish.htm</WebPage>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>0.2.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>false</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -22,6 +40,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -31,6 +50,15 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Quesadilla.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -108,6 +136,7 @@
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -117,9 +146,17 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\CombatGraphData.cs" />
+    <Compile Include="Classes\CombatLine.cs" />
     <Compile Include="Classes\Configuration\PopupLocationType.cs" />
+    <Compile Include="Classes\Processes\ProcessInfo.cs" />
+    <Compile Include="Classes\Processes\ProcessMonitor.cs" />
+    <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
+    <Compile Include="Classes\Resources\QuesadillaSound.cs" />
+    <Compile Include="Extensions\StringExtentions.cs" />
     <Compile Include="QuesadillaAlertPopup.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -163,6 +200,24 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuesadillaConfiguration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuesadillaConfiguration.Designer.cs">
+      <DependentUpon>QuesadillaConfiguration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="QuesadillaDPSGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuesadillaDPSGraph.Designer.cs">
+      <DependentUpon>QuesadillaDPSGraph.cs</DependentUpon>
+    </Compile>
+    <Compile Include="QuesadillaSplashScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuesadillaSplashScreen.Designer.cs">
+      <DependentUpon>QuesadillaSplashScreen.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="QuesadillaAlertPopup.resx">
       <DependentUpon>QuesadillaAlertPopup.cs</DependentUpon>
     </EmbeddedResource>
@@ -178,6 +233,15 @@
     </Compile>
     <EmbeddedResource Include="Quesadilla.resx">
       <DependentUpon>Quesadilla.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="QuesadillaConfiguration.resx">
+      <DependentUpon>QuesadillaConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="QuesadillaDPSGraph.resx">
+      <DependentUpon>QuesadillaDPSGraph.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="QuesadillaSplashScreen.resx">
+      <DependentUpon>QuesadillaSplashScreen.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -287,7 +351,56 @@
     <None Include="images\background4.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="images\background5.jpg" />
+    <None Include="images\background5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\background6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\background7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\background8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\background10.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\background9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\Quesadilla.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\Bravelogo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\therapy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\izakbar.jpeg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\Paulmart_small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\izakbar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="images\bg_eve_infinite.jpg" />
+    <Content Include="images\bg_paulmart.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

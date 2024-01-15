@@ -12,6 +12,8 @@ namespace Quesadilla.Classes.Configuration
         System,
         Home,
         AllCharacters,
-        OneCharacter
+        OneCharacter,
+        AllOnlineCharacters,
+        OneOnlineCharacter
     }
 }

@@ -18,6 +18,7 @@ namespace Quesadilla.Classes.SolarSystems
         public string FromSystemName { get; set; }
 
         public string ToSystemName { get; set; }
+        public string ToSystemRegionName { get; set; }
 
         public string PathId => String.Format("{0}:{1}", FromSystemId, ToSystemId);
     }

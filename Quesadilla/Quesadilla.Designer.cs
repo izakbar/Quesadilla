@@ -31,9 +31,12 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Quesadilla));
             this.mainTimer = new System.Windows.Forms.Timer(this.components);
-            this.richTextBoxLogControl1 = new Serilog.Sinks.WinForms.RichTextBoxLogControl();
-            this.jsonLogTextBox1 = new Serilog.Sinks.WinForms.JsonLogTextBox();
+            this.intelLog = new Serilog.Sinks.WinForms.RichTextBoxLogControl();
             this.alertsOutstanding = new System.Windows.Forms.TextBox();
+            this.ChatServerDown = new System.Windows.Forms.Label();
+            this.CombatFlag = new System.Windows.Forms.Label();
+            this.buttonIntelSize = new System.Windows.Forms.Button();
+            this.lblCurrentClient = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // mainTimer
@@ -42,54 +45,103 @@
             this.mainTimer.Interval = 250;
             this.mainTimer.Tick += new System.EventHandler(this.mainTimer_Tick);
             // 
-            // richTextBoxLogControl1
+            // intelLog
             // 
-            this.richTextBoxLogControl1.BackColor = System.Drawing.SystemColors.Info;
-            this.richTextBoxLogControl1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.richTextBoxLogControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.richTextBoxLogControl1.ForContext = "";
-            this.richTextBoxLogControl1.Location = new System.Drawing.Point(0, 242);
-            this.richTextBoxLogControl1.Margin = new System.Windows.Forms.Padding(2);
-            this.richTextBoxLogControl1.Name = "richTextBoxLogControl1";
-            this.richTextBoxLogControl1.Size = new System.Drawing.Size(600, 123);
-            this.richTextBoxLogControl1.TabIndex = 0;
-            this.richTextBoxLogControl1.Text = "";
-            // 
-            // jsonLogTextBox1
-            // 
-            this.jsonLogTextBox1.ForContext = "";
-            this.jsonLogTextBox1.Location = new System.Drawing.Point(373, 279);
-            this.jsonLogTextBox1.LogBorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.jsonLogTextBox1.LogPadding = new System.Windows.Forms.Padding(3);
-            this.jsonLogTextBox1.Name = "jsonLogTextBox1";
-            this.jsonLogTextBox1.ReadOnly = false;
-            this.jsonLogTextBox1.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this.jsonLogTextBox1.Size = new System.Drawing.Size(5, 5);
-            this.jsonLogTextBox1.TabIndex = 1;
+            this.intelLog.BackColor = System.Drawing.SystemColors.Info;
+            this.intelLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.intelLog.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.intelLog.Enabled = false;
+            this.intelLog.ForContext = "";
+            this.intelLog.Location = new System.Drawing.Point(0, 220);
+            this.intelLog.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.intelLog.Name = "intelLog";
+            this.intelLog.Size = new System.Drawing.Size(992, 229);
+            this.intelLog.TabIndex = 0;
+            this.intelLog.Text = "";
+            this.intelLog.TextChanged += new System.EventHandler(this.intelLog_TextChanged);
             // 
             // alertsOutstanding
             // 
             this.alertsOutstanding.BackColor = System.Drawing.SystemColors.Control;
             this.alertsOutstanding.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.alertsOutstanding.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.alertsOutstanding.ForeColor = System.Drawing.Color.Crimson;
+            this.alertsOutstanding.Enabled = false;
+            this.alertsOutstanding.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.alertsOutstanding.ForeColor = System.Drawing.Color.PaleVioletRed;
             this.alertsOutstanding.Location = new System.Drawing.Point(0, -1);
+            this.alertsOutstanding.Margin = new System.Windows.Forms.Padding(4);
             this.alertsOutstanding.Name = "alertsOutstanding";
-            this.alertsOutstanding.Size = new System.Drawing.Size(44, 40);
+            this.alertsOutstanding.Size = new System.Drawing.Size(59, 28);
             this.alertsOutstanding.TabIndex = 2;
+            this.alertsOutstanding.Text = "       ";
+            // 
+            // ChatServerDown
+            // 
+            this.ChatServerDown.AutoSize = true;
+            this.ChatServerDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ChatServerDown.ForeColor = System.Drawing.Color.Red;
+            this.ChatServerDown.Location = new System.Drawing.Point(226, -1);
+            this.ChatServerDown.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.ChatServerDown.Name = "ChatServerDown";
+            this.ChatServerDown.Size = new System.Drawing.Size(154, 20);
+            this.ChatServerDown.TabIndex = 3;
+            this.ChatServerDown.Text = "Chat Server Down";
+            this.ChatServerDown.Visible = false;
+            // 
+            // CombatFlag
+            // 
+            this.CombatFlag.AutoSize = true;
+            this.CombatFlag.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CombatFlag.ForeColor = System.Drawing.Color.Red;
+            this.CombatFlag.Location = new System.Drawing.Point(67, -1);
+            this.CombatFlag.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.CombatFlag.Name = "CombatFlag";
+            this.CombatFlag.Size = new System.Drawing.Size(92, 20);
+            this.CombatFlag.TabIndex = 4;
+            this.CombatFlag.Text = "In Combat";
+            this.CombatFlag.Visible = false;
+            // 
+            // buttonIntelSize
+            // 
+            this.buttonIntelSize.BackColor = System.Drawing.Color.Transparent;
+            this.buttonIntelSize.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonIntelSize.Location = new System.Drawing.Point(969, 219);
+            this.buttonIntelSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.buttonIntelSize.Name = "buttonIntelSize";
+            this.buttonIntelSize.Size = new System.Drawing.Size(23, 22);
+            this.buttonIntelSize.TabIndex = 6;
+            this.buttonIntelSize.Text = "▼";
+            this.buttonIntelSize.UseVisualStyleBackColor = false;
+            this.buttonIntelSize.Click += new System.EventHandler(this.buttonIntelSize_Click);
+            // 
+            // lblCurrentClient
+            // 
+            this.lblCurrentClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCurrentClient.ForeColor = System.Drawing.Color.Blue;
+            this.lblCurrentClient.Location = new System.Drawing.Point(634, 1);
+            this.lblCurrentClient.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblCurrentClient.Name = "lblCurrentClient";
+            this.lblCurrentClient.Size = new System.Drawing.Size(358, 26);
+            this.lblCurrentClient.TabIndex = 7;
+            this.lblCurrentClient.Text = "Current Client";
+            this.lblCurrentClient.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.lblCurrentClient.Visible = false;
             // 
             // Quesadilla
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(600, 365);
+            this.ClientSize = new System.Drawing.Size(992, 449);
+            this.Controls.Add(this.lblCurrentClient);
+            this.Controls.Add(this.buttonIntelSize);
+            this.Controls.Add(this.CombatFlag);
+            this.Controls.Add(this.ChatServerDown);
             this.Controls.Add(this.alertsOutstanding);
-            this.Controls.Add(this.jsonLogTextBox1);
-            this.Controls.Add(this.richTextBoxLogControl1);
+            this.Controls.Add(this.intelLog);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.MaximizeBox = false;
             this.Name = "Quesadilla";
-            this.Text = "Quesadilla";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Quesadilla_FormClosing);
             this.Load += new System.EventHandler(this.Quesadilla_Load);
             this.ResumeLayout(false);
@@ -100,9 +152,12 @@
         #endregion
 
         private System.Windows.Forms.Timer mainTimer;
-        private Serilog.Sinks.WinForms.RichTextBoxLogControl richTextBoxLogControl1;
-        private Serilog.Sinks.WinForms.JsonLogTextBox jsonLogTextBox1;
+        private Serilog.Sinks.WinForms.RichTextBoxLogControl intelLog;
         private System.Windows.Forms.TextBox alertsOutstanding;
+        private System.Windows.Forms.Label ChatServerDown;
+        private System.Windows.Forms.Label CombatFlag;
+        private System.Windows.Forms.Button buttonIntelSize;
+        private System.Windows.Forms.Label lblCurrentClient;
     }
 }
 
