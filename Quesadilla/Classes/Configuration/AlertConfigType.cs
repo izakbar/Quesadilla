@@ -9,6 +9,7 @@ namespace Quesadilla.Classes.Configuration
     public enum AlertConfigType
     {
         Range,
+        FactionSpawn,
         Text
     }
 }

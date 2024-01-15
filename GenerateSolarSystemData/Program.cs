@@ -38,6 +38,7 @@ namespace QuesadillaExport
                     new SolarSystem()
                     {
                         Name = solarSystem.solarSystemname,
+                        RegionName = solarSystem.RegionName,
                         X = solarSystem.X,
                         Y = solarSystem.Y,
                         Z = solarSystem.Z,

@@ -50,3 +50,8 @@
 /packages/Newtonsoft.Json.13.0.3/lib
 /packages/Newtonsoft.Json.13.0.3
 /Quesadilla/bin/Debug
+/Quesadilla
+/Quesadilla/obj/Release/Quesadilla.csproj.AssemblyReference.cache
+/Quesadilla/obj/Debug/Quesadilla.Properties.Resources.resources
+/Quesadilla/obj/Debug/Quesadilla.QuesadillaAlertPopup.resources
+/Quesadilla/obj/Debug/TempPE/Properties.Resources.Designer.cs.dll
