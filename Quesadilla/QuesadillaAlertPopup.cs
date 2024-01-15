@@ -26,6 +26,7 @@ namespace Quesadilla
         private PopupLocationType _location;
 
         private const string ALERT_TEXT = "Alert";
+        private const string FACTION_TEXT = "Faction Spawn";
 
         public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background)
         {
@@ -47,7 +48,14 @@ namespace Quesadilla
             }
             else
             {
-                SystemName.Text = ALERT_TEXT;
+                if (alert.isFaction)
+                {
+                    SystemName.Text = FACTION_TEXT;
+                }
+                else
+                {
+                    SystemName.Text = ALERT_TEXT;
+                }
             }
 
             RegionName.ForeColor = configuration.AlertPopupRegionNameColour;
@@ -61,17 +69,31 @@ namespace Quesadilla
             }
 
             ContextInfo.ForeColor = configuration.AlertPopupContextInfoColour;
-            if (alert.Path != null)
+            if (alert.Path != null && ! alert.isFaction)
             {
                 ContextInfo.Text = _alert.Path.TotalJumps.ToString() + " jump" + (_alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + _alert.Context;
             }
             else
             {
-                ContextInfo.Text = alert.FriendlyName;
+                if (alert.isFaction)
+                {
+                    ContextInfo.Text = alert.Context;
+                }
+                else
+                {
+                    ContextInfo.Text = alert.FriendlyName;
+                }
             }
 
             IntelLine.ForeColor = configuration.AlertPopupIntelLineColour;
-            IntelLine.Text = _alert.Entry.LineContent;
+            if (alert.isFaction)
+            {
+                IntelLine.Text = FACTION_TEXT;
+            }
+            else
+            {
+                IntelLine.Text = _alert.Entry.LineContent;
+            }
 
             BackgroundImage = background;
 

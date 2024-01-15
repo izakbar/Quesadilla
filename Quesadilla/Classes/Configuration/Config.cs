@@ -103,7 +103,7 @@ namespace Quesadilla.Classes
                 c.WindowSize = new Point(760, 404);
                 c.StayOnTop = true;
                 c.DPSGraphStayOnTop = true;
-                c.DPSGraphTransparent = false;
+                c.DPSGraphTransparent = true;
                 c.DPSShowWindow = true;
                 c.DPSSaveCSV = false;
                 c.DPSAllToons = false;
@@ -206,6 +206,16 @@ namespace Quesadilla.Classes
                     MenuDisplay = "ESS robbery {text} reported by {reporter}",
                     SoundFile = "Boo2",
                     TriggerText = "ess",
+                });
+                c.AlertConfiguration.Add(new AlertConfig()
+                {
+                    FriendlyName = "Faction Spawn",
+                    Enabled = true,
+                    AlertType = AlertConfigType.FactionSpawn,
+                    TextDisplay = "Spawn {context}",
+                    MenuDisplay = "Spawn {context}",
+                    SoundFile = "trumpet",
+                    CustomTriggerEverySeconds = 30,
                 });
             }
 

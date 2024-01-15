@@ -12,5 +12,11 @@ namespace Quesadilla.Classes
         public string Location { get; set; }
         public int LocationId { get; set; }
         public bool IsClientActive { get; set; }
+        public DateTime LastFactionAlert { get; set; }
+
+        public Character()
+        {
+            LastFactionAlert = DateTime.Now;
+        }
     }
 }

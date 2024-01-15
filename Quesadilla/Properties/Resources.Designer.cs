@@ -182,6 +182,16 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap bg_eve_infinite {
+            get {
+                object obj = ResourceManager.GetObject("bg_eve_infinite", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap bg_paulmart {
             get {
                 object obj = ResourceManager.GetObject("bg_paulmart", resourceCulture);

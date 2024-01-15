@@ -32,6 +32,31 @@ namespace Quesadilla
     public partial class Quesadilla : Form
     {
 
+        private List<String> _FactionRats = new List<string>()
+        {
+            "Dark Blood",
+            "Dread Gurista",
+            "True Sansha",
+            "Sentient",
+            "Shadow Serpentis",
+            "Domination",
+            " Titan",
+            " Dreadnought",
+
+            " Hauler",
+            " Ferrier",
+            " Gatherer",
+            " Harvester",
+            " Loader",
+            " Bulker",
+            " Carrier",
+            " Convoy",
+            " Courier",
+            " Trailer",
+            " Transporter",
+            " Trucker",
+        };
+
         private readonly Regex _CombatRegexMissesYouCompletely = new Regex("(?<combatEntity>.*)\\smisses\\syou\\scompletely", RegexOptions.Compiled);
         private readonly Regex _CombatRegexCombatData = new Regex("^<color=0x(?<combatColour>........)><b>(?<combatAmount>.*)</b>\\s*<color=0x........><font size=10>\\s*(?<combatContext>.*)\\s*</font>\\s*<b><color=0xffffffff>(?<combatEntity>.*)</b>(<font size=10>|<color=0x77ffffff>)*\\s-\\s(?<combatText>.*)", RegexOptions.Compiled);
 
@@ -95,6 +120,8 @@ namespace Quesadilla
         private NotifyIcon trayIcon;
 
         private ProcessMonitor _processMonitor = new ProcessMonitor();
+
+        private DateTime LastFactionAlert = DateTime.Now;
 
         public Quesadilla()
         {
@@ -518,7 +545,7 @@ namespace Quesadilla
             }
             return route;
         }
-        private string generateAlertText(LogEntry entry, PathInfo path, AlertConfig alert, string characterName, int type)
+        private string generateAlertText(LogEntry entry, PathInfo path, AlertConfig alert, string characterName, int type, string context)
         {
             // type == 0 - Alert Text, 1 == Menu text
             string returnString = "";
@@ -542,13 +569,17 @@ namespace Quesadilla
             }
             returnString = returnString.Replace("{character}", characterName);
             returnString = returnString.Replace("{text}", entry.LineContent);
+            returnString = returnString.Replace("{context}", context);
             returnString = returnString.Replace("{reporter}", entry.PlayerName);
             return returnString;
         }
         private void EnqueueAlert(AlertQueueItem alert)
         {
-            // only add to new alerts if not already in new alerts. This should prever an alert for each character on same logfile entry
-            var f = NewAlerts.Where(o => o.Path.ToSystemId == alert.Path.ToSystemId).ToList();
+            // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
+            var f = NewAlerts.Where(o => 
+            (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
+            || (o.AlertText == alert.AlertText)
+            ).ToList();
             if (f.Count == 0 || NewAlerts.Count == 0)
             {
                 alert.RouteText = PathToString(alert.Path);
@@ -556,7 +587,7 @@ namespace Quesadilla
             }
             if (f.Count != 0)
             {
-                if (alert.Path.TotalJumps < f.First().Path.TotalJumps)
+                if (f.First().Path != null && alert.Path != null && alert.Path.TotalJumps < f.First().Path.TotalJumps)
                 {
                     f.First().Path = alert.Path;
                     f.First().AlertText = alert.AlertText;
@@ -633,11 +664,9 @@ namespace Quesadilla
                         // Range alerts
                         foreach (AlertConfig alert in Configuration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
                         {
-                            return tempTrigger.Enabled;
-                            /*                            if (!tempTrigger.Enabled)
-                                                            return false;
-                                                        return tempTrigger.AlertType == AlertConfigType.Range;
-                            */
+                            if (!tempTrigger.Enabled)
+                                return false;
+                            return tempTrigger.AlertType == AlertConfigType.Range;
                         })))
                         {
                             bool sendAlert = false;
@@ -651,13 +680,13 @@ namespace Quesadilla
                                     sendAlert = checkJumpsRange(alert, path);
                                     if (sendAlert)
                                     {
-                                        alertText = generateAlertText(entry, path, alert, "", 0);
+                                        alertText = generateAlertText(entry, path, alert, "", 0,"");
                                         Log.Debug("ALERT - " + alertText);
                                         EnqueueAlert(
                                             new AlertQueueItem()
                                             {
                                                 AlertText = alertText,
-                                                MenuText = generateAlertText(entry, path, alert, "", 1),
+                                                MenuText = generateAlertText(entry, path, alert, "", 1,""),
                                                 Entry = entry,
                                                 Path = path,
                                                 Context = homeSystemPathInfo.FromSystemName,
@@ -675,13 +704,13 @@ namespace Quesadilla
                                     sendAlert = checkJumpsRange(alert, path);
                                     if (sendAlert)
                                     {
-                                        alertText = generateAlertText(entry, path, alert, "", 0);
+                                        alertText = generateAlertText(entry, path, alert, "", 0,"");
                                         Log.Debug("ALERT - " + alertText);
                                         EnqueueAlert(
                                             new AlertQueueItem()
                                             {
                                                 AlertText = alertText,
-                                                MenuText = generateAlertText(entry, path, alert, "", 1),
+                                                MenuText = generateAlertText(entry, path, alert, "", 1,""),
                                                 Entry = entry,
                                                 Path = path,
                                                 Context = path.FromSystemName,
@@ -697,30 +726,33 @@ namespace Quesadilla
                                     // check against one specific character
                                     foreach (var x in CharacterList.Where(o => o.CharacterName == alert.TriggerText))
                                     {
-                                        path = _solarSystems.FindAndCachePath(x.LocationId, toSystemId);
-                                        sendAlert = checkJumpsRange(alert, path);
-                                        if (sendAlert)
+                                        if (x.LocationId != 0)
                                         {
-                                            alertText = generateAlertText(entry, path, alert, x.CharacterName, 0);
-                                            Log.Debug("ALERT - " + alertText);
-                                            if (
-                                                alert.AlertRangeType == AlertConfigRangeType.OneCharacter ||
-                                                alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
-                                                )
+                                            path = _solarSystems.FindAndCachePath(x.LocationId, toSystemId);
+                                            sendAlert = checkJumpsRange(alert, path);
+                                            if (sendAlert)
                                             {
-                                                EnqueueAlert(
-                                                new AlertQueueItem()
+                                                alertText = generateAlertText(entry, path, alert, x.CharacterName, 0, "");
+                                                Log.Debug("ALERT - " + alertText);
+                                                if (
+                                                    alert.AlertRangeType == AlertConfigRangeType.OneCharacter ||
+                                                    alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
+                                                    )
                                                 {
-                                                    AlertText = alertText,
-                                                    MenuText = generateAlertText(entry, path, alert, x.CharacterName, 1),
-                                                    Entry = entry,
-                                                    Path = path,
-                                                    Context = x.CharacterName,
-                                                    SoundFile = alert.SoundFile,
-                                                    FriendlyName = alert.FriendlyName,
+                                                    EnqueueAlert(
+                                                    new AlertQueueItem()
+                                                    {
+                                                        AlertText = alertText,
+                                                        MenuText = generateAlertText(entry, path, alert, x.CharacterName, 1, ""),
+                                                        Entry = entry,
+                                                        Path = path,
+                                                        Context = x.CharacterName,
+                                                        SoundFile = alert.SoundFile,
+                                                        FriendlyName = alert.FriendlyName,
+                                                    }
+                                                    );
+                                                    alertCount++;
                                                 }
-                                                );
-                                                alertCount++;
                                             }
                                         }
                                     }
@@ -730,30 +762,33 @@ namespace Quesadilla
                                     // check against all characters
                                     foreach (var x in CharacterList)
                                     {
-                                        path = _solarSystems.FindAndCachePath(x.LocationId, toSystemId);
-                                        sendAlert = checkJumpsRange(alert, path);
-                                        if (sendAlert)
+                                        if (x.LocationId != 0)
                                         {
-                                            alertText = generateAlertText(entry, path, alert, x.CharacterName, 0);
-                                            Log.Debug("ALERT - " + alertText);
-                                            if (
-                                                alert.AlertRangeType == AlertConfigRangeType.AllCharacters ||
-                                                alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive
-                                                )
+                                            path = _solarSystems.FindAndCachePath(x.LocationId, toSystemId);
+                                            sendAlert = checkJumpsRange(alert, path);
+                                            if (sendAlert)
                                             {
-                                                EnqueueAlert(
-                                                new AlertQueueItem()
+                                                alertText = generateAlertText(entry, path, alert, x.CharacterName, 0, "");
+                                                Log.Debug("ALERT - " + alertText);
+                                                if (
+                                                    alert.AlertRangeType == AlertConfigRangeType.AllCharacters ||
+                                                    alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive
+                                                    )
                                                 {
-                                                    AlertText = alertText,
-                                                    MenuText = generateAlertText(entry, path, alert, x.CharacterName, 1),
-                                                    Entry = entry,
-                                                    Path = path,
-                                                    Context = x.CharacterName,
-                                                    SoundFile = alert.SoundFile,
-                                                    FriendlyName = alert.FriendlyName,
+                                                    EnqueueAlert(
+                                                    new AlertQueueItem()
+                                                    {
+                                                        AlertText = alertText,
+                                                        MenuText = generateAlertText(entry, path, alert, x.CharacterName, 1, ""),
+                                                        Entry = entry,
+                                                        Path = path,
+                                                        Context = x.CharacterName,
+                                                        SoundFile = alert.SoundFile,
+                                                        FriendlyName = alert.FriendlyName,
+                                                    }
+                                                    );
+                                                    alertCount++;
                                                 }
-                                                );
-                                                alertCount++;
                                             }
                                         }
                                     }
@@ -766,13 +801,13 @@ namespace Quesadilla
                                         {
                                             path = _solarSystems.FindAndCachePath(x.LocationId, toSystemId);
 
-                                            alertText = generateAlertText(entry, path, alert, alert.TriggerText, 0);
+                                            alertText = generateAlertText(entry, path, alert, alert.TriggerText, 0, alert.TriggerText);
                                             Log.Debug("ALERT - " + alertText);
                                             EnqueueAlert(
                                                 new AlertQueueItem()
                                                 {
                                                     AlertText = alertText,
-                                                    MenuText = generateAlertText(entry, path, alert, alert.TriggerText, 1),
+                                                    MenuText = generateAlertText(entry, path, alert, alert.TriggerText, 1, alert.TriggerText),
                                                     Entry = entry,
                                                     Path = path,
                                                     Context = alert.TriggerText,
@@ -811,13 +846,13 @@ namespace Quesadilla
                         if (entry.LineContent.Contains(alert.TriggerText, StringComparison.OrdinalIgnoreCase))
                         {
 
-                            string alertText = generateAlertText(entry, null, alert, alert.TriggerText, 0);
+                            string alertText = generateAlertText(entry, null, alert, alert.TriggerText, 0, alert.TriggerText);
                             Log.Debug("ALERT - " + alertText);
                             EnqueueAlert(
                                 new AlertQueueItem()
                                 {
                                     AlertText = alertText,
-                                    MenuText = generateAlertText(entry, null, alert, alert.TriggerText, 1),
+                                    MenuText = generateAlertText(entry, null, alert, alert.TriggerText, 1, alert.TriggerText),
                                     Entry = entry,
                                     Path = null,
                                     Context = alert.TriggerText,
@@ -931,6 +966,9 @@ namespace Quesadilla
                 {
                     DPSGraphWindow.Close();
                     DPSGraphWindow = null;
+
+                    DPSGraphWindow = new QuesadillaDPSGraph(this);
+                    DPSGraphWindow.Show();
                 }
             }
         }
@@ -949,6 +987,12 @@ namespace Quesadilla
         {
             Configuration.DPSAllToons = !Configuration.DPSAllToons;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
+
+            if ( InCombat && DPSGraphWindow != null && Configuration.DPSShowWindow )
+            {
+                DPSGraphWindow.Close();
+                DPSGraphWindow = null ;
+            }
         }
        
         private void trayIconMenuDPSTransparent(object sender, EventArgs e)
@@ -1099,6 +1143,65 @@ namespace Quesadilla
                         DamageAmount = dmgAmount,
                         Received = received,
                     });
+
+                    // check if faction 
+                    foreach (AlertConfig alert in Configuration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
+                    {
+                        if (!tempTrigger.Enabled)
+                            return false;
+                        return tempTrigger.AlertType == AlertConfigType.FactionSpawn;
+                    })))
+                    {
+                        // active alert config for faction spawn
+
+
+                        if (_FactionRats.Any(s => match.Groups["combatEntity"].ToString().Contains(s)) )
+                        {
+                            string alertText = generateAlertText(e.Entry, null, alert, "Faction Spawn", 0, match.Groups["combatEntity"].ToString());
+                            PathInfo path = null;
+                            var c = CharacterList.Find(o => o.CharacterName.Equals(e.CharacterName));
+
+                            bool sendAlert = true;
+
+                            if (c != null)
+                            {
+                                path = new PathInfo()
+                                {
+                                    FromSystemId = c.LocationId,
+                                    ToSystemId = c.LocationId,
+                                    FromSystemName = c.Location,
+                                    ToSystemName = c.Location,
+                                    ToSystemRegionName = _solarSystems.SolarSystems[c.LocationId].RegionName,
+                                    PathSystems = new List<int>() { c.LocationId},
+                                };
+
+                                if ( c.LastFactionAlert.AddSeconds(alert.CustomTriggerEverySeconds == null ? 0 : (double)alert.CustomTriggerEverySeconds) > DateTime.Now ) { sendAlert = false; }
+                            } else
+                            {
+                                if (LastFactionAlert.AddSeconds(alert.CustomTriggerEverySeconds == null ? 0 : (double)alert.CustomTriggerEverySeconds) > DateTime.Now) { sendAlert = false; }
+                            }
+
+                            if (sendAlert)
+                            {
+                                LastFactionAlert = DateTime.Now;
+                                if ( c != null ) { c.LastFactionAlert = LastFactionAlert; }
+                                Log.Debug("ALERT - " + alertText);
+                                EnqueueAlert(
+                                    new AlertQueueItem()
+                                    {
+                                        AlertText = alertText,
+                                        MenuText = generateAlertText(e.Entry, null, alert, "Faction spawn", 1, match.Groups["combatEntity"].ToString()),
+                                        Entry = e.Entry,
+                                        Path = path,
+                                        Context = match.Groups["combatEntity"].ToString(),
+                                        SoundFile = alert.SoundFile,
+                                        FriendlyName = alert.FriendlyName,
+                                        isFaction = true,
+                                    }
+                                    );
+                            }
+                        }
+                    }
                 }
                 CombatAdded = true;
             }
@@ -1167,12 +1270,14 @@ namespace Quesadilla
             string foregroundWindowTitle = null;
             var ptr = GetForegroundWindowHandle();
 
+
+/*
             // new / updated clients - ensure they are added 
             foreach (var a in addedProcesses.Union(updatedProcesses))
             {
                 var clientName = a.Title.Replace("EVE - ", "");
                 var c = CharacterList.Find(o => o.CharacterName.Equals(clientName));
-                if (c == null) { }
+                if (c == null) 
                 {
                     c = new Character()
                     {
@@ -1187,7 +1292,7 @@ namespace Quesadilla
             {
                 var clientName = a.Title.Replace("EVE - ", "");
                 var c = CharacterList.Find(o => o.CharacterName.Equals(clientName));
-                if (c == null) { }
+                if (c == null) 
                 {
                     c = new Character()
                     {
@@ -1196,6 +1301,8 @@ namespace Quesadilla
                 }
                 c.IsClientActive = false;
             }
+*/
+
 
             if (ptr != null )
             {
@@ -1239,6 +1346,11 @@ namespace Quesadilla
                 lblCurrentClient.Text = CurrentActiveToon;
             }
 
+            // just double check thru charachter list active clients to make sure there is still an active client.
+            foreach(var c in CharacterList)
+            {
+                c.IsClientActive = _processMonitor.IsCharStillActive(c.CharacterName);
+            }
         }
     }
 }

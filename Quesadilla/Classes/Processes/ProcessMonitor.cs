@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Quesadilla.Classes.Processes
 {
@@ -90,6 +91,13 @@ namespace Quesadilla.Classes.Processes
                 return null;
             }
             return null;
+        }
+
+        public bool IsCharStillActive(string c)
+        {
+             var p = _processCache.Values.Where(o => o.Equals("EVE - " + c)).ToList();
+             if ( p != null && p.Count > 0 ) { return true; }
+            return false;
         }
 
     }
