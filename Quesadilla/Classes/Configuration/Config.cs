@@ -123,13 +123,13 @@ namespace Quesadilla.Classes
                 c.AlertPopupOpacityStep = 5;
                 c.AlertPopupLocation = PopupLocationType.BottomLeft;
                 c.DPSLocation = PopupLocationType.BottomRight;
-                c.AlertPopupBackground = "background2";
+                c.AlertPopupBackground = "bg_paulmart";
 
-                c.AlertPopupSystemNameColour = Color.Red;
-                c.AlertPopupRegionNameColour = Color.Red;
-                c.AlertPopupContextInfoColour = Color.Red;
-                c.AlertPopupIntelLineColour = Color.SaddleBrown;
-                c.AlertPopupAlertTextColour = Color.MistyRose;
+                c.AlertPopupSystemNameColour = Color.Lime;
+                c.AlertPopupRegionNameColour = Color.FromArgb(125,255,255);
+                c.AlertPopupContextInfoColour = Color.Yellow;
+                c.AlertPopupIntelLineColour = Color.White ;
+                c.AlertPopupAlertTextColour = Color.FromArgb(64, 0, 128);
 
                 c.ShowLastUnexpiredAlerts = 5;
 
