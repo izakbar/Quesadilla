@@ -57,3 +57,6 @@
 /GenerateSolarSystemData/bin/Release/net6.0
 /Quesadilla/bin/Release/Quesadilla.config.json
 /Quesadilla/obj/Release/Quesadilla.csproj.AssemblyReference.cache
+/Quesadilla/bin/Release/Quesadilla_20240115.log
+/Quesadilla/obj/Release/Quesadilla.csproj.FileListAbsolute.txt
+/Quesadilla/obj/Release/Quesadilla.csproj.GenerateResource.cache
