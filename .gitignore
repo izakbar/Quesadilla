@@ -50,3 +50,10 @@
 /packages/Newtonsoft.Json.13.0.3/lib
 /packages/Newtonsoft.Json.13.0.3
 /Quesadilla/bin/Debug
+/GenerateSolarSystemData/bin/Release/net6.0/runtimes/browser/lib/net6.0
+/GenerateSolarSystemData/bin/Release/net6.0/runtimes/unix/lib/netcoreapp3.0
+/GenerateSolarSystemData/bin/Release/net6.0/runtimes/win/lib
+/GenerateSolarSystemData/bin/Release/net6.0/runtimes/win-x64/native
+/GenerateSolarSystemData/bin/Release/net6.0
+/Quesadilla/bin/Release/Quesadilla.config.json
+/Quesadilla/obj/Release/Quesadilla.csproj.AssemblyReference.cache
