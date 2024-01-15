@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Quesadilla.Classes.Processes
 {
@@ -20,6 +21,27 @@ namespace Quesadilla.Classes.Processes
             // At the moment this code is executed the main application window is not yet initialized
             this._currentProcessInfo = new ProcessInfo(IntPtr.Zero, "");
         }
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
+        public IntPtr GetForegroundWindowHandle()
+        {
+            return GetForegroundWindow();
+        }
+
+        public struct Rect
+        {
+            public int Left { get; set; }
+            public int Top { get; set; }
+            public int Right { get; set; }
+            public int Bottom { get; set; }
+        }
+        [DllImport("user32.dll")]
+        public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
+        public bool GetWindowDimensions(IntPtr hwnd, ref Rect rectangle)
+        {
+            return GetWindowRect(hwnd, ref rectangle);
+        }
+
         private bool IsMonitoredProcess(string processName)
         {
             // This is a possible extension point

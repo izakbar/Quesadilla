@@ -25,6 +25,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using static Quesadilla.Classes.Processes.ProcessMonitor;
 using static Quesadilla.Extensions.StringExtensions;
 
 namespace Quesadilla
@@ -122,6 +123,8 @@ namespace Quesadilla
         private ProcessMonitor _processMonitor = new ProcessMonitor();
 
         private DateTime LastFactionAlert = DateTime.Now;
+
+        public Rect currentEveWindowRect = new Rect();
 
         public Quesadilla()
         {
@@ -309,7 +312,7 @@ namespace Quesadilla
                     this.Location.Y > Screen.FromControl(this).Bounds.Height || this.Location.Y < Screen.FromControl(this).Bounds.Y
                     )
                 {
-                    this.Location = new Point(0, 0);
+                    this.Location = new System.Drawing.Point(0, 0);
                 }
 
                 //Width = Configuration.WindowSize.X >= 100 ? Configuration.WindowSize.X : 100;
@@ -473,12 +476,6 @@ namespace Quesadilla
                 }
                 CombatAdded = false;
             }
-        }
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetForegroundWindow();
-        public IntPtr GetForegroundWindowHandle()
-        {
-            return GetForegroundWindow();
         }
         private void AddNewCharacter(string characterName)
         {
@@ -940,7 +937,7 @@ namespace Quesadilla
         private void Quesadilla_FormClosing(object sender, FormClosingEventArgs e)
         {
             Configuration.InitialPosition = Location;
-            Configuration.WindowSize = new Point(Width, Height);
+            Configuration.WindowSize = new System.Drawing.Point(Width, Height);
             Configuration.StayOnTop = TopMost;
             Configuration.Save(configuration_filename);
         }
@@ -1050,6 +1047,11 @@ namespace Quesadilla
         {
             if (!ConfigurationWindowOpen)
             {
+
+                Configuration.InitialPosition = Location;
+                Configuration.WindowSize = new System.Drawing.Point(Width, Height);
+                Configuration.StayOnTop = TopMost;
+
                 var ConfigurationWindow = new QuesadillaConfiguration(Configuration, menuConfigurationWindow, this);
                 ((MenuItem)sender).Enabled = !((MenuItem)sender).Enabled;
                 ConfigurationWindow.Show(this);
@@ -1268,9 +1270,17 @@ namespace Quesadilla
             string previousToon = CurrentActiveToon;
 
             string foregroundWindowTitle = null;
-            var ptr = GetForegroundWindowHandle();
+            var ptr = this._processMonitor.GetForegroundWindowHandle();
 
+            var PrevRect = new Rect()
+            {
+                Top = currentEveWindowRect.Top,
+                Bottom = currentEveWindowRect.Bottom,
+                Left = currentEveWindowRect.Left,
+                Right = currentEveWindowRect.Right,
+            };
 
+            var result = this._processMonitor.GetWindowDimensions(ptr, ref currentEveWindowRect);
 /*
             // new / updated clients - ensure they are added 
             foreach (var a in addedProcesses.Union(updatedProcesses))
@@ -1303,7 +1313,6 @@ namespace Quesadilla
             }
 */
 
-
             if (ptr != null )
             {
                 foregroundWindowTitle = this._processMonitor.GetTitleOfKnownProcess(ptr);
@@ -1328,6 +1337,16 @@ namespace Quesadilla
                                 DPSGraphWindow.Show();
                             }
                         }
+                    }
+
+                    if ( DPSGraphWindow != null &&
+                        (
+                        PrevRect.Top != currentEveWindowRect.Top || PrevRect.Bottom != currentEveWindowRect.Bottom ||
+                        PrevRect.Left != currentEveWindowRect.Left || PrevRect.Right != currentEveWindowRect.Right 
+                        )
+                        )
+                    {
+                        DPSGraphWindow.SetScreenPosition();
                     }
                 }
                 else

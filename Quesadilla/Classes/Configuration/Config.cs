@@ -81,6 +81,10 @@ namespace Quesadilla.Classes
                     TriggerText = a.TriggerText
                 });
             }
+
+            c.InitialPosition = new Point(InitialPosition.X, InitialPosition.Y);
+            c.WindowSize = new Point(WindowSize.X, WindowSize.Y);
+
             return (c);
         }
 

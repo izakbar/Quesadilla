@@ -40,49 +40,100 @@ namespace Quesadilla
                 this.FormBorderStyle = FormBorderStyle.None;
             }
 
-            // position on screen
-            Screen screen = Screen.FromControl(this);
-            switch (_main.Configuration.DPSLocation)
-            {
-                case PopupLocationType.TopLeft:
-                    Location = new Point()
-                    {
-                        X = screen.WorkingArea.Left,
-                        Y = screen.WorkingArea.Top,
-                    };
-                    break;
-                case PopupLocationType.TopRight:
-                    Location = new Point()
-                    {
-                        X = screen.WorkingArea.Right - Width,
-                        Y = screen.WorkingArea.Top,
-                    };
-                    break;
-                case PopupLocationType.BottomLeft:
-                    Location = new Point()
-                    {
-                        X = screen.WorkingArea.Left,
-                        Y = screen.WorkingArea.Bottom - Height,
-                    };
-                    break;
-                case PopupLocationType.BottomRight:
-                    Location = new Point()
-                    {
-                        X = screen.WorkingArea.Right - Width,
-                        Y = screen.WorkingArea.Bottom - Height,
-                    };
-                    break;
-                case PopupLocationType.Center:
-                default:
-                    Location = new Point()
-                    {
-                        X = (screen.WorkingArea.Right / 2) - (Width / 2),
-                        Y = (screen.WorkingArea.Bottom / 2) - (Height / 2),
-                    };
-                    break;
-            }
+            SetScreenPosition();
         }
 
+        public void SetScreenPosition()
+        {
+            // position on screen
+            if ( _main.Configuration.DPSGraphTransparent )
+            {
+                // use current eve window (for transparent)
+                switch (_main.Configuration.DPSLocation)
+                {
+                    case PopupLocationType.TopLeft:
+                        Location = new Point()
+                        {
+                            X = _main.currentEveWindowRect.Left,
+                            Y = _main.currentEveWindowRect.Top,
+                        };
+                        break;
+                    case PopupLocationType.TopRight:
+                        Location = new Point()
+                        {
+                            X = _main.currentEveWindowRect.Right - Width,
+                            Y = _main.currentEveWindowRect.Top,
+                        };
+                        break;
+                    case PopupLocationType.BottomLeft:
+                        Location = new Point()
+                        {
+                            X = _main.currentEveWindowRect.Left,
+                            Y = _main.currentEveWindowRect.Bottom - Height,
+                        };
+                        break;
+                    case PopupLocationType.BottomRight:
+                        Location = new Point()
+                        {
+                            X = _main.currentEveWindowRect.Right - Width,
+                            Y = _main.currentEveWindowRect.Bottom - Height,
+                        };
+                        break;
+                    case PopupLocationType.Center:
+                    default:
+                        Location = new Point()
+                        {
+                            X = (_main.currentEveWindowRect.Right / 2) - (Width / 2),
+                            Y = (_main.currentEveWindowRect.Bottom / 2) - (Height / 2),
+                        };
+                        break;
+                }
+            }
+            else
+            {
+                // use screen position
+                Screen screen = Screen.FromControl(this);
+                switch (_main.Configuration.DPSLocation)
+                {
+                    case PopupLocationType.TopLeft:
+                        Location = new Point()
+                        {
+                            X = screen.WorkingArea.Left,
+                            Y = screen.WorkingArea.Top,
+                        };
+                        break;
+                    case PopupLocationType.TopRight:
+                        Location = new Point()
+                        {
+                            X = screen.WorkingArea.Right - Width,
+                            Y = screen.WorkingArea.Top,
+                        };
+                        break;
+                    case PopupLocationType.BottomLeft:
+                        Location = new Point()
+                        {
+                            X = screen.WorkingArea.Left,
+                            Y = screen.WorkingArea.Bottom - Height,
+                        };
+                        break;
+                    case PopupLocationType.BottomRight:
+                        Location = new Point()
+                        {
+                            X = screen.WorkingArea.Right - Width,
+                            Y = screen.WorkingArea.Bottom - Height,
+                        };
+                        break;
+                    case PopupLocationType.Center:
+                    default:
+                        Location = new Point()
+                        {
+                            X = (screen.WorkingArea.Right / 2) - (Width / 2),
+                            Y = (screen.WorkingArea.Bottom / 2) - (Height / 2),
+                        };
+                        break;
+                }
+            }
+        }
         private void QuesadillaDPSGraph_Load(object sender, EventArgs e)
         {
             if (_main.Configuration.DPSGraphTransparent)
@@ -145,6 +196,8 @@ namespace Quesadilla
             } else
             {
                 chartDPS.Visible = true;
+                // Set position based on eve window ?
+                SetScreenPosition();
             }
 
             if ( _main.Configuration.DPSAllToons )
