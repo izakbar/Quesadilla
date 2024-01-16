@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -37,9 +38,14 @@ namespace Quesadilla.Classes.Processes
         }
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
-        public bool GetWindowDimensions(IntPtr hwnd, ref Rect rectangle)
+        [DllImport("user32.dll")]
+        public static extern bool GetClientRect(IntPtr hwnd, ref Rect rectangle);
+        [DllImport("user32.dll")]
+        public static extern bool ClientToScreen(IntPtr hwnd, ref Point point);
+        public bool GetWindowDimensions(IntPtr hwnd, ref Rect rectangle, ref Point point)
         {
-            return GetWindowRect(hwnd, ref rectangle);
+            var result = GetWindowRect(hwnd, ref rectangle);
+            return result;
         }
 
         private bool IsMonitoredProcess(string processName)

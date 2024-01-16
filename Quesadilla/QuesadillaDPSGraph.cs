@@ -40,6 +40,10 @@ namespace Quesadilla
                 this.FormBorderStyle = FormBorderStyle.None;
             }
 
+
+            Width = _main.Configuration.DPSGraphWindowSize.X <= 100 ? 100 : _main.Configuration.DPSGraphWindowSize.X;
+            Height = _main.Configuration.DPSGraphWindowSize.Y <= 50 ? 50 : _main.Configuration.DPSGraphWindowSize.Y;
+
             SetScreenPosition();
         }
 
@@ -54,29 +58,29 @@ namespace Quesadilla
                     case PopupLocationType.TopLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Top,
+                            X = _main.currentEveWindowRect.Left + _main.Configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.TopRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width,
-                            Y = _main.currentEveWindowRect.Top,
+                            X = _main.currentEveWindowRect.Right - Width - _main.Configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Bottom - Height,
+                            X = _main.currentEveWindowRect.Left + _main.Configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width,
-                            Y = _main.currentEveWindowRect.Bottom - Height,
+                            X = _main.currentEveWindowRect.Right - Width - _main.Configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.Center:
@@ -142,6 +146,7 @@ namespace Quesadilla
                 ShowInTaskbar = false;
                 this.chartDPS.AntiAliasing = AntiAliasingStyles.None;
             }
+            chartDPS.Legends.First().Enabled = _main.Configuration.DPSGraphLegends;
         }
 
         public void UpdateDPSGraph()

@@ -40,11 +40,11 @@ namespace Quesadilla.Classes
                 InitialPosition = InitialPosition,
                 StayOnTop = StayOnTop,
                 DPSGraphStayOnTop = DPSGraphStayOnTop,
-                DPSGraphTransparent= DPSGraphTransparent,
+                DPSGraphLegends = DPSGraphLegends,
+                DPSGraphTransparent = DPSGraphTransparent,
                 DPSShowWindow = DPSShowWindow,
                 DPSSaveCSV = DPSSaveCSV,
                 DPSAllToons = DPSAllToons,
-                WindowSize = WindowSize,
                 GraphCombatMaxPoints = GraphCombatMaxPoints,
                 GraphCombatMinPointSeconds = GraphCombatMinPointSeconds,
                 GraphCombatSeconds = GraphCombatSeconds,
@@ -84,6 +84,8 @@ namespace Quesadilla.Classes
 
             c.InitialPosition = new Point(InitialPosition.X, InitialPosition.Y);
             c.WindowSize = new Point(WindowSize.X, WindowSize.Y);
+            c.DPSGraphWindowSize = new Point(DPSGraphWindowSize.X, DPSGraphWindowSize.Y);
+            c.DPSGraphWindowSizeAdjust = new Point(DPSGraphWindowSizeAdjust.X, DPSGraphWindowSizeAdjust.Y);
 
             return (c);
         }
@@ -105,6 +107,9 @@ namespace Quesadilla.Classes
                 c.HomeSystem = "K7D-II";
                 c.InitialPosition = new Point(0, 0);
                 c.WindowSize = new Point(760, 404);
+                c.DPSGraphWindowSize = new Point(250, 100);
+                c.DPSGraphWindowSizeAdjust = new Point(10, 15);
+                c.DPSGraphLegends = false;
                 c.StayOnTop = true;
                 c.DPSGraphStayOnTop = true;
                 c.DPSGraphTransparent = true;
@@ -122,7 +127,7 @@ namespace Quesadilla.Classes
                 c.AlertPopupOpacity = 99;
                 c.AlertPopupOpacityStep = 5;
                 c.AlertPopupLocation = PopupLocationType.BottomLeft;
-                c.DPSLocation = PopupLocationType.BottomRight;
+                c.DPSLocation = PopupLocationType.TopRight;
                 c.AlertPopupBackground = "bg_paulmart";
 
                 c.AlertPopupSystemNameColour = Color.Lime;
@@ -240,8 +245,11 @@ namespace Quesadilla.Classes
         public List<int> ignoreSystems { get; set; }
         public Point InitialPosition { get; set; }
         public Point WindowSize { get; set; }
+        public Point DPSGraphWindowSize { get; set; }
+        public Point DPSGraphWindowSizeAdjust { get; set; }
         public bool StayOnTop { get; set; }
         public bool DPSGraphStayOnTop { get; set; }
+        public bool DPSGraphLegends { get; set; }
         public bool DPSGraphTransparent { get; set; }
         public bool DPSShowWindow { get; set; }
         public bool DPSAllToons { get; set; }

@@ -125,6 +125,7 @@ namespace Quesadilla
         private DateTime LastFactionAlert = DateTime.Now;
 
         public Rect currentEveWindowRect = new Rect();
+        public Point currentEveClientPoint = new Point(0, 0);
 
         public Quesadilla()
         {
@@ -272,9 +273,20 @@ namespace Quesadilla
         private void RebuildLatestAlertsMenu()
         {
             menuLatestAlerts.MenuItems.Clear();
+            bool first = true;
             foreach (var alert in ActiveAlerts.Reverse().Take(Configuration.ShowLastUnexpiredAlerts).ToList())
             {
                 string menuText = alert.Entry.TimeAdded.ToString("HH:mm") + " " + (alert.Path != null ? alert.Path.ToSystemName : "") + " - " + alert.MenuText;
+                string TrayString = alert.Entry.TimeAdded.ToString("HH:mm") + " " + alert.Entry.LineContent;
+                if ( TrayString.Length > 64 )
+                {
+                    TrayString = TrayString.Substring(0, 64);
+                }
+                if ( first )
+                {
+                    first = !first;
+                    trayIcon.Text = TrayString;
+                }
                 MenuItem menuAlert = new MenuItem(menuText);
                 menuLatestAlerts.MenuItems.Add(menuAlert);
             }
@@ -1280,7 +1292,7 @@ namespace Quesadilla
                 Right = currentEveWindowRect.Right,
             };
 
-            var result = this._processMonitor.GetWindowDimensions(ptr, ref currentEveWindowRect);
+            var result = this._processMonitor.GetWindowDimensions(ptr, ref currentEveWindowRect, ref currentEveClientPoint);
 /*
             // new / updated clients - ensure they are added 
             foreach (var a in addedProcesses.Union(updatedProcesses))
