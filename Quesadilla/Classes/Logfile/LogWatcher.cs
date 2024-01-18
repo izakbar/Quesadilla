@@ -18,6 +18,8 @@ namespace Quesadilla.Classes
 
         private ILogger logger = Log.ForContext<LogWatcher>();
 
+        private int EXPIRE_OLD_INTEL_ = 1800; // 30 mins
+
         private string _logPath;
         private string _systemChannelPrefix;
         private Encoding _fileEncoding;
@@ -28,6 +30,7 @@ namespace Quesadilla.Classes
         private readonly Regex _chatLogRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s(?<time>\\d{2}\\:\\d{2}\\:\\d{2})\\s\\]\\s(?<name>\\w.*)\\s>\\s(?<content>.*)", RegexOptions.Compiled);
         private readonly Regex _gameLogRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s(?<time>\\d{2}\\:\\d{2}\\:\\d{2})\\s\\]\\s\\(\\w.*\\)\\s(?<content>.*)", RegexOptions.Compiled);
         private readonly Regex _gameLogCombatRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(combat\\)", RegexOptions.Compiled);
+        private readonly Regex _gameLogISKRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(bounty\\)", RegexOptions.Compiled);
 
         private readonly Regex _localSystemChange = new Regex("EVE\\sSystem\\s>\\sChannel\\schanged\\sto\\sLocal\\s:\\s(?<systemname>.*)", RegexOptions.Compiled);
         private readonly Regex _localListener = new Regex("Listener\\:\\s*(?<name>.*)", RegexOptions.Compiled);
@@ -38,6 +41,7 @@ namespace Quesadilla.Classes
 
         public event EventHandler<ProcessNewDataEventArgs> ProcessNewData;
         public event EventHandler<ProcessCombatEventArgs> ProcessCombat;
+        public event EventHandler<ProcessISKEventArgs> ProcessISK;
         public event EventHandler<ProcessSystemChangeEventArgs> SystemChange;
         public event EventHandler<ProcessChatServerChangeEventArgs> ChatServerChange;
 
@@ -204,19 +208,28 @@ namespace Quesadilla.Classes
                                         tempLogEntry.EntryType = this._logFileType == LogFileType.ChatIntel ? LogEntryType.UnknownChatLogEvent : LogEntryType.UnknownGameLogEvent;
                                     }
 
-                                    if (this._logFileType == LogFileType.Game && this._gameLogCombatRegex.IsMatch(input))
+                                    if (this._logFileType == LogFileType.Game )
                                     {
-                                        if (!this._interestingFiles[interestingFile.Key].InCombat)
+                                        if (this._gameLogCombatRegex.IsMatch(input))
                                         {
-                                            this._interestingFiles[interestingFile.Key].InCombat = true;
-                                            this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Start, tempLogEntry);
-                                        } else
+                                            if (!this._interestingFiles[interestingFile.Key].InCombat)
+                                            {
+                                                this._interestingFiles[interestingFile.Key].InCombat = true;
+                                                this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Start, tempLogEntry);
+                                            }
+                                            else
+                                            {
+                                                this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Combat, tempLogEntry);
+                                            }
+                                            this._interestingFiles[interestingFile.Key].TimeOutTriggered = false;
+                                            this._interestingFiles[interestingFile.Key].LastCombat = this._interestingFiles[interestingFile.Key].LastUpdate;
+                                        } else if (this._gameLogISKRegex.IsMatch(input)) 
                                         {
-                                            this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Combat, tempLogEntry);
+                                            this.OnISK(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
                                         }
-                                        this._interestingFiles[interestingFile.Key].TimeOutTriggered = false;
-                                        this._interestingFiles[interestingFile.Key].LastCombat = this._interestingFiles[interestingFile.Key].LastUpdate;
                                     }
+
+
                                     if (this._previousLogEntries.All<LogEntry>((Func<LogEntry, bool>)(logEntry => logEntry.LineContent != tempLogEntry.LineContent)))
                                     {
                                         this._previousLogEntries.Add(tempLogEntry);
@@ -232,6 +245,20 @@ namespace Quesadilla.Classes
                 return;
             foreach (LogEntry entry in logEntryList)
                 this.OnProcessNewData(entry);
+
+            // see if we should expire first entry in _previousLogEntries - slow trickle - one entry at a time
+            if (_previousLogEntries.Count > 0)
+            {
+                // check if we should expire first entry
+                var a = _previousLogEntries.First();
+                var diffInSeconds = (DateTime.Now - a.TimeAdded).TotalSeconds;
+                if (diffInSeconds > EXPIRE_OLD_INTEL_)
+                {
+                    // expired so dequeue
+                    _previousLogEntries.Remove(a);
+                }
+            }
+
         }
         private LogfileData ReadLogFile(string fileName, long startingPosition)
         {
@@ -486,6 +513,13 @@ namespace Quesadilla.Classes
             if (this.ProcessCombat == null)
                 return;
             this.ProcessCombat((object)this, new ProcessCombatEventArgs(logFileName, characterName, combatEvent, entry));
+        }
+        private void OnISK(string logFileName, string characterName, LogEntry entry)
+        {
+            logger.Debug((entry != null ? entry.LineContent : ""));
+            if (this.ProcessISK == null)
+                return;
+            this.ProcessISK((object)this, new ProcessISKEventArgs(logFileName, characterName, entry));
         }
         private void OnSystemChange(string systemName, string charName)
         {

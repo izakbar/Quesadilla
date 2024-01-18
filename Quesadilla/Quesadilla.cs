@@ -61,6 +61,8 @@ namespace Quesadilla
         private readonly Regex _CombatRegexMissesYouCompletely = new Regex("(?<combatEntity>.*)\\smisses\\syou\\scompletely", RegexOptions.Compiled);
         private readonly Regex _CombatRegexCombatData = new Regex("^<color=0x(?<combatColour>........)><b>(?<combatAmount>.*)</b>\\s*<color=0x........><font size=10>\\s*(?<combatContext>.*)\\s*</font>\\s*<b><color=0xffffffff>(?<combatEntity>.*)</b>(<font size=10>|<color=0x77ffffff>)*\\s-\\s(?<combatText>.*)", RegexOptions.Compiled);
 
+        private readonly Regex _ISKRegexISKData = new Regex("^<font size=12><b><color=0x........>\\s*(?<iskAmount>.*) ISK\\s*</b><color=0x........> added to next bounty payout", RegexOptions.Compiled);
+
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
 
         public SolarSystemManager _solarSystems = new SolarSystemManager();
@@ -111,6 +113,7 @@ namespace Quesadilla
         private Color OriginalBackgroundColour;
 
         public Dictionary<string, List<CombatLine>> _combat = new Dictionary<string, List<CombatLine>>();
+        public Dictionary<string, List<IskLine>> _ISK = new Dictionary<string, List<IskLine>>();
 
         private List<ProcessInfo>knowProcesses = new List<ProcessInfo>();
         public string CurrentActiveToon;
@@ -203,10 +206,14 @@ namespace Quesadilla
                     watcher.SystemChange += new EventHandler<ProcessSystemChangeEventArgs>(this._localWatcher_SystemChange);
                     watcher.ChatServerChange += new EventHandler<ProcessChatServerChangeEventArgs>(this._localWatcher_ChatServerChange);
                 }
-                else
+                else if (watcher._logFileType == LogFileType.Game)
+                {
+                    watcher.ProcessCombat += new EventHandler<ProcessCombatEventArgs>(this.logFile_ProcessCombat);
+                    watcher.ProcessISK += new EventHandler<ProcessISKEventArgs>(this.logFile_ProcessISK);
+                }
+                else 
                 {
                     watcher.ProcessNewData += new EventHandler<ProcessNewDataEventArgs>(this.logFile_ProcessNewData);
-                    watcher.ProcessCombat += new EventHandler<ProcessCombatEventArgs>(this.logFile_ProcessCombat);
                 }
             }
 
@@ -469,6 +476,20 @@ namespace Quesadilla
                         }
                     }
                 }
+
+                // expire ISK ?
+                foreach (var k in _ISK.Keys)
+                {
+                    if (_ISK[k].Count > 0)
+                    {
+                        TimeSpan ts = DateTime.Now - _ISK[k].First().TimeAdded;
+                        if (ts.TotalSeconds > Configuration.ExpireISKSeconds)
+                        {
+                            _ISK[k].Remove(_ISK[k].First());
+                        }
+                    }
+                }
+
             }
 
             UpdateEveProcesses();
@@ -488,6 +509,17 @@ namespace Quesadilla
                 }
                 CombatAdded = false;
             }
+
+            if (_ISK.ContainsKey(CurrentActiveToon))
+            {
+                lblISK.Text = GetIskLastHour(CurrentActiveToon);
+                lblISK.Visible = true;
+            }
+            else
+            {
+                lblISK.Visible = false;
+            }
+
         }
         private void AddNewCharacter(string characterName)
         {
@@ -1230,6 +1262,33 @@ namespace Quesadilla
 
             }
         }
+        private void logFile_ProcessISK(object sender, ProcessISKEventArgs e)
+        {
+            //Log.Information("COMBAT:" + e.CombatEvent);
+            if (e.Entry != null)
+            {
+                if (!_ISK.ContainsKey(e.Entry.CharacterName))
+                {
+                    _ISK.Add(e.Entry.CharacterName, new List<IskLine>());
+                }
+
+                Match match = _ISKRegexISKData.Match(e.Entry.LineContent);
+                if (match.Success)
+                {
+                    double iskAmount = 0;
+
+                    var amount = match.Groups["iskAmount"].ToString();
+                    iskAmount = Double.Parse(amount.Trim());
+
+                    _ISK[e.Entry.CharacterName].Add(new IskLine()
+                    {
+                        TimeAdded = e.Entry.TimeAdded,
+                        IskAmount = iskAmount,
+                    });
+                }
+            }
+        }
+
 
         private void buttonIntelSize_Click(object sender, EventArgs e)
         {
@@ -1382,6 +1441,26 @@ namespace Quesadilla
             {
                 c.IsClientActive = _processMonitor.IsCharStillActive(c.CharacterName);
             }
+        }
+        public string GetIskLastHour(string toon)
+        {
+            var ret = "";
+            double isk = 0;
+
+            //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
+            var expireTime = DateTime.Now.AddSeconds(-3600);
+
+            foreach (var i in _ISK[toon].Where(o => o.TimeAdded >= expireTime))
+            {
+                isk += i.IskAmount;
+            }
+
+            if ( isk > 0 )
+            {
+                ret = Math.Truncate(isk).ToString("0,000 ISK");
+            }
+
+            return ret;
         }
     }
 }
