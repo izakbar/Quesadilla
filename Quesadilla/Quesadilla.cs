@@ -278,9 +278,9 @@ namespace Quesadilla
             {
                 string menuText = alert.Entry.TimeAdded.ToString("HH:mm") + " " + (alert.Path != null ? alert.Path.ToSystemName : "") + " - " + alert.MenuText;
                 string TrayString = alert.Entry.TimeAdded.ToString("HH:mm") + " " + alert.Entry.LineContent;
-                if ( TrayString.Length > 64 )
+                if ( TrayString.Length > 63 )
                 {
-                    TrayString = TrayString.Substring(0, 64);
+                    TrayString = TrayString.Substring(0, 63);
                 }
                 if ( first )
                 {
