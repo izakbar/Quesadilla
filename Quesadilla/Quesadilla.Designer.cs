@@ -37,6 +37,7 @@
             this.CombatFlag = new System.Windows.Forms.Label();
             this.buttonIntelSize = new System.Windows.Forms.Button();
             this.lblCurrentClient = new System.Windows.Forms.Label();
+            this.lblISK = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // mainTimer
@@ -52,10 +53,10 @@
             this.intelLog.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.intelLog.Enabled = false;
             this.intelLog.ForContext = "";
-            this.intelLog.Location = new System.Drawing.Point(0, 220);
+            this.intelLog.Location = new System.Drawing.Point(0, 276);
             this.intelLog.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.intelLog.Name = "intelLog";
-            this.intelLog.Size = new System.Drawing.Size(992, 229);
+            this.intelLog.Size = new System.Drawing.Size(1116, 285);
             this.intelLog.TabIndex = 0;
             this.intelLog.Text = "";
             this.intelLog.TextChanged += new System.EventHandler(this.intelLog_TextChanged);
@@ -68,9 +69,9 @@
             this.alertsOutstanding.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.alertsOutstanding.ForeColor = System.Drawing.Color.PaleVioletRed;
             this.alertsOutstanding.Location = new System.Drawing.Point(0, -1);
-            this.alertsOutstanding.Margin = new System.Windows.Forms.Padding(4);
+            this.alertsOutstanding.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.alertsOutstanding.Name = "alertsOutstanding";
-            this.alertsOutstanding.Size = new System.Drawing.Size(59, 28);
+            this.alertsOutstanding.Size = new System.Drawing.Size(66, 41);
             this.alertsOutstanding.TabIndex = 2;
             this.alertsOutstanding.Text = "       ";
             // 
@@ -79,10 +80,10 @@
             this.ChatServerDown.AutoSize = true;
             this.ChatServerDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ChatServerDown.ForeColor = System.Drawing.Color.Red;
-            this.ChatServerDown.Location = new System.Drawing.Point(226, -1);
+            this.ChatServerDown.Location = new System.Drawing.Point(254, -1);
             this.ChatServerDown.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.ChatServerDown.Name = "ChatServerDown";
-            this.ChatServerDown.Size = new System.Drawing.Size(154, 20);
+            this.ChatServerDown.Size = new System.Drawing.Size(223, 29);
             this.ChatServerDown.TabIndex = 3;
             this.ChatServerDown.Text = "Chat Server Down";
             this.ChatServerDown.Visible = false;
@@ -92,10 +93,10 @@
             this.CombatFlag.AutoSize = true;
             this.CombatFlag.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CombatFlag.ForeColor = System.Drawing.Color.Red;
-            this.CombatFlag.Location = new System.Drawing.Point(67, -1);
+            this.CombatFlag.Location = new System.Drawing.Point(75, -1);
             this.CombatFlag.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.CombatFlag.Name = "CombatFlag";
-            this.CombatFlag.Size = new System.Drawing.Size(92, 20);
+            this.CombatFlag.Size = new System.Drawing.Size(131, 29);
             this.CombatFlag.TabIndex = 4;
             this.CombatFlag.Text = "In Combat";
             this.CombatFlag.Visible = false;
@@ -104,10 +105,10 @@
             // 
             this.buttonIntelSize.BackColor = System.Drawing.Color.Transparent;
             this.buttonIntelSize.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonIntelSize.Location = new System.Drawing.Point(969, 219);
+            this.buttonIntelSize.Location = new System.Drawing.Point(1090, 274);
             this.buttonIntelSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonIntelSize.Name = "buttonIntelSize";
-            this.buttonIntelSize.Size = new System.Drawing.Size(23, 22);
+            this.buttonIntelSize.Size = new System.Drawing.Size(26, 28);
             this.buttonIntelSize.TabIndex = 6;
             this.buttonIntelSize.Text = "▼";
             this.buttonIntelSize.UseVisualStyleBackColor = false;
@@ -117,20 +118,31 @@
             // 
             this.lblCurrentClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCurrentClient.ForeColor = System.Drawing.Color.Blue;
-            this.lblCurrentClient.Location = new System.Drawing.Point(634, 1);
+            this.lblCurrentClient.Location = new System.Drawing.Point(713, 1);
             this.lblCurrentClient.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblCurrentClient.Name = "lblCurrentClient";
-            this.lblCurrentClient.Size = new System.Drawing.Size(358, 26);
+            this.lblCurrentClient.Size = new System.Drawing.Size(403, 32);
             this.lblCurrentClient.TabIndex = 7;
             this.lblCurrentClient.Text = "Current Client";
             this.lblCurrentClient.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.lblCurrentClient.Visible = false;
             // 
+            // lblISK
+            // 
+            this.lblISK.ForeColor = System.Drawing.Color.ForestGreen;
+            this.lblISK.Location = new System.Drawing.Point(945, 33);
+            this.lblISK.Name = "lblISK";
+            this.lblISK.Size = new System.Drawing.Size(171, 17);
+            this.lblISK.TabIndex = 8;
+            this.lblISK.Text = "999999";
+            this.lblISK.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
             // Quesadilla
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(992, 449);
+            this.ClientSize = new System.Drawing.Size(1116, 561);
+            this.Controls.Add(this.lblISK);
             this.Controls.Add(this.lblCurrentClient);
             this.Controls.Add(this.buttonIntelSize);
             this.Controls.Add(this.CombatFlag);
@@ -139,7 +151,7 @@
             this.Controls.Add(this.intelLog);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.MaximizeBox = false;
             this.Name = "Quesadilla";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Quesadilla_FormClosing);
@@ -158,6 +170,7 @@
         private System.Windows.Forms.Label CombatFlag;
         private System.Windows.Forms.Button buttonIntelSize;
         private System.Windows.Forms.Label lblCurrentClient;
+        private System.Windows.Forms.Label lblISK;
     }
 }
 
