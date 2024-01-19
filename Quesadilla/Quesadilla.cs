@@ -695,11 +695,18 @@ namespace Quesadilla
 
                         // Cache paths - if not already stored
                         var homeSystemPathInfo = _solarSystems.FindAndCachePath(homeSystemId, toSystemId);
-                        Log.Debug("Jumps from HOME:" + _solarSystems.SolarSystems[homeSystemId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + homeSystemPathInfo.TotalJumps);
+                        if (homeSystemPathInfo != null)
+                        {
+                            Log.Debug("Jumps from HOME:" + _solarSystems.SolarSystems[homeSystemId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + homeSystemPathInfo.TotalJumps);
+                        }
+
                         foreach (var c in CharacterList.Where(o => o.LocationId > 0))
                         {
                             var CurrectLocationPathInfo = _solarSystems.FindAndCachePath(c.LocationId, toSystemId);
-                            Log.Debug("Jumps from " + c.CharacterName + ":" + _solarSystems.SolarSystems[c.LocationId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + CurrectLocationPathInfo.TotalJumps);
+                            if (CurrectLocationPathInfo != null)
+                            {
+                                Log.Debug("Jumps from " + c.CharacterName + ":" + _solarSystems.SolarSystems[c.LocationId].Name + " to " + _solarSystems.SolarSystems[toSystemId].Name + " is " + CurrectLocationPathInfo.TotalJumps);
+                            }
                         }
 
                         // Range alerts
