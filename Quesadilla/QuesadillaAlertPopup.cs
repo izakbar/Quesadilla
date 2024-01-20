@@ -108,6 +108,13 @@ namespace Quesadilla
                         Y = screen.WorkingArea.Top,
                     };
                     break;
+                case PopupLocationType.TopCenter:
+                    Location = new Point()
+                    {
+                        X = (screen.WorkingArea.Right / 2) - (Width / 2),
+                        Y = screen.WorkingArea.Top,
+                    };
+                    break;
                 case PopupLocationType.TopRight:
                     Location = new Point()
                     {
@@ -119,6 +126,13 @@ namespace Quesadilla
                     Location = new Point()
                     {
                         X = screen.WorkingArea.Left,
+                        Y = screen.WorkingArea.Bottom - Height,
+                    };
+                    break;
+                case PopupLocationType.BottomCenter:
+                    Location = new Point()
+                    {
+                        X = (screen.WorkingArea.Right / 2) - (Width / 2),
                         Y = screen.WorkingArea.Bottom - Height,
                     };
                     break;

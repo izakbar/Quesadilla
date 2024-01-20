@@ -62,6 +62,13 @@ namespace Quesadilla
                             Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
+                    case PopupLocationType.TopCenter:
+                        Location = new Point()
+                        {
+                            X = ( (_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                        };
+                        break;
                     case PopupLocationType.TopRight:
                         Location = new Point()
                         {
@@ -76,6 +83,13 @@ namespace Quesadilla
                             Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
+                    case PopupLocationType.BottomCenter:
+                        Location = new Point()
+                        {
+                            X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
+                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                        };
+                        break;
                     case PopupLocationType.BottomRight:
                         Location = new Point()
                         {
@@ -87,8 +101,8 @@ namespace Quesadilla
                     default:
                         Location = new Point()
                         {
-                            X = (_main.currentEveWindowRect.Right / 2) - (Width / 2),
-                            Y = (_main.currentEveWindowRect.Bottom / 2) - (Height / 2),
+                            X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
+                            Y = ((_main.currentEveWindowRect.Top - _main.currentEveWindowRect.Bottom) / 2) - (Height/ 2) + _main.currentEveWindowRect.Top,
                         };
                         break;
                 }

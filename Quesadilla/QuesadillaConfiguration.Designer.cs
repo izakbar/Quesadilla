@@ -67,6 +67,10 @@
             this.radioDPSTopLeft = new System.Windows.Forms.RadioButton();
             this.cbDPSShowWindow = new System.Windows.Forms.CheckBox();
             this.cbDPSAllToons = new System.Windows.Forms.CheckBox();
+            this.radioAlertTopCenter = new System.Windows.Forms.RadioButton();
+            this.radioAlertBottomCenter = new System.Windows.Forms.RadioButton();
+            this.radioDPSBottomCenter = new System.Windows.Forms.RadioButton();
+            this.radioDPSTopCenter = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.alertDemo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackOpacity)).BeginInit();
@@ -298,16 +302,18 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.radioAlertBottomCenter);
+            this.groupBox1.Controls.Add(this.radioAlertTopCenter);
             this.groupBox1.Controls.Add(this.radioAlertCenter);
             this.groupBox1.Controls.Add(this.radioAlertBottomRight);
             this.groupBox1.Controls.Add(this.radioAlertBottomLeft);
             this.groupBox1.Controls.Add(this.radioAlertTopRight);
             this.groupBox1.Controls.Add(this.radioAlertTopLeft);
-            this.groupBox1.Location = new System.Drawing.Point(11, 207);
+            this.groupBox1.Location = new System.Drawing.Point(13, 207);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox1.Size = new System.Drawing.Size(131, 97);
+            this.groupBox1.Size = new System.Drawing.Size(129, 97);
             this.groupBox1.TabIndex = 26;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Popup Location";
@@ -315,7 +321,7 @@
             // radioAlertCenter
             // 
             this.radioAlertCenter.AutoSize = true;
-            this.radioAlertCenter.Location = new System.Drawing.Point(57, 49);
+            this.radioAlertCenter.Location = new System.Drawing.Point(48, 49);
             this.radioAlertCenter.Margin = new System.Windows.Forms.Padding(4);
             this.radioAlertCenter.Name = "radioAlertCenter";
             this.radioAlertCenter.Size = new System.Drawing.Size(14, 13);
@@ -327,7 +333,7 @@
             // radioAlertBottomRight
             // 
             this.radioAlertBottomRight.AutoSize = true;
-            this.radioAlertBottomRight.Location = new System.Drawing.Point(101, 71);
+            this.radioAlertBottomRight.Location = new System.Drawing.Point(85, 71);
             this.radioAlertBottomRight.Margin = new System.Windows.Forms.Padding(4);
             this.radioAlertBottomRight.Name = "radioAlertBottomRight";
             this.radioAlertBottomRight.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -352,7 +358,7 @@
             // radioAlertTopRight
             // 
             this.radioAlertTopRight.AutoSize = true;
-            this.radioAlertTopRight.Location = new System.Drawing.Point(101, 23);
+            this.radioAlertTopRight.Location = new System.Drawing.Point(85, 26);
             this.radioAlertTopRight.Margin = new System.Windows.Forms.Padding(4);
             this.radioAlertTopRight.Name = "radioAlertTopRight";
             this.radioAlertTopRight.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -406,12 +412,14 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.radioDPSBottomCenter);
+            this.groupBox2.Controls.Add(this.radioDPSTopCenter);
             this.groupBox2.Controls.Add(this.radioDPSCenter);
             this.groupBox2.Controls.Add(this.radioDPSBottomRight);
             this.groupBox2.Controls.Add(this.radioDPSBottomLeft);
             this.groupBox2.Controls.Add(this.radioDPSTopRight);
             this.groupBox2.Controls.Add(this.radioDPSTopLeft);
-            this.groupBox2.Location = new System.Drawing.Point(11, 412);
+            this.groupBox2.Location = new System.Drawing.Point(11, 415);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
@@ -423,7 +431,7 @@
             // radioDPSCenter
             // 
             this.radioDPSCenter.AutoSize = true;
-            this.radioDPSCenter.Location = new System.Drawing.Point(57, 49);
+            this.radioDPSCenter.Location = new System.Drawing.Point(48, 51);
             this.radioDPSCenter.Margin = new System.Windows.Forms.Padding(4);
             this.radioDPSCenter.Name = "radioDPSCenter";
             this.radioDPSCenter.Size = new System.Drawing.Size(14, 13);
@@ -435,7 +443,7 @@
             // radioDPSBottomRight
             // 
             this.radioDPSBottomRight.AutoSize = true;
-            this.radioDPSBottomRight.Location = new System.Drawing.Point(101, 71);
+            this.radioDPSBottomRight.Location = new System.Drawing.Point(85, 71);
             this.radioDPSBottomRight.Margin = new System.Windows.Forms.Padding(4);
             this.radioDPSBottomRight.Name = "radioDPSBottomRight";
             this.radioDPSBottomRight.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -460,7 +468,7 @@
             // radioDPSTopRight
             // 
             this.radioDPSTopRight.AutoSize = true;
-            this.radioDPSTopRight.Location = new System.Drawing.Point(101, 23);
+            this.radioDPSTopRight.Location = new System.Drawing.Point(85, 26);
             this.radioDPSTopRight.Margin = new System.Windows.Forms.Padding(4);
             this.radioDPSTopRight.Name = "radioDPSTopRight";
             this.radioDPSTopRight.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -511,6 +519,52 @@
             this.cbDPSAllToons.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.cbDPSAllToons.UseVisualStyleBackColor = true;
             this.cbDPSAllToons.CheckedChanged += new System.EventHandler(this.cbDPSAllToons_CheckedChanged);
+            // 
+            // radioAlertTopCenter
+            // 
+            this.radioAlertTopCenter.AutoSize = true;
+            this.radioAlertTopCenter.Location = new System.Drawing.Point(48, 26);
+            this.radioAlertTopCenter.Margin = new System.Windows.Forms.Padding(4);
+            this.radioAlertTopCenter.Name = "radioAlertTopCenter";
+            this.radioAlertTopCenter.Size = new System.Drawing.Size(14, 13);
+            this.radioAlertTopCenter.TabIndex = 31;
+            this.radioAlertTopCenter.TabStop = true;
+            this.radioAlertTopCenter.UseVisualStyleBackColor = true;
+            this.radioAlertTopCenter.CheckedChanged += new System.EventHandler(this.radioAlertTopCenter_CheckedChanged);
+            // 
+            // radioAlertBottomCenter
+            // 
+            this.radioAlertBottomCenter.AutoSize = true;
+            this.radioAlertBottomCenter.Location = new System.Drawing.Point(48, 71);
+            this.radioAlertBottomCenter.Margin = new System.Windows.Forms.Padding(4);
+            this.radioAlertBottomCenter.Name = "radioAlertBottomCenter";
+            this.radioAlertBottomCenter.Size = new System.Drawing.Size(14, 13);
+            this.radioAlertBottomCenter.TabIndex = 32;
+            this.radioAlertBottomCenter.TabStop = true;
+            this.radioAlertBottomCenter.UseVisualStyleBackColor = true;
+            this.radioAlertBottomCenter.CheckedChanged += new System.EventHandler(this.radioAlertBottomCenter_CheckedChanged);
+            // 
+            // radioDPSBottomCenter
+            // 
+            this.radioDPSBottomCenter.AutoSize = true;
+            this.radioDPSBottomCenter.Location = new System.Drawing.Point(48, 71);
+            this.radioDPSBottomCenter.Margin = new System.Windows.Forms.Padding(4);
+            this.radioDPSBottomCenter.Name = "radioDPSBottomCenter";
+            this.radioDPSBottomCenter.Size = new System.Drawing.Size(14, 13);
+            this.radioDPSBottomCenter.TabIndex = 34;
+            this.radioDPSBottomCenter.TabStop = true;
+            this.radioDPSBottomCenter.UseVisualStyleBackColor = true;
+            // 
+            // radioDPSTopCenter
+            // 
+            this.radioDPSTopCenter.AutoSize = true;
+            this.radioDPSTopCenter.Location = new System.Drawing.Point(48, 26);
+            this.radioDPSTopCenter.Margin = new System.Windows.Forms.Padding(4);
+            this.radioDPSTopCenter.Name = "radioDPSTopCenter";
+            this.radioDPSTopCenter.Size = new System.Drawing.Size(14, 13);
+            this.radioDPSTopCenter.TabIndex = 33;
+            this.radioDPSTopCenter.TabStop = true;
+            this.radioDPSTopCenter.UseVisualStyleBackColor = true;
             // 
             // QuesadillaConfiguration
             // 
@@ -601,5 +655,9 @@
         private System.Windows.Forms.RadioButton radioDPSTopLeft;
         private System.Windows.Forms.CheckBox cbDPSShowWindow;
         private System.Windows.Forms.CheckBox cbDPSAllToons;
+        private System.Windows.Forms.RadioButton radioAlertBottomCenter;
+        private System.Windows.Forms.RadioButton radioAlertTopCenter;
+        private System.Windows.Forms.RadioButton radioDPSBottomCenter;
+        private System.Windows.Forms.RadioButton radioDPSTopCenter;
     }
 }
