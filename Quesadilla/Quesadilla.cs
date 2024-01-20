@@ -1163,6 +1163,10 @@ namespace Quesadilla
                 {
                     int dmgAmount = 0;
                     int neutAmount = 0;
+                    int capAmount = 0;
+                    int shieldAmount = 0;
+                    int armorAmount = 0;
+                    int hullAmount = 0;
 
                     var amount = match.Groups["combatAmount"].ToString();
                     bool received = true;
@@ -1176,10 +1180,39 @@ namespace Quesadilla
                     }
                     else
                     {
-                        dmgAmount = Int32.Parse(amount.Trim());
+
                         if (match.Groups["combatContext"].ToString() == "to")
                         {
                             received = false;
+                        }
+
+                        if (match.Groups["combatContext"].ToString() == "to" || match.Groups["combatContext"].ToString() == "from")
+                        {
+                            dmgAmount = Int32.Parse(amount.Trim());
+                        }
+                        else
+                        {
+                            if (match.Groups["combatContext"].ToString().StartsWith("remote shield boosted "))
+                            {
+                                shieldAmount = Int32.Parse(amount.Trim());
+                            }
+                            if (match.Groups["combatContext"].ToString().StartsWith("remote armor boosted "))
+                            {
+                                armorAmount = Int32.Parse(amount.Trim());
+                            }
+                            if (match.Groups["combatContext"].ToString().StartsWith("remote hull boosted "))
+                            {
+                                hullAmount = Int32.Parse(amount.Trim());
+                            }
+                            if (match.Groups["combatContext"].ToString().StartsWith("remote capacitor transmitted "))
+                            {
+                                capAmount = Int32.Parse(amount.Trim());
+                            }
+
+                            if (match.Groups["combatContext"].ToString().Trim().EndsWith("to") )
+                            {
+                                received = false;
+                            }
                         }
                     }
 
@@ -1190,6 +1223,10 @@ namespace Quesadilla
                         Text = match.Groups["combatText"].ToString(),
                         NeutAmount = neutAmount,
                         DamageAmount = dmgAmount,
+                        CapAmount = capAmount,
+                        ShieldAmount = shieldAmount,
+                        ArmorAmount = armorAmount,
+                        HullAmount = hullAmount,
                         Received = received,
                     });
 
