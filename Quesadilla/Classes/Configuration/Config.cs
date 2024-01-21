@@ -43,6 +43,7 @@ namespace Quesadilla.Classes
                 DPSGraphStayOnTop = DPSGraphStayOnTop,
                 DPSGraphLegends = DPSGraphLegends,
                 DPSGraphTransparent = DPSGraphTransparent,
+                AlertTransparent = AlertTransparent,
                 DPSShowWindow = DPSShowWindow,
                 DPSSaveCSV = DPSSaveCSV,
                 DPSAllToons = DPSAllToons,
@@ -114,6 +115,7 @@ namespace Quesadilla.Classes
                 c.StayOnTop = true;
                 c.DPSGraphStayOnTop = true;
                 c.DPSGraphTransparent = true;
+                c.AlertTransparent = false;
                 c.DPSShowWindow = true;
                 c.DPSSaveCSV = false;
                 c.DPSAllToons = false;
@@ -121,7 +123,7 @@ namespace Quesadilla.Classes
                 c.ExpireAlertSeconds = 500;
                 c.ExpireCombatSeconds = 1200;
                 c.ExpireISKSeconds = 5400; // 90 mins
-                c.GraphCombatSeconds = 180;
+                c.GraphCombatSeconds = 300;
                 c.GraphCombatMaxPoints = 30;
                 c.GraphCombatMinPointSeconds = 10;
 
@@ -253,6 +255,7 @@ namespace Quesadilla.Classes
         public bool DPSGraphStayOnTop { get; set; }
         public bool DPSGraphLegends { get; set; }
         public bool DPSGraphTransparent { get; set; }
+        public bool AlertTransparent { get; set; }
         public bool DPSShowWindow { get; set; }
         public bool DPSAllToons { get; set; }
         public bool DPSSaveCSV { get; set; }

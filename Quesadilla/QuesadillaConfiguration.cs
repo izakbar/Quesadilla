@@ -162,7 +162,7 @@ namespace Quesadilla
             {
                 _alertPopup.Close();
             }
-            _alertPopup = new QuesadillaAlertPopup(_dummyAlert, _configuration, _mainForm.LoadImageFromFile(_configuration.AlertPopupBackground));
+            _alertPopup = new QuesadillaAlertPopup(_dummyAlert, _configuration, _mainForm.LoadImageFromFile(_configuration.AlertPopupBackground), _mainForm);
             _alertPopup.Show();
             _alertPopup.Hide();
             alertDemo.Image = GetFormImageWithoutBorders(_alertPopup);
@@ -328,6 +328,11 @@ namespace Quesadilla
         private void radioAlertBottomCenter_CheckedChanged(object sender, EventArgs e)
         {
             _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.BottomCenter;
+        }
+
+        private void cbAlertTransparent_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.AlertTransparent= cbAlertTransparent.Checked;
         }
     }
 }

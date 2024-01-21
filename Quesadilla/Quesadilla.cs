@@ -92,6 +92,7 @@ namespace Quesadilla
         private MenuItem menuConfigurationDPSShowDPS = new MenuItem("Show DPS");
         private MenuItem menuConfigurationDPSStayOnTop = new MenuItem("DPS Always on top");
         private MenuItem menuConfigurationDPSTransparent = new MenuItem("DPS Transparent");
+        private MenuItem menuConfigurationAlertTransparent = new MenuItem("Alert Transparent");
         private MenuItem menuConfigurationDPSSaveCSV = new MenuItem("DPS Save CSV");
         private MenuItem menuConfigurationDPSShowAll = new MenuItem("DPS Combine");
 
@@ -166,7 +167,8 @@ namespace Quesadilla
 
             menuConfiguration.MenuItems.Add(menuConfigurationDPSShowDPS = new MenuItem("Show DPS", trayIconMenuDPSShowWindow) { Checked = Configuration.DPSShowWindow, });
             menuConfiguration.MenuItems.Add(menuConfigurationDPSStayOnTop = new MenuItem("DPS Always on top", trayIconMenuDPSAlwaysOnTop) { Checked = Configuration.DPSGraphStayOnTop, });
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSTransparent =  new MenuItem("DPS Transparent", trayIconMenuDPSTransparent) { Checked = Configuration.DPSGraphTransparent, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSTransparent = new MenuItem("DPS Transparent", trayIconMenuDPSTransparent) { Checked = Configuration.DPSGraphTransparent, });
+            menuConfiguration.MenuItems.Add(menuConfigurationAlertTransparent = new MenuItem("Alert Transparent", trayIconMenuAlertTransparent) { Checked = Configuration.AlertTransparent, });
             menuConfiguration.MenuItems.Add(menuConfigurationDPSSaveCSV = new MenuItem("DPS Save CSV", trayIconMenuDPSSaveCSV) { Checked = Configuration.DPSSaveCSV, });
             menuConfiguration.MenuItems.Add(menuConfigurationDPSShowAll = new MenuItem("DPS Combine", trayIconMenuDPSAllToons) { Checked = Configuration.DPSAllToons, });
 
@@ -435,7 +437,7 @@ namespace Quesadilla
                 ActiveAlerts.Enqueue(NewAlert);
                 // do any extra processing 
 
-                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Configuration, LoadImageFromFile(Configuration.AlertPopupBackground));
+                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Configuration, LoadImageFromFile(Configuration.AlertPopupBackground), this);
                 NewAlertWindow.Show(this);
 
                 SoundPlayer sound = LoadSoundFromFile(NewAlert.SoundFile);
@@ -1038,7 +1040,7 @@ namespace Quesadilla
                 DPSGraphWindow = null ;
             }
         }
-       
+
         private void trayIconMenuDPSTransparent(object sender, EventArgs e)
         {
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
@@ -1060,6 +1062,11 @@ namespace Quesadilla
                         break;
                 }
             }
+        }
+        private void trayIconMenuAlertTransparent(object sender, EventArgs e)
+        {
+            ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
+            Configuration.AlertTransparent = ((MenuItem)sender).Checked;
         }
 
 

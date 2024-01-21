@@ -71,6 +71,7 @@
             this.radioAlertBottomCenter = new System.Windows.Forms.RadioButton();
             this.radioDPSBottomCenter = new System.Windows.Forms.RadioButton();
             this.radioDPSTopCenter = new System.Windows.Forms.RadioButton();
+            this.cbAlertTransparent = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.alertDemo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackOpacity)).BeginInit();
@@ -566,11 +567,27 @@
             this.radioDPSTopCenter.TabStop = true;
             this.radioDPSTopCenter.UseVisualStyleBackColor = true;
             // 
+            // cbAlertTransparent
+            // 
+            this.cbAlertTransparent.AutoSize = true;
+            this.cbAlertTransparent.Location = new System.Drawing.Point(712, 123);
+            this.cbAlertTransparent.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.cbAlertTransparent.Name = "cbAlertTransparent";
+            this.cbAlertTransparent.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.cbAlertTransparent.Size = new System.Drawing.Size(129, 20);
+            this.cbAlertTransparent.TabIndex = 32;
+            this.cbAlertTransparent.Text = "Alert Transparent";
+            this.cbAlertTransparent.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.cbAlertTransparent.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.cbAlertTransparent.UseVisualStyleBackColor = true;
+            this.cbAlertTransparent.CheckedChanged += new System.EventHandler(this.cbAlertTransparent_CheckedChanged);
+            // 
             // QuesadillaConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1312, 751);
+            this.Controls.Add(this.cbAlertTransparent);
             this.Controls.Add(this.cbDPSAllToons);
             this.Controls.Add(this.cbDPSShowWindow);
             this.Controls.Add(this.groupBox2);
@@ -659,5 +676,6 @@
         private System.Windows.Forms.RadioButton radioAlertTopCenter;
         private System.Windows.Forms.RadioButton radioDPSBottomCenter;
         private System.Windows.Forms.RadioButton radioDPSTopCenter;
+        private System.Windows.Forms.CheckBox cbAlertTransparent;
     }
 }
