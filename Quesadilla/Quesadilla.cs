@@ -27,6 +27,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using static Quesadilla.Classes.Processes.ProcessMonitor;
 using static Quesadilla.Extensions.StringExtensions;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Quesadilla
 {
@@ -286,8 +287,13 @@ namespace Quesadilla
         {
             menuLatestAlerts.MenuItems.Clear();
             bool first = true;
+            DateTime now = DateTime.Now;
+
             foreach (var alert in ActiveAlerts.Reverse().Take(Configuration.ShowLastUnexpiredAlerts).ToList())
             {
+                TimeSpan timeAgo = now - alert.Entry.TimeAdded;
+                var timeAgoString = timeAgo.ToString();
+
                 string menuText = alert.Entry.TimeAdded.ToString("HH:mm") + " " + (alert.Path != null ? alert.Path.ToSystemName : "") + " - " + alert.MenuText;
                 string TrayString = alert.Entry.TimeAdded.ToString("HH:mm") + " " + alert.Entry.LineContent;
                 if ( TrayString.Length > 63 )
