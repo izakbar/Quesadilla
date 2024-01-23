@@ -34,6 +34,7 @@ namespace Quesadilla.Classes
                 AlertPopupSeconds = AlertPopupSeconds,
                 AlertPopupSystemNameColour = AlertPopupSystemNameColour,
                 ExpireAlertSeconds = ExpireAlertSeconds,
+                ExpireZKillSeconds = ExpireZKillSeconds,
                 ShowLastUnexpiredAlerts = ShowLastUnexpiredAlerts,
                 IgnoreAsTooManyJumps = IgnoreAsTooManyJumps,
                 ExpireCombatSeconds = ExpireCombatSeconds,
@@ -125,6 +126,7 @@ namespace Quesadilla.Classes
                 c.ExpireAlertSeconds = 500;
                 c.ExpireCombatSeconds = 1200;
                 c.ExpireISKSeconds = 5400; // 90 mins
+                c.ExpireZKillSeconds = 900; // 15 mins
                 c.GraphCombatSeconds = 300;
                 c.GraphCombatMaxPoints = 30;
                 c.GraphCombatMinPointSeconds = 10;
@@ -266,6 +268,7 @@ namespace Quesadilla.Classes
         public int ExpireAlertSeconds { get; set; }
         public int ExpireCombatSeconds { get; set; }
         public int ExpireISKSeconds { get; set; }
+        public int ExpireZKillSeconds { get; set; }
         public int GraphCombatSeconds { get; set; }
         public int GraphCombatMaxPoints { get; set; }
         public int GraphCombatMinPointSeconds { get; set; }

@@ -99,6 +99,7 @@ namespace Quesadilla
         private MenuItem menuConfigurationDPSShowAll = new MenuItem("DPS Combine");
 
         private ZKillRedisQ ZKillFeed;
+        private List<ZKillKill> ZKillKills = new List<ZKillKill>();
 
         public bool AlertShowing = false;
 
@@ -511,6 +512,20 @@ namespace Quesadilla
                         }
                     }
                 }
+
+                // expire zkills ?
+                foreach (var k in ZKillKills)
+                {
+                    TimeSpan ts = DateTime.Now - k.TimeAdded;
+                    if (ts.TotalSeconds > Configuration.ExpireZKillSeconds)
+                    {
+                        _solarSystems.SolarSystems[(int)k.SolarSystemId].Kills.Remove(k);
+                        k.Expired = true;
+                    }
+                }
+                ZKillKills.RemoveAll(o => o.Expired);
+
+
                 TicksSinceLastCleardown = 0;
             }
 
@@ -1425,37 +1440,6 @@ namespace Quesadilla
             };
 
             var result = this._processMonitor.GetWindowDimensions(ptr, ref currentEveWindowRect, ref currentEveClientPoint);
-            /*
-                        // new / updated clients - ensure they are added 
-                        foreach (var a in addedProcesses.Union(updatedProcesses))
-                        {
-                            var clientName = a.Title.Replace("EVE - ", "");
-                            var c = CharacterList.Find(o => o.CharacterName.Equals(clientName));
-                            if (c == null) 
-                            {
-                                c = new Character()
-                                {
-                                    CharacterName = clientName,
-                                };
-                            }
-                            c.IsClientActive = true;
-                        }
-
-                        // removed clients - ensure they are set inactive
-                        foreach (var a in removedProcesses)
-                        {
-                            var clientName = a.Title.Replace("EVE - ", "");
-                            var c = CharacterList.Find(o => o.CharacterName.Equals(clientName));
-                            if (c == null) 
-                            {
-                                c = new Character()
-                                {
-                                    CharacterName = clientName,
-                                };
-                            }
-                            c.IsClientActive = false;
-                        }
-            */
 
             if (ptr != null)
             {
@@ -1547,8 +1531,15 @@ namespace Quesadilla
                 regionName = _solarSystems.SolarSystems[(int)e.Kill.SolarSystemId].RegionName;
                 e.Kill.SolarSystemName = systemName;
                 e.Kill.RegionName = regionName;
+
+                if ( _solarSystems.SolarSystems[(int)e.Kill.SolarSystemId].Kills == null )
+                {
+                    _solarSystems.SolarSystems[(int)e.Kill.SolarSystemId].Kills = new List<ZKillKill>();
+                }
+                _solarSystems.SolarSystems[(int)e.Kill.SolarSystemId].Kills.Add(e.Kill);
+                ZKillKills.Add(e.Kill);
             }
-            Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {e.Kill.VictimShipTypeId} {e.Kill.href}");
+            Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {e.Kill.VictimShipTypeId}");
         }
     }
 }

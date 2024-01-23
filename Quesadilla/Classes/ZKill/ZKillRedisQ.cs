@@ -26,9 +26,9 @@ namespace Quesadilla.Classes.ZKill
         private bool FeedRunning = false;
         private System.Timers.Timer t;
 
-        public event EventHandler<ZKillEventArgs> ZKillEventHandler;
+        private int ZkillErrorCount = 0;
 
-        public List<ZKillKill> Kills { get; set; }
+        public event EventHandler<ZKillEventArgs> ZKillEventHandler;
 
         public ZKillRedisQ()
         {
@@ -58,11 +58,14 @@ namespace Quesadilla.Classes.ZKill
 
         public void Pause()
         {
+            Log.Error("ZKill RedisQ processing PAUSED");
             FeedPaused = true;
         }
         public void Resume()
         {
+            Log.Error("ZKill RedisQ processing RESUMED");
             FeedPaused = false;
+            ZkillErrorCount = 0;            // Reset error counter
         }
 
 
@@ -90,12 +93,19 @@ namespace Quesadilla.Classes.ZKill
             }
             catch
             {
+                log.Error("ZKill RedisQ request failed");
+                ZkillErrorCount++;
                 return ;
             }
 
             // if we have an error - sleep a long time - consider pause
             if (strContent == "Error")
             {
+                log.Error("Getting error back from ZKill - sleeping worker");
+                ZkillErrorCount++;
+
+                if (ZkillErrorCount > 50) this.Pause();  // too many errors - pause
+
                 Thread.Sleep(500000);
                 return;
             }
@@ -110,16 +120,11 @@ namespace Quesadilla.Classes.ZKill
             }
             else
             {
-                log.Information($"ZkillID:{zkill.Package.ID} {zkill.Package.Killmail.SolarSystemId}");
+                //log.Information($"ZkillID:{zkill.Package.ID} {zkill.Package.Killmail.SolarSystemId}");
 
                 // if event handler AND not npc
                 if ( ZKillEventHandler != null )
                 {
-
-                    if (zkill.Package.Zkb.Npc)
-                    {
-                        log.Information("NPC Kill");
-                    }
 
                     var mainAttacker = zkill.Package.Killmail.Attackers.Where(o => o.FinalBlow).First();
 
@@ -128,6 +133,7 @@ namespace Quesadilla.Classes.ZKill
                         ID = zkill.Package.ID,
                         SolarSystemId = zkill.Package.Killmail.SolarSystemId,
                         Timestamp = zkill.Package.Killmail.Timestamp,
+                        TimeAdded = DateTime.Now,
 
                         VictimAllianceId = zkill.Package.Killmail.Victim.AllianceId,
                         VictimCharacterId = zkill.Package.Killmail.Victim.CharacterId,
@@ -141,6 +147,8 @@ namespace Quesadilla.Classes.ZKill
                         KillerWeaponTypeId = mainAttacker.WeaponTypeId,
 
                         href = zkill.Package.Zkb.Href,
+                        
+                        Expired = false,
 
                     };
                     ZKillEventHandler((object)this, new ZKillEventArgs(z));

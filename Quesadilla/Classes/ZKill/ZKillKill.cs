@@ -11,6 +11,8 @@ namespace Quesadilla.Classes.ZKill
     {
         public long ID { get; set; }
         public System.DateTimeOffset Timestamp { get; set; }
+        public System.DateTimeOffset TimeAdded { get; set; }
+        public bool Expired { get; set; }
         public long SolarSystemId { get; set; }
 
         public string SolarSystemName { get; set; }
