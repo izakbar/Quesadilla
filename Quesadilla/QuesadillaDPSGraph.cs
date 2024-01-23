@@ -62,6 +62,13 @@ namespace Quesadilla
                             Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
+                    case PopupLocationType.TopCenter:
+                        Location = new Point()
+                        {
+                            X = ( (_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                        };
+                        break;
                     case PopupLocationType.TopRight:
                         Location = new Point()
                         {
@@ -76,6 +83,13 @@ namespace Quesadilla
                             Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
+                    case PopupLocationType.BottomCenter:
+                        Location = new Point()
+                        {
+                            X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
+                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                        };
+                        break;
                     case PopupLocationType.BottomRight:
                         Location = new Point()
                         {
@@ -87,8 +101,8 @@ namespace Quesadilla
                     default:
                         Location = new Point()
                         {
-                            X = (_main.currentEveWindowRect.Right / 2) - (Width / 2),
-                            Y = (_main.currentEveWindowRect.Bottom / 2) - (Height / 2),
+                            X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
+                            Y = ((_main.currentEveWindowRect.Top - _main.currentEveWindowRect.Bottom) / 2) - (Height/ 2) + _main.currentEveWindowRect.Top,
                         };
                         break;
                 }
@@ -242,6 +256,70 @@ namespace Quesadilla
             toon1NeutGiven.BorderWidth = LineSize;
             toon1NeutGiven.BorderDashStyle = ChartDashStyle.Solid;
 
+            var toon1ShieldReceived = chartDPS.Series.Add("LogiS IN");
+            toon1ShieldReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1ShieldReceived.Points.Clear();
+            toon1ShieldReceived.Color = Color.Aqua;
+            toon1ShieldReceived.YAxisType = AxisType.Secondary;
+            toon1ShieldReceived.BorderWidth = LineSize;
+            toon1ShieldReceived.BorderDashStyle = ChartDashStyle.Solid;
+
+            var toon1ShieldGiven = chartDPS.Series.Add("LogiS OUT");
+            toon1ShieldGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1ShieldGiven.Points.Clear();
+            toon1ShieldGiven.Color = Color.CornflowerBlue;
+            toon1ShieldGiven.YAxisType = AxisType.Secondary;
+            toon1ShieldGiven.BorderWidth = LineSize;
+            toon1ShieldGiven.BorderDashStyle = ChartDashStyle.Solid;
+
+            var toon1ArmorReceived = chartDPS.Series.Add("LogiA IN");
+            toon1ArmorReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1ArmorReceived.Points.Clear();
+            toon1ArmorReceived.Color = Color.Fuchsia;
+            toon1ArmorReceived.YAxisType = AxisType.Secondary;
+            toon1ArmorReceived.BorderWidth = LineSize;
+            toon1ArmorReceived.BorderDashStyle = ChartDashStyle.Solid;
+
+            var toon1ArmorGiven = chartDPS.Series.Add("LogiA OUT");
+            toon1ArmorGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1ArmorGiven.Points.Clear();
+            toon1ArmorGiven.Color = Color.DarkMagenta;
+            toon1ArmorGiven.YAxisType = AxisType.Secondary;
+            toon1ArmorGiven.BorderWidth = LineSize;
+            toon1ArmorGiven.BorderDashStyle = ChartDashStyle.Solid;
+
+            var toon1HullReceived = chartDPS.Series.Add("LogiH IN");
+            toon1HullReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1HullReceived.Points.Clear();
+            toon1HullReceived.Color = Color.Silver;
+            toon1HullReceived.YAxisType = AxisType.Secondary;
+            toon1HullReceived.BorderWidth = LineSize;
+            toon1HullReceived.BorderDashStyle = ChartDashStyle.Solid;
+
+            var toon1HullGiven = chartDPS.Series.Add("LogiH OUT");
+            toon1ArmorGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1ArmorGiven.Points.Clear();
+            toon1ArmorGiven.Color = Color.SlateGray;
+            toon1ArmorGiven.YAxisType = AxisType.Secondary;
+            toon1ArmorGiven.BorderWidth = LineSize;
+            toon1ArmorGiven.BorderDashStyle = ChartDashStyle.Solid;
+
+            var toon1CapReceived = chartDPS.Series.Add("LogiC IN");
+            toon1ArmorReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1ArmorReceived.Points.Clear();
+            toon1ArmorReceived.Color = Color.LightYellow;
+            toon1ArmorReceived.YAxisType = AxisType.Secondary;
+            toon1ArmorReceived.BorderWidth = LineSize;
+            toon1ArmorReceived.BorderDashStyle = ChartDashStyle.Solid;
+
+            var toon1CapGiven = chartDPS.Series.Add("LogiC OUT");
+            toon1ArmorGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1ArmorGiven.Points.Clear();
+            toon1ArmorGiven.Color = Color.OldLace;
+            toon1ArmorGiven.YAxisType = AxisType.Secondary;
+            toon1ArmorGiven.BorderWidth = LineSize;
+            toon1ArmorGiven.BorderDashStyle = ChartDashStyle.Solid;
+
             _combatGraphData.Clear();
 
             DateTime start = DateTime.Now;
@@ -296,11 +374,19 @@ namespace Quesadilla
                         {
                             _combatGraphData[slot].DamageReceived += c.DamageAmount;
                             _combatGraphData[slot].NeutsReceived += c.NeutAmount;
+                            _combatGraphData[slot].ShieldReceived+= c.ShieldAmount;
+                            _combatGraphData[slot].ArmorReceived += c.ArmorAmount;
+                            _combatGraphData[slot].HullReceived += c.HullAmount;
+                            _combatGraphData[slot].CapReceived += c.CapAmount;
                         }
                         else
                         {
                             _combatGraphData[slot].DamageGiven += c.DamageAmount;
                             _combatGraphData[slot].NeutsGiven += c.NeutAmount;
+                            _combatGraphData[slot].ShieldGiven += c.ShieldAmount;
+                            _combatGraphData[slot].ArmorGiven += c.ArmorAmount;
+                            _combatGraphData[slot].HullGiven += c.HullAmount;
+                            _combatGraphData[slot].CapGiven += c.CapAmount;
                         }
                     }
                 }
@@ -327,10 +413,14 @@ namespace Quesadilla
 
                 var seconds = (int)Math.Truncate((curr - start).TotalSeconds);
 
-                double dReceived = 0;
-                double dGiven = 0;
-                double nReceived = 0;
-                double nGiven = 0;
+                double dReceived = 0; double dGiven = 0;
+                double nReceived = 0; double nGiven = 0;
+
+                double sReceived = 0; double sGiven = 0;
+                double aReceived = 0; double aGiven = 0;
+                double hReceived = 0; double hGiven = 0;
+                double cReceived = 0; double cGiven = 0;
+
                 curr = curr.AddSeconds(span);
                 for (var i = p; i <= n; i++)
                 {
@@ -338,17 +428,54 @@ namespace Quesadilla
                     {
                         dReceived += _combatGraphData[i].DamageReceived;
                         dGiven += _combatGraphData[i].DamageGiven;
+
                         nReceived += _combatGraphData[i].NeutsReceived;
                         nGiven += _combatGraphData[i].NeutsGiven;
+
+                        sReceived += _combatGraphData[i].ShieldReceived;
+                        sGiven += _combatGraphData[i].ShieldGiven;
+
+                        aReceived += _combatGraphData[i].ArmorReceived;
+                        aGiven += _combatGraphData[i].ArmorGiven;
+
+                        hReceived += _combatGraphData[i].HullReceived;
+                        hGiven += _combatGraphData[i].HullGiven;
+
+                        cReceived += _combatGraphData[i].CapReceived;
+                        cGiven += _combatGraphData[i].CapGiven;
                     }
                 }
                 if (seconds > 0)
                 {
-                    toon1Received.Points.AddXY(seconds, dReceived / (span * 2 + 1));
-                    toon1Given.Points.AddXY(seconds, dGiven / (span * 2 + 1));
+                    if (dReceived > 0 ) toon1Received.Points.AddXY(seconds, dReceived / (span * 2 + 1));
+                    if (dGiven > 0) toon1Given.Points.AddXY(seconds, dGiven / (span * 2 + 1));
 
-                    toon1NeutReceived.Points.AddXY(seconds, nReceived/ (span * 2 + 1) );
-                    toon1NeutGiven.Points.AddXY(seconds, nGiven / (span * 2 + 1) );
+                    if (nReceived > 0) toon1NeutReceived.Points.AddXY(seconds, nReceived/ (span * 2 + 1) );
+                    if (nGiven > 0) toon1NeutGiven.Points.AddXY(seconds, nGiven / (span * 2 + 1) );
+
+                    if (sReceived > 0) toon1ShieldReceived.Points.AddXY(seconds, sReceived / (span * 2 + 1));
+                    if (sGiven > 0) toon1ShieldGiven.Points.AddXY(seconds, sGiven / (span * 2 + 1));
+
+                    if (aReceived > 0) toon1ArmorReceived.Points.AddXY(seconds, aReceived / (span * 2 + 1));
+                    if (aGiven > 0) toon1ArmorGiven.Points.AddXY(seconds, aGiven / (span * 2 + 1));
+
+                    if (hReceived > 0) toon1HullReceived.Points.AddXY(seconds, hReceived / (span * 2 + 1));
+                    if (hGiven > 0) toon1HullGiven.Points.AddXY(seconds, hGiven / (span * 2 + 1));
+
+                    if (cReceived > 0) toon1CapReceived.Points.AddXY(seconds, cReceived / (span * 2 + 1));
+                    if (cGiven > 0) toon1CapGiven.Points.AddXY(seconds, cGiven / (span * 2 + 1));
+
+                }
+            }
+
+            foreach ( var s in chartDPS.Series)
+            {
+                if ( s.Points.Count == 0 )
+                {
+                    s.Enabled = false;
+                } else
+                {
+                    s.Enabled = true;
                 }
             }
 

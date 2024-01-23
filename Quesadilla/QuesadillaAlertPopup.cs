@@ -25,11 +25,14 @@ namespace Quesadilla
         private int _opacitystep;
         private PopupLocationType _location;
 
+        private Quesadilla _main;
+
         private const string ALERT_TEXT = "Alert";
         private const string FACTION_TEXT = "Faction Spawn";
 
-        public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background)
+        public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background, Quesadilla mainForm)
         {
+            _main = mainForm;
             InitializeComponent();
             _alert = alert;
             _seconds = configuration.AlertPopupSeconds;
@@ -97,46 +100,123 @@ namespace Quesadilla
 
             BackgroundImage = background;
 
+
             // position on screen
-            Screen screen = Screen.FromControl(this);
-            switch (configuration.AlertPopupLocation)
+            if (_main.Configuration.AlertTransparent)
             {
-                case PopupLocationType.TopLeft:
-                    Location = new Point()
-                    {
-                        X = screen.WorkingArea.Left,
-                        Y = screen.WorkingArea.Top,
-                    };
-                    break;
-                case PopupLocationType.TopRight:
-                    Location = new Point()
-                    {
-                        X = screen.WorkingArea.Right - Width,
-                        Y = screen.WorkingArea.Top,
-                    };
-                    break;
-                case PopupLocationType.BottomLeft:
-                    Location = new Point()
-                    {
-                        X = screen.WorkingArea.Left,
-                        Y = screen.WorkingArea.Bottom - Height,
-                    };
-                    break;
-                case PopupLocationType.BottomRight:
-                    Location = new Point()
-                    {
-                        X = screen.WorkingArea.Right - Width,
-                        Y = screen.WorkingArea.Bottom - Height,
-                    };
-                    break;
-                case PopupLocationType.Center:
-                default:
-                    Location = new Point()
-                    {
-                        X = (screen.WorkingArea.Right/2) - (Width/2),
-                        Y = (screen.WorkingArea.Bottom/2) - (Height/2),
-                    };
-                    break;
+                // use current eve window (for transparent)
+                switch (_main.Configuration.DPSLocation)
+                {
+                    case PopupLocationType.TopLeft:
+                        Location = new Point()
+                        {
+                            X = _main.currentEveWindowRect.Left + _main.Configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                        };
+                        break;
+                    case PopupLocationType.TopCenter:
+                        Location = new Point()
+                        {
+                            X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                        };
+                        break;
+                    case PopupLocationType.TopRight:
+                        Location = new Point()
+                        {
+                            X = _main.currentEveWindowRect.Right - Width - _main.Configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                        };
+                        break;
+                    case PopupLocationType.BottomLeft:
+                        Location = new Point()
+                        {
+                            X = _main.currentEveWindowRect.Left + _main.Configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                        };
+                        break;
+                    case PopupLocationType.BottomCenter:
+                        Location = new Point()
+                        {
+                            X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
+                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                        };
+                        break;
+                    case PopupLocationType.BottomRight:
+                        Location = new Point()
+                        {
+                            X = _main.currentEveWindowRect.Right - Width - _main.Configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                        };
+                        break;
+                    case PopupLocationType.Center:
+                    default:
+                        Location = new Point()
+                        {
+                            X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
+                            Y = ((_main.currentEveWindowRect.Top - _main.currentEveWindowRect.Bottom) / 2) - (Height / 2) + _main.currentEveWindowRect.Top,
+                        };
+                        break;
+                }
+            }
+            else
+            {
+
+                // position on screen
+                Screen screen = Screen.FromControl(this);
+                switch (configuration.AlertPopupLocation)
+                {
+                    case PopupLocationType.TopLeft:
+                        Location = new Point()
+                        {
+                            X = screen.WorkingArea.Left,
+                            Y = screen.WorkingArea.Top,
+                        };
+                        break;
+                    case PopupLocationType.TopCenter:
+                        Location = new Point()
+                        {
+                            X = (screen.WorkingArea.Right / 2) - (Width / 2),
+                            Y = screen.WorkingArea.Top,
+                        };
+                        break;
+                    case PopupLocationType.TopRight:
+                        Location = new Point()
+                        {
+                            X = screen.WorkingArea.Right - Width,
+                            Y = screen.WorkingArea.Top,
+                        };
+                        break;
+                    case PopupLocationType.BottomLeft:
+                        Location = new Point()
+                        {
+                            X = screen.WorkingArea.Left,
+                            Y = screen.WorkingArea.Bottom - Height,
+                        };
+                        break;
+                    case PopupLocationType.BottomCenter:
+                        Location = new Point()
+                        {
+                            X = (screen.WorkingArea.Right / 2) - (Width / 2),
+                            Y = screen.WorkingArea.Bottom - Height,
+                        };
+                        break;
+                    case PopupLocationType.BottomRight:
+                        Location = new Point()
+                        {
+                            X = screen.WorkingArea.Right - Width,
+                            Y = screen.WorkingArea.Bottom - Height,
+                        };
+                        break;
+                    case PopupLocationType.Center:
+                    default:
+                        Location = new Point()
+                        {
+                            X = (screen.WorkingArea.Right / 2) - (Width / 2),
+                            Y = (screen.WorkingArea.Bottom / 2) - (Height / 2),
+                        };
+                        break;
+                }
             }
         }
 

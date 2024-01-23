@@ -88,10 +88,14 @@ namespace Quesadilla
                     radioAlertCenter.Checked = true; break;
                 case Classes.Configuration.PopupLocationType.TopLeft:
                     radioAlertTopLeft.Checked = true; break;
+                case Classes.Configuration.PopupLocationType.TopCenter:
+                    radioAlertTopCenter.Checked = true; break;
                 case Classes.Configuration.PopupLocationType.TopRight:
                     radioAlertTopRight.Checked = true; break;
                 case Classes.Configuration.PopupLocationType.BottomLeft:
                     radioAlertBottomLeft.Checked = true;break;
+                case Classes.Configuration.PopupLocationType.BottomCenter:
+                    radioAlertBottomCenter.Checked = true; break;
                 case Classes.Configuration.PopupLocationType.BottomRight:
                     radioAlertBottomRight.Checked = true;break;
             }
@@ -102,10 +106,14 @@ namespace Quesadilla
                     radioDPSCenter.Checked = true; break;
                 case Classes.Configuration.PopupLocationType.TopLeft:
                     radioDPSTopLeft.Checked = true; break;
+                case Classes.Configuration.PopupLocationType.TopCenter:
+                    radioDPSTopCenter.Checked = true; break;
                 case Classes.Configuration.PopupLocationType.TopRight:
                     radioDPSTopRight.Checked = true; break;
                 case Classes.Configuration.PopupLocationType.BottomLeft:
                     radioDPSBottomLeft.Checked = true; break;
+                case Classes.Configuration.PopupLocationType.BottomCenter:
+                    radioDPSBottomCenter.Checked = true; break;
                 case Classes.Configuration.PopupLocationType.BottomRight:
                     radioDPSBottomRight.Checked = true; break;
             }
@@ -154,7 +162,7 @@ namespace Quesadilla
             {
                 _alertPopup.Close();
             }
-            _alertPopup = new QuesadillaAlertPopup(_dummyAlert, _configuration, _mainForm.LoadImageFromFile(_configuration.AlertPopupBackground));
+            _alertPopup = new QuesadillaAlertPopup(_dummyAlert, _configuration, _mainForm.LoadImageFromFile(_configuration.AlertPopupBackground), _mainForm);
             _alertPopup.Show();
             _alertPopup.Hide();
             alertDemo.Image = GetFormImageWithoutBorders(_alertPopup);
@@ -310,6 +318,21 @@ namespace Quesadilla
         private void cbDPSAllToons_CheckedChanged(object sender, EventArgs e)
         {
             _configuration.DPSAllToons= cbDPSAllToons.Checked;
+        }
+
+        private void radioAlertTopCenter_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.TopCenter;
+        }
+
+        private void radioAlertBottomCenter_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.BottomCenter;
+        }
+
+        private void cbAlertTransparent_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.AlertTransparent= cbAlertTransparent.Checked;
         }
     }
 }

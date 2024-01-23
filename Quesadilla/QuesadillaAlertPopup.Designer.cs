@@ -105,9 +105,9 @@
             this.IntelLine.BackColor = System.Drawing.Color.Transparent;
             this.IntelLine.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.IntelLine.ForeColor = System.Drawing.Color.SaddleBrown;
-            this.IntelLine.Location = new System.Drawing.Point(117, 64);
+            this.IntelLine.Location = new System.Drawing.Point(12, 64);
             this.IntelLine.Name = "IntelLine";
-            this.IntelLine.Size = new System.Drawing.Size(243, 19);
+            this.IntelLine.Size = new System.Drawing.Size(348, 19);
             this.IntelLine.TabIndex = 4;
             this.IntelLine.Text = "XXXXXXX";
             this.IntelLine.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
