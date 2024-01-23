@@ -6,6 +6,7 @@ using Quesadilla.Classes.Processes;
 using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.Resources;
 using Quesadilla.Classes.SolarSystems;
+using Quesadilla.Classes.ZKill;
 using Serilog;
 using System;
 using System.Collections;
@@ -97,6 +98,8 @@ namespace Quesadilla
         private MenuItem menuConfigurationDPSSaveCSV = new MenuItem("DPS Save CSV");
         private MenuItem menuConfigurationDPSShowAll = new MenuItem("DPS Combine");
 
+        private ZKillRedisQ ZKillFeed;
+
         public bool AlertShowing = false;
 
         private bool ChatServerStatus = true;
@@ -107,6 +110,7 @@ namespace Quesadilla
 
         private bool ConfigurationWindowOpen = false;
         private int TicksSinceLastCleardown = 0;
+        private int TicksSinceLastZkill = 0;
 
         private Thread splashScreenThread;
         private QuesadillaSplashScreen splashScreen;
@@ -117,7 +121,7 @@ namespace Quesadilla
         public Dictionary<string, List<CombatLine>> _combat = new Dictionary<string, List<CombatLine>>();
         public Dictionary<string, List<IskLine>> _ISK = new Dictionary<string, List<IskLine>>();
 
-        private List<ProcessInfo>knowProcesses = new List<ProcessInfo>();
+        private List<ProcessInfo> knowProcesses = new List<ProcessInfo>();
         public string CurrentActiveToon;
 
         // TODO - config things - really need to go into config structure later
@@ -131,6 +135,8 @@ namespace Quesadilla
 
         public Rect currentEveWindowRect = new Rect();
         public Point currentEveClientPoint = new Point(0, 0);
+
+        private string ZKillRedisID = "Quesadilla_" + Guid.NewGuid().ToString();
 
         public Quesadilla()
         {
@@ -197,8 +203,8 @@ namespace Quesadilla
 
             watchers.Add(new LogWatcher("Quer_Catch", Classes.Logfile.LogFileType.ChatIntel, "Querious/Catch Intel"));
 
-//            watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
-             
+            //            watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
+
             watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
             watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
 
@@ -217,7 +223,7 @@ namespace Quesadilla
                     watcher.ProcessCombat += new EventHandler<ProcessCombatEventArgs>(this.logFile_ProcessCombat);
                     watcher.ProcessISK += new EventHandler<ProcessISKEventArgs>(this.logFile_ProcessISK);
                 }
-                else 
+                else
                 {
                     watcher.ProcessNewData += new EventHandler<ProcessNewDataEventArgs>(this.logFile_ProcessNewData);
                 }
@@ -232,6 +238,8 @@ namespace Quesadilla
             // start main tick timer
             mainTimer.Enabled = true;
 
+            ZKillFeed = new ZKillRedisQ();
+            ZKillFeed.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
         }
 
         private void ShowSplashScreen()
@@ -296,11 +304,11 @@ namespace Quesadilla
 
                 string menuText = alert.Entry.TimeAdded.ToString("HH:mm") + " " + (alert.Path != null ? alert.Path.ToSystemName : "") + " - " + alert.MenuText;
                 string TrayString = alert.Entry.TimeAdded.ToString("HH:mm") + " " + alert.Entry.LineContent;
-                if ( TrayString.Length > 63 )
+                if (TrayString.Length > 63)
                 {
                     TrayString = TrayString.Substring(0, 63);
                 }
-                if ( first )
+                if (first)
                 {
                     first = !first;
                     trayIcon.Text = TrayString;
@@ -429,6 +437,9 @@ namespace Quesadilla
 
         private void mainTimer_Tick(object sender, EventArgs e)
         {
+
+
+            // progress logfiles
             foreach (LogWatcher watcher in watchers)
             {
                 watcher.Tick();
@@ -500,13 +511,13 @@ namespace Quesadilla
                         }
                     }
                 }
-
+                TicksSinceLastCleardown = 0;
             }
 
             UpdateEveProcesses();
 
             CombatFlag.Visible = InCombat;
-            if ( CombatAdded )
+            if (CombatAdded)
             {
                 if (Configuration.DPSShowWindow && DPSGraphWindow == null)
                 {
@@ -532,6 +543,7 @@ namespace Quesadilla
             }
 
         }
+
         private void AddNewCharacter(string characterName)
         {
             if (characterName.Trim().Length == 0)
@@ -628,7 +640,7 @@ namespace Quesadilla
         private void EnqueueAlert(AlertQueueItem alert)
         {
             // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
-            var f = NewAlerts.Where(o => 
+            var f = NewAlerts.Where(o =>
             (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
             || (o.AlertText == alert.AlertText)
             ).ToList();
@@ -732,13 +744,13 @@ namespace Quesadilla
                                     sendAlert = checkJumpsRange(alert, path);
                                     if (sendAlert)
                                     {
-                                        alertText = generateAlertText(entry, path, alert, "", 0,"");
+                                        alertText = generateAlertText(entry, path, alert, "", 0, "");
                                         Log.Debug("ALERT - " + alertText);
                                         EnqueueAlert(
                                             new AlertQueueItem()
                                             {
                                                 AlertText = alertText,
-                                                MenuText = generateAlertText(entry, path, alert, "", 1,""),
+                                                MenuText = generateAlertText(entry, path, alert, "", 1, ""),
                                                 Entry = entry,
                                                 Path = path,
                                                 Context = homeSystemPathInfo.FromSystemName,
@@ -756,13 +768,13 @@ namespace Quesadilla
                                     sendAlert = checkJumpsRange(alert, path);
                                     if (sendAlert)
                                     {
-                                        alertText = generateAlertText(entry, path, alert, "", 0,"");
+                                        alertText = generateAlertText(entry, path, alert, "", 0, "");
                                         Log.Debug("ALERT - " + alertText);
                                         EnqueueAlert(
                                             new AlertQueueItem()
                                             {
                                                 AlertText = alertText,
-                                                MenuText = generateAlertText(entry, path, alert, "", 1,""),
+                                                MenuText = generateAlertText(entry, path, alert, "", 1, ""),
                                                 Entry = entry,
                                                 Path = path,
                                                 Context = path.FromSystemName,
@@ -1040,10 +1052,10 @@ namespace Quesadilla
             Configuration.DPSAllToons = !Configuration.DPSAllToons;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
 
-            if ( InCombat && DPSGraphWindow != null && Configuration.DPSShowWindow )
+            if (InCombat && DPSGraphWindow != null && Configuration.DPSShowWindow)
             {
                 DPSGraphWindow.Close();
-                DPSGraphWindow = null ;
+                DPSGraphWindow = null;
             }
         }
 
@@ -1149,7 +1161,7 @@ namespace Quesadilla
             //Log.Information("COMBAT:" + e.CombatEvent);
             if (e.Entry != null)
             {
-                if ( InCombat == false && Configuration.DPSShowWindow)
+                if (InCombat == false && Configuration.DPSShowWindow)
                 {
                     DPSGraphWindow = new QuesadillaDPSGraph(this);
                     DPSGraphWindow.Show();
@@ -1222,7 +1234,7 @@ namespace Quesadilla
                                 capAmount = Int32.Parse(amount.Trim());
                             }
 
-                            if (match.Groups["combatContext"].ToString().Trim().EndsWith("to") )
+                            if (match.Groups["combatContext"].ToString().Trim().EndsWith("to"))
                             {
                                 received = false;
                             }
@@ -1254,7 +1266,7 @@ namespace Quesadilla
                         // active alert config for faction spawn
 
 
-                        if (_FactionRats.Any(s => match.Groups["combatEntity"].ToString().Contains(s)) )
+                        if (_FactionRats.Any(s => match.Groups["combatEntity"].ToString().Contains(s)))
                         {
                             string alertText = generateAlertText(e.Entry, null, alert, "Faction Spawn", 0, match.Groups["combatEntity"].ToString());
                             PathInfo path = null;
@@ -1271,11 +1283,12 @@ namespace Quesadilla
                                     FromSystemName = c.Location,
                                     ToSystemName = c.Location,
                                     ToSystemRegionName = _solarSystems.SolarSystems[c.LocationId].RegionName,
-                                    PathSystems = new List<int>() { c.LocationId},
+                                    PathSystems = new List<int>() { c.LocationId },
                                 };
 
-                                if ( c.LastFactionAlert.AddSeconds(alert.CustomTriggerEverySeconds == null ? 0 : (double)alert.CustomTriggerEverySeconds) > DateTime.Now ) { sendAlert = false; }
-                            } else
+                                if (c.LastFactionAlert.AddSeconds(alert.CustomTriggerEverySeconds == null ? 0 : (double)alert.CustomTriggerEverySeconds) > DateTime.Now) { sendAlert = false; }
+                            }
+                            else
                             {
                                 if (LastFactionAlert.AddSeconds(alert.CustomTriggerEverySeconds == null ? 0 : (double)alert.CustomTriggerEverySeconds) > DateTime.Now) { sendAlert = false; }
                             }
@@ -1283,7 +1296,7 @@ namespace Quesadilla
                             if (sendAlert)
                             {
                                 LastFactionAlert = DateTime.Now;
-                                if ( c != null ) { c.LastFactionAlert = LastFactionAlert; }
+                                if (c != null) { c.LastFactionAlert = LastFactionAlert; }
                                 Log.Debug("ALERT - " + alertText);
                                 EnqueueAlert(
                                     new AlertQueueItem()
@@ -1307,7 +1320,7 @@ namespace Quesadilla
             else
             {
                 InCombat = false;
-                if (DPSGraphWindow != null )
+                if (DPSGraphWindow != null)
                 {
                     DPSGraphWindow.Close();
                     DPSGraphWindow = null;
@@ -1375,10 +1388,10 @@ namespace Quesadilla
                 CreateParams cp = base.CreateParams;
                 // Set the form click-through
 
-//                cp.ExStyle |= 
-//                    0x80000 /* WS_EX_LAYERED */ | 
-//                    0x20 /* WS_EX_TRANSPARENT */
-//                    ;
+                //                cp.ExStyle |= 
+                //                    0x80000 /* WS_EX_LAYERED */ | 
+                //                    0x20 /* WS_EX_TRANSPARENT */
+                //                    ;
                 return cp;
             }
         }
@@ -1405,39 +1418,39 @@ namespace Quesadilla
             };
 
             var result = this._processMonitor.GetWindowDimensions(ptr, ref currentEveWindowRect, ref currentEveClientPoint);
-/*
-            // new / updated clients - ensure they are added 
-            foreach (var a in addedProcesses.Union(updatedProcesses))
-            {
-                var clientName = a.Title.Replace("EVE - ", "");
-                var c = CharacterList.Find(o => o.CharacterName.Equals(clientName));
-                if (c == null) 
-                {
-                    c = new Character()
-                    {
-                        CharacterName = clientName,
-                    };
-                }
-                c.IsClientActive = true;
-            }
+            /*
+                        // new / updated clients - ensure they are added 
+                        foreach (var a in addedProcesses.Union(updatedProcesses))
+                        {
+                            var clientName = a.Title.Replace("EVE - ", "");
+                            var c = CharacterList.Find(o => o.CharacterName.Equals(clientName));
+                            if (c == null) 
+                            {
+                                c = new Character()
+                                {
+                                    CharacterName = clientName,
+                                };
+                            }
+                            c.IsClientActive = true;
+                        }
 
-            // removed clients - ensure they are set inactive
-            foreach (var a in removedProcesses)
-            {
-                var clientName = a.Title.Replace("EVE - ", "");
-                var c = CharacterList.Find(o => o.CharacterName.Equals(clientName));
-                if (c == null) 
-                {
-                    c = new Character()
-                    {
-                        CharacterName = clientName,
-                    };
-                }
-                c.IsClientActive = false;
-            }
-*/
+                        // removed clients - ensure they are set inactive
+                        foreach (var a in removedProcesses)
+                        {
+                            var clientName = a.Title.Replace("EVE - ", "");
+                            var c = CharacterList.Find(o => o.CharacterName.Equals(clientName));
+                            if (c == null) 
+                            {
+                                c = new Character()
+                                {
+                                    CharacterName = clientName,
+                                };
+                            }
+                            c.IsClientActive = false;
+                        }
+            */
 
-            if (ptr != null )
+            if (ptr != null)
             {
                 foregroundWindowTitle = this._processMonitor.GetTitleOfKnownProcess(ptr);
                 if (foregroundWindowTitle != null)
@@ -1463,10 +1476,10 @@ namespace Quesadilla
                         }
                     }
 
-                    if ( DPSGraphWindow != null &&
+                    if (DPSGraphWindow != null &&
                         (
                         PrevRect.Top != currentEveWindowRect.Top || PrevRect.Bottom != currentEveWindowRect.Bottom ||
-                        PrevRect.Left != currentEveWindowRect.Left || PrevRect.Right != currentEveWindowRect.Right 
+                        PrevRect.Left != currentEveWindowRect.Left || PrevRect.Right != currentEveWindowRect.Right
                         )
                         )
                     {
@@ -1482,7 +1495,7 @@ namespace Quesadilla
                 }
             }
 
-            if ( foregroundWindowTitle == null )
+            if (foregroundWindowTitle == null)
             {
                 lblCurrentClient.Visible = false;
                 CurrentActiveToon = "";
@@ -1490,7 +1503,7 @@ namespace Quesadilla
             }
 
             // just double check thru charachter list active clients to make sure there is still an active client.
-            foreach(var c in CharacterList)
+            foreach (var c in CharacterList)
             {
                 c.IsClientActive = _processMonitor.IsCharStillActive(c.CharacterName);
             }
@@ -1508,12 +1521,27 @@ namespace Quesadilla
                 isk += i.IskAmount;
             }
 
-            if ( isk > 0 )
+            if (isk > 0)
             {
                 ret = Math.Truncate(isk).ToString("0,000 ISK");
             }
 
             return ret;
+        }
+
+        private void ZKill_ProcessNewData(object sender, ZKillEventArgs e)
+        {
+            string systemName = "---";
+            string regionName = "---";
+
+            if (_solarSystems.SolarSystems.ContainsKey((int)e.Kill.SolarSystemId))
+            {
+                systemName = _solarSystems.SolarSystems[(int)e.Kill.SolarSystemId].Name;
+                regionName = _solarSystems.SolarSystems[(int)e.Kill.SolarSystemId].RegionName;
+                e.Kill.SolarSystemName = systemName;
+                e.Kill.RegionName = regionName;
+            }
+            Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {e.Kill.VictimShipTypeId} {e.Kill.href}");
         }
     }
 }

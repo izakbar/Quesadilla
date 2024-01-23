@@ -21,6 +21,7 @@ namespace Quesadilla.Classes
             {
                 TickMiliseconds = TickMiliseconds,
                 HowManyTicksBeforeCleardown = HowManyTicksBeforeCleardown,
+                HowManyTicksBeforeZkill = HowManyTicksBeforeZkill,
                 AlertPopupOpacityStep = AlertPopupOpacityStep,
                 AlertPopupOpacity = AlertPopupOpacity,
                 AlertPopupAlertTextColour = AlertPopupAlertTextColour,
@@ -104,8 +105,9 @@ namespace Quesadilla.Classes
             if (c is null)
             {
                 c = new Config();
-                c.TickMiliseconds = 505;
+                c.TickMiliseconds = 900;
                 c.HowManyTicksBeforeCleardown = 8;
+                c.HowManyTicksBeforeZkill = 5;
                 c.HomeSystem = "K7D-II";
                 c.InitialPosition = new Point(0, 0);
                 c.WindowSize = new Point(760, 404);
@@ -244,6 +246,7 @@ namespace Quesadilla.Classes
 
         public int TickMiliseconds {  get; set; }
         public int HowManyTicksBeforeCleardown { get; set; }
+        public int HowManyTicksBeforeZkill { get; set; }
         public string HomeSystem { get; set; }
         public List<Regex> ignoreStrings { get; set; }
         public List<int> ignoreSystems { get; set; }

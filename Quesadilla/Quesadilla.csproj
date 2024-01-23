@@ -156,11 +156,21 @@
     <Compile Include="Classes\CombatLine.cs" />
     <Compile Include="Classes\Configuration\PopupLocationType.cs" />
     <Compile Include="Classes\Events\ProcessISKEventArgs.cs" />
+    <Compile Include="Classes\Events\ZKillEventArgs.cs" />
     <Compile Include="Classes\IskLine.cs" />
     <Compile Include="Classes\Processes\ProcessInfo.cs" />
     <Compile Include="Classes\Processes\ProcessMonitor.cs" />
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
     <Compile Include="Classes\Resources\QuesadillaSound.cs" />
+    <Compile Include="Classes\ShipType.cs" />
+    <Compile Include="Classes\ZKill\ZKillKill.cs" />
+    <Compile Include="Classes\ZKill\ZKillRedisQ.cs" />
+    <Compile Include="Classes\ZKill\ZKillRedisQAttacker.cs" />
+    <Compile Include="Classes\ZKill\ZKillRedisQKillmail.cs" />
+    <Compile Include="Classes\ZKill\ZKillRedisQVictim.cs" />
+    <Compile Include="Classes\ZKill\ZkillRedisQZkb.cs" />
+    <Compile Include="Classes\ZKill\ZKillRedistQData.cs" />
+    <Compile Include="Classes\ZKill\ZKillRedistQPackage.cs" />
     <Compile Include="Extensions\StringExtentions.cs" />
     <Compile Include="QuesadillaAlertPopup.cs">
       <SubType>Form</SubType>
@@ -261,6 +271,7 @@
     <None Include="Quesadilla.config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Quesadilla.ShipTypes.json" />
     <None Include="Quesadilla.Systems.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
