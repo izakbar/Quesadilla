@@ -239,6 +239,15 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
+        internal static System.IO.UnmanagedMemoryStream epic_orchestra {
+            get {
+                return ResourceManager.GetStream("epic_orchestra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
         internal static System.IO.UnmanagedMemoryStream flute {
             get {
                 return ResourceManager.GetStream("flute", resourceCulture);
@@ -333,6 +342,15 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
+        internal static System.IO.UnmanagedMemoryStream quiet_click {
+            get {
+                return ResourceManager.GetStream("quiet_click", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
         internal static System.IO.UnmanagedMemoryStream RedCoin2 {
             get {
                 return ResourceManager.GetStream("RedCoin2", resourceCulture);
@@ -354,6 +372,15 @@ namespace Quesadilla.Properties {
         internal static System.IO.UnmanagedMemoryStream skamos66 {
             get {
                 return ResourceManager.GetStream("skamos66", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream spacebar {
+            get {
+                return ResourceManager.GetStream("spacebar", resourceCulture);
             }
         }
         

@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using EVEStandard.Enumerations;
+using EVEStandard;
+using Newtonsoft.Json;
+using Quesadilla.Classes.ESIData;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -8,11 +11,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace Quesadilla.Classes.SolarSystems
 {
     public class UniverseManager
     {
+        public EVEStandardAPI esiClient;
 
         private const long LOWEST_WH_SYSTEM_ID = 31000000;
         private ILogger logger = Log.ForContext<UniverseManager>();
@@ -20,6 +25,8 @@ namespace Quesadilla.Classes.SolarSystems
         public Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
         public Dictionary<string, int> Names = new Dictionary<string, int>();
         public Dictionary<int, ItemType> ItemTypes = new Dictionary<int, ItemType>();
+
+        public Dictionary<int, ESICharacter> ESICharacters = new Dictionary<int, ESICharacter>();
 
         private Dictionary<string, PathInfo> _pathfindingCache = new Dictionary<string, PathInfo>();
         public int HomeSolarSystemID { get; set; }
@@ -43,6 +50,29 @@ namespace Quesadilla.Classes.SolarSystems
 
             ItemTypes = JsonConvert.DeserializeObject<Dictionary<int, ItemType>>(json);
         }
+        public void ReadESICharacters(string jsonFile)
+        {
+            if (File.Exists(jsonFile))
+            {
+                StreamReader reader = new StreamReader(jsonFile);
+                var json = reader.ReadToEnd();
+                ESICharacters = JsonConvert.DeserializeObject<Dictionary<int, ESICharacter>>(json);
+            }
+        }
+        public void WriteESICharacters(string jsonFile)
+        {
+            var json = JsonConvert.SerializeObject(ESICharacters);
+            File.WriteAllText(jsonFile, json);
+        }
+
+        public void SetupESI()
+        {
+            esiClient = new EVEStandardAPI(
+                    "IzaWorks",                  // User agent
+                    DataSource.Tranquility,         // Server [Tranquility/Singularity]
+                    TimeSpan.FromSeconds(30));       // Timeout
+        }
+
         public PathInfo FindAndCachePath(int fromSystemId, int toSystemId)
         {
 
@@ -139,13 +169,40 @@ namespace Quesadilla.Classes.SolarSystems
             }
             if (FoundPath == null)
             {
-                Log.Error("Unable to find path");
+                Log.Debug("Unable to find path");
                 return null;
             }
 
             Log.Debug("Found path");
             _pathfindingCache.Add(FoundPath.PathId, FoundPath);
             return (FoundPath);
+        }
+
+        public string GetCharacterName(int characterId)
+        {
+            if ( ESICharacters.ContainsKey(characterId) ) 
+            {
+                return ESICharacters[characterId].CharacterName;
+            }
+
+            try
+            {
+                var characterInfo = esiClient.Character.GetCharacterPublicInfoV5Async(characterId).Result;
+                ESICharacters.Add(characterId, new ESICharacter()
+                {
+                    CharacterId = characterId,
+                    CharacterName = characterInfo.Model.Name,
+                });
+                return characterInfo.Model.Name;
+            }
+            catch ( Exception ex) { 
+                Log.Error(ex.Message); 
+                if ( ex.InnerException != null )
+                {
+                    Log.Error(ex.InnerException.Message);
+                }
+                return "**ESIERROR**";
+            }
         }
 
         public void AddAlert(int systemId)

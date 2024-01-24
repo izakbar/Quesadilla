@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.SolarSystems;
 using Serilog;
@@ -6,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO.Packaging;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Permissions;
@@ -128,6 +130,25 @@ namespace Quesadilla.Classes.ZKill
 
                     var mainAttacker = zkill.Package.Killmail.Attackers.Where(o => o.FinalBlow).First();
 
+                    string isk = "";
+
+                    if (zkill.Package.Zkb.TotalValue < 1000000)
+                    {
+                        isk = Math.Truncate(zkill.Package.Zkb.TotalValue / 1000).ToString() + "k";
+                    }
+                    else if (zkill.Package.Zkb.TotalValue < 1000000000)
+                    {
+                        isk = Math.Truncate(zkill.Package.Zkb.TotalValue / 1000000).ToString() + "m";
+                    }
+                    else if (zkill.Package.Zkb.TotalValue < 1000000000000)
+                    {
+                        isk = Math.Round(zkill.Package.Zkb.TotalValue / 1000000000,1).ToString() + "b";
+                    }
+                    else
+                    {
+                        isk = Math.Round(zkill.Package.Zkb.TotalValue / 1000000000000,1).ToString() + "t";
+                    }
+
                     ZKillKill z = new ZKillKill()
                     {
                         ID = zkill.Package.ID,
@@ -147,7 +168,10 @@ namespace Quesadilla.Classes.ZKill
                         KillerWeaponTypeId = mainAttacker.WeaponTypeId,
 
                         href = zkill.Package.Zkb.Href,
-                        
+
+                        NPC = zkill.Package.Zkb.Npc,
+                        TotalValue = isk,
+
                         Expired = false,
 
                     };

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Media;
@@ -103,7 +104,13 @@ namespace Quesadilla
             } else if ( IsZkill )
             {
                 IntelLine.Text = alert.Kill.Context;
+
                 pAlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
+                Image RoundedImage = ClipToCircle(pAlertImage.Image, new PointF(pAlertImage.Image.Width / 2, pAlertImage.Image.Height / 2), pAlertImage.Image.Width / 2, 
+                    Color.Transparent ,_main.Configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, _main.Configuration.ZKillIskColour, _main.Configuration.ZKillShowBar, _main.Configuration.ZKillBarColour);
+                Bitmap b = new Bitmap(RoundedImage);
+                b.MakeTransparent(b.GetPixel(0, 0));
+                pAlertImage.Image = b;
             }
             else
             {
@@ -301,5 +308,76 @@ namespace Quesadilla
                 System.Diagnostics.Process.Start($"https://zkillboard.com/kill/{_alert.Kill.ID}");
             }
         }
+
+        // makes nice round ellipse/circle images from rectangle images
+        public Image ClipToCircle(Image srcImage, PointF center, float radius, Color backGround, Color circleColour, int circleWidth, string isk, Color iskColour, bool showBar, Color barColor)
+        {
+            int TEXT_SIZE = 135;
+            Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
+            
+            using (Graphics g = Graphics.FromImage(dstImage))
+            {
+                // Border
+                RectangleF r2 = new RectangleF(center.X - radius, center.Y - radius, (radius * 2), (radius * 2));
+
+                // Main picture
+                RectangleF r = new RectangleF(center.X - radius + circleWidth, center.Y - radius + circleWidth, (radius * 2)- (circleWidth*2), (radius * 2)- (circleWidth*2));
+
+                RectangleF rISK = new RectangleF(0, 0, srcImage.Width, srcImage.Height);
+
+                // enables smoothing of the edge of the circle (less pixelated)
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+
+                if (backGround != Color.Transparent)
+                {
+                    // fills background color
+                    using (Brush br = new SolidBrush(backGround))
+                    {
+                        g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
+                    }
+                }
+
+                if (circleWidth > 0)
+                {
+                    GraphicsPath pathborder = new GraphicsPath();
+                    pathborder.AddEllipse(r2);
+                    g.SetClip(pathborder);
+                    using (Brush br = new SolidBrush(circleColour))
+                    {
+                        g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
+                    }
+                }
+
+                // adds the new ellipse & draws the image again 
+                GraphicsPath path = new GraphicsPath();
+                path.AddEllipse(r);
+                g.SetClip(path);
+                g.DrawImage(srcImage, 0, 0);
+
+                g.ResetClip();
+/*
+                using (Brush br = new SolidBrush(Color.Orange))
+                {
+                    g.FillRectangle(br, 0, srcImage.Height-100 , srcImage.Width, 100);
+                }
+*/
+
+                using (Font myfont = new Font("Arial", TEXT_SIZE - 10,FontStyle.Bold))
+                {
+                    var format = new StringFormat
+                    {
+                        Alignment = StringAlignment.Far,
+                        LineAlignment = StringAlignment.Center
+                    };
+                    if ( showBar ) g.FillRectangle(new SolidBrush(barColor), 0, srcImage.Height - TEXT_SIZE, srcImage.Width, TEXT_SIZE);
+                    g.DrawString(isk, myfont, new SolidBrush(iskColour), new RectangleF(0, srcImage.Height - TEXT_SIZE, srcImage.Width, TEXT_SIZE), format);
+                }
+
+
+                return dstImage;
+            }
+        }
+
+
     }
 }

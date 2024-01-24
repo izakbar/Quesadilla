@@ -31,6 +31,8 @@ namespace Quesadilla.Classes.ZKill
         public long KillerShipTypeId { get; set; }
         public long KillerWeaponTypeId { get; set; }
 
+        public string TotalValue { get; set; }
+
         public string href { get; set; }
 
         public string Context {  get; set; }

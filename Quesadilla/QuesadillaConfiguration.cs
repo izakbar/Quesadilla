@@ -125,6 +125,7 @@ namespace Quesadilla
             cbStayOnTop.Checked = _configuration.StayOnTop;
             cbAlertTransparent.Checked = _configuration.AlertTransparent;
             cbShowZKillAlerts.Checked = _configuration.ShowZKillAlerts;
+            cbZkillShowBar.Checked = _configuration.ZKillShowBar;
         }
         private Bitmap GetControlImage(Control ctl)
         {
@@ -340,6 +341,26 @@ namespace Quesadilla
         private void cbShowZKillAlerts_CheckedChanged(object sender, EventArgs e)
         {
             _configuration.ShowZKillAlerts= cbShowZKillAlerts.Checked;
+        }
+
+        private void buttonPickZKillCircleColour_Click(object sender, EventArgs e)
+        {
+            _configuration.ZKillCircleColour = ChooseColour(_configuration.ZKillCircleColour);
+        }
+
+        private void buttonPickZKillIskColour_Click(object sender, EventArgs e)
+        {
+            _configuration.ZKillIskColour = ChooseColour(_configuration.ZKillIskColour);
+        }
+
+        private void buttonPickZKillBarColour_Click(object sender, EventArgs e)
+        {
+            _configuration.ZKillBarColour = ChooseColour(_configuration.ZKillBarColour);
+        }
+
+        private void cbZkillShowBar_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.ZKillShowBar = cbZkillShowBar.Checked;
         }
     }
 }

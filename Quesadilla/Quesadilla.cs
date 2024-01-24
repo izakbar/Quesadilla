@@ -82,6 +82,8 @@ namespace Quesadilla
         private int _intelSizeMin = 48;
         private int _windowExtraHeight = 80;
 
+        private const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
+
         private MenuItem menuConfiguredAlerts = new MenuItem("Configured Alerts");
         private MenuItem menuBackgrounds = new MenuItem("Popup Background");
         private MenuItem menuLatestAlerts = new MenuItem("Latest Alerts");
@@ -191,6 +193,8 @@ namespace Quesadilla
             CharacterList = new List<Character>();
             _universe.ReadSolarSystems("Quesadilla.Systems.Json");
             _universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
+            _universe.ReadESICharacters(CHARACTER_CACHE_FILE);
+            _universe.SetupESI();
 
             ReloadConfiguration();
 
@@ -673,10 +677,11 @@ namespace Quesadilla
             }
             returnString = returnString.Replace("{character}", characterName);
             returnString = returnString.Replace("{text}", kill.href);
-            returnString = returnString.Replace("{victim}", kill.VictimCharacterId.ToString());
-            returnString = returnString.Replace("{killer}", kill.KillerCharacterId.ToString());
+            returnString = returnString.Replace("{value}", kill.TotalValue);
+            returnString = returnString.Replace("{victim}", _universe.GetCharacterName((int)kill.VictimCharacterId));
+            returnString = returnString.Replace("{killer}", kill.KillerCharacterId == 0 ? "NPC" : _universe.GetCharacterName((int)kill.KillerCharacterId));
             returnString = returnString.Replace("{victimship}", _universe.ItemTypes[(int)kill.VictimShipTypeId].Name);
-            returnString = returnString.Replace("{killership}", _universe.ItemTypes[(int)kill.KillerShipTypeId].Name);
+            returnString = returnString.Replace("{killership}", _universe.ItemTypes.ContainsKey((int)kill.KillerShipTypeId) ? _universe.ItemTypes[(int)kill.KillerShipTypeId].Name : kill.KillerShipTypeId.ToString());
             returnString = returnString.Replace("{killerweapon}", kill.KillerWeaponTypeId.ToString());
             return returnString;
         }
@@ -1056,6 +1061,7 @@ namespace Quesadilla
             Configuration.InitialPosition = Location;
             Configuration.WindowSize = new System.Drawing.Point(Width, Height);
             Configuration.StayOnTop = TopMost;
+            _universe.WriteESICharacters(CHARACTER_CACHE_FILE);
             Configuration.Save(configuration_filename);
         }
 
@@ -1616,10 +1622,9 @@ namespace Quesadilla
                         sendAlert = checkJumpsRange(alert, path);
                         if (sendAlert)
                         {
-                            Log.Information("ALERT");
                             alertText = generateZKillAlertText(e.Kill, path, Configuration.ZKillAlertText,"");
-
                             Log.Debug("ALERT - " + alertText);
+
                             EnqueueAlert(
                                 new AlertQueueItem()
                                 {
@@ -1628,7 +1633,7 @@ namespace Quesadilla
                                     Kill = e.Kill,
                                     Path = path,
                                     Context = homeSystemPathInfo.FromSystemName,
-                                    SoundFile = "zkill",
+                                    SoundFile = Configuration.ZKillSound,
                                     FriendlyName = "zkill",
                                 }
                                 );
@@ -1641,18 +1646,17 @@ namespace Quesadilla
                         sendAlert = checkJumpsRange(alert, path);
                         if (sendAlert)
                         {
-                            Log.Information("ALERT");
                             alertText = generateZKillAlertText(e.Kill, path, Configuration.ZKillAlertText, "");
                             Log.Debug("ALERT - " + alertText);
                             EnqueueAlert(
                                 new AlertQueueItem()
                                 {
                                     AlertText = alertText,
-                                    MenuText = "zkill",
+                                    MenuText = generateZKillAlertText(e.Kill, path, Configuration.ZKillMenuText, ""),
                                     Kill = e.Kill,
                                     Path = path,
-                                    Context = homeSystemPathInfo.FromSystemName,
-                                    SoundFile = "zkill",
+                                    Context = path.FromSystemName,
+                                    SoundFile = Configuration.ZKillSound,
                                     FriendlyName = "zkill",
                                 }
                                 );
@@ -1669,7 +1673,6 @@ namespace Quesadilla
                                 sendAlert = checkJumpsRange(alert, path);
                                 if (sendAlert)
                                 {
-                                    Log.Information("ALERT");
                                     alertText = generateZKillAlertText(e.Kill, path, Configuration.ZKillAlertText, x.CharacterName);
                                     Log.Debug("ALERT - " + alertText);
                                     if (
@@ -1685,7 +1688,7 @@ namespace Quesadilla
                                             Kill = e.Kill,
                                             Path = path,
                                             Context = x.CharacterName,
-                                            SoundFile = alert.SoundFile,
+                                            SoundFile = Configuration.ZKillSound,
                                             FriendlyName = alert.FriendlyName,
                                         }
                                         );
@@ -1704,26 +1707,27 @@ namespace Quesadilla
                                 path = _universe.FindAndCachePath(x.LocationId, toSystemId);
                                 sendAlert = checkJumpsRange(alert, path);
                                 if (sendAlert)
-                                    Log.Information("ALERT");
-                                alertText = generateZKillAlertText(e.Kill, path, Configuration.ZKillAlertText, x.CharacterName);
-                                Log.Debug("ALERT - " + alertText);
-                                if (
-                                    alert.AlertRangeType == AlertConfigRangeType.OneCharacter ||
-                                    alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
-                                    )
                                 {
-                                    EnqueueAlert(
-                                    new AlertQueueItem()
+                                    alertText = generateZKillAlertText(e.Kill, path, Configuration.ZKillAlertText, x.CharacterName);
+                                    Log.Debug("ALERT - " + alertText);
+                                    if (
+                                        alert.AlertRangeType == AlertConfigRangeType.OneCharacter ||
+                                        alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
+                                        )
                                     {
-                                        AlertText = alertText,
-                                        MenuText = generateZKillAlertText(e.Kill, path, Configuration.ZKillMenuText, x.CharacterName),
-                                        Kill = e.Kill,
-                                        Path = path,
-                                        Context = x.CharacterName,
-                                        SoundFile = alert.SoundFile,
-                                        FriendlyName = alert.FriendlyName,
+                                        EnqueueAlert(
+                                        new AlertQueueItem()
+                                        {
+                                            AlertText = alertText,
+                                            MenuText = generateZKillAlertText(e.Kill, path, Configuration.ZKillMenuText, x.CharacterName),
+                                            Kill = e.Kill,
+                                            Path = path,
+                                            Context = x.CharacterName,
+                                            SoundFile = Configuration.ZKillSound,
+                                            FriendlyName = "zkill",
+                                        }
+                                        );
                                     }
-                                    );
                                 }
                             }
                         }

@@ -56,6 +56,11 @@ namespace Quesadilla.Classes
                 ZKillAlertText = ZKillAlertText,
                 ZKillMenuText = ZKillMenuText,
                 ZKillContextText = ZKillContextText,
+                ZKillCircleColour = ZKillCircleColour,
+                ZKillIskColour = ZKillIskColour,
+                ZKillBarColour = ZKillBarColour,
+                ZKillShowBar = ZKillShowBar,
+                ZKillSound = ZKillSound,
             };
 
             c.ignoreStrings = new List<Regex>();
@@ -126,7 +131,7 @@ namespace Quesadilla.Classes
                 c.DPSShowWindow = true;
                 c.DPSSaveCSV = false;
                 c.DPSAllToons = false;
-                c.IgnoreAsTooManyJumps = 12;
+                c.IgnoreAsTooManyJumps = 99;
                 c.ExpireAlertSeconds = 500;
                 c.ExpireCombatSeconds = 1200;
                 c.ExpireISKSeconds = 5400; // 90 mins
@@ -155,6 +160,11 @@ namespace Quesadilla.Classes
                 c.ZKillAlertText = "{victim} died to {killer} in {tosystem}";
                 c.ZKillContextText = "{victim} {victimship}\nKilled by {killer}";
                 c.ZKillMenuText = "ZKILL {victim} died to {killer} in {tosystem}";
+                c.ZKillCircleColour = Color.Red;
+                c.ZKillIskColour = Color.White;
+                c.ZKillBarColour = Color.LimeGreen;
+                c.ZKillShowBar = true;
+                c.ZKillSound = "quiet-click";
             }
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
@@ -175,7 +185,7 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.AllOnlineCharacters,
-                    TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem} {route}",
+                    TextDisplay = "{jumps}->{fromsystem} : {route}",
                     MenuDisplay = "{jumps} jumps from {character} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
@@ -188,7 +198,7 @@ namespace Quesadilla.Classes
                     Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.OneOnlineCharacter,
-                    TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem} {route}",
+                    TextDisplay = "{jumps}->{fromsystem} : {route}",
                     MenuDisplay = "{jumps} jumps from {character} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
@@ -202,7 +212,7 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.Home,
-                    TextDisplay = "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
+                    TextDisplay = "{jumps}->{fromsystem} : {route}",
                     MenuDisplay = "{jumps} jumps from {fromsystem} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
@@ -211,15 +221,15 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "1DQ1-A < 5 jumps",
+                    FriendlyName = "1DQ1-A < 50 jumps",
                     Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.System,
-                    TextDisplay = "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
+                    TextDisplay = "{jumps}->{fromsystem} : {route}",
                     MenuDisplay = "{jumps} jumps from {fromsystem} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
-                    Jumps1Number = 5,
+                    Jumps1Number = 50,
                     Jumps2Comparison = AlertConfigJumpsComparison.None,
                     TriggerText = "1DQ1-A",
                 });
@@ -300,6 +310,11 @@ namespace Quesadilla.Classes
         public string ZKillAlertText { get; set; }
         public string ZKillContextText { get; set; }
         public string ZKillMenuText { get; set; }
+        public string ZKillSound { get; set; }
+        public Color ZKillCircleColour { get; set; }
+        public Color ZKillIskColour { get; set; }
+        public Color ZKillBarColour { get; set; }
+        public bool ZKillShowBar { get; set; }
 
         public int ShowLastUnexpiredAlerts { get; set; }
     }

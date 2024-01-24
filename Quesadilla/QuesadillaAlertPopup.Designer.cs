@@ -51,10 +51,10 @@
             // 
             this.pAlertImage.BackColor = System.Drawing.Color.Transparent;
             this.pAlertImage.Image = ((System.Drawing.Image)(resources.GetObject("pAlertImage.Image")));
-            this.pAlertImage.Location = new System.Drawing.Point(414, 116);
-            this.pAlertImage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pAlertImage.Location = new System.Drawing.Point(466, 145);
+            this.pAlertImage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.pAlertImage.Name = "pAlertImage";
-            this.pAlertImage.Size = new System.Drawing.Size(65, 49);
+            this.pAlertImage.Size = new System.Drawing.Size(73, 61);
             this.pAlertImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pAlertImage.TabIndex = 0;
             this.pAlertImage.TabStop = false;
@@ -69,11 +69,12 @@
             // 
             this.AlertText.BackColor = System.Drawing.Color.Transparent;
             this.AlertText.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.AlertText.Font = new System.Drawing.Font("Verdana", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.AlertText.ForeColor = System.Drawing.Color.MistyRose;
-            this.AlertText.Location = new System.Drawing.Point(0, 169);
+            this.AlertText.Location = new System.Drawing.Point(0, 207);
             this.AlertText.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.AlertText.Name = "AlertText";
-            this.AlertText.Size = new System.Drawing.Size(492, 14);
+            this.AlertText.Size = new System.Drawing.Size(554, 22);
             this.AlertText.TabIndex = 1;
             this.AlertText.Text = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
             this.AlertText.Click += new System.EventHandler(this.label1_Click);
@@ -83,10 +84,10 @@
             this.SystemName.BackColor = System.Drawing.Color.Transparent;
             this.SystemName.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SystemName.ForeColor = System.Drawing.Color.Red;
-            this.SystemName.Location = new System.Drawing.Point(291, 11);
+            this.SystemName.Location = new System.Drawing.Point(327, 14);
             this.SystemName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.SystemName.Name = "SystemName";
-            this.SystemName.Size = new System.Drawing.Size(196, 38);
+            this.SystemName.Size = new System.Drawing.Size(220, 48);
             this.SystemName.TabIndex = 2;
             this.SystemName.Text = "XXXXXXX";
             this.SystemName.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -95,12 +96,12 @@
             // ContextInfo
             // 
             this.ContextInfo.BackColor = System.Drawing.Color.Transparent;
-            this.ContextInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ContextInfo.Font = new System.Drawing.Font("Verdana", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ContextInfo.ForeColor = System.Drawing.Color.Red;
-            this.ContextInfo.Location = new System.Drawing.Point(225, 58);
+            this.ContextInfo.Location = new System.Drawing.Point(3, 72);
             this.ContextInfo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.ContextInfo.Name = "ContextInfo";
-            this.ContextInfo.Size = new System.Drawing.Size(256, 23);
+            this.ContextInfo.Size = new System.Drawing.Size(538, 29);
             this.ContextInfo.TabIndex = 3;
             this.ContextInfo.Text = "XXXXXXX";
             this.ContextInfo.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -108,12 +109,12 @@
             // IntelLine
             // 
             this.IntelLine.BackColor = System.Drawing.Color.Transparent;
-            this.IntelLine.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IntelLine.Font = new System.Drawing.Font("Verdana", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.IntelLine.ForeColor = System.Drawing.Color.SaddleBrown;
-            this.IntelLine.Location = new System.Drawing.Point(78, 79);
+            this.IntelLine.Location = new System.Drawing.Point(36, 99);
             this.IntelLine.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.IntelLine.Name = "IntelLine";
-            this.IntelLine.Size = new System.Drawing.Size(402, 33);
+            this.IntelLine.Size = new System.Drawing.Size(504, 41);
             this.IntelLine.TabIndex = 4;
             this.IntelLine.Text = "XXXXXXX";
             this.IntelLine.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -128,10 +129,10 @@
             this.RegionName.BackColor = System.Drawing.Color.Transparent;
             this.RegionName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.RegionName.ForeColor = System.Drawing.Color.Lime;
-            this.RegionName.Location = new System.Drawing.Point(319, 46);
+            this.RegionName.Location = new System.Drawing.Point(359, 58);
             this.RegionName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.RegionName.Name = "RegionName";
-            this.RegionName.Size = new System.Drawing.Size(156, 16);
+            this.RegionName.Size = new System.Drawing.Size(176, 20);
             this.RegionName.TabIndex = 5;
             this.RegionName.Text = "XXXXXXX";
             this.RegionName.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -139,11 +140,11 @@
             // 
             // QuesadillaAlertPopup
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = global::Quesadilla.Properties.Resources.bg_eve_infinite;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.ClientSize = new System.Drawing.Size(492, 183);
+            this.ClientSize = new System.Drawing.Size(554, 229);
             this.ControlBox = false;
             this.Controls.Add(this.RegionName);
             this.Controls.Add(this.IntelLine);
@@ -153,7 +154,7 @@
             this.Controls.Add(this.pAlertImage);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "QuesadillaAlertPopup";
