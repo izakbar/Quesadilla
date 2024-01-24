@@ -162,7 +162,7 @@
     <Compile Include="Classes\Processes\ProcessMonitor.cs" />
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
     <Compile Include="Classes\Resources\QuesadillaSound.cs" />
-    <Compile Include="Classes\ShipType.cs" />
+    <Compile Include="Classes\ItemType.cs" />
     <Compile Include="Classes\ZKill\ZKillKill.cs" />
     <Compile Include="Classes\ZKill\ZKillRedisQ.cs" />
     <Compile Include="Classes\ZKill\ZKillRedisQAttacker.cs" />
@@ -205,7 +205,7 @@
     <Compile Include="Classes\SolarSystems\SolarSystem.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemConnectionData.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemData.cs" />
-    <Compile Include="Classes\SolarSystems\SolarSystemManager.cs" />
+    <Compile Include="Classes\SolarSystems\UniverseManager.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemNode.cs" />
     <Compile Include="Quesadilla.cs">
       <SubType>Form</SubType>
@@ -271,7 +271,9 @@
     <None Include="Quesadilla.config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Quesadilla.ShipTypes.json" />
+    <None Include="Quesadilla.ItemTypes.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Quesadilla.Systems.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

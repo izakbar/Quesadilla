@@ -52,6 +52,8 @@
             this.lblOpacity = new System.Windows.Forms.Label();
             this.lblPopupSeconds = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.radioAlertBottomCenter = new System.Windows.Forms.RadioButton();
+            this.radioAlertTopCenter = new System.Windows.Forms.RadioButton();
             this.radioAlertCenter = new System.Windows.Forms.RadioButton();
             this.radioAlertBottomRight = new System.Windows.Forms.RadioButton();
             this.radioAlertBottomLeft = new System.Windows.Forms.RadioButton();
@@ -60,6 +62,8 @@
             this.cbDPSStayOnTop = new System.Windows.Forms.CheckBox();
             this.cbDPSTransparent = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.radioDPSBottomCenter = new System.Windows.Forms.RadioButton();
+            this.radioDPSTopCenter = new System.Windows.Forms.RadioButton();
             this.radioDPSCenter = new System.Windows.Forms.RadioButton();
             this.radioDPSBottomRight = new System.Windows.Forms.RadioButton();
             this.radioDPSBottomLeft = new System.Windows.Forms.RadioButton();
@@ -67,11 +71,8 @@
             this.radioDPSTopLeft = new System.Windows.Forms.RadioButton();
             this.cbDPSShowWindow = new System.Windows.Forms.CheckBox();
             this.cbDPSAllToons = new System.Windows.Forms.CheckBox();
-            this.radioAlertTopCenter = new System.Windows.Forms.RadioButton();
-            this.radioAlertBottomCenter = new System.Windows.Forms.RadioButton();
-            this.radioDPSBottomCenter = new System.Windows.Forms.RadioButton();
-            this.radioDPSTopCenter = new System.Windows.Forms.RadioButton();
             this.cbAlertTransparent = new System.Windows.Forms.CheckBox();
+            this.cbShowZKillAlerts = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.alertDemo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackOpacity)).BeginInit();
@@ -319,6 +320,30 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Popup Location";
             // 
+            // radioAlertBottomCenter
+            // 
+            this.radioAlertBottomCenter.AutoSize = true;
+            this.radioAlertBottomCenter.Location = new System.Drawing.Point(48, 71);
+            this.radioAlertBottomCenter.Margin = new System.Windows.Forms.Padding(4);
+            this.radioAlertBottomCenter.Name = "radioAlertBottomCenter";
+            this.radioAlertBottomCenter.Size = new System.Drawing.Size(14, 13);
+            this.radioAlertBottomCenter.TabIndex = 32;
+            this.radioAlertBottomCenter.TabStop = true;
+            this.radioAlertBottomCenter.UseVisualStyleBackColor = true;
+            this.radioAlertBottomCenter.CheckedChanged += new System.EventHandler(this.radioAlertBottomCenter_CheckedChanged);
+            // 
+            // radioAlertTopCenter
+            // 
+            this.radioAlertTopCenter.AutoSize = true;
+            this.radioAlertTopCenter.Location = new System.Drawing.Point(48, 26);
+            this.radioAlertTopCenter.Margin = new System.Windows.Forms.Padding(4);
+            this.radioAlertTopCenter.Name = "radioAlertTopCenter";
+            this.radioAlertTopCenter.Size = new System.Drawing.Size(14, 13);
+            this.radioAlertTopCenter.TabIndex = 31;
+            this.radioAlertTopCenter.TabStop = true;
+            this.radioAlertTopCenter.UseVisualStyleBackColor = true;
+            this.radioAlertTopCenter.CheckedChanged += new System.EventHandler(this.radioAlertTopCenter_CheckedChanged);
+            // 
             // radioAlertCenter
             // 
             this.radioAlertCenter.AutoSize = true;
@@ -429,6 +454,28 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "DPS Location";
             // 
+            // radioDPSBottomCenter
+            // 
+            this.radioDPSBottomCenter.AutoSize = true;
+            this.radioDPSBottomCenter.Location = new System.Drawing.Point(48, 71);
+            this.radioDPSBottomCenter.Margin = new System.Windows.Forms.Padding(4);
+            this.radioDPSBottomCenter.Name = "radioDPSBottomCenter";
+            this.radioDPSBottomCenter.Size = new System.Drawing.Size(14, 13);
+            this.radioDPSBottomCenter.TabIndex = 34;
+            this.radioDPSBottomCenter.TabStop = true;
+            this.radioDPSBottomCenter.UseVisualStyleBackColor = true;
+            // 
+            // radioDPSTopCenter
+            // 
+            this.radioDPSTopCenter.AutoSize = true;
+            this.radioDPSTopCenter.Location = new System.Drawing.Point(48, 26);
+            this.radioDPSTopCenter.Margin = new System.Windows.Forms.Padding(4);
+            this.radioDPSTopCenter.Name = "radioDPSTopCenter";
+            this.radioDPSTopCenter.Size = new System.Drawing.Size(14, 13);
+            this.radioDPSTopCenter.TabIndex = 33;
+            this.radioDPSTopCenter.TabStop = true;
+            this.radioDPSTopCenter.UseVisualStyleBackColor = true;
+            // 
             // radioDPSCenter
             // 
             this.radioDPSCenter.AutoSize = true;
@@ -521,52 +568,6 @@
             this.cbDPSAllToons.UseVisualStyleBackColor = true;
             this.cbDPSAllToons.CheckedChanged += new System.EventHandler(this.cbDPSAllToons_CheckedChanged);
             // 
-            // radioAlertTopCenter
-            // 
-            this.radioAlertTopCenter.AutoSize = true;
-            this.radioAlertTopCenter.Location = new System.Drawing.Point(48, 26);
-            this.radioAlertTopCenter.Margin = new System.Windows.Forms.Padding(4);
-            this.radioAlertTopCenter.Name = "radioAlertTopCenter";
-            this.radioAlertTopCenter.Size = new System.Drawing.Size(14, 13);
-            this.radioAlertTopCenter.TabIndex = 31;
-            this.radioAlertTopCenter.TabStop = true;
-            this.radioAlertTopCenter.UseVisualStyleBackColor = true;
-            this.radioAlertTopCenter.CheckedChanged += new System.EventHandler(this.radioAlertTopCenter_CheckedChanged);
-            // 
-            // radioAlertBottomCenter
-            // 
-            this.radioAlertBottomCenter.AutoSize = true;
-            this.radioAlertBottomCenter.Location = new System.Drawing.Point(48, 71);
-            this.radioAlertBottomCenter.Margin = new System.Windows.Forms.Padding(4);
-            this.radioAlertBottomCenter.Name = "radioAlertBottomCenter";
-            this.radioAlertBottomCenter.Size = new System.Drawing.Size(14, 13);
-            this.radioAlertBottomCenter.TabIndex = 32;
-            this.radioAlertBottomCenter.TabStop = true;
-            this.radioAlertBottomCenter.UseVisualStyleBackColor = true;
-            this.radioAlertBottomCenter.CheckedChanged += new System.EventHandler(this.radioAlertBottomCenter_CheckedChanged);
-            // 
-            // radioDPSBottomCenter
-            // 
-            this.radioDPSBottomCenter.AutoSize = true;
-            this.radioDPSBottomCenter.Location = new System.Drawing.Point(48, 71);
-            this.radioDPSBottomCenter.Margin = new System.Windows.Forms.Padding(4);
-            this.radioDPSBottomCenter.Name = "radioDPSBottomCenter";
-            this.radioDPSBottomCenter.Size = new System.Drawing.Size(14, 13);
-            this.radioDPSBottomCenter.TabIndex = 34;
-            this.radioDPSBottomCenter.TabStop = true;
-            this.radioDPSBottomCenter.UseVisualStyleBackColor = true;
-            // 
-            // radioDPSTopCenter
-            // 
-            this.radioDPSTopCenter.AutoSize = true;
-            this.radioDPSTopCenter.Location = new System.Drawing.Point(48, 26);
-            this.radioDPSTopCenter.Margin = new System.Windows.Forms.Padding(4);
-            this.radioDPSTopCenter.Name = "radioDPSTopCenter";
-            this.radioDPSTopCenter.Size = new System.Drawing.Size(14, 13);
-            this.radioDPSTopCenter.TabIndex = 33;
-            this.radioDPSTopCenter.TabStop = true;
-            this.radioDPSTopCenter.UseVisualStyleBackColor = true;
-            // 
             // cbAlertTransparent
             // 
             this.cbAlertTransparent.AutoSize = true;
@@ -582,11 +583,27 @@
             this.cbAlertTransparent.UseVisualStyleBackColor = true;
             this.cbAlertTransparent.CheckedChanged += new System.EventHandler(this.cbAlertTransparent_CheckedChanged);
             // 
+            // cbShowZKillAlerts
+            // 
+            this.cbShowZKillAlerts.AutoSize = true;
+            this.cbShowZKillAlerts.Location = new System.Drawing.Point(717, 147);
+            this.cbShowZKillAlerts.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.cbShowZKillAlerts.Name = "cbShowZKillAlerts";
+            this.cbShowZKillAlerts.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.cbShowZKillAlerts.Size = new System.Drawing.Size(124, 20);
+            this.cbShowZKillAlerts.TabIndex = 33;
+            this.cbShowZKillAlerts.Text = "Show ZKill Alerts";
+            this.cbShowZKillAlerts.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.cbShowZKillAlerts.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.cbShowZKillAlerts.UseVisualStyleBackColor = true;
+            this.cbShowZKillAlerts.CheckedChanged += new System.EventHandler(this.cbShowZKillAlerts_CheckedChanged);
+            // 
             // QuesadillaConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1312, 751);
+            this.Controls.Add(this.cbShowZKillAlerts);
             this.Controls.Add(this.cbAlertTransparent);
             this.Controls.Add(this.cbDPSAllToons);
             this.Controls.Add(this.cbDPSShowWindow);
@@ -677,5 +694,6 @@
         private System.Windows.Forms.RadioButton radioDPSBottomCenter;
         private System.Windows.Forms.RadioButton radioDPSTopCenter;
         private System.Windows.Forms.CheckBox cbAlertTransparent;
+        private System.Windows.Forms.CheckBox cbShowZKillAlerts;
     }
 }

@@ -27,6 +27,9 @@ namespace Quesadilla
 
         private Quesadilla _main;
 
+        public bool IsZkill = false;
+        public bool IsAlert = true;
+
         private const string ALERT_TEXT = "Alert";
         private const string FACTION_TEXT = "Faction Spawn";
 
@@ -38,11 +41,16 @@ namespace Quesadilla
             _seconds = configuration.AlertPopupSeconds;
             _opacity = configuration.AlertPopupOpacity;
             _opacitystep = configuration.AlertPopupOpacityStep;
-
             Opacity = 0;
 
             AlertText.ForeColor = configuration.AlertPopupAlertTextColour;
             AlertText.Text = _alert.AlertText;
+
+            if (alert.Kill != null)
+            {
+                IsZkill = true;
+                IsAlert = false;
+            }
 
             SystemName.ForeColor = configuration.AlertPopupSystemNameColour;
             if (alert.Path != null)
@@ -92,6 +100,10 @@ namespace Quesadilla
             if (alert.isFaction)
             {
                 IntelLine.Text = FACTION_TEXT;
+            } else if ( IsZkill )
+            {
+                IntelLine.Text = alert.Kill.Context;
+                pAlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
             }
             else
             {
@@ -282,5 +294,12 @@ namespace Quesadilla
             get { return true; }
         }
 
+        private void pAlertImage_Click(object sender, EventArgs e)
+        {
+            if ( IsZkill )
+            {
+                System.Diagnostics.Process.Start($"https://zkillboard.com/kill/{_alert.Kill.ID}");
+            }
+        }
     }
 }

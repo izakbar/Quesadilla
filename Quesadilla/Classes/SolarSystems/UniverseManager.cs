@@ -11,12 +11,16 @@ using System.Threading.Tasks;
 
 namespace Quesadilla.Classes.SolarSystems
 {
-    public class SolarSystemManager
+    public class UniverseManager
     {
-        private ILogger logger = Log.ForContext<SolarSystemManager>();
+
+        private const long LOWEST_WH_SYSTEM_ID = 31000000;
+        private ILogger logger = Log.ForContext<UniverseManager>();
 
         public Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
         public Dictionary<string, int> Names = new Dictionary<string, int>();
+        public Dictionary<int, ItemType> ItemTypes = new Dictionary<int, ItemType>();
+
         private Dictionary<string, PathInfo> _pathfindingCache = new Dictionary<string, PathInfo>();
         public int HomeSolarSystemID { get; set; }
 
@@ -32,8 +36,18 @@ namespace Quesadilla.Classes.SolarSystems
                 s.Value.SetNameRegex();
             }
         }
+        public void ReadItemTypes(string jsonFile)
+        {
+            StreamReader reader = new StreamReader(jsonFile);
+            var json = reader.ReadToEnd();
+
+            ItemTypes = JsonConvert.DeserializeObject<Dictionary<int, ItemType>>(json);
+        }
         public PathInfo FindAndCachePath(int fromSystemId, int toSystemId)
         {
+
+            if ( fromSystemId >= LOWEST_WH_SYSTEM_ID || toSystemId >= LOWEST_WH_SYSTEM_ID) return null;
+
             PathInfo pathInfo = new PathInfo()
             {
                 FromSystemId = fromSystemId,

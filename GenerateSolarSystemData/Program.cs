@@ -48,22 +48,22 @@ namespace QuesadillaExport
 
         }
 
-        static void GenerateShiptypesData()
+        static void GenerateItemTypesData()
         {
-            var shipTypes = DataAccess.invTypes.SelectAll(6);
-            Dictionary<int, ShipType> ShipTypes = new Dictionary<int, ShipType>();
-            foreach (var ship in shipTypes)
+            var itemTypes = DataAccess.invTypes.SelectAll();
+            Dictionary<int, ItemType> ItemTypes = new Dictionary<int, ItemType>();
+            foreach (var item in itemTypes)
             {
-                ShipTypes.Add(ship.TypeId,
-                new ShipType()
+                ItemTypes.Add(item.TypeId,
+                new ItemType()
                 {
-                    Name = ship.TypeName,
-                    Group = ship.GroupName,
-                    Id = ship.TypeId,
+                    Name = item.TypeName,
+                    Group = item.GroupName,
+                    Id = item.TypeId,
                 });
             }
-            var json = JsonConvert.SerializeObject(ShipTypes);
-            File.WriteAllText(@"Quesadilla.ShipTypes.json", json);
+            var json = JsonConvert.SerializeObject(ItemTypes);
+            File.WriteAllText(@"Quesadilla.ItemTypes.json", json);
         }
 
 
@@ -84,7 +84,7 @@ namespace QuesadillaExport
                 .CreateLogger();
 
             GenerateSolarSystemData();
-            GenerateShiptypesData();
+            GenerateItemTypesData();
         }
     }
 }

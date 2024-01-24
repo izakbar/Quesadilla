@@ -11,7 +11,7 @@ namespace Quesadilla.Classes.ZKill
     {
         public long ID { get; set; }
         public System.DateTimeOffset Timestamp { get; set; }
-        public System.DateTimeOffset TimeAdded { get; set; }
+        public System.DateTime TimeAdded { get; set; }
         public bool Expired { get; set; }
         public long SolarSystemId { get; set; }
 
@@ -32,5 +32,7 @@ namespace Quesadilla.Classes.ZKill
         public long KillerWeaponTypeId { get; set; }
 
         public string href { get; set; }
+
+        public string Context {  get; set; }
     }
 }

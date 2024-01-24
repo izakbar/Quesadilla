@@ -34,7 +34,7 @@ namespace Quesadilla
         private void SetSystem(ComboBox cmb, string systemName)
         {
             cmb.Items.Clear();
-            cmb.DataSource = _mainForm._solarSystems.Names.Keys.OrderBy(x => x).ToList();
+            cmb.DataSource = _mainForm._universe.Names.Keys.OrderBy(x => x).ToList();
             cmb.Text = systemName;
         }
         private void SetBackground(ComboBox cmb, string background)
@@ -123,6 +123,8 @@ namespace Quesadilla
             cbDPSShowWindow.Checked = _configuration.DPSShowWindow;
             cbDPSAllToons.Checked = _configuration.DPSAllToons;
             cbStayOnTop.Checked = _configuration.StayOnTop;
+            cbAlertTransparent.Checked = _configuration.AlertTransparent;
+            cbShowZKillAlerts.Checked = _configuration.ShowZKillAlerts;
         }
         private Bitmap GetControlImage(Control ctl)
         {
@@ -333,6 +335,11 @@ namespace Quesadilla
         private void cbAlertTransparent_CheckedChanged(object sender, EventArgs e)
         {
             _configuration.AlertTransparent= cbAlertTransparent.Checked;
+        }
+
+        private void cbShowZKillAlerts_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.ShowZKillAlerts= cbShowZKillAlerts.Checked;
         }
     }
 }

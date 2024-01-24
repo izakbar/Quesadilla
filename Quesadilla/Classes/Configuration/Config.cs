@@ -52,6 +52,10 @@ namespace Quesadilla.Classes
                 GraphCombatMaxPoints = GraphCombatMaxPoints,
                 GraphCombatMinPointSeconds = GraphCombatMinPointSeconds,
                 GraphCombatSeconds = GraphCombatSeconds,
+                ShowZKillAlerts = ShowZKillAlerts,
+                ZKillAlertText = ZKillAlertText,
+                ZKillMenuText = ZKillMenuText,
+                ZKillContextText = ZKillContextText,
             };
 
             c.ignoreStrings = new List<Regex>();
@@ -122,7 +126,7 @@ namespace Quesadilla.Classes
                 c.DPSShowWindow = true;
                 c.DPSSaveCSV = false;
                 c.DPSAllToons = false;
-                c.IgnoreAsTooManyJumps = 15;
+                c.IgnoreAsTooManyJumps = 12;
                 c.ExpireAlertSeconds = 500;
                 c.ExpireCombatSeconds = 1200;
                 c.ExpireISKSeconds = 5400; // 90 mins
@@ -138,6 +142,8 @@ namespace Quesadilla.Classes
                 c.DPSLocation = PopupLocationType.TopRight;
                 c.AlertPopupBackground = "bg_paulmart";
 
+                c.ShowZKillAlerts = true;
+
                 c.AlertPopupSystemNameColour = Color.Lime;
                 c.AlertPopupRegionNameColour = Color.FromArgb(125,255,255);
                 c.AlertPopupContextInfoColour = Color.Yellow;
@@ -146,6 +152,9 @@ namespace Quesadilla.Classes
 
                 c.ShowLastUnexpiredAlerts = 5;
 
+                c.ZKillAlertText = "{victim} died to {killer} in {tosystem}";
+                c.ZKillContextText = "{victim} {victimship}\nKilled by {killer}";
+                c.ZKillMenuText = "ZKILL {victim} died to {killer} in {tosystem}";
             }
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
@@ -264,6 +273,8 @@ namespace Quesadilla.Classes
         public bool DPSShowWindow { get; set; }
         public bool DPSAllToons { get; set; }
         public bool DPSSaveCSV { get; set; }
+
+        public bool ShowZKillAlerts { get; set; }
         public int IgnoreAsTooManyJumps { get; set; }
         public int ExpireAlertSeconds { get; set; }
         public int ExpireCombatSeconds { get; set; }
@@ -285,6 +296,10 @@ namespace Quesadilla.Classes
         public Color AlertPopupContextInfoColour { get; set; }
         public Color AlertPopupIntelLineColour { get; set; }
         public Color AlertPopupAlertTextColour { get; set; }
+
+        public string ZKillAlertText { get; set; }
+        public string ZKillContextText { get; set; }
+        public string ZKillMenuText { get; set; }
 
         public int ShowLastUnexpiredAlerts { get; set; }
     }
