@@ -1,4 +1,5 @@
-﻿using Quesadilla.Classes;
+﻿using EVEStandard.Models;
+using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.Logfile;
@@ -679,6 +680,7 @@ namespace Quesadilla
             returnString = returnString.Replace("{text}", kill.href);
             returnString = returnString.Replace("{value}", kill.TotalValue);
             returnString = returnString.Replace("{victim}", _universe.GetCharacterName((int)kill.VictimCharacterId));
+            returnString = returnString.Replace("{system}", _universe.SolarSystems.ContainsKey((int)kill.SolarSystemId) ? _universe.SolarSystems[(int)kill.SolarSystemId].Name : kill.SolarSystemId.ToString());
             returnString = returnString.Replace("{killer}", kill.KillerCharacterId == 0 ? "NPC" : _universe.GetCharacterName((int)kill.KillerCharacterId));
             returnString = returnString.Replace("{victimship}", _universe.ItemTypes[(int)kill.VictimShipTypeId].Name);
             returnString = returnString.Replace("{killership}", _universe.ItemTypes.ContainsKey((int)kill.KillerShipTypeId) ? _universe.ItemTypes[(int)kill.KillerShipTypeId].Name : kill.KillerShipTypeId.ToString());
@@ -1579,7 +1581,7 @@ namespace Quesadilla
                 ZKillKills.Add(e.Kill);
             }
 
-            Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {e.Kill.VictimShipTypeId}");
+            Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {_universe.ItemTypes[(int)e.Kill.VictimShipTypeId].Name} {_universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
             e.Kill.Context = generateZKillAlertText(e.Kill, null, Configuration.ZKillContextText, "");
 
             // check if zkill system matches any range alerts
@@ -1623,7 +1625,7 @@ namespace Quesadilla
                         if (sendAlert)
                         {
                             alertText = generateZKillAlertText(e.Kill, path, Configuration.ZKillAlertText,"");
-                            Log.Debug("ALERT - " + alertText);
+                            Log.Information("ALERT - " + alertText);
 
                             EnqueueAlert(
                                 new AlertQueueItem()
@@ -1647,7 +1649,7 @@ namespace Quesadilla
                         if (sendAlert)
                         {
                             alertText = generateZKillAlertText(e.Kill, path, Configuration.ZKillAlertText, "");
-                            Log.Debug("ALERT - " + alertText);
+                            Log.Information("ALERT - " + alertText);
                             EnqueueAlert(
                                 new AlertQueueItem()
                                 {
@@ -1674,7 +1676,7 @@ namespace Quesadilla
                                 if (sendAlert)
                                 {
                                     alertText = generateZKillAlertText(e.Kill, path, Configuration.ZKillAlertText, x.CharacterName);
-                                    Log.Debug("ALERT - " + alertText);
+                                    Log.Information("ALERT - " + alertText);
                                     if (
                                         alert.AlertRangeType == AlertConfigRangeType.OneCharacter ||
                                         alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
@@ -1709,10 +1711,10 @@ namespace Quesadilla
                                 if (sendAlert)
                                 {
                                     alertText = generateZKillAlertText(e.Kill, path, Configuration.ZKillAlertText, x.CharacterName);
-                                    Log.Debug("ALERT - " + alertText);
+                                    Log.Information("ALERT - " + alertText);
                                     if (
-                                        alert.AlertRangeType == AlertConfigRangeType.OneCharacter ||
-                                        alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
+                                        alert.AlertRangeType == AlertConfigRangeType.AllCharacters ||
+                                        alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive
                                         )
                                     {
                                         EnqueueAlert(

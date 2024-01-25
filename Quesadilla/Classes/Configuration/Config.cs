@@ -157,9 +157,9 @@ namespace Quesadilla.Classes
 
                 c.ShowLastUnexpiredAlerts = 5;
 
-                c.ZKillAlertText = "{victim} died to {killer} in {tosystem}";
+                c.ZKillAlertText = "{victim} died to {killer} in {system}";
                 c.ZKillContextText = "{victim} {victimship}\nKilled by {killer}";
-                c.ZKillMenuText = "ZKILL {victim} died to {killer} in {tosystem}";
+                c.ZKillMenuText = "{killer} killed {victim} in {system}";
                 c.ZKillCircleColour = Color.Red;
                 c.ZKillIskColour = Color.White;
                 c.ZKillBarColour = Color.LimeGreen;
