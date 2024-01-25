@@ -2,6 +2,7 @@
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Events;
+using Quesadilla.Classes.EveScout;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Processes;
 using Quesadilla.Classes.Queues;
@@ -105,6 +106,8 @@ namespace Quesadilla
         private ZKillRedisQ ZKillFeed;
         private List<ZKillKill> ZKillKills = new List<ZKillKill>();
 
+        private EveScoutManager EveScoutProcessor;
+
         public bool AlertShowing = false;
 
         private bool ChatServerStatus = true;
@@ -115,7 +118,7 @@ namespace Quesadilla
 
         private bool ConfigurationWindowOpen = false;
         private int TicksSinceLastCleardown = 0;
-        private int TicksSinceLastZkill = 0;
+        private int TicksSinceLastAlert = 0;
 
         private Thread splashScreenThread;
         private QuesadillaSplashScreen splashScreen;
@@ -199,6 +202,8 @@ namespace Quesadilla
 
             ReloadConfiguration();
 
+            EveScoutProcessor = new EveScoutManager();
+
             watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel, "Catch Intel"));
             watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel, "Fountain Intel"));
             watchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.ChatIntel, "Period Basis Intel"));
@@ -248,6 +253,7 @@ namespace Quesadilla
 
             ZKillFeed = new ZKillRedisQ();
             ZKillFeed.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
+
         }
 
         private void ShowSplashScreen()
@@ -455,7 +461,7 @@ namespace Quesadilla
             }
 
             // dequeue Alerts
-            if (NewAlerts.Count > 0)
+            if (NewAlerts.Count > 0 && ++TicksSinceLastAlert > Configuration.HowManyTicksBeforeAlert)
             {
                 var NewAlert = NewAlerts.Dequeue();
                 Log.Error(NewAlert.AlertText);
@@ -470,6 +476,7 @@ namespace Quesadilla
                 if (sound != null) sound.Play();
 
                 RebuildLatestAlertsMenu();
+                TicksSinceLastAlert = 0;
             }
 
 
@@ -992,6 +999,7 @@ namespace Quesadilla
         {
             int foundSystemId = -1;
             string foundSystemName = "Unknown";
+            PathInfo closePath;
 
             int nativeId;
             if (int.TryParse(e.SystemName, out nativeId))
@@ -1043,12 +1051,34 @@ namespace Quesadilla
                         Location = foundSystemName,
                     });
                 }
+
+                var ClosestThera = EveScoutProcessor.FindClosest(_universe,foundSystemId, "Thera");
+                var ClosestTurnur = EveScoutProcessor.FindClosest(_universe,foundSystemId, "Turnur");
+
+                if (ClosestThera != null)
+                {
+                    closePath = _universe.FindAndCachePath(foundSystemId, (ClosestThera.FromSystemId == EveScoutManager.SYSTEMID_THERA) ? (int)ClosestThera.ToSystemId : (int)ClosestThera.FromSystemId);
+                    if (closePath != null)
+                    {
+                        Log.Information($"EveScount: Closest Thera {ClosestThera.ToSystemId}:{ClosestThera.FromSystemId} {closePath.TotalJumps} {closePath.ToSystemName}");
+                    }
+                }
+                if (ClosestTurnur != null)
+                {
+                    closePath = _universe.FindAndCachePath(foundSystemId, (ClosestTurnur.FromSystemId == EveScoutManager.SYSTEMID_TURNUR) ? (int)ClosestTurnur.ToSystemId : (int)ClosestTurnur.FromSystemId);
+                    if (closePath != null)
+                    {
+                        Log.Information($"EveScount: Closest Turnur {ClosestTurnur.ToSystemId}:{ClosestTurnur.FromSystemId} {closePath.TotalJumps} {closePath.ToSystemName}");
+                    }
+                }
+
                 // TODO                if (this._conf.CameraFollowCharacter && this.CentreOnCharacter.Text == key) this.ZoomTo(num1);
             }
 
             if (foundSystemId == -1)
                 return;
             Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
+
         }
 
         private void _localWatcher_ChatServerChange(object sender, ProcessChatServerChangeEventArgs e)

@@ -184,7 +184,10 @@ namespace Quesadilla.Classes.SolarSystems
             {
                 return ESICharacters[characterId].CharacterName;
             }
-
+            if ( characterId == 0 )
+            {
+                return "*NO ONE*";
+            }
             try
             {
                 var characterInfo = esiClient.Character.GetCharacterPublicInfoV5Async(characterId).Result;

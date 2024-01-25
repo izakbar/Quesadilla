@@ -197,6 +197,8 @@
     <Compile Include="Classes\ESIData\ESICharacter.cs" />
     <Compile Include="Classes\Events\ProcessISKEventArgs.cs" />
     <Compile Include="Classes\Events\ZKillEventArgs.cs" />
+    <Compile Include="Classes\EveScout\EveScoutManager.cs" />
+    <Compile Include="Classes\EveScout\EveScoutWH.cs" />
     <Compile Include="Classes\IskLine.cs" />
     <Compile Include="Classes\Processes\ProcessInfo.cs" />
     <Compile Include="Classes\Processes\ProcessMonitor.cs" />
