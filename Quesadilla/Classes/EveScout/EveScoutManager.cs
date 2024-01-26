@@ -23,7 +23,6 @@ namespace Quesadilla.Classes.EveScout
         private BackgroundWorker Worker;
 
         private bool FeedPaused = false;
-        private bool FeedRunning = false;
         private System.Timers.Timer t;
 
         public const int SYSTEMID_THERA = 31000005;
@@ -140,18 +139,21 @@ namespace Quesadilla.Classes.EveScout
             EveScoutWH closestSystem = null;
             int closestJumps = 999;
 
-            foreach(var w in Signatures.Where(o => o.Connector == connector))
+            lock (Signatures)
             {
-                int toSystem = (int)w.ToSystemId;
-                if ( toSystem == SYSTEMID_THERA || toSystem == SYSTEMID_TURNUR )
+                foreach (var w in Signatures.Where(o => o.Connector == connector))
                 {
-                    toSystem = (int)w.FromSystemId;
-                }
-                var path = u.FindAndCachePath((int)systemId, toSystem);
-                if (path != null && path.TotalJumps < closestJumps)
-                {
-                    closestJumps = path.TotalJumps;
-                    closestSystem = w;
+                    int toSystem = (int)w.ToSystemId;
+                    if (toSystem == SYSTEMID_THERA || toSystem == SYSTEMID_TURNUR)
+                    {
+                        toSystem = (int)w.FromSystemId;
+                    }
+                    var path = u.FindAndCachePath((int)systemId, toSystem);
+                    if (path != null && path.TotalJumps < closestJumps)
+                    {
+                        closestJumps = path.TotalJumps;
+                        closestSystem = w;
+                    }
                 }
             }
 

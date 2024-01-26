@@ -637,7 +637,7 @@ namespace Quesadilla
                 foreach (int systemId in path.PathSystems)
                 {
                     if (route.Length > 0) route += " -> ";
-                    route += _universe.SolarSystems[systemId].Name;
+                    route += systemId == path.FromSystemId ? "" : _universe.SolarSystems[systemId].Name;
                 }
             }
             return route;

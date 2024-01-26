@@ -11,6 +11,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Media;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -33,6 +34,8 @@ namespace Quesadilla
 
         private const string ALERT_TEXT = "Alert";
         private const string FACTION_TEXT = "Faction Spawn";
+
+        private const int ZOOM_SIZE_INCREASE = 1;
 
         public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background, Quesadilla mainForm)
         {
@@ -362,15 +365,16 @@ namespace Quesadilla
                 }
 */
 
-                using (Font myfont = new Font("Arial", TEXT_SIZE - 10,FontStyle.Bold))
+                using (Font myfont = new Font("Arial", TEXT_SIZE - 20,FontStyle.Bold))
                 {
                     var format = new StringFormat
                     {
                         Alignment = StringAlignment.Far,
-                        LineAlignment = StringAlignment.Center
+                        LineAlignment = StringAlignment.Center,
+                        Trimming = StringTrimming.None,
                     };
-                    if ( showBar ) g.FillRectangle(new SolidBrush(barColor), 0, srcImage.Height - TEXT_SIZE, srcImage.Width, TEXT_SIZE);
-                    g.DrawString(isk, myfont, new SolidBrush(iskColour), new RectangleF(0, srcImage.Height - TEXT_SIZE, srcImage.Width, TEXT_SIZE), format);
+                    if ( showBar ) g.FillRectangle(new SolidBrush(barColor), 0, srcImage.Height - TEXT_SIZE , srcImage.Width, TEXT_SIZE );
+                    g.DrawString(isk, myfont, new SolidBrush(iskColour), new RectangleF(0, (srcImage.Height - TEXT_SIZE), srcImage.Width, TEXT_SIZE), format);
                 }
 
 
@@ -378,6 +382,21 @@ namespace Quesadilla
             }
         }
 
+        private void Zoom_MouseEnter(object sender, EventArgs e)
+        {
+            System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
+            x.Font = new Font(x.Font.Name, x.Font.Size+ZOOM_SIZE_INCREASE, FontStyle.Bold);
+        }
 
+        private void Zoom_MouseLeave(object sender, EventArgs e)
+        {
+            System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
+            x.Font = new Font(x.Font.Name, x.Font.Size-ZOOM_SIZE_INCREASE, FontStyle.Regular);
+        }
+
+        private void IntelLine_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

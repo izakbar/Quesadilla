@@ -114,9 +114,6 @@ namespace Quesadilla.Classes.Processes
             if ( _processCache.ContainsKey(windowHandle) )
             {
                 return _processCache[windowHandle];
-            } else
-            {
-                return null;
             }
             return null;
         }

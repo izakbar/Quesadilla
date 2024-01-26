@@ -131,7 +131,7 @@ namespace Quesadilla.Classes
                 c.DPSShowWindow = true;
                 c.DPSSaveCSV = false;
                 c.DPSAllToons = false;
-                c.IgnoreAsTooManyJumps = 99;
+                c.IgnoreAsTooManyJumps = 12;
                 c.ExpireAlertSeconds = 500;
                 c.ExpireCombatSeconds = 1200;
                 c.ExpireISKSeconds = 5400; // 90 mins
@@ -153,7 +153,7 @@ namespace Quesadilla.Classes
                 c.AlertPopupRegionNameColour = Color.FromArgb(125,255,255);
                 c.AlertPopupContextInfoColour = Color.Yellow;
                 c.AlertPopupIntelLineColour = Color.White ;
-                c.AlertPopupAlertTextColour = Color.FromArgb(64, 0, 128);
+                c.AlertPopupAlertTextColour = Color.White;
 
                 c.ShowLastUnexpiredAlerts = 5;
 
@@ -221,7 +221,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "1DQ1-A < 50 jumps",
+                    FriendlyName = "1DQ1-A < 5 jumps",
                     Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.System,
@@ -229,7 +229,7 @@ namespace Quesadilla.Classes
                     MenuDisplay = "{jumps} jumps from {fromsystem} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
-                    Jumps1Number = 50,
+                    Jumps1Number = 5,
                     Jumps2Comparison = AlertConfigJumpsComparison.None,
                     TriggerText = "1DQ1-A",
                 });
