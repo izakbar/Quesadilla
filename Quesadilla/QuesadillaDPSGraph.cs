@@ -402,6 +402,7 @@ namespace Quesadilla
             chartDPS.ChartAreas[0].AxisX.Maximum = graphEndXp;
             chartDPS.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
 
+            double maxDReceived = 0; double maxDGiven = 0;
             while (curr <= end)
             {
                 // curr is mid point of damage
@@ -428,6 +429,9 @@ namespace Quesadilla
                     {
                         dReceived += _combatGraphData[i].DamageReceived;
                         dGiven += _combatGraphData[i].DamageGiven;
+
+                        maxDReceived += _combatGraphData[i].DamageReceived;
+                        maxDGiven += _combatGraphData[i].DamageGiven;
 
                         nReceived += _combatGraphData[i].NeutsReceived;
                         nGiven += _combatGraphData[i].NeutsGiven;
@@ -477,6 +481,14 @@ namespace Quesadilla
                 {
                     s.Enabled = true;
                 }
+            }
+
+            if ( maxDGiven > 1000 || maxDReceived > 1000 )
+            {
+                chartDPS.ChartAreas[0].Axes[1].LabelStyle.Format = "{0:0,#}K";
+            } else
+            {
+                chartDPS.ChartAreas[0].Axes[1].LabelStyle.Format = "";
             }
 
             // dump to csv
