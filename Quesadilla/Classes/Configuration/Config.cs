@@ -22,6 +22,7 @@ namespace Quesadilla.Classes
                 TickMiliseconds = TickMiliseconds,
                 HowManyTicksBeforeCleardown = HowManyTicksBeforeCleardown,
                 HowManyTicksBeforeAlert = HowManyTicksBeforeAlert,
+                HowManyTicksBeforeDPSGraphUpdate = HowManyTicksBeforeDPSGraphUpdate,
                 AlertPopupOpacityStep = AlertPopupOpacityStep,
                 AlertPopupOpacity = AlertPopupOpacity,
                 AlertPopupAlertTextColour = AlertPopupAlertTextColour,
@@ -49,6 +50,7 @@ namespace Quesadilla.Classes
                 DPSShowWindow = DPSShowWindow,
                 DPSSaveCSV = DPSSaveCSV,
                 DPSAllToons = DPSAllToons,
+                DPSGraphLineSize = DPSGraphLineSize,
                 GraphCombatMaxPoints = GraphCombatMaxPoints,
                 GraphCombatMinPointSeconds = GraphCombatMinPointSeconds,
                 GraphCombatSeconds = GraphCombatSeconds,
@@ -115,9 +117,10 @@ namespace Quesadilla.Classes
             if (c is null)
             {
                 c = new Config();
-                c.TickMiliseconds = 900;
+                c.TickMiliseconds = 590;
                 c.HowManyTicksBeforeCleardown = 8;
-                c.HowManyTicksBeforeAlert = 2;
+                c.HowManyTicksBeforeAlert = 3;
+                c.HowManyTicksBeforeDPSGraphUpdate = 4;
                 c.HomeSystem = "K7D-II";
                 c.InitialPosition = new Point(0, 0);
                 c.WindowSize = new Point(760, 404);
@@ -127,6 +130,7 @@ namespace Quesadilla.Classes
                 c.StayOnTop = true;
                 c.DPSGraphStayOnTop = true;
                 c.DPSGraphTransparent = true;
+                c.DPSGraphLineSize = 2;
                 c.AlertTransparent = false;
                 c.DPSShowWindow = true;
                 c.DPSSaveCSV = false;
@@ -155,11 +159,11 @@ namespace Quesadilla.Classes
                 c.AlertPopupIntelLineColour = Color.White ;
                 c.AlertPopupAlertTextColour = Color.White;
 
-                c.ShowLastUnexpiredAlerts = 5;
+                c.ShowLastUnexpiredAlerts = 7;
 
                 c.ZKillAlertText = "{victim} died to {killer} in {system}";
                 c.ZKillContextText = "{victim} {victimship}\nKilled by {killer}";
-                c.ZKillMenuText = "{killer} killed {victim} in {system}";
+                c.ZKillMenuText = "{killer} killed {victim} in {system} {value}";
                 c.ZKillCircleColour = Color.Red;
                 c.ZKillIskColour = Color.White;
                 c.ZKillBarColour = Color.LimeGreen;
@@ -268,6 +272,7 @@ namespace Quesadilla.Classes
         public int TickMiliseconds {  get; set; }
         public int HowManyTicksBeforeCleardown { get; set; }
         public int HowManyTicksBeforeAlert { get; set; }
+        public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
         public string HomeSystem { get; set; }
         public List<Regex> ignoreStrings { get; set; }
         public List<int> ignoreSystems { get; set; }
@@ -316,6 +321,7 @@ namespace Quesadilla.Classes
         public Color ZKillBarColour { get; set; }
         public bool ZKillShowBar { get; set; }
 
+        public int DPSGraphLineSize { get; set; }
         public int ShowLastUnexpiredAlerts { get; set; }
     }
 }

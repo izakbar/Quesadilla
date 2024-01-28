@@ -24,6 +24,7 @@ using System.Media;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -117,8 +118,8 @@ namespace Quesadilla
         private string combatNeutOut = "ff7fffff";
 
         private bool ConfigurationWindowOpen = false;
-        private int TicksSinceLastCleardown = 0;
-        private int TicksSinceLastAlert = 0;
+
+        public Dictionary<string, int> TickCounts = new Dictionary<string, int>();
 
         private Thread splashScreenThread;
         private QuesadillaSplashScreen splashScreen;
@@ -175,6 +176,10 @@ namespace Quesadilla
                     new MenuItem("Exit", new EventHandler(trayIconMenuClose)),
             });
 
+            TickCounts["SinceLastCleardown"] = 0;
+            TickCounts["SinceLastAlert"] = 0;
+            TickCounts["SinceLastDPSGraphUpdate"] = 0;
+
             menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
 
@@ -203,6 +208,7 @@ namespace Quesadilla
             ReloadConfiguration();
 
             EveScoutProcessor = new EveScoutManager();
+            EveScoutProcessor.EveScoutEventHandler += new EventHandler<EveScoutEventArgs>(this.EveScout_ProcessNewData);
 
             watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel, "Catch Intel"));
             watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel, "Fountain Intel"));
@@ -254,6 +260,11 @@ namespace Quesadilla
             ZKillFeed = new ZKillRedisQ();
             ZKillFeed.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
 
+        }
+
+        private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void ShowSplashScreen()
@@ -328,7 +339,7 @@ namespace Quesadilla
                     first = !first;
                     trayIcon.Text = TrayString;
                 }
-                MenuItem menuAlert = new MenuItem(menuText);
+                MenuItem menuAlert = new MenuItem(menuText, trayIconMenuShowHistoricAlert){ Tag = alert};
                 menuLatestAlerts.MenuItems.Add(menuAlert);
             }
         }
@@ -461,7 +472,7 @@ namespace Quesadilla
             }
 
             // dequeue Alerts
-            if (NewAlerts.Count > 0 && ++TicksSinceLastAlert > Configuration.HowManyTicksBeforeAlert)
+            if (NewAlerts.Count > 0 && ++TickCounts["SinceLastAlert"] > Configuration.HowManyTicksBeforeAlert)
             {
                 var NewAlert = NewAlerts.Dequeue();
                 Log.Error(NewAlert.AlertText);
@@ -476,12 +487,12 @@ namespace Quesadilla
                 if (sound != null) sound.Play();
 
                 RebuildLatestAlertsMenu();
-                TicksSinceLastAlert = 0;
+                TickCounts["SinceLastAlert"] = 0;
             }
 
 
             // do cleardown/rebuild of alerts menu - if number of ticks passed
-            if (++TicksSinceLastCleardown > Configuration.HowManyTicksBeforeCleardown)
+            if ( ++TickCounts["SinceLastCleardown"] > Configuration.HowManyTicksBeforeCleardown)
             {
                 // Show number of recent alerts
                 if (ActiveAlerts.Count > 0)
@@ -530,25 +541,28 @@ namespace Quesadilla
                 }
 
                 // expire zkills ?
-                foreach (var k in ZKillKills)
+                lock (ZKillKills)
                 {
-                    TimeSpan ts = DateTime.Now - k.TimeAdded;
-                    if (ts.TotalSeconds > Configuration.ExpireZKillSeconds)
+                    foreach (var k in ZKillKills)
                     {
-                        _universe.SolarSystems[(int)k.SolarSystemId].Kills.Remove(k);
-                        k.Expired = true;
+                        TimeSpan ts = DateTime.Now - k.TimeAdded;
+                        if (ts.TotalSeconds > Configuration.ExpireZKillSeconds)
+                        {
+                            _universe.SolarSystems[(int)k.SolarSystemId].Kills.Remove(k);
+                            k.Expired = true;
+                        }
                     }
+                    ZKillKills.RemoveAll(o => o.Expired);
                 }
-                ZKillKills.RemoveAll(o => o.Expired);
 
-
-                TicksSinceLastCleardown = 0;
+                TickCounts["SinceLastCleardown"] = 0;
             }
 
             UpdateEveProcesses();
 
             CombatFlag.Visible = InCombat;
-            if (CombatAdded)
+            TickCounts["SinceLastDPSGraphUpdate"]++;
+            if (CombatAdded && TickCounts["SinceLastDPSGraphUpdate"] > Configuration.HowManyTicksBeforeDPSGraphUpdate )
             {
                 if (Configuration.DPSShowWindow && DPSGraphWindow == null)
                 {
@@ -561,6 +575,7 @@ namespace Quesadilla
                     DPSGraphWindow.UpdateDPSGraph();
                 }
                 CombatAdded = false;
+                TickCounts["SinceLastDPSGraphUpdate"] = 0;
             }
 
             if (_ISK.ContainsKey(CurrentActiveToon))
@@ -572,7 +587,6 @@ namespace Quesadilla
             {
                 lblISK.Visible = false;
             }
-
         }
 
         private void AddNewCharacter(string characterName)
@@ -999,7 +1013,6 @@ namespace Quesadilla
         {
             int foundSystemId = -1;
             string foundSystemName = "Unknown";
-            PathInfo closePath;
 
             int nativeId;
             if (int.TryParse(e.SystemName, out nativeId))
@@ -1044,36 +1057,20 @@ namespace Quesadilla
                 }
                 else
                 {
-                    CharacterList.Add(new Character()
+                    c = new Character()
                     {
                         CharacterName = characterName,
                         LocationId = foundSystemId,
                         Location = foundSystemName,
-                    });
+                    };
+                    CharacterList.Add(c);
                 }
 
-                var ClosestThera = EveScoutProcessor.FindClosest(_universe,foundSystemId, "Thera");
-                var ClosestTurnur = EveScoutProcessor.FindClosest(_universe,foundSystemId, "Turnur");
-
-                if (ClosestThera != null)
-                {
-                    closePath = _universe.FindAndCachePath(foundSystemId, (ClosestThera.FromSystemId == EveScoutManager.SYSTEMID_THERA) ? (int)ClosestThera.ToSystemId : (int)ClosestThera.FromSystemId);
-                    if (closePath != null)
-                    {
-                        Log.Information($"EveScount: Closest Thera {ClosestThera.ToSystemId}:{ClosestThera.FromSystemId} {closePath.TotalJumps} {closePath.ToSystemName}");
-                    }
-                }
-                if (ClosestTurnur != null)
-                {
-                    closePath = _universe.FindAndCachePath(foundSystemId, (ClosestTurnur.FromSystemId == EveScoutManager.SYSTEMID_TURNUR) ? (int)ClosestTurnur.ToSystemId : (int)ClosestTurnur.FromSystemId);
-                    if (closePath != null)
-                    {
-                        Log.Information($"EveScount: Closest Turnur {ClosestTurnur.ToSystemId}:{ClosestTurnur.FromSystemId} {closePath.TotalJumps} {closePath.ToSystemName}");
-                    }
-                }
-
+                CheckEveScoutConnection(c);
                 // TODO                if (this._conf.CameraFollowCharacter && this.CentreOnCharacter.Text == key) this.ZoomTo(num1);
             }
+
+            SetupStatusBar();
 
             if (foundSystemId == -1)
                 return;
@@ -1521,6 +1518,9 @@ namespace Quesadilla
                     CurrentActiveToon = foregroundWindowTitle.Replace("EVE - ", "");
                     lblCurrentClient.Text = CurrentActiveToon;
 
+                    SetupStatusBar();
+
+                    // sort out DPS Graph
                     if (previousToon == null || previousToon == "" || previousToon != CurrentActiveToon)
                     {
                         if (Configuration.DPSShowWindow && DPSGraphWindow != null)
@@ -1562,6 +1562,7 @@ namespace Quesadilla
                 lblCurrentClient.Visible = false;
                 CurrentActiveToon = "";
                 lblCurrentClient.Text = CurrentActiveToon;
+                SetupStatusBar();
             }
 
             // just double check thru charachter list active clients to make sure there is still an active client.
@@ -1608,7 +1609,10 @@ namespace Quesadilla
                     _universe.SolarSystems[(int)e.Kill.SolarSystemId].Kills = new List<ZKillKill>();
                 }
                 _universe.SolarSystems[(int)e.Kill.SolarSystemId].Kills.Add(e.Kill);
-                ZKillKills.Add(e.Kill);
+                lock (ZKillKills)
+                {
+                    ZKillKills.Add(e.Kill);
+                }
             }
 
             Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {_universe.ItemTypes[(int)e.Kill.VictimShipTypeId].Name} {_universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
@@ -1768,6 +1772,96 @@ namespace Quesadilla
                         break;
                 }
             }
+        }
+        public void SetupStatusBar()
+        {
+            StringBuilder status = new StringBuilder();
+
+            if (CurrentActiveToon != null && CurrentActiveToon != "")
+            {
+                var c = CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
+                if (c != null)
+                {
+                    if (c.ClosestThera != null)
+                    {
+                        status.Append("  Thera <- ");
+                        status.Append(c.ClosestTheraPath.ToSystemName);
+                        status.Append(" (");
+                        status.Append(c.ClosestTheraPath.TotalJumps);
+                        status.Append(") - Sig:");
+                        status.Append((c.ClosestThera.FromSystemId == c.ClosestTheraPath.ToSystemId) ? c.ClosestThera.FromSignature : c.ClosestThera.ToSignature );
+                    }
+
+                    if (c.ClosestTurnur != null)
+                    {
+                        status.Append("  Turnur <- ");
+                        status.Append(c.ClosestTurnurPath.ToSystemName);
+                        status.Append(" (");
+                        status.Append(c.ClosestTurnurPath.TotalJumps);
+                        status.Append(") - Sig:");
+                        status.Append((c.ClosestTurnur.FromSystemId == c.ClosestTurnurPath.ToSystemId) ? c.ClosestTurnur.FromSignature : c.ClosestTurnur.ToSignature);
+                    }
+                }
+            } else
+            {
+                status.Append("No active Character");
+            }
+
+            lblStatus.Text = status.ToString().Trim();
+        }
+
+        private void CheckEveScoutConnection(Character c)
+        {
+
+            if (c == null || c.LocationId == 0) return;
+
+            var ClosestThera = EveScoutProcessor.FindClosest(_universe, c.LocationId, "Thera");
+            var ClosestTurnur = EveScoutProcessor.FindClosest(_universe, c.LocationId, "Turnur");
+            PathInfo closePath;
+
+            if (ClosestThera != null)
+            {
+                closePath = _universe.FindAndCachePath(c.LocationId, (ClosestThera.FromSystemId == EveScoutManager.SYSTEMID_THERA) ? (int)ClosestThera.ToSystemId : (int)ClosestThera.FromSystemId);
+                if (closePath != null)
+                {
+                    Log.Information($"EveScount: Closest Thera {ClosestThera.ToSystemId}:{ClosestThera.FromSystemId} {closePath.TotalJumps} {closePath.ToSystemName}");
+                    c.ClosestThera = ClosestThera;
+                    c.ClosestTheraPath = closePath;
+                }
+                else
+                {
+                    c.ClosestThera = null;
+                    c.ClosestTheraPath = null;
+                }
+            }
+            if (ClosestTurnur != null)
+            {
+                closePath = _universe.FindAndCachePath(c.LocationId, (ClosestTurnur.FromSystemId == EveScoutManager.SYSTEMID_TURNUR) ? (int)ClosestTurnur.ToSystemId : (int)ClosestTurnur.FromSystemId);
+                if (closePath != null)
+                {
+                    Log.Information($"EveScount: Closest Turnur {ClosestTurnur.ToSystemId}:{ClosestTurnur.FromSystemId} {closePath.TotalJumps} {closePath.ToSystemName}");
+                    c.ClosestTurnur = ClosestTurnur;
+                    c.ClosestTurnurPath = closePath;
+                }
+                else
+                {
+                    c.ClosestTurnur = null;
+                    c.ClosestTurnurPath = null;
+                }
+            }
+        }
+        private void EveScout_ProcessNewData(object sender, EveScoutEventArgs e)
+        {
+            foreach(var c in CharacterList.Where(o => o.IsClientActive)) { 
+                CheckEveScoutConnection(c);
+            }
+        }
+
+        private void trayIconMenuShowHistoricAlert(object sender, EventArgs e)
+        {
+            AlertQueueItem alert = (AlertQueueItem)((MenuItem)sender).Tag;
+            var NewAlertWindow = new QuesadillaAlertPopup(alert, Configuration, LoadImageFromFile(Configuration.AlertPopupBackground), this);
+            NewAlertWindow.Show(this);
         }
     }
 }

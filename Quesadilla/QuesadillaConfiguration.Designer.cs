@@ -49,8 +49,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.trackPopupTime = new System.Windows.Forms.TrackBar();
             this.label4 = new System.Windows.Forms.Label();
-            this.lblOpacity = new System.Windows.Forms.Label();
-            this.lblPopupSeconds = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.radioAlertBottomCenter = new System.Windows.Forms.RadioButton();
             this.radioAlertTopCenter = new System.Windows.Forms.RadioButton();
@@ -77,12 +75,18 @@
             this.buttonPickZKillIskColour = new System.Windows.Forms.Button();
             this.buttonPickZKillBarColour = new System.Windows.Forms.Button();
             this.cbZkillShowBar = new System.Windows.Forms.CheckBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.trackDPSGraphLineSize = new System.Windows.Forms.TrackBar();
+            this.lblOpacity = new System.Windows.Forms.Label();
+            this.lblPopupSeconds = new System.Windows.Forms.Label();
+            this.lblDPSGraphLineSize = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.alertDemo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackOpacity)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackPopupTime)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackDPSGraphLineSize)).BeginInit();
             this.SuspendLayout();
             // 
             // cmbHomeSystem
@@ -90,29 +94,29 @@
             this.cmbHomeSystem.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.cmbHomeSystem.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cmbHomeSystem.FormattingEnabled = true;
-            this.cmbHomeSystem.Location = new System.Drawing.Point(1311, 569);
+            this.cmbHomeSystem.Location = new System.Drawing.Point(1165, 455);
             this.cmbHomeSystem.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cmbHomeSystem.Name = "cmbHomeSystem";
-            this.cmbHomeSystem.Size = new System.Drawing.Size(147, 28);
+            this.cmbHomeSystem.Size = new System.Drawing.Size(131, 24);
             this.cmbHomeSystem.TabIndex = 0;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(1197, 574);
+            this.label1.Location = new System.Drawing.Point(1064, 459);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(109, 20);
+            this.label1.Size = new System.Drawing.Size(92, 16);
             this.label1.TabIndex = 1;
             this.label1.Text = "Home System";
             // 
             // cbStayOnTop
             // 
             this.cbStayOnTop.AutoSize = true;
-            this.cbStayOnTop.Location = new System.Drawing.Point(843, 15);
+            this.cbStayOnTop.Location = new System.Drawing.Point(749, 12);
             this.cbStayOnTop.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cbStayOnTop.Name = "cbStayOnTop";
             this.cbStayOnTop.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.cbStayOnTop.Size = new System.Drawing.Size(116, 24);
+            this.cbStayOnTop.Size = new System.Drawing.Size(93, 20);
             this.cbStayOnTop.TabIndex = 2;
             this.cbStayOnTop.Text = "Stay on top";
             this.cbStayOnTop.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -122,10 +126,10 @@
             // 
             // buttonSave
             // 
-            this.buttonSave.Location = new System.Drawing.Point(1335, 872);
+            this.buttonSave.Location = new System.Drawing.Point(1187, 698);
             this.buttonSave.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonSave.Name = "buttonSave";
-            this.buttonSave.Size = new System.Drawing.Size(125, 55);
+            this.buttonSave.Size = new System.Drawing.Size(111, 44);
             this.buttonSave.TabIndex = 3;
             this.buttonSave.Text = "Save";
             this.buttonSave.UseVisualStyleBackColor = true;
@@ -133,10 +137,10 @@
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(1202, 872);
+            this.buttonCancel.Location = new System.Drawing.Point(1068, 698);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(125, 55);
+            this.buttonCancel.Size = new System.Drawing.Size(111, 44);
             this.buttonCancel.TabIndex = 4;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
@@ -151,10 +155,10 @@
             // pictureBox1
             // 
             this.pictureBox1.Image = global::Quesadilla.Properties.Resources.Quesadilla;
-            this.pictureBox1.Location = new System.Drawing.Point(1202, 608);
+            this.pictureBox1.Location = new System.Drawing.Point(1068, 486);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(258, 259);
+            this.pictureBox1.Size = new System.Drawing.Size(229, 207);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 5;
             this.pictureBox1.TabStop = false;
@@ -162,19 +166,19 @@
             // alertDemo
             // 
             this.alertDemo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.alertDemo.Location = new System.Drawing.Point(12, 15);
+            this.alertDemo.Location = new System.Drawing.Point(11, 12);
             this.alertDemo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.alertDemo.Name = "alertDemo";
-            this.alertDemo.Size = new System.Drawing.Size(556, 233);
+            this.alertDemo.Size = new System.Drawing.Size(494, 187);
             this.alertDemo.TabIndex = 6;
             this.alertDemo.TabStop = false;
             // 
             // buttonPickSystemColour
             // 
-            this.buttonPickSystemColour.Location = new System.Drawing.Point(575, 41);
+            this.buttonPickSystemColour.Location = new System.Drawing.Point(511, 33);
             this.buttonPickSystemColour.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonPickSystemColour.Name = "buttonPickSystemColour";
-            this.buttonPickSystemColour.Size = new System.Drawing.Size(188, 40);
+            this.buttonPickSystemColour.Size = new System.Drawing.Size(167, 32);
             this.buttonPickSystemColour.TabIndex = 8;
             this.buttonPickSystemColour.Text = "System name colour";
             this.buttonPickSystemColour.UseVisualStyleBackColor = true;
@@ -182,10 +186,10 @@
             // 
             // buttonPickContextColour
             // 
-            this.buttonPickContextColour.Location = new System.Drawing.Point(575, 88);
+            this.buttonPickContextColour.Location = new System.Drawing.Point(511, 70);
             this.buttonPickContextColour.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonPickContextColour.Name = "buttonPickContextColour";
-            this.buttonPickContextColour.Size = new System.Drawing.Size(188, 40);
+            this.buttonPickContextColour.Size = new System.Drawing.Size(167, 32);
             this.buttonPickContextColour.TabIndex = 9;
             this.buttonPickContextColour.Text = "Context Info Colour";
             this.buttonPickContextColour.UseVisualStyleBackColor = true;
@@ -193,10 +197,10 @@
             // 
             // buttonPickRegionColour
             // 
-            this.buttonPickRegionColour.Location = new System.Drawing.Point(775, 62);
+            this.buttonPickRegionColour.Location = new System.Drawing.Point(689, 50);
             this.buttonPickRegionColour.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonPickRegionColour.Name = "buttonPickRegionColour";
-            this.buttonPickRegionColour.Size = new System.Drawing.Size(188, 40);
+            this.buttonPickRegionColour.Size = new System.Drawing.Size(167, 32);
             this.buttonPickRegionColour.TabIndex = 10;
             this.buttonPickRegionColour.Text = "Region name colour";
             this.buttonPickRegionColour.UseVisualStyleBackColor = true;
@@ -204,10 +208,10 @@
             // 
             // buttonPickIntelLineColour
             // 
-            this.buttonPickIntelLineColour.Location = new System.Drawing.Point(775, 109);
+            this.buttonPickIntelLineColour.Location = new System.Drawing.Point(689, 87);
             this.buttonPickIntelLineColour.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonPickIntelLineColour.Name = "buttonPickIntelLineColour";
-            this.buttonPickIntelLineColour.Size = new System.Drawing.Size(188, 40);
+            this.buttonPickIntelLineColour.Size = new System.Drawing.Size(167, 32);
             this.buttonPickIntelLineColour.TabIndex = 11;
             this.buttonPickIntelLineColour.Text = "Intel Line Colour";
             this.buttonPickIntelLineColour.UseVisualStyleBackColor = true;
@@ -215,10 +219,10 @@
             // 
             // buttonPickAlertTextColour
             // 
-            this.buttonPickAlertTextColour.Location = new System.Drawing.Point(575, 208);
+            this.buttonPickAlertTextColour.Location = new System.Drawing.Point(511, 166);
             this.buttonPickAlertTextColour.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonPickAlertTextColour.Name = "buttonPickAlertTextColour";
-            this.buttonPickAlertTextColour.Size = new System.Drawing.Size(188, 40);
+            this.buttonPickAlertTextColour.Size = new System.Drawing.Size(167, 32);
             this.buttonPickAlertTextColour.TabIndex = 12;
             this.buttonPickAlertTextColour.Text = "Alert Text Colour";
             this.buttonPickAlertTextColour.UseVisualStyleBackColor = true;
@@ -227,9 +231,9 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(180, 262);
+            this.label2.Location = new System.Drawing.Point(160, 210);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(95, 20);
+            this.label2.Size = new System.Drawing.Size(80, 16);
             this.label2.TabIndex = 14;
             this.label2.Text = "Background";
             // 
@@ -238,21 +242,21 @@
             this.cmbBackground.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.cmbBackground.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.cmbBackground.FormattingEnabled = true;
-            this.cmbBackground.Location = new System.Drawing.Point(345, 259);
+            this.cmbBackground.Location = new System.Drawing.Point(307, 207);
             this.cmbBackground.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cmbBackground.Name = "cmbBackground";
-            this.cmbBackground.Size = new System.Drawing.Size(221, 28);
+            this.cmbBackground.Size = new System.Drawing.Size(197, 24);
             this.cmbBackground.TabIndex = 13;
             this.cmbBackground.SelectedIndexChanged += new System.EventHandler(this.cmbBackground_SelectedIndexChanged);
             // 
             // trackOpacity
             // 
             this.trackOpacity.LargeChange = 10;
-            this.trackOpacity.Location = new System.Drawing.Point(274, 302);
-            this.trackOpacity.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.trackOpacity.Location = new System.Drawing.Point(244, 242);
+            this.trackOpacity.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.trackOpacity.Maximum = 100;
             this.trackOpacity.Name = "trackOpacity";
-            this.trackOpacity.Size = new System.Drawing.Size(294, 69);
+            this.trackOpacity.Size = new System.Drawing.Size(261, 45);
             this.trackOpacity.TabIndex = 15;
             this.trackOpacity.TickFrequency = 10;
             this.trackOpacity.Scroll += new System.EventHandler(this.trackOpacity_Scroll);
@@ -260,9 +264,9 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(202, 308);
+            this.label3.Location = new System.Drawing.Point(180, 246);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(62, 20);
+            this.label3.Size = new System.Drawing.Size(53, 16);
             this.label3.TabIndex = 16;
             this.label3.Text = "Opacity";
             // 
@@ -270,41 +274,25 @@
             // 
             this.trackPopupTime.AccessibleDescription = "";
             this.trackPopupTime.LargeChange = 10;
-            this.trackPopupTime.Location = new System.Drawing.Point(274, 348);
-            this.trackPopupTime.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.trackPopupTime.Maximum = 100;
+            this.trackPopupTime.Location = new System.Drawing.Point(244, 278);
+            this.trackPopupTime.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.trackPopupTime.Maximum = 60;
+            this.trackPopupTime.Minimum = 1;
             this.trackPopupTime.Name = "trackPopupTime";
-            this.trackPopupTime.Size = new System.Drawing.Size(294, 69);
+            this.trackPopupTime.Size = new System.Drawing.Size(261, 45);
             this.trackPopupTime.TabIndex = 17;
             this.trackPopupTime.TickFrequency = 10;
+            this.trackPopupTime.Value = 1;
             this.trackPopupTime.Scroll += new System.EventHandler(this.trackPopupTime_Scroll);
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(177, 348);
+            this.label4.Location = new System.Drawing.Point(157, 278);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(89, 20);
+            this.label4.Size = new System.Drawing.Size(75, 16);
             this.label4.TabIndex = 18;
             this.label4.Text = "Popup time";
-            // 
-            // lblOpacity
-            // 
-            this.lblOpacity.AutoSize = true;
-            this.lblOpacity.Location = new System.Drawing.Point(572, 308);
-            this.lblOpacity.Name = "lblOpacity";
-            this.lblOpacity.Size = new System.Drawing.Size(62, 20);
-            this.lblOpacity.TabIndex = 19;
-            this.lblOpacity.Text = "Opacity";
-            // 
-            // lblPopupSeconds
-            // 
-            this.lblPopupSeconds.AutoSize = true;
-            this.lblPopupSeconds.Location = new System.Drawing.Point(572, 352);
-            this.lblPopupSeconds.Name = "lblPopupSeconds";
-            this.lblPopupSeconds.Size = new System.Drawing.Size(62, 20);
-            this.lblPopupSeconds.TabIndex = 20;
-            this.lblPopupSeconds.Text = "Opacity";
             // 
             // groupBox1
             // 
@@ -315,11 +303,11 @@
             this.groupBox1.Controls.Add(this.radioAlertBottomLeft);
             this.groupBox1.Controls.Add(this.radioAlertTopRight);
             this.groupBox1.Controls.Add(this.radioAlertTopLeft);
-            this.groupBox1.Location = new System.Drawing.Point(15, 259);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox1.Location = new System.Drawing.Point(13, 207);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Size = new System.Drawing.Size(145, 121);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Size = new System.Drawing.Size(129, 97);
             this.groupBox1.TabIndex = 26;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Popup Location";
@@ -327,10 +315,10 @@
             // radioAlertBottomCenter
             // 
             this.radioAlertBottomCenter.AutoSize = true;
-            this.radioAlertBottomCenter.Location = new System.Drawing.Point(54, 89);
-            this.radioAlertBottomCenter.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioAlertBottomCenter.Location = new System.Drawing.Point(48, 71);
+            this.radioAlertBottomCenter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioAlertBottomCenter.Name = "radioAlertBottomCenter";
-            this.radioAlertBottomCenter.Size = new System.Drawing.Size(21, 20);
+            this.radioAlertBottomCenter.Size = new System.Drawing.Size(14, 13);
             this.radioAlertBottomCenter.TabIndex = 32;
             this.radioAlertBottomCenter.TabStop = true;
             this.radioAlertBottomCenter.UseVisualStyleBackColor = true;
@@ -339,10 +327,10 @@
             // radioAlertTopCenter
             // 
             this.radioAlertTopCenter.AutoSize = true;
-            this.radioAlertTopCenter.Location = new System.Drawing.Point(54, 32);
-            this.radioAlertTopCenter.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioAlertTopCenter.Location = new System.Drawing.Point(48, 26);
+            this.radioAlertTopCenter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioAlertTopCenter.Name = "radioAlertTopCenter";
-            this.radioAlertTopCenter.Size = new System.Drawing.Size(21, 20);
+            this.radioAlertTopCenter.Size = new System.Drawing.Size(14, 13);
             this.radioAlertTopCenter.TabIndex = 31;
             this.radioAlertTopCenter.TabStop = true;
             this.radioAlertTopCenter.UseVisualStyleBackColor = true;
@@ -351,10 +339,10 @@
             // radioAlertCenter
             // 
             this.radioAlertCenter.AutoSize = true;
-            this.radioAlertCenter.Location = new System.Drawing.Point(54, 61);
-            this.radioAlertCenter.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioAlertCenter.Location = new System.Drawing.Point(48, 49);
+            this.radioAlertCenter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioAlertCenter.Name = "radioAlertCenter";
-            this.radioAlertCenter.Size = new System.Drawing.Size(21, 20);
+            this.radioAlertCenter.Size = new System.Drawing.Size(14, 13);
             this.radioAlertCenter.TabIndex = 30;
             this.radioAlertCenter.TabStop = true;
             this.radioAlertCenter.UseVisualStyleBackColor = true;
@@ -363,11 +351,11 @@
             // radioAlertBottomRight
             // 
             this.radioAlertBottomRight.AutoSize = true;
-            this.radioAlertBottomRight.Location = new System.Drawing.Point(96, 89);
-            this.radioAlertBottomRight.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioAlertBottomRight.Location = new System.Drawing.Point(85, 71);
+            this.radioAlertBottomRight.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioAlertBottomRight.Name = "radioAlertBottomRight";
             this.radioAlertBottomRight.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radioAlertBottomRight.Size = new System.Drawing.Size(21, 20);
+            this.radioAlertBottomRight.Size = new System.Drawing.Size(14, 13);
             this.radioAlertBottomRight.TabIndex = 29;
             this.radioAlertBottomRight.TabStop = true;
             this.radioAlertBottomRight.UseVisualStyleBackColor = true;
@@ -376,10 +364,10 @@
             // radioAlertBottomLeft
             // 
             this.radioAlertBottomLeft.AutoSize = true;
-            this.radioAlertBottomLeft.Location = new System.Drawing.Point(9, 89);
-            this.radioAlertBottomLeft.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioAlertBottomLeft.Location = new System.Drawing.Point(8, 71);
+            this.radioAlertBottomLeft.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioAlertBottomLeft.Name = "radioAlertBottomLeft";
-            this.radioAlertBottomLeft.Size = new System.Drawing.Size(21, 20);
+            this.radioAlertBottomLeft.Size = new System.Drawing.Size(14, 13);
             this.radioAlertBottomLeft.TabIndex = 28;
             this.radioAlertBottomLeft.TabStop = true;
             this.radioAlertBottomLeft.UseVisualStyleBackColor = true;
@@ -388,11 +376,11 @@
             // radioAlertTopRight
             // 
             this.radioAlertTopRight.AutoSize = true;
-            this.radioAlertTopRight.Location = new System.Drawing.Point(96, 32);
-            this.radioAlertTopRight.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioAlertTopRight.Location = new System.Drawing.Point(85, 26);
+            this.radioAlertTopRight.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioAlertTopRight.Name = "radioAlertTopRight";
             this.radioAlertTopRight.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radioAlertTopRight.Size = new System.Drawing.Size(21, 20);
+            this.radioAlertTopRight.Size = new System.Drawing.Size(14, 13);
             this.radioAlertTopRight.TabIndex = 27;
             this.radioAlertTopRight.TabStop = true;
             this.radioAlertTopRight.UseVisualStyleBackColor = true;
@@ -401,10 +389,10 @@
             // radioAlertTopLeft
             // 
             this.radioAlertTopLeft.AutoSize = true;
-            this.radioAlertTopLeft.Location = new System.Drawing.Point(9, 32);
-            this.radioAlertTopLeft.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioAlertTopLeft.Location = new System.Drawing.Point(8, 26);
+            this.radioAlertTopLeft.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioAlertTopLeft.Name = "radioAlertTopLeft";
-            this.radioAlertTopLeft.Size = new System.Drawing.Size(21, 20);
+            this.radioAlertTopLeft.Size = new System.Drawing.Size(14, 13);
             this.radioAlertTopLeft.TabIndex = 26;
             this.radioAlertTopLeft.TabStop = true;
             this.radioAlertTopLeft.UseVisualStyleBackColor = true;
@@ -413,11 +401,11 @@
             // cbDPSStayOnTop
             // 
             this.cbDPSStayOnTop.AutoSize = true;
-            this.cbDPSStayOnTop.Location = new System.Drawing.Point(12, 391);
+            this.cbDPSStayOnTop.Location = new System.Drawing.Point(11, 313);
             this.cbDPSStayOnTop.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cbDPSStayOnTop.Name = "cbDPSStayOnTop";
             this.cbDPSStayOnTop.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.cbDPSStayOnTop.Size = new System.Drawing.Size(153, 24);
+            this.cbDPSStayOnTop.Size = new System.Drawing.Size(124, 20);
             this.cbDPSStayOnTop.TabIndex = 27;
             this.cbDPSStayOnTop.Text = "DPS Stay on top";
             this.cbDPSStayOnTop.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -428,11 +416,11 @@
             // cbDPSTransparent
             // 
             this.cbDPSTransparent.AutoSize = true;
-            this.cbDPSTransparent.Location = new System.Drawing.Point(6, 424);
+            this.cbDPSTransparent.Location = new System.Drawing.Point(5, 339);
             this.cbDPSTransparent.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cbDPSTransparent.Name = "cbDPSTransparent";
             this.cbDPSTransparent.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.cbDPSTransparent.Size = new System.Drawing.Size(158, 24);
+            this.cbDPSTransparent.Size = new System.Drawing.Size(130, 20);
             this.cbDPSTransparent.TabIndex = 28;
             this.cbDPSTransparent.Text = "DPS Transparent";
             this.cbDPSTransparent.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -449,11 +437,11 @@
             this.groupBox2.Controls.Add(this.radioDPSBottomLeft);
             this.groupBox2.Controls.Add(this.radioDPSTopRight);
             this.groupBox2.Controls.Add(this.radioDPSTopLeft);
-            this.groupBox2.Location = new System.Drawing.Point(12, 519);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox2.Location = new System.Drawing.Point(11, 415);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox2.Size = new System.Drawing.Size(147, 121);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Size = new System.Drawing.Size(131, 97);
             this.groupBox2.TabIndex = 29;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "DPS Location";
@@ -461,10 +449,10 @@
             // radioDPSBottomCenter
             // 
             this.radioDPSBottomCenter.AutoSize = true;
-            this.radioDPSBottomCenter.Location = new System.Drawing.Point(54, 89);
-            this.radioDPSBottomCenter.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioDPSBottomCenter.Location = new System.Drawing.Point(48, 71);
+            this.radioDPSBottomCenter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioDPSBottomCenter.Name = "radioDPSBottomCenter";
-            this.radioDPSBottomCenter.Size = new System.Drawing.Size(21, 20);
+            this.radioDPSBottomCenter.Size = new System.Drawing.Size(14, 13);
             this.radioDPSBottomCenter.TabIndex = 34;
             this.radioDPSBottomCenter.TabStop = true;
             this.radioDPSBottomCenter.UseVisualStyleBackColor = true;
@@ -472,10 +460,10 @@
             // radioDPSTopCenter
             // 
             this.radioDPSTopCenter.AutoSize = true;
-            this.radioDPSTopCenter.Location = new System.Drawing.Point(54, 32);
-            this.radioDPSTopCenter.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioDPSTopCenter.Location = new System.Drawing.Point(48, 26);
+            this.radioDPSTopCenter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioDPSTopCenter.Name = "radioDPSTopCenter";
-            this.radioDPSTopCenter.Size = new System.Drawing.Size(21, 20);
+            this.radioDPSTopCenter.Size = new System.Drawing.Size(14, 13);
             this.radioDPSTopCenter.TabIndex = 33;
             this.radioDPSTopCenter.TabStop = true;
             this.radioDPSTopCenter.UseVisualStyleBackColor = true;
@@ -483,10 +471,10 @@
             // radioDPSCenter
             // 
             this.radioDPSCenter.AutoSize = true;
-            this.radioDPSCenter.Location = new System.Drawing.Point(54, 64);
-            this.radioDPSCenter.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioDPSCenter.Location = new System.Drawing.Point(48, 51);
+            this.radioDPSCenter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioDPSCenter.Name = "radioDPSCenter";
-            this.radioDPSCenter.Size = new System.Drawing.Size(21, 20);
+            this.radioDPSCenter.Size = new System.Drawing.Size(14, 13);
             this.radioDPSCenter.TabIndex = 30;
             this.radioDPSCenter.TabStop = true;
             this.radioDPSCenter.UseVisualStyleBackColor = true;
@@ -495,11 +483,11 @@
             // radioDPSBottomRight
             // 
             this.radioDPSBottomRight.AutoSize = true;
-            this.radioDPSBottomRight.Location = new System.Drawing.Point(96, 89);
-            this.radioDPSBottomRight.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioDPSBottomRight.Location = new System.Drawing.Point(85, 71);
+            this.radioDPSBottomRight.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioDPSBottomRight.Name = "radioDPSBottomRight";
             this.radioDPSBottomRight.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radioDPSBottomRight.Size = new System.Drawing.Size(21, 20);
+            this.radioDPSBottomRight.Size = new System.Drawing.Size(14, 13);
             this.radioDPSBottomRight.TabIndex = 29;
             this.radioDPSBottomRight.TabStop = true;
             this.radioDPSBottomRight.UseVisualStyleBackColor = true;
@@ -508,10 +496,10 @@
             // radioDPSBottomLeft
             // 
             this.radioDPSBottomLeft.AutoSize = true;
-            this.radioDPSBottomLeft.Location = new System.Drawing.Point(9, 89);
-            this.radioDPSBottomLeft.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioDPSBottomLeft.Location = new System.Drawing.Point(8, 71);
+            this.radioDPSBottomLeft.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioDPSBottomLeft.Name = "radioDPSBottomLeft";
-            this.radioDPSBottomLeft.Size = new System.Drawing.Size(21, 20);
+            this.radioDPSBottomLeft.Size = new System.Drawing.Size(14, 13);
             this.radioDPSBottomLeft.TabIndex = 28;
             this.radioDPSBottomLeft.TabStop = true;
             this.radioDPSBottomLeft.UseVisualStyleBackColor = true;
@@ -520,11 +508,11 @@
             // radioDPSTopRight
             // 
             this.radioDPSTopRight.AutoSize = true;
-            this.radioDPSTopRight.Location = new System.Drawing.Point(96, 32);
-            this.radioDPSTopRight.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioDPSTopRight.Location = new System.Drawing.Point(85, 26);
+            this.radioDPSTopRight.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioDPSTopRight.Name = "radioDPSTopRight";
             this.radioDPSTopRight.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.radioDPSTopRight.Size = new System.Drawing.Size(21, 20);
+            this.radioDPSTopRight.Size = new System.Drawing.Size(14, 13);
             this.radioDPSTopRight.TabIndex = 27;
             this.radioDPSTopRight.TabStop = true;
             this.radioDPSTopRight.UseVisualStyleBackColor = true;
@@ -533,10 +521,10 @@
             // radioDPSTopLeft
             // 
             this.radioDPSTopLeft.AutoSize = true;
-            this.radioDPSTopLeft.Location = new System.Drawing.Point(9, 32);
-            this.radioDPSTopLeft.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioDPSTopLeft.Location = new System.Drawing.Point(8, 26);
+            this.radioDPSTopLeft.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.radioDPSTopLeft.Name = "radioDPSTopLeft";
-            this.radioDPSTopLeft.Size = new System.Drawing.Size(21, 20);
+            this.radioDPSTopLeft.Size = new System.Drawing.Size(14, 13);
             this.radioDPSTopLeft.TabIndex = 26;
             this.radioDPSTopLeft.TabStop = true;
             this.radioDPSTopLeft.UseVisualStyleBackColor = true;
@@ -545,11 +533,11 @@
             // cbDPSShowWindow
             // 
             this.cbDPSShowWindow.AutoSize = true;
-            this.cbDPSShowWindow.Location = new System.Drawing.Point(51, 456);
+            this.cbDPSShowWindow.Location = new System.Drawing.Point(45, 365);
             this.cbDPSShowWindow.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cbDPSShowWindow.Name = "cbDPSShowWindow";
             this.cbDPSShowWindow.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.cbDPSShowWindow.Size = new System.Drawing.Size(112, 24);
+            this.cbDPSShowWindow.Size = new System.Drawing.Size(90, 20);
             this.cbDPSShowWindow.TabIndex = 30;
             this.cbDPSShowWindow.Text = "Show DPS";
             this.cbDPSShowWindow.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -560,11 +548,11 @@
             // cbDPSAllToons
             // 
             this.cbDPSAllToons.AutoSize = true;
-            this.cbDPSAllToons.Location = new System.Drawing.Point(27, 486);
+            this.cbDPSAllToons.Location = new System.Drawing.Point(24, 389);
             this.cbDPSAllToons.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cbDPSAllToons.Name = "cbDPSAllToons";
             this.cbDPSAllToons.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.cbDPSAllToons.Size = new System.Drawing.Size(135, 24);
+            this.cbDPSAllToons.Size = new System.Drawing.Size(111, 20);
             this.cbDPSAllToons.TabIndex = 31;
             this.cbDPSAllToons.Text = "Combine DPS";
             this.cbDPSAllToons.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -575,11 +563,11 @@
             // cbAlertTransparent
             // 
             this.cbAlertTransparent.AutoSize = true;
-            this.cbAlertTransparent.Location = new System.Drawing.Point(605, 15);
+            this.cbAlertTransparent.Location = new System.Drawing.Point(538, 12);
             this.cbAlertTransparent.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cbAlertTransparent.Name = "cbAlertTransparent";
             this.cbAlertTransparent.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.cbAlertTransparent.Size = new System.Drawing.Size(158, 24);
+            this.cbAlertTransparent.Size = new System.Drawing.Size(129, 20);
             this.cbAlertTransparent.TabIndex = 32;
             this.cbAlertTransparent.Text = "Alert Transparent";
             this.cbAlertTransparent.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -590,11 +578,11 @@
             // cbShowZKillAlerts
             // 
             this.cbShowZKillAlerts.AutoSize = true;
-            this.cbShowZKillAlerts.Location = new System.Drawing.Point(1020, 13);
+            this.cbShowZKillAlerts.Location = new System.Drawing.Point(907, 10);
             this.cbShowZKillAlerts.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cbShowZKillAlerts.Name = "cbShowZKillAlerts";
             this.cbShowZKillAlerts.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.cbShowZKillAlerts.Size = new System.Drawing.Size(153, 24);
+            this.cbShowZKillAlerts.Size = new System.Drawing.Size(124, 20);
             this.cbShowZKillAlerts.TabIndex = 33;
             this.cbShowZKillAlerts.Text = "Show ZKill Alerts";
             this.cbShowZKillAlerts.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -604,10 +592,10 @@
             // 
             // buttonPickZKillCircleColour
             // 
-            this.buttonPickZKillCircleColour.Location = new System.Drawing.Point(985, 41);
+            this.buttonPickZKillCircleColour.Location = new System.Drawing.Point(876, 33);
             this.buttonPickZKillCircleColour.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonPickZKillCircleColour.Name = "buttonPickZKillCircleColour";
-            this.buttonPickZKillCircleColour.Size = new System.Drawing.Size(188, 40);
+            this.buttonPickZKillCircleColour.Size = new System.Drawing.Size(167, 32);
             this.buttonPickZKillCircleColour.TabIndex = 34;
             this.buttonPickZKillCircleColour.Text = "ZKill Circle Colour";
             this.buttonPickZKillCircleColour.UseVisualStyleBackColor = true;
@@ -615,10 +603,10 @@
             // 
             // buttonPickZKillIskColour
             // 
-            this.buttonPickZKillIskColour.Location = new System.Drawing.Point(985, 85);
+            this.buttonPickZKillIskColour.Location = new System.Drawing.Point(876, 68);
             this.buttonPickZKillIskColour.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonPickZKillIskColour.Name = "buttonPickZKillIskColour";
-            this.buttonPickZKillIskColour.Size = new System.Drawing.Size(188, 40);
+            this.buttonPickZKillIskColour.Size = new System.Drawing.Size(167, 32);
             this.buttonPickZKillIskColour.TabIndex = 35;
             this.buttonPickZKillIskColour.Text = "ZKill ISK Colour";
             this.buttonPickZKillIskColour.UseVisualStyleBackColor = true;
@@ -626,10 +614,10 @@
             // 
             // buttonPickZKillBarColour
             // 
-            this.buttonPickZKillBarColour.Location = new System.Drawing.Point(985, 154);
+            this.buttonPickZKillBarColour.Location = new System.Drawing.Point(876, 123);
             this.buttonPickZKillBarColour.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonPickZKillBarColour.Name = "buttonPickZKillBarColour";
-            this.buttonPickZKillBarColour.Size = new System.Drawing.Size(188, 40);
+            this.buttonPickZKillBarColour.Size = new System.Drawing.Size(167, 32);
             this.buttonPickZKillBarColour.TabIndex = 36;
             this.buttonPickZKillBarColour.Text = "ZKill bar Colour";
             this.buttonPickZKillBarColour.UseVisualStyleBackColor = true;
@@ -638,11 +626,11 @@
             // cbZkillShowBar
             // 
             this.cbZkillShowBar.AutoSize = true;
-            this.cbZkillShowBar.Location = new System.Drawing.Point(1006, 126);
+            this.cbZkillShowBar.Location = new System.Drawing.Point(894, 101);
             this.cbZkillShowBar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cbZkillShowBar.Name = "cbZkillShowBar";
             this.cbZkillShowBar.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.cbZkillShowBar.Size = new System.Drawing.Size(167, 24);
+            this.cbZkillShowBar.Size = new System.Drawing.Size(134, 20);
             this.cbZkillShowBar.TabIndex = 37;
             this.cbZkillShowBar.Text = "Show ZKill ISK Bar";
             this.cbZkillShowBar.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -650,11 +638,67 @@
             this.cbZkillShowBar.UseVisualStyleBackColor = true;
             this.cbZkillShowBar.CheckedChanged += new System.EventHandler(this.cbZkillShowBar_CheckedChanged);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(144, 314);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(100, 16);
+            this.label5.TabIndex = 39;
+            this.label5.Text = "DPS Line Width";
+            // 
+            // trackDPSGraphLineSize
+            // 
+            this.trackDPSGraphLineSize.AccessibleDescription = "";
+            this.trackDPSGraphLineSize.LargeChange = 10;
+            this.trackDPSGraphLineSize.Location = new System.Drawing.Point(244, 314);
+            this.trackDPSGraphLineSize.Margin = new System.Windows.Forms.Padding(4);
+            this.trackDPSGraphLineSize.Maximum = 12;
+            this.trackDPSGraphLineSize.Minimum = 1;
+            this.trackDPSGraphLineSize.Name = "trackDPSGraphLineSize";
+            this.trackDPSGraphLineSize.Size = new System.Drawing.Size(261, 45);
+            this.trackDPSGraphLineSize.TabIndex = 38;
+            this.trackDPSGraphLineSize.TickFrequency = 10;
+            this.trackDPSGraphLineSize.Value = 1;
+            this.trackDPSGraphLineSize.Scroll += new System.EventHandler(this.trackDPSGraphLineSize_Scroll);
+            // 
+            // lblOpacity
+            // 
+            this.lblOpacity.AutoSize = true;
+            this.lblOpacity.Location = new System.Drawing.Point(508, 246);
+            this.lblOpacity.Name = "lblOpacity";
+            this.lblOpacity.Size = new System.Drawing.Size(28, 16);
+            this.lblOpacity.TabIndex = 40;
+            this.lblOpacity.Text = "999";
+            // 
+            // lblPopupSeconds
+            // 
+            this.lblPopupSeconds.AutoSize = true;
+            this.lblPopupSeconds.Location = new System.Drawing.Point(508, 276);
+            this.lblPopupSeconds.Name = "lblPopupSeconds";
+            this.lblPopupSeconds.Size = new System.Drawing.Size(28, 16);
+            this.lblPopupSeconds.TabIndex = 41;
+            this.lblPopupSeconds.Text = "999";
+            // 
+            // lblDPSGraphLineSize
+            // 
+            this.lblDPSGraphLineSize.AutoSize = true;
+            this.lblDPSGraphLineSize.Location = new System.Drawing.Point(508, 314);
+            this.lblDPSGraphLineSize.Name = "lblDPSGraphLineSize";
+            this.lblDPSGraphLineSize.Size = new System.Drawing.Size(28, 16);
+            this.lblDPSGraphLineSize.TabIndex = 42;
+            this.lblDPSGraphLineSize.Text = "999";
+            // 
             // QuesadillaConfiguration
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1476, 939);
+            this.ClientSize = new System.Drawing.Size(1312, 751);
+            this.Controls.Add(this.lblDPSGraphLineSize);
+            this.Controls.Add(this.lblPopupSeconds);
+            this.Controls.Add(this.lblOpacity);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.trackDPSGraphLineSize);
             this.Controls.Add(this.cbZkillShowBar);
             this.Controls.Add(this.buttonPickZKillBarColour);
             this.Controls.Add(this.buttonPickZKillIskColour);
@@ -667,8 +711,6 @@
             this.Controls.Add(this.cbDPSTransparent);
             this.Controls.Add(this.cbDPSStayOnTop);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.lblPopupSeconds);
-            this.Controls.Add(this.lblOpacity);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.trackPopupTime);
             this.Controls.Add(this.label3);
@@ -700,6 +742,7 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackDPSGraphLineSize)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -727,8 +770,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TrackBar trackPopupTime;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label lblOpacity;
-        private System.Windows.Forms.Label lblPopupSeconds;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton radioAlertCenter;
         private System.Windows.Forms.RadioButton radioAlertBottomRight;
@@ -755,5 +796,10 @@
         private System.Windows.Forms.Button buttonPickZKillIskColour;
         private System.Windows.Forms.Button buttonPickZKillBarColour;
         private System.Windows.Forms.CheckBox cbZkillShowBar;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TrackBar trackDPSGraphLineSize;
+        private System.Windows.Forms.Label lblOpacity;
+        private System.Windows.Forms.Label lblPopupSeconds;
+        private System.Windows.Forms.Label lblDPSGraphLineSize;
     }
 }

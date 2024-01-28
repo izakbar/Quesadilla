@@ -168,11 +168,7 @@ namespace Quesadilla
             int maxPoints = _main.Configuration.GraphCombatMaxPoints;
             int minSpanSize = _main.Configuration.GraphCombatMinPointSeconds;
 
-            int LineSize = 1;
-            if ( _main.Configuration.DPSGraphTransparent )
-            {
-                LineSize = 3;
-            }
+            int LineSize = _main.Configuration.DPSGraphLineSize;
 
             // default to total dps
             chartDPS.Series.Clear();
@@ -430,9 +426,6 @@ namespace Quesadilla
                         dReceived += _combatGraphData[i].DamageReceived;
                         dGiven += _combatGraphData[i].DamageGiven;
 
-                        maxDReceived += _combatGraphData[i].DamageReceived;
-                        maxDGiven += _combatGraphData[i].DamageGiven;
-
                         nReceived += _combatGraphData[i].NeutsReceived;
                         nGiven += _combatGraphData[i].NeutsGiven;
 
@@ -448,11 +441,21 @@ namespace Quesadilla
                         cReceived += _combatGraphData[i].CapReceived;
                         cGiven += _combatGraphData[i].CapGiven;
                     }
-                }
+                } 
                 if (seconds > 0)
                 {
-                    if (dReceived > 0 ) toon1Received.Points.AddXY(seconds, dReceived / (span * 2 + 1));
-                    if (dGiven > 0) toon1Given.Points.AddXY(seconds, dGiven / (span * 2 + 1));
+                    if (dReceived > 0)
+                    {
+                        var dpsReceived = dReceived / (span * 2 + 1);
+                        toon1Received.Points.AddXY(seconds, dpsReceived);
+                        maxDReceived = Math.Max(dpsReceived, maxDReceived);
+                    }
+                    if (dGiven > 0)
+                    {
+                        var dpsGiven = dGiven / (span * 2 + 1);
+                        toon1Given.Points.AddXY(seconds, dpsGiven);
+                        maxDGiven = Math.Max(dpsGiven, maxDGiven);
+                    }
 
                     if (nReceived > 0) toon1NeutReceived.Points.AddXY(seconds, nReceived/ (span * 2 + 1) );
                     if (nGiven > 0) toon1NeutGiven.Points.AddXY(seconds, nGiven / (span * 2 + 1) );
@@ -472,6 +475,7 @@ namespace Quesadilla
                 }
             }
 
+            bool secondY = false;
             foreach ( var s in chartDPS.Series)
             {
                 if ( s.Points.Count == 0 )
@@ -480,16 +484,32 @@ namespace Quesadilla
                 } else
                 {
                     s.Enabled = true;
+                    if ( s.YAxisType == AxisType.Secondary )
+                    {
+                        secondY = true;
+                    }
                 }
             }
 
+
+            // sort out YLabels 
             if ( maxDGiven > 1000 || maxDReceived > 1000 )
             {
-                chartDPS.ChartAreas[0].Axes[1].LabelStyle.Format = "{0:0,#}K";
+                chartDPS.ChartAreas[0].Axes[1].LabelStyle.Format = "{0:0,.#}K";  
             } else
             {
                 chartDPS.ChartAreas[0].Axes[1].LabelStyle.Format = "";
             }
+
+            if (secondY)
+            {
+                chartDPS.ChartAreas[0].Axes[3].Enabled = AxisEnabled.True;
+            } 
+            else
+            {
+                chartDPS.ChartAreas[0].Axes[3].Enabled = AxisEnabled.False;
+            }
+
 
             // dump to csv
             if (_main.Configuration.DPSSaveCSV)

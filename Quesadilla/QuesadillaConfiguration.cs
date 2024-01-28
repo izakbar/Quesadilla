@@ -77,10 +77,12 @@ namespace Quesadilla
             ShowAlertBitmap();
             trackOpacity.Value = _configuration.AlertPopupOpacity;
             trackPopupTime.Value = _configuration.AlertPopupSeconds;
+            trackDPSGraphLineSize.Value = _configuration.DPSGraphLineSize;
 
             SetBackground(cmbBackground, _configuration.AlertPopupBackground);
             lblOpacity.Text = _configuration.AlertPopupOpacity.ToString();
             lblPopupSeconds.Text = _configuration.AlertPopupSeconds.ToString();
+            lblDPSGraphLineSize.Text = _configuration.DPSGraphLineSize.ToString();
 
             switch (_configuration.AlertPopupLocation)
             {
@@ -361,6 +363,12 @@ namespace Quesadilla
         private void cbZkillShowBar_CheckedChanged(object sender, EventArgs e)
         {
             _configuration.ZKillShowBar = cbZkillShowBar.Checked;
+        }
+
+        private void trackDPSGraphLineSize_Scroll(object sender, EventArgs e)
+        {
+            _configuration.DPSGraphLineSize = ((TrackBar)sender).Value;
+            lblDPSGraphLineSize.Text = ((TrackBar)sender).Value.ToString();
         }
     }
 }

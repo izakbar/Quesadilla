@@ -25,6 +25,8 @@ namespace Quesadilla.Classes.EveScout
         private bool FeedPaused = false;
         private System.Timers.Timer t;
 
+        public event EventHandler<EveScoutEventArgs> EveScoutEventHandler;
+
         public const int SYSTEMID_THERA = 31000005;
         public const int SYSTEMID_TURNUR = 30002086;
 
@@ -80,6 +82,10 @@ namespace Quesadilla.Classes.EveScout
         {
             GetEveScoutData("Thera");
             GetEveScoutData("Turnur");
+            if (EveScoutEventHandler != null)
+            {
+                EveScoutEventHandler((object)this, new EveScoutEventArgs());
+            }
         }
 
         private void GetEveScoutData(string whConnector)
@@ -120,12 +126,15 @@ namespace Quesadilla.Classes.EveScout
             {
                 var whData = JsonConvert.DeserializeObject<List<EveScoutWH>>(strContent);
 
-                // clear down previous entries
-                Signatures.RemoveAll(o => o.Connector == whConnector);
-                foreach(var w in whData)
+                lock (Signatures)
                 {
-                    w.Connector = whConnector;
-                    Signatures.Add(w);
+                    // clear down previous entries and readd new
+                    Signatures.RemoveAll(o => o.Connector == whConnector);
+                    foreach (var w in whData)
+                    {
+                        w.Connector = whConnector;
+                        Signatures.Add(w);
+                    }
                 }
             }
             catch (Exception ex)

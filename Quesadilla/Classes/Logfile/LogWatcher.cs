@@ -208,7 +208,7 @@ namespace Quesadilla.Classes
                                         tempLogEntry.EntryType = this._logFileType == LogFileType.ChatIntel ? LogEntryType.UnknownChatLogEvent : LogEntryType.UnknownGameLogEvent;
                                     }
 
-                                    if (this._logFileType == LogFileType.Game )
+                                    if (this._logFileType == LogFileType.Game)
                                     {
                                         if (this._gameLogCombatRegex.IsMatch(input))
                                         {
@@ -223,17 +223,20 @@ namespace Quesadilla.Classes
                                             }
                                             this._interestingFiles[interestingFile.Key].TimeOutTriggered = false;
                                             this._interestingFiles[interestingFile.Key].LastCombat = this._interestingFiles[interestingFile.Key].LastUpdate;
-                                        } else if (this._gameLogISKRegex.IsMatch(input)) 
+                                        }
+                                        else if (this._gameLogISKRegex.IsMatch(input))
                                         {
                                             this.OnISK(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
                                         }
                                     }
-
-
-                                    if (this._previousLogEntries.All<LogEntry>((Func<LogEntry, bool>)(logEntry => logEntry.LineContent != tempLogEntry.LineContent)))
+                                    else
                                     {
-                                        this._previousLogEntries.Add(tempLogEntry);
-                                        logEntryList.Add(tempLogEntry);
+                                        // don't treat as intel if seen in gamelog !
+                                        if (this._previousLogEntries.All<LogEntry>((Func<LogEntry, bool>)(logEntry => logEntry.LineContent != tempLogEntry.LineContent)))
+                                        {
+                                            this._previousLogEntries.Add(tempLogEntry);
+                                            logEntryList.Add(tempLogEntry);
+                                        }
                                     }
                                 }
                             }

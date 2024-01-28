@@ -56,7 +56,6 @@
             chartArea1.AxisY2.IsLabelAutoFit = false;
             chartArea1.AxisY2.LabelStyle.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             chartArea1.AxisY2.LabelStyle.ForeColor = System.Drawing.Color.Tomato;
-            chartArea1.AxisY2.LabelStyle.Format = "{0:0,}K";
             chartArea1.AxisY2.MajorGrid.Enabled = false;
             chartArea1.AxisY2.MajorGrid.LineColor = System.Drawing.Color.DimGray;
             chartArea1.AxisY2.MajorGrid.LineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Dot;
@@ -74,7 +73,6 @@
             legend1.Name = "Legend1";
             this.chartDPS.Legends.Add(legend1);
             this.chartDPS.Location = new System.Drawing.Point(0, 0);
-            this.chartDPS.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.chartDPS.Name = "chartDPS";
             series1.ChartArea = "ChartArea1";
             series1.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Bold);
@@ -82,19 +80,18 @@
             series1.Legend = "Legend1";
             series1.Name = "Series1";
             this.chartDPS.Series.Add(series1);
-            this.chartDPS.Size = new System.Drawing.Size(838, 257);
+            this.chartDPS.Size = new System.Drawing.Size(559, 167);
             this.chartDPS.TabIndex = 8;
             this.chartDPS.Text = "DPS";
             this.chartDPS.Click += new System.EventHandler(this.chartDPS_Click);
             // 
             // QuesadillaDPSGraph
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(838, 257);
+            this.ClientSize = new System.Drawing.Size(559, 167);
             this.Controls.Add(this.chartDPS);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "QuesadillaDPSGraph";
             this.Text = "Queadilla DPS";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.QuesadillaDPSGraph_FormClosed);
