@@ -78,11 +78,13 @@ namespace Quesadilla
             trackOpacity.Value = _configuration.AlertPopupOpacity;
             trackPopupTime.Value = _configuration.AlertPopupSeconds;
             trackDPSGraphLineSize.Value = _configuration.DPSGraphLineSize;
+            trackShowLastUnexpiredAlerts.Value = _configuration.ShowLastUnexpiredAlerts;
 
             SetBackground(cmbBackground, _configuration.AlertPopupBackground);
             lblOpacity.Text = _configuration.AlertPopupOpacity.ToString();
             lblPopupSeconds.Text = _configuration.AlertPopupSeconds.ToString();
             lblDPSGraphLineSize.Text = _configuration.DPSGraphLineSize.ToString();
+            lblShowLastUnexpiredAlerts.Text = _configuration.ShowLastUnexpiredAlerts.ToString();
 
             switch (_configuration.AlertPopupLocation)
             {
@@ -369,6 +371,12 @@ namespace Quesadilla
         {
             _configuration.DPSGraphLineSize = ((TrackBar)sender).Value;
             lblDPSGraphLineSize.Text = ((TrackBar)sender).Value.ToString();
+        }
+
+        private void trackShowLastUnexpiredAlerts_Scroll(object sender, EventArgs e)
+        {
+            _configuration.ShowLastUnexpiredAlerts = ((TrackBar)sender).Value;
+            lblShowLastUnexpiredAlerts.Text = ((TrackBar)sender).Value.ToString();
         }
     }
 }

@@ -80,6 +80,9 @@
             this.lblOpacity = new System.Windows.Forms.Label();
             this.lblPopupSeconds = new System.Windows.Forms.Label();
             this.lblDPSGraphLineSize = new System.Windows.Forms.Label();
+            this.lblShowLastUnexpiredAlerts = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.trackShowLastUnexpiredAlerts = new System.Windows.Forms.TrackBar();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.alertDemo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackOpacity)).BeginInit();
@@ -87,6 +90,7 @@
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackDPSGraphLineSize)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackShowLastUnexpiredAlerts)).BeginInit();
             this.SuspendLayout();
             // 
             // cmbHomeSystem
@@ -252,11 +256,11 @@
             // trackOpacity
             // 
             this.trackOpacity.LargeChange = 10;
-            this.trackOpacity.Location = new System.Drawing.Point(244, 242);
+            this.trackOpacity.Location = new System.Drawing.Point(265, 242);
             this.trackOpacity.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.trackOpacity.Maximum = 100;
             this.trackOpacity.Name = "trackOpacity";
-            this.trackOpacity.Size = new System.Drawing.Size(261, 45);
+            this.trackOpacity.Size = new System.Drawing.Size(200, 45);
             this.trackOpacity.TabIndex = 15;
             this.trackOpacity.TickFrequency = 10;
             this.trackOpacity.Scroll += new System.EventHandler(this.trackOpacity_Scroll);
@@ -264,7 +268,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(180, 246);
+            this.label3.Location = new System.Drawing.Point(201, 245);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(53, 16);
             this.label3.TabIndex = 16;
@@ -274,12 +278,12 @@
             // 
             this.trackPopupTime.AccessibleDescription = "";
             this.trackPopupTime.LargeChange = 10;
-            this.trackPopupTime.Location = new System.Drawing.Point(244, 278);
+            this.trackPopupTime.Location = new System.Drawing.Point(265, 278);
             this.trackPopupTime.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.trackPopupTime.Maximum = 60;
             this.trackPopupTime.Minimum = 1;
             this.trackPopupTime.Name = "trackPopupTime";
-            this.trackPopupTime.Size = new System.Drawing.Size(261, 45);
+            this.trackPopupTime.Size = new System.Drawing.Size(200, 45);
             this.trackPopupTime.TabIndex = 17;
             this.trackPopupTime.TickFrequency = 10;
             this.trackPopupTime.Value = 1;
@@ -288,7 +292,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(157, 278);
+            this.label4.Location = new System.Drawing.Point(179, 277);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(75, 16);
             this.label4.TabIndex = 18;
@@ -641,7 +645,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(144, 314);
+            this.label5.Location = new System.Drawing.Point(154, 313);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(100, 16);
             this.label5.TabIndex = 39;
@@ -651,12 +655,12 @@
             // 
             this.trackDPSGraphLineSize.AccessibleDescription = "";
             this.trackDPSGraphLineSize.LargeChange = 10;
-            this.trackDPSGraphLineSize.Location = new System.Drawing.Point(244, 314);
+            this.trackDPSGraphLineSize.Location = new System.Drawing.Point(265, 314);
             this.trackDPSGraphLineSize.Margin = new System.Windows.Forms.Padding(4);
             this.trackDPSGraphLineSize.Maximum = 12;
             this.trackDPSGraphLineSize.Minimum = 1;
             this.trackDPSGraphLineSize.Name = "trackDPSGraphLineSize";
-            this.trackDPSGraphLineSize.Size = new System.Drawing.Size(261, 45);
+            this.trackDPSGraphLineSize.Size = new System.Drawing.Size(200, 45);
             this.trackDPSGraphLineSize.TabIndex = 38;
             this.trackDPSGraphLineSize.TickFrequency = 10;
             this.trackDPSGraphLineSize.Value = 1;
@@ -665,7 +669,7 @@
             // lblOpacity
             // 
             this.lblOpacity.AutoSize = true;
-            this.lblOpacity.Location = new System.Drawing.Point(508, 246);
+            this.lblOpacity.Location = new System.Drawing.Point(472, 246);
             this.lblOpacity.Name = "lblOpacity";
             this.lblOpacity.Size = new System.Drawing.Size(28, 16);
             this.lblOpacity.TabIndex = 40;
@@ -674,7 +678,7 @@
             // lblPopupSeconds
             // 
             this.lblPopupSeconds.AutoSize = true;
-            this.lblPopupSeconds.Location = new System.Drawing.Point(508, 276);
+            this.lblPopupSeconds.Location = new System.Drawing.Point(472, 276);
             this.lblPopupSeconds.Name = "lblPopupSeconds";
             this.lblPopupSeconds.Size = new System.Drawing.Size(28, 16);
             this.lblPopupSeconds.TabIndex = 41;
@@ -683,17 +687,52 @@
             // lblDPSGraphLineSize
             // 
             this.lblDPSGraphLineSize.AutoSize = true;
-            this.lblDPSGraphLineSize.Location = new System.Drawing.Point(508, 314);
+            this.lblDPSGraphLineSize.Location = new System.Drawing.Point(472, 314);
             this.lblDPSGraphLineSize.Name = "lblDPSGraphLineSize";
             this.lblDPSGraphLineSize.Size = new System.Drawing.Size(28, 16);
             this.lblDPSGraphLineSize.TabIndex = 42;
             this.lblDPSGraphLineSize.Text = "999";
+            // 
+            // lblShowLastUnexpiredAlerts
+            // 
+            this.lblShowLastUnexpiredAlerts.AutoSize = true;
+            this.lblShowLastUnexpiredAlerts.Location = new System.Drawing.Point(472, 353);
+            this.lblShowLastUnexpiredAlerts.Name = "lblShowLastUnexpiredAlerts";
+            this.lblShowLastUnexpiredAlerts.Size = new System.Drawing.Size(28, 16);
+            this.lblShowLastUnexpiredAlerts.TabIndex = 45;
+            this.lblShowLastUnexpiredAlerts.Text = "999";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(175, 352);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(79, 16);
+            this.label7.TabIndex = 44;
+            this.label7.Text = "Alert History";
+            // 
+            // trackShowLastUnexpiredAlerts
+            // 
+            this.trackShowLastUnexpiredAlerts.LargeChange = 10;
+            this.trackShowLastUnexpiredAlerts.Location = new System.Drawing.Point(265, 349);
+            this.trackShowLastUnexpiredAlerts.Margin = new System.Windows.Forms.Padding(4);
+            this.trackShowLastUnexpiredAlerts.Maximum = 25;
+            this.trackShowLastUnexpiredAlerts.Minimum = 1;
+            this.trackShowLastUnexpiredAlerts.Name = "trackShowLastUnexpiredAlerts";
+            this.trackShowLastUnexpiredAlerts.Size = new System.Drawing.Size(200, 45);
+            this.trackShowLastUnexpiredAlerts.TabIndex = 43;
+            this.trackShowLastUnexpiredAlerts.TickFrequency = 10;
+            this.trackShowLastUnexpiredAlerts.Value = 1;
+            this.trackShowLastUnexpiredAlerts.Scroll += new System.EventHandler(this.trackShowLastUnexpiredAlerts_Scroll);
             // 
             // QuesadillaConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1312, 751);
+            this.Controls.Add(this.lblShowLastUnexpiredAlerts);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.trackShowLastUnexpiredAlerts);
             this.Controls.Add(this.lblDPSGraphLineSize);
             this.Controls.Add(this.lblPopupSeconds);
             this.Controls.Add(this.lblOpacity);
@@ -743,6 +782,7 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackDPSGraphLineSize)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackShowLastUnexpiredAlerts)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -801,5 +841,8 @@
         private System.Windows.Forms.Label lblOpacity;
         private System.Windows.Forms.Label lblPopupSeconds;
         private System.Windows.Forms.Label lblDPSGraphLineSize;
+        private System.Windows.Forms.Label lblShowLastUnexpiredAlerts;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TrackBar trackShowLastUnexpiredAlerts;
     }
 }
