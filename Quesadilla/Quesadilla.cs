@@ -27,6 +27,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using static Quesadilla.Classes.Processes.ProcessMonitor;
@@ -481,13 +482,16 @@ namespace Quesadilla
                 ActiveAlerts.Enqueue(NewAlert);
                 // do any extra processing 
 
-                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Configuration, LoadImageFromFile(Configuration.AlertPopupBackground), this);
-                NewAlertWindow.Show(this);
 
+                // try to prevent new alert stealing focus
+                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Configuration, LoadImageFromFile(Configuration.AlertPopupBackground), this);
+                var ptr = this._processMonitor.GetForegroundWindowHandle();
+                NewAlertWindow.Show(this);
+                var ptr2 = this._processMonitor.SetForegroundWindowHandle(ptr);
                 SoundPlayer sound = LoadSoundFromFile(NewAlert.SoundFile);
                 if (sound != null) sound.Play();
-
                 RebuildLatestAlertsMenu();
+
                 TickCounts["SinceLastAlert"] = 0;
             }
 

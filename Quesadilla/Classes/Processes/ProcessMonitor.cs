@@ -23,10 +23,18 @@ namespace Quesadilla.Classes.Processes
             this._currentProcessInfo = new ProcessInfo(IntPtr.Zero, "");
         }
         [DllImport("user32.dll")]
-        public static extern IntPtr GetForegroundWindow();
+        static extern IntPtr GetForegroundWindow();
         public IntPtr GetForegroundWindowHandle()
         {
             return GetForegroundWindow();
+        }
+
+
+        [DllImport("user32.dll")]
+        static extern IntPtr SetForegroundWindow(IntPtr hWnd);
+        public IntPtr SetForegroundWindowHandle(IntPtr hWnd)
+        {
+            return SetForegroundWindow(hWnd);
         }
 
         public struct Rect
