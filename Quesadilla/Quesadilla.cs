@@ -472,7 +472,8 @@ namespace Quesadilla
             }
 
             // dequeue Alerts
-            if (NewAlerts.Count > 0 && ++TickCounts["SinceLastAlert"] > Configuration.HowManyTicksBeforeAlert)
+            TickCounts["SinceLastAlert"]++;
+            if (NewAlerts.Count > 0 && TickCounts["SinceLastAlert"] > Configuration.HowManyTicksBeforeAlert)
             {
                 var NewAlert = NewAlerts.Dequeue();
                 Log.Error(NewAlert.AlertText);
