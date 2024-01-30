@@ -149,7 +149,7 @@ namespace Quesadilla.Classes
                 c.AlertPopupOpacityStep = 5;
                 c.AlertPopupLocation = PopupLocationType.BottomLeft;
                 c.DPSLocation = PopupLocationType.TopRight;
-                c.AlertPopupBackground = "bg_paulmart";
+                c.AlertPopupBackground = "bg_paulmart2";
 
                 c.ShowZKillAlerts = true;
 

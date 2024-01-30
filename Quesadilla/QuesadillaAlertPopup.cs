@@ -386,12 +386,14 @@ namespace Quesadilla
         {
             System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
             x.Font = new Font(x.Font.Name, x.Font.Size+ZOOM_SIZE_INCREASE, FontStyle.Bold);
+            x.TextAlign = ContentAlignment.TopLeft;
         }
 
         private void Zoom_MouseLeave(object sender, EventArgs e)
         {
             System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
             x.Font = new Font(x.Font.Name, x.Font.Size-ZOOM_SIZE_INCREASE, FontStyle.Regular);
+            x.TextAlign = ContentAlignment.TopRight;
         }
 
         private void IntelLine_Click(object sender, EventArgs e)

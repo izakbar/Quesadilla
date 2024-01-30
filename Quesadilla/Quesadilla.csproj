@@ -460,8 +460,17 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="images\bg_vagabond_Lloyd_George.png" />
+    <None Include="images\bg_zirnitra.png" />
+    <None Include="images\bg_0001.png" />
     <Content Include="images\bg_eve_infinite.jpg" />
+    <None Include="images\bg_massacre_m2_xfe.png" />
+    <None Include="images\bg_m2_monument.png" />
+    <None Include="images\bg_imperium.png" />
+    <None Include="images\bg_paladin.png" />
     <Content Include="images\bg_paulmart.png" />
+    <None Include="images\bg_zub.png" />
+    <None Include="images\bg_paulmart2.png" />
     <None Include="Resources\Sounds\quiet-click.wav" />
     <None Include="Resources\Sounds\spacebar.wav" />
     <None Include="Resources\Sounds\epic-orchestra.wav" />

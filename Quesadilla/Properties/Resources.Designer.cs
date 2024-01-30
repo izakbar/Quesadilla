@@ -82,9 +82,9 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap background1 {
+        internal static System.Drawing.Bitmap bg_0001 {
             get {
-                object obj = ResourceManager.GetObject("background1", resourceCulture);
+                object obj = ResourceManager.GetObject("bg_0001", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -92,9 +92,9 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap background10 {
+        internal static System.Drawing.Bitmap bg_imperium {
             get {
-                object obj = ResourceManager.GetObject("background10", resourceCulture);
+                object obj = ResourceManager.GetObject("bg_imperium", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -102,9 +102,9 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap background2 {
+        internal static System.Drawing.Bitmap bg_m2_monument {
             get {
-                object obj = ResourceManager.GetObject("background2", resourceCulture);
+                object obj = ResourceManager.GetObject("bg_m2_monument", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -112,9 +112,9 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap background3 {
+        internal static System.Drawing.Bitmap bg_massacre_m2_xfe {
             get {
-                object obj = ResourceManager.GetObject("background3", resourceCulture);
+                object obj = ResourceManager.GetObject("bg_massacre_m2_xfe", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -122,69 +122,9 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap background4 {
+        internal static System.Drawing.Bitmap bg_paladin {
             get {
-                object obj = ResourceManager.GetObject("background4", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap background5 {
-            get {
-                object obj = ResourceManager.GetObject("background5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap background6 {
-            get {
-                object obj = ResourceManager.GetObject("background6", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap background7 {
-            get {
-                object obj = ResourceManager.GetObject("background7", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap background8 {
-            get {
-                object obj = ResourceManager.GetObject("background8", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap background9 {
-            get {
-                object obj = ResourceManager.GetObject("background9", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap bg_eve_infinite {
-            get {
-                object obj = ResourceManager.GetObject("bg_eve_infinite", resourceCulture);
+                object obj = ResourceManager.GetObject("bg_paladin", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -195,6 +135,36 @@ namespace Quesadilla.Properties {
         internal static System.Drawing.Bitmap bg_paulmart {
             get {
                 object obj = ResourceManager.GetObject("bg_paulmart", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap bg_paulmart2 {
+            get {
+                object obj = ResourceManager.GetObject("bg_paulmart2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap bg_zirnitra {
+            get {
+                object obj = ResourceManager.GetObject("bg_zirnitra", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap bg_zub {
+            get {
+                object obj = ResourceManager.GetObject("bg_zub", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
