@@ -468,6 +468,7 @@
     <None Include="images\bg_m2_monument.png" />
     <None Include="images\bg_imperium.png" />
     <None Include="images\bg_paladin.png" />
+    <None Include="images\bg_goons.png" />
     <Content Include="images\bg_paulmart.png" />
     <None Include="images\bg_zub.png" />
     <None Include="images\bg_paulmart2.png" />
