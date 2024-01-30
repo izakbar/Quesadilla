@@ -1,5 +1,6 @@
 ﻿using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.SolarSystems;
+using Quesadilla.Classes.ZKill;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace Quesadilla.Classes.Queues
     {
         public PathInfo Path {  get; set; }
         public LogEntry Entry { get; set; }
+        public ZKillKill Kill { get; set; }
         public string AlertText { get; set; }
         public string MenuText { get; set; }
         public string RouteText { get; set; }

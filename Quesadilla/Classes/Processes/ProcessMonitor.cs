@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -22,10 +23,18 @@ namespace Quesadilla.Classes.Processes
             this._currentProcessInfo = new ProcessInfo(IntPtr.Zero, "");
         }
         [DllImport("user32.dll")]
-        public static extern IntPtr GetForegroundWindow();
+        static extern IntPtr GetForegroundWindow();
         public IntPtr GetForegroundWindowHandle()
         {
             return GetForegroundWindow();
+        }
+
+
+        [DllImport("user32.dll")]
+        static extern IntPtr SetForegroundWindow(IntPtr hWnd);
+        public IntPtr SetForegroundWindowHandle(IntPtr hWnd)
+        {
+            return SetForegroundWindow(hWnd);
         }
 
         public struct Rect
@@ -37,9 +46,14 @@ namespace Quesadilla.Classes.Processes
         }
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
-        public bool GetWindowDimensions(IntPtr hwnd, ref Rect rectangle)
+        [DllImport("user32.dll")]
+        public static extern bool GetClientRect(IntPtr hwnd, ref Rect rectangle);
+        [DllImport("user32.dll")]
+        public static extern bool ClientToScreen(IntPtr hwnd, ref Point point);
+        public bool GetWindowDimensions(IntPtr hwnd, ref Rect rectangle, ref Point point)
         {
-            return GetWindowRect(hwnd, ref rectangle);
+            var result = GetWindowRect(hwnd, ref rectangle);
+            return result;
         }
 
         private bool IsMonitoredProcess(string processName)
@@ -108,9 +122,6 @@ namespace Quesadilla.Classes.Processes
             if ( _processCache.ContainsKey(windowHandle) )
             {
                 return _processCache[windowHandle];
-            } else
-            {
-                return null;
             }
             return null;
         }

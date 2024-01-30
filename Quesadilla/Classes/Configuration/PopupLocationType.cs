@@ -10,8 +10,10 @@ namespace Quesadilla.Classes.Configuration
     {
         Center,
         TopLeft,
+        TopCenter,
         TopRight,
         BottomLeft,
+        BottomCenter,
         BottomRight,
     }
 }

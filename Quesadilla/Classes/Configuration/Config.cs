@@ -21,6 +21,8 @@ namespace Quesadilla.Classes
             {
                 TickMiliseconds = TickMiliseconds,
                 HowManyTicksBeforeCleardown = HowManyTicksBeforeCleardown,
+                HowManyTicksBeforeAlert = HowManyTicksBeforeAlert,
+                HowManyTicksBeforeDPSGraphUpdate = HowManyTicksBeforeDPSGraphUpdate,
                 AlertPopupOpacityStep = AlertPopupOpacityStep,
                 AlertPopupOpacity = AlertPopupOpacity,
                 AlertPopupAlertTextColour = AlertPopupAlertTextColour,
@@ -33,21 +35,34 @@ namespace Quesadilla.Classes
                 AlertPopupSeconds = AlertPopupSeconds,
                 AlertPopupSystemNameColour = AlertPopupSystemNameColour,
                 ExpireAlertSeconds = ExpireAlertSeconds,
+                ExpireZKillSeconds = ExpireZKillSeconds,
                 ShowLastUnexpiredAlerts = ShowLastUnexpiredAlerts,
                 IgnoreAsTooManyJumps = IgnoreAsTooManyJumps,
                 ExpireCombatSeconds = ExpireCombatSeconds,
+                ExpireISKSeconds = ExpireISKSeconds,
                 HomeSystem = HomeSystem,
                 InitialPosition = InitialPosition,
                 StayOnTop = StayOnTop,
                 DPSGraphStayOnTop = DPSGraphStayOnTop,
-                DPSGraphTransparent= DPSGraphTransparent,
+                DPSGraphLegends = DPSGraphLegends,
+                DPSGraphTransparent = DPSGraphTransparent,
+                AlertTransparent = AlertTransparent,
                 DPSShowWindow = DPSShowWindow,
                 DPSSaveCSV = DPSSaveCSV,
                 DPSAllToons = DPSAllToons,
-                WindowSize = WindowSize,
+                DPSGraphLineSize = DPSGraphLineSize,
                 GraphCombatMaxPoints = GraphCombatMaxPoints,
                 GraphCombatMinPointSeconds = GraphCombatMinPointSeconds,
                 GraphCombatSeconds = GraphCombatSeconds,
+                ShowZKillAlerts = ShowZKillAlerts,
+                ZKillAlertText = ZKillAlertText,
+                ZKillMenuText = ZKillMenuText,
+                ZKillContextText = ZKillContextText,
+                ZKillCircleColour = ZKillCircleColour,
+                ZKillIskColour = ZKillIskColour,
+                ZKillBarColour = ZKillBarColour,
+                ZKillShowBar = ZKillShowBar,
+                ZKillSound = ZKillSound,
             };
 
             c.ignoreStrings = new List<Regex>();
@@ -84,6 +99,8 @@ namespace Quesadilla.Classes
 
             c.InitialPosition = new Point(InitialPosition.X, InitialPosition.Y);
             c.WindowSize = new Point(WindowSize.X, WindowSize.Y);
+            c.DPSGraphWindowSize = new Point(DPSGraphWindowSize.X, DPSGraphWindowSize.Y);
+            c.DPSGraphWindowSizeAdjust = new Point(DPSGraphWindowSizeAdjust.X, DPSGraphWindowSizeAdjust.Y);
 
             return (c);
         }
@@ -100,21 +117,30 @@ namespace Quesadilla.Classes
             if (c is null)
             {
                 c = new Config();
-                c.TickMiliseconds = 505;
+                c.TickMiliseconds = 590;
                 c.HowManyTicksBeforeCleardown = 8;
+                c.HowManyTicksBeforeAlert = 3;
+                c.HowManyTicksBeforeDPSGraphUpdate = 4;
                 c.HomeSystem = "K7D-II";
                 c.InitialPosition = new Point(0, 0);
                 c.WindowSize = new Point(760, 404);
+                c.DPSGraphWindowSize = new Point(250, 100);
+                c.DPSGraphWindowSizeAdjust = new Point(10, 15);
+                c.DPSGraphLegends = false;
                 c.StayOnTop = true;
                 c.DPSGraphStayOnTop = true;
                 c.DPSGraphTransparent = true;
+                c.DPSGraphLineSize = 2;
+                c.AlertTransparent = false;
                 c.DPSShowWindow = true;
                 c.DPSSaveCSV = false;
                 c.DPSAllToons = false;
-                c.IgnoreAsTooManyJumps = 15;
+                c.IgnoreAsTooManyJumps = 12;
                 c.ExpireAlertSeconds = 500;
                 c.ExpireCombatSeconds = 1200;
-                c.GraphCombatSeconds = 180;
+                c.ExpireISKSeconds = 5400; // 90 mins
+                c.ExpireZKillSeconds = 900; // 15 mins
+                c.GraphCombatSeconds = 300;
                 c.GraphCombatMaxPoints = 30;
                 c.GraphCombatMinPointSeconds = 10;
 
@@ -122,17 +148,27 @@ namespace Quesadilla.Classes
                 c.AlertPopupOpacity = 99;
                 c.AlertPopupOpacityStep = 5;
                 c.AlertPopupLocation = PopupLocationType.BottomLeft;
-                c.DPSLocation = PopupLocationType.BottomRight;
-                c.AlertPopupBackground = "bg_paulmart";
+                c.DPSLocation = PopupLocationType.TopRight;
+                c.AlertPopupBackground = "bg_paulmart2";
+
+                c.ShowZKillAlerts = true;
 
                 c.AlertPopupSystemNameColour = Color.Lime;
                 c.AlertPopupRegionNameColour = Color.FromArgb(125,255,255);
                 c.AlertPopupContextInfoColour = Color.Yellow;
                 c.AlertPopupIntelLineColour = Color.White ;
-                c.AlertPopupAlertTextColour = Color.FromArgb(64, 0, 128);
+                c.AlertPopupAlertTextColour = Color.White;
 
-                c.ShowLastUnexpiredAlerts = 5;
+                c.ShowLastUnexpiredAlerts = 7;
 
+                c.ZKillAlertText = "{victim} died to {killer} in {system}";
+                c.ZKillContextText = "{victim} {victimship}\nKilled by {killer}";
+                c.ZKillMenuText = "{killer} killed {victim} in {system} {value}";
+                c.ZKillCircleColour = Color.Red;
+                c.ZKillIskColour = Color.White;
+                c.ZKillBarColour = Color.LimeGreen;
+                c.ZKillShowBar = true;
+                c.ZKillSound = "quiet_click";
             }
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
@@ -153,7 +189,7 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.AllOnlineCharacters,
-                    TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem} {route}",
+                    TextDisplay = "{jumps}->{fromsystem} : {route}",
                     MenuDisplay = "{jumps} jumps from {character} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
@@ -166,7 +202,7 @@ namespace Quesadilla.Classes
                     Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.OneOnlineCharacter,
-                    TextDisplay = "Hostile {jumps} jumps from {character} in {tosystem} {route}",
+                    TextDisplay = "{jumps}->{fromsystem} : {route}",
                     MenuDisplay = "{jumps} jumps from {character} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
@@ -180,7 +216,7 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.Home,
-                    TextDisplay = "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
+                    TextDisplay = "{jumps}->{fromsystem} : {route}",
                     MenuDisplay = "{jumps} jumps from {fromsystem} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
@@ -193,7 +229,7 @@ namespace Quesadilla.Classes
                     Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.System,
-                    TextDisplay = "Hostile {jumps} jumps from {fromsystem} in {tosystem} {route}",
+                    TextDisplay = "{jumps}->{fromsystem} : {route}",
                     MenuDisplay = "{jumps} jumps from {fromsystem} in {tosystem}",
                     SoundFile = "xylophone",
                     Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
@@ -235,20 +271,30 @@ namespace Quesadilla.Classes
 
         public int TickMiliseconds {  get; set; }
         public int HowManyTicksBeforeCleardown { get; set; }
+        public int HowManyTicksBeforeAlert { get; set; }
+        public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
         public string HomeSystem { get; set; }
         public List<Regex> ignoreStrings { get; set; }
         public List<int> ignoreSystems { get; set; }
         public Point InitialPosition { get; set; }
         public Point WindowSize { get; set; }
+        public Point DPSGraphWindowSize { get; set; }
+        public Point DPSGraphWindowSizeAdjust { get; set; }
         public bool StayOnTop { get; set; }
         public bool DPSGraphStayOnTop { get; set; }
+        public bool DPSGraphLegends { get; set; }
         public bool DPSGraphTransparent { get; set; }
+        public bool AlertTransparent { get; set; }
         public bool DPSShowWindow { get; set; }
         public bool DPSAllToons { get; set; }
         public bool DPSSaveCSV { get; set; }
+
+        public bool ShowZKillAlerts { get; set; }
         public int IgnoreAsTooManyJumps { get; set; }
         public int ExpireAlertSeconds { get; set; }
         public int ExpireCombatSeconds { get; set; }
+        public int ExpireISKSeconds { get; set; }
+        public int ExpireZKillSeconds { get; set; }
         public int GraphCombatSeconds { get; set; }
         public int GraphCombatMaxPoints { get; set; }
         public int GraphCombatMinPointSeconds { get; set; }
@@ -266,6 +312,16 @@ namespace Quesadilla.Classes
         public Color AlertPopupIntelLineColour { get; set; }
         public Color AlertPopupAlertTextColour { get; set; }
 
+        public string ZKillAlertText { get; set; }
+        public string ZKillContextText { get; set; }
+        public string ZKillMenuText { get; set; }
+        public string ZKillSound { get; set; }
+        public Color ZKillCircleColour { get; set; }
+        public Color ZKillIskColour { get; set; }
+        public Color ZKillBarColour { get; set; }
+        public bool ZKillShowBar { get; set; }
+
+        public int DPSGraphLineSize { get; set; }
         public int ShowLastUnexpiredAlerts { get; set; }
     }
 }

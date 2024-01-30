@@ -13,22 +13,8 @@ namespace QuesadillaExport
     internal class Program
     {
 
-        static void Main(string[] args)
+        static void GenerateSolarSystemData()
         {
-
-            // Build a config object, using env vars and JSON providers.
-            IConfiguration Configuration = new ConfigurationBuilder()
-                .AddJsonFile("GenerateSolarSystemData.json")
-                .AddEnvironmentVariables()
-                .Build();
-
-            QuesadillaExport.DataAccess.DataAccess.ConnectionString = Configuration.GetConnectionString("db");
-
-            using var Log = new LoggerConfiguration()
-                .MinimumLevel.Information()
-                .WriteTo.Console()
-                .CreateLogger();
-
             var solarSystems = DataAccess.mapSolarSystems.SelectAll();
             Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
 
@@ -57,8 +43,48 @@ namespace QuesadillaExport
                     IsRegional = jump.fromRegionId == jump.toRegionId ? false : true,
                 });
             }
-            var json = JsonConvert.SerializeObject( SolarSystems );
+            var json = JsonConvert.SerializeObject(SolarSystems);
             File.WriteAllText(@"Quesadilla.Systems.json", json);
+
+        }
+
+        static void GenerateItemTypesData()
+        {
+            var itemTypes = DataAccess.invTypes.SelectAll();
+            Dictionary<int, ItemType> ItemTypes = new Dictionary<int, ItemType>();
+            foreach (var item in itemTypes)
+            {
+                ItemTypes.Add(item.TypeId,
+                new ItemType()
+                {
+                    Name = item.TypeName,
+                    Group = item.GroupName,
+                    Id = item.TypeId,
+                });
+            }
+            var json = JsonConvert.SerializeObject(ItemTypes);
+            File.WriteAllText(@"Quesadilla.ItemTypes.json", json);
+        }
+
+
+        static void Main(string[] args)
+        {
+
+            // Build a config object, using env vars and JSON providers.
+            IConfiguration Configuration = new ConfigurationBuilder()
+                .AddJsonFile("GenerateSolarSystemData.json")
+                .AddEnvironmentVariables()
+                .Build();
+
+            QuesadillaExport.DataAccess.DataAccess.ConnectionString = Configuration.GetConnectionString("db");
+
+            using var Log = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.Console()
+                .CreateLogger();
+
+            GenerateSolarSystemData();
+            GenerateItemTypesData();
         }
     }
 }

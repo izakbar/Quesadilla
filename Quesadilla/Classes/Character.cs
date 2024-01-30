@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Quesadilla.Classes.EveScout;
+using Quesadilla.Classes.SolarSystems;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +15,11 @@ namespace Quesadilla.Classes
         public int LocationId { get; set; }
         public bool IsClientActive { get; set; }
         public DateTime LastFactionAlert { get; set; }
+
+        public EveScoutWH ClosestTurnur { get; set; }
+        public PathInfo ClosestTurnurPath { get; set; }
+        public EveScoutWH ClosestThera { get; set; }
+        public PathInfo ClosestTheraPath { get; set; }
 
         public Character()
         {
