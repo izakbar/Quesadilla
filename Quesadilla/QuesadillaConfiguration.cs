@@ -378,5 +378,10 @@ namespace Quesadilla
             _configuration.ShowLastUnexpiredAlerts = ((TrackBar)sender).Value;
             lblShowLastUnexpiredAlerts.Text = ((TrackBar)sender).Value.ToString();
         }
+
+        private void cmbHomeSystem_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _configuration.HomeSystem = cmbHomeSystem.Text;
+        }
     }
 }

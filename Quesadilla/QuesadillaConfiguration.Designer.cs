@@ -103,6 +103,7 @@
             this.cmbHomeSystem.Name = "cmbHomeSystem";
             this.cmbHomeSystem.Size = new System.Drawing.Size(147, 28);
             this.cmbHomeSystem.TabIndex = 0;
+            this.cmbHomeSystem.SelectedIndexChanged += new System.EventHandler(this.cmbHomeSystem_SelectedIndexChanged);
             // 
             // label1
             // 
