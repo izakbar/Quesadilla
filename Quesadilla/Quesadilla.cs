@@ -177,6 +177,8 @@ namespace Quesadilla
                     new MenuItem("Exit", new EventHandler(trayIconMenuClose)),
             });
 
+            trayIcon.MouseDoubleClick += trayIconDoubleClick;
+
             TickCounts["SinceLastCleardown"] = 0;
             TickCounts["SinceLastAlert"] = 0;
             TickCounts["SinceLastDPSGraphUpdate"] = 0;
@@ -1209,6 +1211,15 @@ namespace Quesadilla
             }
         }
 
+        private void trayIconDoubleClick(object sender, EventArgs e)
+        {
+            if (ActiveAlerts.Count > 0)
+            {
+                var alert = ActiveAlerts.Reverse().Take(1).ToList().First();
+                var NewAlertWindow = new QuesadillaAlertPopup(alert, Configuration, LoadImageFromFile(Configuration.AlertPopupBackground), this);
+                NewAlertWindow.Show(this);
+            }
+        }
 
         private void trayIconMenuConfigurationClick(object sender, EventArgs e)
         {

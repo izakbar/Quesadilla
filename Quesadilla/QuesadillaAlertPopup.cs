@@ -37,6 +37,9 @@ namespace Quesadilla
 
         private const int ZOOM_SIZE_INCREASE = 1;
 
+        private bool _rightMouseDown = false;
+        private Point diffPoint;
+
         public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background, Quesadilla mainForm)
         {
             _main = mainForm;
@@ -399,6 +402,33 @@ namespace Quesadilla
         private void IntelLine_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void QuesadillaAlertPopup_MouseDown(object sender, MouseEventArgs e)
+        {
+            if ( e.Button == MouseButtons.Right)
+            {
+                _rightMouseDown = true;
+                diffPoint.X = System.Windows.Forms.Cursor.Position.X - this.Left;
+                diffPoint.Y = System.Windows.Forms.Cursor.Position.Y - this.Top;
+            }
+        }
+
+        private void QuesadillaAlertPopup_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                _rightMouseDown = false;
+            }
+        }
+
+        private void QuesadillaAlertPopup_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_rightMouseDown)
+            {
+                this.Left = System.Windows.Forms.Cursor.Position.X - diffPoint.X;
+                this.Top = System.Windows.Forms.Cursor.Position.Y - diffPoint.Y;
+            }
         }
     }
 }
