@@ -39,6 +39,7 @@
             this.IntelLine = new System.Windows.Forms.Label();
             this.timerOpacityClose = new System.Windows.Forms.Timer(this.components);
             this.RegionName = new System.Windows.Forms.Label();
+            this.ShipName = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pAlertImage)).BeginInit();
             this.SuspendLayout();
             // 
@@ -59,6 +60,8 @@
             this.pAlertImage.TabStop = false;
             this.pAlertImage.Click += new System.EventHandler(this.pAlertImage_Click);
             this.pAlertImage.MouseDown += new System.Windows.Forms.MouseEventHandler(this.QuesadillaAlertPopup_MouseDown);
+            this.pAlertImage.MouseEnter += new System.EventHandler(this.pAlertImage_MouseEnter);
+            this.pAlertImage.MouseLeave += new System.EventHandler(this.pAlertImage_MouseLeave);
             this.pAlertImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.QuesadillaAlertPopup_MouseMove);
             this.pAlertImage.MouseUp += new System.Windows.Forms.MouseEventHandler(this.QuesadillaAlertPopup_MouseMove);
             // 
@@ -153,6 +156,20 @@
             this.RegionName.MouseMove += new System.Windows.Forms.MouseEventHandler(this.QuesadillaAlertPopup_MouseMove);
             this.RegionName.MouseUp += new System.Windows.Forms.MouseEventHandler(this.QuesadillaAlertPopup_MouseUp);
             // 
+            // ShipName
+            // 
+            this.ShipName.BackColor = System.Drawing.Color.Transparent;
+            this.ShipName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ShipName.ForeColor = System.Drawing.Color.Lime;
+            this.ShipName.Location = new System.Drawing.Point(154, 120);
+            this.ShipName.Name = "ShipName";
+            this.ShipName.Size = new System.Drawing.Size(160, 13);
+            this.ShipName.TabIndex = 6;
+            this.ShipName.Text = "XXXXXXX";
+            this.ShipName.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.ShipName.UseCompatibleTextRendering = true;
+            this.ShipName.Visible = false;
+            // 
             // QuesadillaAlertPopup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -161,6 +178,7 @@
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ClientSize = new System.Drawing.Size(367, 150);
             this.ControlBox = false;
+            this.Controls.Add(this.ShipName);
             this.Controls.Add(this.RegionName);
             this.Controls.Add(this.pAlertImage);
             this.Controls.Add(this.IntelLine);
@@ -195,5 +213,6 @@
         private System.Windows.Forms.Label IntelLine;
         private System.Windows.Forms.Timer timerOpacityClose;
         private System.Windows.Forms.Label RegionName;
+        private System.Windows.Forms.Label ShipName;
     }
 }

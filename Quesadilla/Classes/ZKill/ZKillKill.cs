@@ -22,9 +22,8 @@ namespace Quesadilla.Classes.ZKill
         public long VictimCharacterId { get; set; }
         public long VictimCorporationId { get; set; }
         public long VictimShipTypeId { get; set; }
-
+        public string VictimShipName { get; set; }
         public bool NPC {  get; set; }
-
         public long KillerCharacterId { get; set; }
         public long KillerCorporationId { get; set; }
         public long KillerAllianceId { get; set; }

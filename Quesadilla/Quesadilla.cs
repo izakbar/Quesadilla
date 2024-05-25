@@ -1613,6 +1613,9 @@ namespace Quesadilla
             string systemName = "---";
             string regionName = "---";
 
+            var victimShipName = _universe.ItemTypes[(int)e.Kill.VictimShipTypeId].Name;
+            e.Kill.VictimShipName = victimShipName;
+
             if (_universe.SolarSystems.ContainsKey((int)e.Kill.SolarSystemId))
             {
                 systemName = _universe.SolarSystems[(int)e.Kill.SolarSystemId].Name;
@@ -1631,7 +1634,7 @@ namespace Quesadilla
                 }
             }
 
-            Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {_universe.ItemTypes[(int)e.Kill.VictimShipTypeId].Name} {_universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
+            Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {_universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
             e.Kill.Context = generateZKillAlertText(e.Kill, null, Configuration.ZKillContextText, "");
 
             // check if zkill system matches any range alerts

@@ -44,6 +44,9 @@ namespace Quesadilla
         {
             _main = mainForm;
             InitializeComponent();
+
+            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+
             _alert = alert;
             _seconds = configuration.AlertPopupSeconds;
             _opacity = configuration.AlertPopupOpacity;
@@ -117,14 +120,16 @@ namespace Quesadilla
                 Bitmap b = new Bitmap(RoundedImage);
                 b.MakeTransparent(b.GetPixel(0, 0));
                 pAlertImage.Image = b;
+
+                ShipName.Text = alert.Kill.VictimShipName;
             }
             else
             {
                 IntelLine.Text = _alert.Entry.LineContent;
+                ShipName.Text = "";
             }
 
             BackgroundImage = background;
-
 
             // position on screen
             if (_main.Configuration.AlertTransparent)
@@ -429,6 +434,19 @@ namespace Quesadilla
                 this.Left = System.Windows.Forms.Cursor.Position.X - diffPoint.X;
                 this.Top = System.Windows.Forms.Cursor.Position.Y - diffPoint.Y;
             }
+        }
+
+        private void pAlertImage_MouseEnter(object sender, EventArgs e)
+        {
+            if (IsZkill)
+            {
+                ShipName.Visible = true;
+            }
+        }
+
+        private void pAlertImage_MouseLeave(object sender, EventArgs e)
+        {
+            ShipName.Visible = false;
         }
     }
 }
