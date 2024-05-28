@@ -1613,7 +1613,7 @@ namespace Quesadilla
             string systemName = "---";
             string regionName = "---";
 
-            var victimShipName = _universe.ItemTypes[(int)e.Kill.VictimShipTypeId].Name;
+            var victimShipName = _universe.ItemTypes.ContainsKey((int)e.Kill.VictimShipTypeId) ? _universe.ItemTypes[(int)e.Kill.VictimShipTypeId].Name : "Unknown:" + e.Kill.VictimShipTypeId.ToString();
             e.Kill.VictimShipName = victimShipName;
 
             if (_universe.SolarSystems.ContainsKey((int)e.Kill.SolarSystemId))
