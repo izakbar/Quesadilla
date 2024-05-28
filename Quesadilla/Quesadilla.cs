@@ -411,7 +411,7 @@ namespace Quesadilla
             splashScreen = null;
 
             Version version = Assembly.GetEntryAssembly().GetName().Version;
-            this.Text = "Quesadill v" + version.ToString();
+            this.Text = "Quesadilla v" + version.ToString();
 
         }
         private SoundPlayer LoadSoundFromFile(string fileName)
