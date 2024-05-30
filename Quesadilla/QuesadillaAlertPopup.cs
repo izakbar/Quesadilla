@@ -34,6 +34,7 @@ namespace Quesadilla
 
         private const string ALERT_TEXT = "Alert";
         private const string FACTION_TEXT = "Faction Spawn";
+        private const string DECLOAK_TEXT = "Pilot decloaked";
 
         private const int ZOOM_SIZE_INCREASE = 1;
 
@@ -73,6 +74,10 @@ namespace Quesadilla
                 {
                     SystemName.Text = FACTION_TEXT;
                 }
+                else if (alert.isDecloak)
+                {
+                    SystemName.Text = DECLOAK_TEXT;
+                }
                 else
                 {
                     SystemName.Text = ALERT_TEXT;
@@ -87,10 +92,14 @@ namespace Quesadilla
             else
             {
                 RegionName.Text = "";
+                if ( alert.isDecloak)
+                {
+                    RegionName.Text = alert.Entry.CharacterName;
+                }
             }
 
             ContextInfo.ForeColor = configuration.AlertPopupContextInfoColour;
-            if (alert.Path != null && ! alert.isFaction)
+            if (alert.Path != null && ! (alert.isFaction|| alert.isDecloak))
             {
                 ContextInfo.Text = _alert.Path.TotalJumps.ToString() + " jump" + (_alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + _alert.Context;
             }
@@ -100,7 +109,12 @@ namespace Quesadilla
                 {
                     ContextInfo.Text = alert.Context;
                 }
+                else if (alert.isDecloak)
+                {
+                    ContextInfo.Text = alert.Context;
+                }
                 else
+
                 {
                     ContextInfo.Text = alert.FriendlyName;
                 }

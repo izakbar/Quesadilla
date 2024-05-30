@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
 namespace Quesadilla.Classes
 {
@@ -32,6 +33,8 @@ namespace Quesadilla.Classes
         private readonly Regex _gameLogCombatRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(combat\\)", RegexOptions.Compiled);
         private readonly Regex _gameLogISKRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(bounty\\)", RegexOptions.Compiled);
 
+        private readonly Regex _gameLogCloakRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(notify\\)\\s*.*cloak deactivates", RegexOptions.Compiled);
+
         private readonly Regex _localSystemChange = new Regex("EVE\\sSystem\\s>\\sChannel\\schanged\\sto\\sLocal\\s:\\s(?<systemname>.*)", RegexOptions.Compiled);
         private readonly Regex _localListener = new Regex("Listener\\:\\s*(?<name>.*)", RegexOptions.Compiled);
         private readonly Regex _localInitialSystem = new Regex("Channel\\sID:\\s*\\(\\(\\'solarsystemid2\\',\\s(?<initialsystem>[0-9]{8})", RegexOptions.Compiled);
@@ -42,6 +45,8 @@ namespace Quesadilla.Classes
         public event EventHandler<ProcessNewDataEventArgs> ProcessNewData;
         public event EventHandler<ProcessCombatEventArgs> ProcessCombat;
         public event EventHandler<ProcessISKEventArgs> ProcessISK;
+
+        public event EventHandler<ProcessDecloakEventArgs> ProcessDecloak;
         public event EventHandler<ProcessSystemChangeEventArgs> SystemChange;
         public event EventHandler<ProcessChatServerChangeEventArgs> ChatServerChange;
 
@@ -228,6 +233,11 @@ namespace Quesadilla.Classes
                                         {
                                             this.OnISK(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
                                         }
+                                        else if (this._gameLogCloakRegex.IsMatch(input))
+                                        {
+                                            this.OnDecloak(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
+                                        }
+                                        
                                     }
                                     else
                                     {
@@ -523,6 +533,13 @@ namespace Quesadilla.Classes
             if (this.ProcessISK == null)
                 return;
             this.ProcessISK((object)this, new ProcessISKEventArgs(logFileName, characterName, entry));
+        }
+        private void OnDecloak(string logFileName, string characterName, LogEntry entry)
+        {
+            logger.Debug((entry != null ? entry.LineContent : ""));
+            if (this.ProcessDecloak == null)
+                return;
+            this.ProcessDecloak((object)this, new ProcessDecloakEventArgs(logFileName, characterName, entry));
         }
         private void OnSystemChange(string systemName, string charName)
         {

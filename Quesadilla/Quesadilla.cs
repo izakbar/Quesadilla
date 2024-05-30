@@ -67,6 +67,9 @@ namespace Quesadilla
         private readonly Regex _CombatRegexMissesYouCompletely = new Regex("(?<combatEntity>.*)\\smisses\\syou\\scompletely", RegexOptions.Compiled);
         private readonly Regex _CombatRegexCombatData = new Regex("^<color=0x(?<combatColour>........)><b>(?<combatAmount>.*)</b>\\s*<color=0x........><font size=10>\\s*(?<combatContext>.*)\\s*</font>\\s*<b><color=0xffffffff>(?<combatEntity>.*)</b>(<font size=10>|<color=0x77ffffff>)*\\s-\\s(?<combatText>.*)", RegexOptions.Compiled);
 
+        private readonly Regex _DecloakRegexMobileObservatory = new Regex("cloak deactivates due to a pulse from a Mobile Observatory", RegexOptions.Compiled);
+        private readonly Regex _DecloakRegexProximity = new Regex("Your cloak deactivates due to proximity to (?<decloakProximity>.*)", RegexOptions.Compiled);
+
         private readonly Regex _ISKRegexISKData = new Regex("^<font size=12><b><color=0x........>\\s*(?<iskAmount>.*) ISK\\s*</b><color=0x........> added to next bounty payout", RegexOptions.Compiled);
 
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
@@ -244,6 +247,7 @@ namespace Quesadilla
                 {
                     watcher.ProcessCombat += new EventHandler<ProcessCombatEventArgs>(this.logFile_ProcessCombat);
                     watcher.ProcessISK += new EventHandler<ProcessISKEventArgs>(this.logFile_ProcessISK);
+                    watcher.ProcessDecloak += new EventHandler<ProcessDecloakEventArgs>(this.logFile_ProcessDecloak);
                 }
                 else
                 {
@@ -1460,7 +1464,54 @@ namespace Quesadilla
                 }
             }
         }
+        private void logFile_ProcessDecloak(object sender, ProcessDecloakEventArgs e)
+        {
+            //Log.Information("COMBAT:" + e.CombatEvent);
+            if (e.Entry != null)
+            {
 
+                PathInfo path = null;
+                var c = CharacterList.Find(o => o.CharacterName.Equals(e.CharacterName));
+                string alertText = "";
+
+                foreach (AlertConfig alert in Configuration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
+                {
+                    if (!tempTrigger.Enabled)
+                        return false;
+                    return tempTrigger.AlertType == AlertConfigType.Decloak;
+                })))
+                {
+
+                    Match match = _DecloakRegexMobileObservatory.Match(e.Entry.LineContent);
+                    if (match.Success)
+                    {
+                        Log.Information("DECLOAK: mobile observatory");
+                        alertText = generateAlertText(e.Entry, null, alert, "Decloaked pilot", 0, "mobile observatory");
+                    }
+
+                    match = _DecloakRegexProximity.Match(e.Entry.LineContent);
+                    if (match.Success)
+                    {
+                        alertText = generateAlertText(e.Entry, null, alert, "Decloaked pilot", 0, match.Groups["decloakProximity"].ToString());
+                        Log.Information("DECLOAK: proximity to " + alertText);
+                    }
+
+                    EnqueueAlert(
+                    new AlertQueueItem()
+                    {
+                        AlertText = alertText,
+                        MenuText = c.CharacterName + alertText,
+                        Entry = e.Entry,
+                        Path = path,
+                        Context = alertText,
+                        SoundFile = alert.SoundFile,
+                        FriendlyName = alert.FriendlyName,
+                        isDecloak = true,
+                    }
+                    );
+                }
+            }
+        }
 
         private void buttonIntelSize_Click(object sender, EventArgs e)
         {

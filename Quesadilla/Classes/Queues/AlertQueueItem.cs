@@ -21,6 +21,7 @@ namespace Quesadilla.Classes.Queues
         public string Context { get; set; }
         public string SoundFile { get; set; }
         public string FriendlyName { get; set; }
-        public bool isFaction { get ; set; }
+        public bool isFaction { get; set; }
+        public bool isDecloak { get; set; }
     }
 }

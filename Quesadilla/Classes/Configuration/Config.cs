@@ -257,6 +257,15 @@ namespace Quesadilla.Classes
                     SoundFile = "trumpet",
                     CustomTriggerEverySeconds = 30,
                 });
+                c.AlertConfiguration.Add(new AlertConfig()
+                {
+                    FriendlyName = "Decloak",
+                    Enabled = true,
+                    AlertType = AlertConfigType.Decloak,
+                    TextDisplay = "Decloak by {context}",
+                    MenuDisplay = "Decloak by {context}",
+                    SoundFile = "tuba",
+                });
             }
 
             return (c);
