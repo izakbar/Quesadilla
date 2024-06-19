@@ -293,28 +293,28 @@ namespace Quesadilla
             toon1HullReceived.BorderDashStyle = ChartDashStyle.Solid;
 
             var toon1HullGiven = chartDPS.Series.Add("LogiH OUT");
-            toon1ArmorGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            toon1ArmorGiven.Points.Clear();
-            toon1ArmorGiven.Color = Color.SlateGray;
-            toon1ArmorGiven.YAxisType = AxisType.Secondary;
-            toon1ArmorGiven.BorderWidth = LineSize;
-            toon1ArmorGiven.BorderDashStyle = ChartDashStyle.Solid;
+            toon1HullGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1HullGiven.Points.Clear();
+            toon1HullGiven.Color = Color.SlateGray;
+            toon1HullGiven.YAxisType = AxisType.Secondary;
+            toon1HullGiven.BorderWidth = LineSize;
+            toon1HullGiven.BorderDashStyle = ChartDashStyle.Solid;
 
             var toon1CapReceived = chartDPS.Series.Add("LogiC IN");
-            toon1ArmorReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            toon1ArmorReceived.Points.Clear();
-            toon1ArmorReceived.Color = Color.LightYellow;
-            toon1ArmorReceived.YAxisType = AxisType.Secondary;
-            toon1ArmorReceived.BorderWidth = LineSize;
-            toon1ArmorReceived.BorderDashStyle = ChartDashStyle.Solid;
+            toon1CapReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1CapReceived.Points.Clear();
+            toon1CapReceived.Color = Color.LightYellow;
+            toon1CapReceived.YAxisType = AxisType.Secondary;
+            toon1CapReceived.BorderWidth = LineSize;
+            toon1CapReceived.BorderDashStyle = ChartDashStyle.Solid;
 
             var toon1CapGiven = chartDPS.Series.Add("LogiC OUT");
-            toon1ArmorGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            toon1ArmorGiven.Points.Clear();
-            toon1ArmorGiven.Color = Color.OldLace;
-            toon1ArmorGiven.YAxisType = AxisType.Secondary;
-            toon1ArmorGiven.BorderWidth = LineSize;
-            toon1ArmorGiven.BorderDashStyle = ChartDashStyle.Solid;
+            toon1CapGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1CapGiven.Points.Clear();
+            toon1CapGiven.Color = Color.DarkOrange;
+            toon1CapGiven.YAxisType = AxisType.Secondary;
+            toon1CapGiven.BorderWidth = LineSize;
+            toon1CapGiven.BorderDashStyle = ChartDashStyle.Solid;
 
             _combatGraphData.Clear();
 
