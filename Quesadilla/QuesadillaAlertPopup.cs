@@ -12,6 +12,7 @@ using System.Data;
 using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Media;
@@ -603,6 +604,8 @@ namespace Quesadilla
 
                         using (Font myfont = new Font("Verdana", TEXT_SIZE, FontStyle.Regular))
                         {
+                            g.TextRenderingHint = TextRenderingHint.AntiAlias;
+
                             g.DrawString(currentSystem.solarSystem.Name, myfont, new SolidBrush(SystemColorText), currentPoint.X + CIRCLE_RADIUS + 2, currentPoint.Y + CIRCLE_RADIUS + 2, new StringFormat
                             {
                                 Alignment = StringAlignment.Far,
@@ -699,6 +702,8 @@ namespace Quesadilla
             var flags = TextFormatFlags.Right;
             if ( l.TextAlign == ContentAlignment.TopLeft || l.TextAlign == ContentAlignment.BottomLeft || l.TextAlign == ContentAlignment.MiddleLeft ) flags = TextFormatFlags.Left;
             flags = flags | TextFormatFlags.WordBreak;
+
+            e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
 
             TextRenderer.DrawText(e.Graphics,l.Text,l.Font,new Rectangle(l.Left, l.Top, l.Width, l.Height),l.ForeColor, flags);
         }
