@@ -33,7 +33,16 @@ namespace Quesadilla.Classes.ZKill
         public string TotalValue { get; set; }
 
         public string href { get; set; }
-
         public string Context {  get; set; }
+        public string ToFeedHtml()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<div class=zkill><div class=zkill-ship><a href=https://zkillboard.com/kill/" + ID + "><img width=98% src=https://images.evetech.net/types/" + VictimShipTypeId.ToString() + "/render></a>" +
+                "</div>" +
+                "<div class=zkill-value>" + TotalValue + "</div>" +
+                "</div>"
+                );
+            return sb.ToString();
+        }
     }
 }
