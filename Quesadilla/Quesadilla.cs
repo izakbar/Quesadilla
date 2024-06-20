@@ -76,6 +76,7 @@ namespace Quesadilla
         private readonly Regex _ISKRegexISKData = new Regex("^<font size=12><b><color=0x........>\\s*(?<iskAmount>.*) ISK\\s*</b><color=0x........> added to next bounty payout", RegexOptions.Compiled);
 
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
+        public Queue<ZKillKill> Kills = new Queue<ZKillKill>();
 
         public UniverseManager _universe = new UniverseManager();
         public Config Configuration = new Config();
@@ -1692,6 +1693,8 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {_universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
             e.Kill.Context = generateZKillAlertText(e.Kill, null, Configuration.ZKillContextText, "");
 
+            EnqueueZKill(e.Kill);
+
             // check if zkill system matches any range alerts
             // and that report zkill flag is set
             if (!Configuration.ShowZKillAlerts) return;
@@ -1936,6 +1939,16 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             AlertQueueItem alert = (AlertQueueItem)((MenuItem)sender).Tag;
             var NewAlertWindow = new QuesadillaAlertPopup(alert, Configuration, LoadImageFromFile(Configuration.AlertPopupBackground), this);
             NewAlertWindow.Show(this);
+        }
+
+        private void EnqueueZKill(ZKillKill kill)
+        {
+            // only add to new zkill list if not already in list. This should prevent multiple entries for same thing
+            var f = Kills.Where(o => o.ID == kill.ID).ToList();
+            if (f.Count == 0 || NewAlerts.Count == 0)
+            {
+                Kills.Enqueue(kill);
+            }
         }
     }
 }
