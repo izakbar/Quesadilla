@@ -63,7 +63,21 @@ namespace Quesadilla.Classes
                 ZKillBarColour = ZKillBarColour,
                 ZKillShowBar = ZKillShowBar,
                 ZKillSound = ZKillSound,
+                AlertPopupMinimap = AlertPopupMinimap,
+                AlertPopupMinimapShowSystemText = AlertPopupMinimapShowSystemText,
+                AlertPopupShowMinimapBorder = AlertPopupShowMinimapBorder,
+                AlertPopupMinimapBorderColor = AlertPopupMinimapBorderColor,
+                AlertPopupMinimapLineColorNormal = AlertPopupMinimapLineColorNormal,
+                AlertPopupMinimapLineColorRoute = AlertPopupMinimapLineColorRoute,
+                AlertPopupMinimapSystemColorNormal = AlertPopupMinimapSystemColorNormal,
+                AlertPopupMinimapSystemColorRoute = AlertPopupMinimapSystemColorRoute,
+                AlertPopupMinimapSystemColorFrom = AlertPopupMinimapSystemColorFrom,
+                AlertPopupMinimapSystemColorTo = AlertPopupMinimapSystemColorTo,
+                AlertPopupMinimapSystemColorText = AlertPopupMinimapSystemColorText,
             };
+
+            c.AlertPopupMinimapPosition = new Point(AlertPopupMinimapPosition.X, AlertPopupMinimapPosition.Y);
+            c.AlertPopupMinimapSize = new Point(AlertPopupMinimapSize.X, AlertPopupMinimapSize.Y);
 
             c.ignoreStrings = new List<Regex>();
             c.ignoreSystems = new List<int>();
@@ -169,6 +183,21 @@ namespace Quesadilla.Classes
                 c.ZKillBarColour = Color.LimeGreen;
                 c.ZKillShowBar = true;
                 c.ZKillSound = "quiet_click";
+
+                c.AlertPopupMinimap = true;
+                c.AlertPopupShowMinimapBorder = false;
+                c.AlertPopupMinimapBorderColor = Color.SteelBlue;
+                c.AlertPopupMinimapLineColorNormal = Color.Gainsboro;
+                c.AlertPopupMinimapLineColorRoute = Color.Tomato;
+                c.AlertPopupMinimapSystemColorNormal = Color.Gainsboro;
+                c.AlertPopupMinimapSystemColorRoute = Color.Pink;
+                c.AlertPopupMinimapSystemColorFrom = Color.Red;
+                c.AlertPopupMinimapSystemColorTo = Color.Green;
+                c.AlertPopupMinimapShowSystemText = true;
+                c.AlertPopupMinimapSystemColorText = Color.LemonChiffon;
+
+                c.AlertPopupMinimapPosition = new Point(30, 0);
+                c.AlertPopupMinimapSize = new Point(232, 204);
             }
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
@@ -332,5 +361,20 @@ namespace Quesadilla.Classes
 
         public int DPSGraphLineSize { get; set; }
         public int ShowLastUnexpiredAlerts { get; set; }
+
+        public bool AlertPopupMinimap { get; set; }
+        public bool AlertPopupShowMinimapBorder { get; set; }
+        public bool AlertPopupMinimapShowSystemText { get; set; }
+        public Color AlertPopupMinimapBorderColor { get; set; }
+        public Color AlertPopupMinimapLineColorNormal { get; set; }
+        public Color AlertPopupMinimapLineColorRoute { get; set; }
+        public Color AlertPopupMinimapSystemColorNormal { get; set; }
+        public Color AlertPopupMinimapSystemColorRoute { get; set; }
+        public Color AlertPopupMinimapSystemColorFrom { get; set; }
+        public Color AlertPopupMinimapSystemColorTo { get; set; }
+        public Color AlertPopupMinimapSystemColorText { get; set; }
+
+        public Point AlertPopupMinimapPosition { get; set; }
+        public Point AlertPopupMinimapSize { get; set; }
     }
 }

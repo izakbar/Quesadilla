@@ -4,10 +4,12 @@ using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.SolarSystems;
+using Serilog.Debugging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -148,12 +150,29 @@ namespace Quesadilla
                 ShipName.Text = "";
             }
 
-            if (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0)
+            if (_main.Configuration.AlertPopupMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0) )
             {
-                Image minimapImage = ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path );
+                Image minimapImage = ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path ,
+                    _main.Configuration.AlertPopupMinimapShowSystemText, 
+                    _main.Configuration.AlertPopupShowMinimapBorder, _main.Configuration.AlertPopupMinimapBorderColor,
+                    _main.Configuration.AlertPopupMinimapLineColorNormal,
+                    _main.Configuration.AlertPopupMinimapLineColorRoute,
+                    _main.Configuration.AlertPopupMinimapSystemColorNormal,
+                    _main.Configuration.AlertPopupMinimapSystemColorRoute,
+                    _main.Configuration.AlertPopupMinimapSystemColorFrom,
+                    _main.Configuration.AlertPopupMinimapSystemColorTo,
+                    _main.Configuration.AlertPopupMinimapSystemColorText
+                    );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
                 pMinimapImage.Image = minimapBitmap;
+                pMinimapImage.Location = _main.Configuration.AlertPopupMinimapPosition;
+                pMinimapImage.Size = (Size)_main.Configuration.AlertPopupMinimapSize;
+                pMinimapImage.Visible = true;
+            }
+            else
+            {
+                pMinimapImage.Visible = false;
             }
 
             BackgroundImage = background;
@@ -313,8 +332,18 @@ namespace Quesadilla
 
         private void QuesadillaAlertPopup_Click(object sender, EventArgs e)
         {
-            Opacity = 0;
-            CloseWindow();
+            MouseEventArgs e2 = (MouseEventArgs)e;
+            Point clickLocation = new Point(e2.X, e2.Y);
+            Rectangle r = new Rectangle(SystemName.Location.X, SystemName.Location.Y, SystemName.Width, SystemName.Height);
+            if (r.Contains(clickLocation))
+            {
+                SystemName_Click(sender, e);
+            }
+            else
+            {
+                Opacity = 0;
+                CloseWindow();
+            }
         }
 
         private void timerOpacityClose_Tick(object sender, EventArgs e)
@@ -393,12 +422,6 @@ namespace Quesadilla
                 g.DrawImage(srcImage, 0, 0);
 
                 g.ResetClip();
-/*
-                using (Brush br = new SolidBrush(Color.Orange))
-                {
-                    g.FillRectangle(br, 0, srcImage.Height-100 , srcImage.Width, 100);
-                }
-*/
 
                 using (Font myfont = new Font("Arial", TEXT_SIZE - 20,FontStyle.Bold))
                 {
@@ -418,70 +441,177 @@ namespace Quesadilla
         }
 
         // makes nice round ellipse/circle images from rectangle images
-        public Image ClipMiniMap(Image srcImage, PathInfo path)
+        public Image ClipMiniMap(Image srcImage, PathInfo path, 
+            bool showSystemText,
+            bool Border, Color BorderColor,
+            Color LineColorNormal,
+            Color LineColorRoute,
+            Color SystemColorNormal,
+            Color SystemColorRoute,
+            Color SystemColorFrom,
+            Color SystemColorTo,
+            Color SystemColorText
+            )
         {
             Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
-            int TRANSPARENT_BORDERWIDTH = 1;
-            int BORDERWIDTH = 1;
+            int TRANSPARENT_BORDER_WIDTH = 1;
+            int BORDER_WIDTH = 1;
+            int TEXT_SIZE = 8;
 
-            double LYSCALING = 9460000000000; 
-            double GUI_SCALING = 60;
+            double LY_SCALING = 9460000000000; 
+            double GUI_SCALING = 30;
 
             int CIRCLE_RADIUS = 3;
 
-            int combinedBorder = TRANSPARENT_BORDERWIDTH + BORDERWIDTH;
+            int combinedBorder = TRANSPARENT_BORDER_WIDTH + BORDER_WIDTH;
 
             Point center = new Point((srcImage.Width/2)-1, (srcImage.Height / 2)-1);
 
             using (Graphics g = Graphics.FromImage(dstImage))
             {
-                // Border
-                RectangleF r2 = new RectangleF(0,0,dstImage.Width, dstImage.Height);
-
                 // main background
                 using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.PaleGoldenrod)))
                 {
                     g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
                 }
-                using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.PaleTurquoise)))
-                {
-                    g.FillRectangle(br, TRANSPARENT_BORDERWIDTH, TRANSPARENT_BORDERWIDTH, dstImage.Width - (TRANSPARENT_BORDERWIDTH*2), dstImage.Height - (TRANSPARENT_BORDERWIDTH*2));
-                }
-                using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.PaleGoldenrod)))
-                {
-                    g.FillRectangle(br, combinedBorder, combinedBorder, dstImage.Width - (combinedBorder*2), dstImage.Height - (combinedBorder*2) );
-                }
 
-                // current system in middle
-                using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.GreenYellow)))
+                // Border ?
+                if (Border)
                 {
-                    g.FillEllipse(br, center.X - CIRCLE_RADIUS, center.Y - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+                    using (Brush br = new SolidBrush(BorderColor))
+                    {
+                        g.FillRectangle(br, TRANSPARENT_BORDER_WIDTH, TRANSPARENT_BORDER_WIDTH, dstImage.Width - (TRANSPARENT_BORDER_WIDTH * 2), dstImage.Height - (TRANSPARENT_BORDER_WIDTH * 2));
+                    }
+                    using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.PaleGoldenrod)))
+                    {
+                        g.FillRectangle(br, combinedBorder, combinedBorder, dstImage.Width - (combinedBorder * 2), dstImage.Height - (combinedBorder * 2));
+                    }
+                } 
+                else
+                {
+                    using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.PaleGoldenrod)))
+                    {
+                        g.FillRectangle(br, TRANSPARENT_BORDER_WIDTH, TRANSPARENT_BORDER_WIDTH, dstImage.Width - (TRANSPARENT_BORDER_WIDTH * 2), dstImage.Height - (TRANSPARENT_BORDER_WIDTH * 2));
+                    }
                 }
 
                 var FromSystem = _main._universe.SolarSystems[path.FromSystemId];
-                
-                List<int> localSystems  = new List<int>(path.FromSystemId);
 
-                // just add route systems
-                localSystems.AddRange(path.PathSystems);
 
-                // add surrounding later ;)
+                // add route systems
+                List<MinimapSystem> minimapSystems = new List<MinimapSystem>();
 
-                Point lastPoint = center;
-                foreach (var system in localSystems)
+                foreach(var pathSystem in path.PathSystems)
                 {
-                    if (system.Equals(path.FromSystemId)) continue;
-                    SolarSystem ss = _main._universe.SolarSystems[system];
-                    var coordX = (int)Math.Round((FromSystem.X - ss.X) / LYSCALING / GUI_SCALING);
-                    var coordY = (int)Math.Round((FromSystem.Y - ss.Y) / LYSCALING / GUI_SCALING);
+                    var _solarSystem = _main._universe.SolarSystems[pathSystem];
 
-                    Point systemPoint = new Point(center.X + coordX, center.Y + coordY);
-                    Pen linePen = new Pen(Color.White, 1);
-                    g.DrawLine(linePen, lastPoint, systemPoint);
-                    lastPoint = systemPoint;
+                    minimapSystems.Add(new MinimapSystem()
+                    {
+                        solarSystem = _solarSystem,
+                        fromSystem = pathSystem == path.FromSystemId ? true : false,
+                        toSystem = pathSystem == path.ToSystemId ? true : false,
+                        route = true,
+                        textDisplay = (pathSystem == path.FromSystemId || pathSystem == path.ToSystemId) ? true : false,
+                        X = (int)Math.Round((FromSystem.X - _solarSystem.X) / LY_SCALING),
+                        Y = (int)Math.Round((FromSystem.Y - _solarSystem.Y) / LY_SCALING),
+                    });
+                }
 
-                    Brush systemBrush = new SolidBrush(Color.FromKnownColor( (ss.Id == path.ToSystemId ? KnownColor.Red : KnownColor.Orange) ));
-                    g.FillEllipse(systemBrush, systemPoint.X - CIRCLE_RADIUS, systemPoint.Y - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+                // work out scale 
+                int maxX = 0;
+                int maxY = 0;
+                int minX = 0;
+                int minY = 0;
+
+                foreach (var currentSystem in minimapSystems)
+                {
+                    maxX = Math.Max(maxX, currentSystem.X);
+                    maxY = Math.Max(maxY, currentSystem.Y);
+                    minX = Math.Min(minX, currentSystem.X);
+                    minY = Math.Min(minY, currentSystem.Y);
+                }
+                int maxSize = Math.Max((int)(maxX - minX), (int)(maxY - minY));
+                int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (CIRCLE_RADIUS*2);
+                GUI_SCALING = (int)Math.Round(  (double)(maxSize / (pictureSize * .8)));
+
+                // Apply scale
+                maxX = 0;maxY = 0;minX = 0;minY = 0;
+                foreach (var currentSystem in minimapSystems)
+                {
+                    currentSystem.X = (int)Math.Round(currentSystem.X / GUI_SCALING);
+                    currentSystem.Y = (int)Math.Round(currentSystem.Y / GUI_SCALING);
+
+                    maxX = Math.Max(maxX, currentSystem.X);
+                    maxY = Math.Max(maxY, currentSystem.Y);
+                    minX = Math.Min(minX, currentSystem.X);
+                    minY = Math.Min(minY, currentSystem.Y);
+
+                }
+
+                int ox = center.X;
+                int oy = center.Y;
+
+                if (minimapSystems.Count > 1)
+                {
+                    ox = ((srcImage.Width - (maxX - minX)) / 2) - BORDER_WIDTH - CIRCLE_RADIUS - TRANSPARENT_BORDER_WIDTH - 1;
+                    oy = ((srcImage.Height - (maxY - minY)) / 2) - BORDER_WIDTH - CIRCLE_RADIUS - TRANSPARENT_BORDER_WIDTH - 1;
+                    if (minX < 0) ox = ox + Math.Abs(minX);
+                    if (minY < 0) oy = oy + Math.Abs(minY);
+                }
+
+                // adjust origin
+                Point originPoint = new Point(ox, oy);
+
+                // draw route lines
+                var previousSystem = minimapSystems[0];
+                Point previousPoint = new Point(originPoint.X + minimapSystems[0].X, originPoint.Y + minimapSystems[0].Y);
+                foreach (var currentSystem in minimapSystems)
+                {
+                    Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+                    if (!currentSystem.solarSystem.Id.Equals(path.FromSystemId))
+                    {
+                        Pen linePen = new Pen(currentSystem.route ? LineColorRoute : LineColorNormal, 1);
+
+                        g.DrawLine(linePen, previousPoint, currentPoint);
+                    }
+
+                    previousSystem = currentSystem;
+                    previousPoint = currentPoint;
+                }
+
+                // draw system blobs
+                foreach (var currentSystem in minimapSystems)
+                {
+                    Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+                    Color systemBrushColour = SystemColorNormal;
+                    if (currentSystem.route) systemBrushColour = SystemColorRoute;
+                    if (currentSystem.fromSystem) systemBrushColour = SystemColorFrom;
+                    if (currentSystem.toSystem) systemBrushColour = SystemColorTo;
+                    Brush systemBrush = new SolidBrush(systemBrushColour);
+
+                    g.FillEllipse(systemBrush, currentPoint.X - CIRCLE_RADIUS, currentPoint.Y - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+                }
+
+                // draw text
+                if (showSystemText)
+                {
+                    foreach (var currentSystem in minimapSystems)
+                    {
+                        if (!currentSystem.textDisplay) continue;
+
+                        Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+
+                        using (Font myfont = new Font("Verdana", TEXT_SIZE, FontStyle.Regular))
+                        {
+                            g.DrawString(currentSystem.solarSystem.Name, myfont, new SolidBrush(SystemColorText), currentPoint.X + CIRCLE_RADIUS + 2, currentPoint.Y + CIRCLE_RADIUS + 2, new StringFormat
+                            {
+                                Alignment = StringAlignment.Far,
+                                LineAlignment = StringAlignment.Near,
+                                Trimming = StringTrimming.None,
+                            });
+                        }
+
+                    }
                 }
 
                 return dstImage;
@@ -551,6 +681,38 @@ namespace Quesadilla
         private void pMinimap_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void QuesadillaAlertPopup_Paint(object sender, PaintEventArgs e)
+        {
+            AlertDrawText(e, AlertText);
+            AlertDrawText(e, SystemName);
+            AlertDrawText(e,RegionName);
+            AlertDrawText(e,ContextInfo);
+            //AlertDrawText(e, ShipName);
+            AlertDrawText(e, ContextInfo);
+            AlertDrawText(e, IntelLine);
+
+        }
+        private void AlertDrawText(PaintEventArgs e, System.Windows.Forms.Label l)
+        {
+            var flags = TextFormatFlags.Right;
+            if ( l.TextAlign == ContentAlignment.TopLeft || l.TextAlign == ContentAlignment.BottomLeft || l.TextAlign == ContentAlignment.MiddleLeft ) flags = TextFormatFlags.Left;
+            flags = flags | TextFormatFlags.WordBreak;
+
+            TextRenderer.DrawText(e.Graphics,l.Text,l.Font,new Rectangle(l.Left, l.Top, l.Width, l.Height),l.ForeColor, flags);
+        }
+
+        private void ShipName_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void QuesadillaAlertPopup_Shown(object sender, EventArgs e)
+        {
+            _main.latestAlertBitmap = new Bitmap(this.Width, this.Height);
+            this.DrawToBitmap(_main.latestAlertBitmap, new Rectangle(Point.Empty, _main.latestAlertBitmap.Size));
+            _main.latestAlertBitmap.Save("QuesadillaLatestAlert.png");
         }
     }
 }

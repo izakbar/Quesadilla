@@ -207,6 +207,7 @@
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
     <Compile Include="Classes\Resources\QuesadillaSound.cs" />
     <Compile Include="Classes\ItemType.cs" />
+    <Compile Include="Classes\SolarSystems\MinimapSystem.cs" />
     <Compile Include="Classes\ZKill\ZKillKill.cs" />
     <Compile Include="Classes\ZKill\ZKillRedisQ.cs" />
     <Compile Include="Classes\ZKill\ZKillRedisQAttacker.cs" />
