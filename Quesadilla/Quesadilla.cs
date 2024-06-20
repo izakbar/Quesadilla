@@ -714,7 +714,8 @@ namespace Quesadilla
             returnString = returnString.Replace("{victim}", _universe.GetCharacterName((int)kill.VictimCharacterId));
             returnString = returnString.Replace("{system}", _universe.SolarSystems.ContainsKey((int)kill.SolarSystemId) ? _universe.SolarSystems[(int)kill.SolarSystemId].Name : kill.SolarSystemId.ToString());
             returnString = returnString.Replace("{killer}", kill.KillerCharacterId == 0 ? "NPC" : _universe.GetCharacterName((int)kill.KillerCharacterId));
-            returnString = returnString.Replace("{victimship}", _universe.ItemTypes[(int)kill.VictimShipTypeId].Name);
+            returnString = returnString.Replace("{victimship}", _universe.ItemTypes.ContainsKey((int)kill.VictimShipTypeId) ? _universe.ItemTypes[(int)kill.VictimShipTypeId].Name : "Unknown:" + kill.VictimShipTypeId.ToString());
+
             returnString = returnString.Replace("{killership}", _universe.ItemTypes.ContainsKey((int)kill.KillerShipTypeId) ? _universe.ItemTypes[(int)kill.KillerShipTypeId].Name : kill.KillerShipTypeId.ToString());
             returnString = returnString.Replace("{killerweapon}", kill.KillerWeaponTypeId.ToString());
             return returnString;

@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using EVEStandard.Models;
+using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Queues;
+using Quesadilla.Classes.SolarSystems;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,10 +13,13 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Media;
+using System.Numerics;
 using System.Reflection.Emit;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace Quesadilla
 {
@@ -131,9 +136,9 @@ namespace Quesadilla
                 pAlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
                 Image RoundedImage = ClipToCircle(pAlertImage.Image, new PointF(pAlertImage.Image.Width / 2, pAlertImage.Image.Height / 2), pAlertImage.Image.Width / 2, 
                     Color.Transparent ,_main.Configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, _main.Configuration.ZKillIskColour, _main.Configuration.ZKillShowBar, _main.Configuration.ZKillBarColour);
-                Bitmap b = new Bitmap(RoundedImage);
-                b.MakeTransparent(b.GetPixel(0, 0));
-                pAlertImage.Image = b;
+                Bitmap killBitmap = new Bitmap(RoundedImage);
+                killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
+                pAlertImage.Image = killBitmap;
 
                 ShipName.Text = alert.Kill.VictimShipName;
             }
@@ -141,6 +146,14 @@ namespace Quesadilla
             {
                 IntelLine.Text = _alert.Entry.LineContent;
                 ShipName.Text = "";
+            }
+
+            if (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0)
+            {
+                Image minimapImage = ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path );
+                Bitmap minimapBitmap = new Bitmap(minimapImage);
+                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
+                pMinimapImage.Image = minimapBitmap;
             }
 
             BackgroundImage = background;
@@ -404,6 +417,78 @@ namespace Quesadilla
             }
         }
 
+        // makes nice round ellipse/circle images from rectangle images
+        public Image ClipMiniMap(Image srcImage, PathInfo path)
+        {
+            Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
+            int TRANSPARENT_BORDERWIDTH = 1;
+            int BORDERWIDTH = 1;
+
+            double LYSCALING = 9460000000000; 
+            double GUI_SCALING = 60;
+
+            int CIRCLE_RADIUS = 3;
+
+            int combinedBorder = TRANSPARENT_BORDERWIDTH + BORDERWIDTH;
+
+            Point center = new Point((srcImage.Width/2)-1, (srcImage.Height / 2)-1);
+
+            using (Graphics g = Graphics.FromImage(dstImage))
+            {
+                // Border
+                RectangleF r2 = new RectangleF(0,0,dstImage.Width, dstImage.Height);
+
+                // main background
+                using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.PaleGoldenrod)))
+                {
+                    g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
+                }
+                using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.PaleTurquoise)))
+                {
+                    g.FillRectangle(br, TRANSPARENT_BORDERWIDTH, TRANSPARENT_BORDERWIDTH, dstImage.Width - (TRANSPARENT_BORDERWIDTH*2), dstImage.Height - (TRANSPARENT_BORDERWIDTH*2));
+                }
+                using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.PaleGoldenrod)))
+                {
+                    g.FillRectangle(br, combinedBorder, combinedBorder, dstImage.Width - (combinedBorder*2), dstImage.Height - (combinedBorder*2) );
+                }
+
+                // current system in middle
+                using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.GreenYellow)))
+                {
+                    g.FillEllipse(br, center.X - CIRCLE_RADIUS, center.Y - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+                }
+
+                var FromSystem = _main._universe.SolarSystems[path.FromSystemId];
+                
+                List<int> localSystems  = new List<int>(path.FromSystemId);
+
+                // just add route systems
+                localSystems.AddRange(path.PathSystems);
+
+                // add surrounding later ;)
+
+                Point lastPoint = center;
+                foreach (var system in localSystems)
+                {
+                    if (system.Equals(path.FromSystemId)) continue;
+                    SolarSystem ss = _main._universe.SolarSystems[system];
+                    var coordX = (int)Math.Round((FromSystem.X - ss.X) / LYSCALING / GUI_SCALING);
+                    var coordY = (int)Math.Round((FromSystem.Y - ss.Y) / LYSCALING / GUI_SCALING);
+
+                    Point systemPoint = new Point(center.X + coordX, center.Y + coordY);
+                    Pen linePen = new Pen(Color.White, 1);
+                    g.DrawLine(linePen, lastPoint, systemPoint);
+                    lastPoint = systemPoint;
+
+                    Brush systemBrush = new SolidBrush(Color.FromKnownColor( (ss.Id == path.ToSystemId ? KnownColor.Red : KnownColor.Orange) ));
+                    g.FillEllipse(systemBrush, systemPoint.X - CIRCLE_RADIUS, systemPoint.Y - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+                }
+
+                return dstImage;
+            }
+        }
+
+
         private void Zoom_MouseEnter(object sender, EventArgs e)
         {
             System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
@@ -461,6 +546,11 @@ namespace Quesadilla
         private void pAlertImage_MouseLeave(object sender, EventArgs e)
         {
             ShipName.Visible = false;
+        }
+
+        private void pMinimap_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

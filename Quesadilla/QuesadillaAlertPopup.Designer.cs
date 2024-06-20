@@ -40,7 +40,9 @@
             this.timerOpacityClose = new System.Windows.Forms.Timer(this.components);
             this.RegionName = new System.Windows.Forms.Label();
             this.ShipName = new System.Windows.Forms.Label();
+            this.pMinimapImage = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pAlertImage)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pMinimapImage)).BeginInit();
             this.SuspendLayout();
             // 
             // timerAlertWindow
@@ -170,6 +172,16 @@
             this.ShipName.UseCompatibleTextRendering = true;
             this.ShipName.Visible = false;
             // 
+            // pMinimapImage
+            // 
+            this.pMinimapImage.BackColor = System.Drawing.Color.Transparent;
+            this.pMinimapImage.Location = new System.Drawing.Point(38, 5);
+            this.pMinimapImage.Name = "pMinimapImage";
+            this.pMinimapImage.Size = new System.Drawing.Size(130, 125);
+            this.pMinimapImage.TabIndex = 7;
+            this.pMinimapImage.TabStop = false;
+            this.pMinimapImage.Click += new System.EventHandler(this.pMinimap_Click);
+            // 
             // QuesadillaAlertPopup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -178,6 +190,7 @@
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ClientSize = new System.Drawing.Size(367, 150);
             this.ControlBox = false;
+            this.Controls.Add(this.pMinimapImage);
             this.Controls.Add(this.ShipName);
             this.Controls.Add(this.RegionName);
             this.Controls.Add(this.pAlertImage);
@@ -198,6 +211,7 @@
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.QuesadillaAlertPopup_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.QuesadillaAlertPopup_MouseUp);
             ((System.ComponentModel.ISupportInitialize)(this.pAlertImage)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pMinimapImage)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -214,5 +228,6 @@
         private System.Windows.Forms.Timer timerOpacityClose;
         private System.Windows.Forms.Label RegionName;
         private System.Windows.Forms.Label ShipName;
+        private System.Windows.Forms.PictureBox pMinimapImage;
     }
 }
