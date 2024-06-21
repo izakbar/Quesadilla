@@ -573,7 +573,8 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                 // expire zkills (OBS OPage)?
                 lock (OBSZKills)
                 {
-                    if (OBSZKills.Count > 0)
+                    bool removedOBSZkill = true;
+                    while (OBSZKills.Count > 0 && removedOBSZkill)
                     {
                         var k = OBSZKills.First();
                         TimeSpan ts = DateTime.Now - k.TimeAdded;
@@ -581,6 +582,10 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                         {
                             k.Expired = true;
                             OBSZKills.Dequeue();
+                            removedOBSZkill = true;
+                        } else
+                        {
+                            removedOBSZkill = false;
                         }
                     }
                 }
