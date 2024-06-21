@@ -109,8 +109,6 @@ namespace Quesadilla
         private MenuItem menuConfigurationDPSSaveCSV = new MenuItem("DPS Save CSV");
         private MenuItem menuConfigurationDPSShowAll = new MenuItem("DPS Combine");
 
-        private ZKillRedisQ ZKillFeed;
-
         private EveScoutManager EveScoutProcessor;
 
         public bool AlertShowing = false;
@@ -260,8 +258,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             // start main tick timer
             mainTimer.Enabled = true;
 
-            ZKillFeed = new ZKillRedisQ();
-            ZKillFeed.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
+            Program.ZKillHandler.ZKillFeed.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
 
         }
 

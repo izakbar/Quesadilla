@@ -9,11 +9,14 @@ namespace Quesadilla.Classes.ZKill
     public class ZKill
     {
         public Queue<ZKillKill> OBSZKills {  get; set; }
-        public List<ZKillKill> ZKillKills = new List<ZKillKill>();
+        public List<ZKillKill> ZKillKills { get; set; }
+        public ZKillRedisQ ZKillFeed { get; set; }
 
         public ZKill()
         {
             OBSZKills  = new Queue<ZKillKill>();
+            ZKillKills = new List<ZKillKill>();
+            ZKillFeed = new ZKillRedisQ();
         }
 
         public void EnqueueZKillOBS(ZKillKill kill)
