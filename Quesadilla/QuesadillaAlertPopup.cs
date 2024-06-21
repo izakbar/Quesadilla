@@ -537,16 +537,18 @@ namespace Quesadilla
 
                 // Apply scale
                 maxX = 0;maxY = 0;minX = 0;minY = 0;
-                foreach (var currentSystem in minimapSystems)
+                if (GUI_SCALING > 0)
                 {
-                    currentSystem.X = (int)Math.Round(currentSystem.X / GUI_SCALING);
-                    currentSystem.Y = (int)Math.Round(currentSystem.Y / GUI_SCALING);
+                    foreach (var currentSystem in minimapSystems)
+                    {
+                        currentSystem.X = (int)Math.Round(currentSystem.X / GUI_SCALING);
+                        currentSystem.Y = (int)Math.Round(currentSystem.Y / GUI_SCALING);
 
-                    maxX = Math.Max(maxX, currentSystem.X);
-                    maxY = Math.Max(maxY, currentSystem.Y);
-                    minX = Math.Min(minX, currentSystem.X);
-                    minY = Math.Min(minY, currentSystem.Y);
-
+                        maxX = Math.Max(maxX, currentSystem.X);
+                        maxY = Math.Max(maxY, currentSystem.Y);
+                        minX = Math.Min(minX, currentSystem.X);
+                        minY = Math.Min(minY, currentSystem.Y);
+                    }
                 }
 
                 int ox = center.X;
@@ -566,18 +568,21 @@ namespace Quesadilla
                 // draw route lines
                 var previousSystem = minimapSystems[0];
                 Point previousPoint = new Point(originPoint.X + minimapSystems[0].X, originPoint.Y + minimapSystems[0].Y);
-                foreach (var currentSystem in minimapSystems)
+                if (minimapSystems.Count > 1)
                 {
-                    Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-                    if (!currentSystem.solarSystem.Id.Equals(path.FromSystemId))
+                    foreach (var currentSystem in minimapSystems)
                     {
-                        Pen linePen = new Pen(currentSystem.route ? LineColorRoute : LineColorNormal, 1);
+                        Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+                        if (!currentSystem.solarSystem.Id.Equals(path.FromSystemId))
+                        {
+                            Pen linePen = new Pen(currentSystem.route ? LineColorRoute : LineColorNormal, 1);
 
-                        g.DrawLine(linePen, previousPoint, currentPoint);
+                            g.DrawLine(linePen, previousPoint, currentPoint);
+                        }
+
+                        previousSystem = currentSystem;
+                        previousPoint = currentPoint;
                     }
-
-                    previousSystem = currentSystem;
-                    previousPoint = currentPoint;
                 }
 
                 // draw system blobs
