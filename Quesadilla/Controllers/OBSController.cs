@@ -36,10 +36,10 @@ namespace Quesadilla.Controllers
         {
             string output = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
             int count = 0;
-            if (Program.OBSZKills != null && Program.OBSZKills.Count > 0)
+            if (Program.ZKillHandler.OBSZKills != null && Program.ZKillHandler.OBSZKills.Count > 0)
             {
                 output += "<div class=zkill>";
-                foreach (ZKillKill k in Program.OBSZKills.Reverse())
+                foreach (ZKillKill k in Program.ZKillHandler.OBSZKills.Reverse())
                 {
                     if (limit != null && count++ >= limit)
                     {

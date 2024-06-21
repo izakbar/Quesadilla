@@ -110,7 +110,6 @@ namespace Quesadilla
         private MenuItem menuConfigurationDPSShowAll = new MenuItem("DPS Combine");
 
         private ZKillRedisQ ZKillFeed;
-        private List<ZKillKill> ZKillKills = new List<ZKillKill>();
 
         private EveScoutManager EveScoutProcessor;
 
@@ -548,22 +547,8 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                     }
                 }
 
-                // expire zkills ?
-                lock (ZKillKills)
-                {
-                    foreach (var k in ZKillKills)
-                    {
-                        TimeSpan ts = DateTime.Now - k.TimeAdded;
-                        if (ts.TotalSeconds > MainConfiguration.ExpireZKillSeconds)
-                        {
-                            Program.Universe.SolarSystems[(int)k.SolarSystemId].Kills.Remove(k);
-                            k.Expired = true;
-                        }
-                    }
-                    ZKillKills.RemoveAll(o => o.Expired);
-                }
-
-                Program.ExpireOBSZKillQueue();
+                Program.ZKillHandler.ExpireZKillQueueAlerts();
+                Program.ZKillHandler.ExpireZKillQueueOBS();
 
                 TickCounts["SinceLastCleardown"] = 0;
             }
@@ -1683,16 +1668,14 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                     Program.Universe.SolarSystems[(int)e.Kill.SolarSystemId].Kills = new List<ZKillKill>();
                 }
                 Program.Universe.SolarSystems[(int)e.Kill.SolarSystemId].Kills.Add(e.Kill);
-                lock (ZKillKills)
-                {
-                    ZKillKills.Add(e.Kill);
-                }
+
+                Program.ZKillHandler.EnqueueZKillAlert(e.Kill);
             }
 
             Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {Program.Universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
             e.Kill.Context = generateZKillAlertText(e.Kill, null, MainConfiguration.ZKillContextText, "");
 
-            Program.EnqueueZKill(e.Kill);
+            Program.ZKillHandler.EnqueueZKillOBS(e.Kill);
 
             // check if zkill system matches any range alerts
             // and that report zkill flag is set
