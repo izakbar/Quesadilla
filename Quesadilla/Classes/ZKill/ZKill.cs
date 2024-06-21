@@ -9,47 +9,51 @@ namespace Quesadilla.Classes.ZKill
     public class ZKill
     {
         public Queue<ZKillKill> OBSZKills {  get; set; }
-        public List<ZKillKill> ZKillKills { get; set; }
+        public Queue<ZKillKill> ZKillKills { get; set; }
         public ZKillRedisQ ZKillFeed { get; set; }
 
         public ZKill()
         {
             OBSZKills  = new Queue<ZKillKill>();
-            ZKillKills = new List<ZKillKill>();
+            ZKillKills = new Queue<ZKillKill>();
             ZKillFeed = new ZKillRedisQ();
+        }
+
+        public void EnqueueZKillAlert(Queue<ZKillKill> q, ZKillKill kill)
+        {
+            // only add to new zkill list if not already in list. This should prevent multiple entries for same thing
+            var f = q.Where(o => o.ID == kill.ID).ToList();
+            if (f.Count == 0 )
+            {
+                lock (q)
+                {
+                    q.Enqueue(kill);
+                }
+            }
         }
 
         public void EnqueueZKillOBS(ZKillKill kill)
         {
-            // only add to new zkill list if not already in list. This should prevent multiple entries for same thing
-            var f = OBSZKills.Where(o => o.ID == kill.ID).ToList();
-            if (f.Count == 0 )
-            {
-                OBSZKills.Enqueue(kill);
-            }
+            EnqueueZKillAlert(OBSZKills, kill);
         }
-
         public void EnqueueZKillAlert(ZKillKill kill)
         {
-            lock (ZKillKills)
-            {
-                ZKillKills.Add(kill);
-            }
+            EnqueueZKillAlert(ZKillKills, kill);
         }
-        public void ExpireZKillQueueOBS()
+
+        private void ExpireZkillQueue(Queue<ZKillKill> zq)
         {
-            // expire zkills (OBS OPage)?
-            lock (OBSZKills)
+            lock (zq)
             {
                 bool removedOBSZkill = true;
-                while (OBSZKills.Count > 0 && removedOBSZkill)
+                while (zq.Count > 0 && removedOBSZkill)
                 {
-                    var k = OBSZKills.First();
+                    var k = zq.First();
                     TimeSpan ts = DateTime.Now - k.TimeAdded;
                     if (ts.TotalSeconds > Program.MainConfiguration.ExpireZKillSeconds)
                     {
                         k.Expired = true;
-                        OBSZKills.Dequeue();
+                        zq.Dequeue();
                         removedOBSZkill = true;
                     }
                     else
@@ -59,22 +63,14 @@ namespace Quesadilla.Classes.ZKill
                 }
             }
         }
+
+        public void ExpireZKillQueueOBS()
+        {
+            ExpireZkillQueue(OBSZKills);
+        }
         public void ExpireZKillQueueAlerts()
         {
-            // expire zkills ?
-            lock (ZKillKills)
-            {
-                foreach (var k in ZKillKills)
-                {
-                    TimeSpan ts = DateTime.Now - k.TimeAdded;
-                    if (ts.TotalSeconds > Program.MainConfiguration.ExpireZKillSeconds)
-                    {
-                        Program.Universe.SolarSystems[(int)k.SolarSystemId].Kills.Remove(k);
-                        k.Expired = true;
-                    }
-                }
-                ZKillKills.RemoveAll(o => o.Expired);
-            }
+            ExpireZkillQueue(ZKillKills);
         }
 
     }
