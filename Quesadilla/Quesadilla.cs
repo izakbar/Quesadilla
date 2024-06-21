@@ -76,7 +76,6 @@ namespace Quesadilla
         private readonly Regex _ISKRegexISKData = new Regex("^<font size=12><b><color=0x........>\\s*(?<iskAmount>.*) ISK\\s*</b><color=0x........> added to next bounty payout", RegexOptions.Compiled);
 
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
-        public Queue<ZKillKill> Kills = new Queue<ZKillKill>();
 
         public UniverseManager _universe = new UniverseManager();
         public Config Configuration = new Config();
@@ -114,6 +113,7 @@ namespace Quesadilla
 
         private ZKillRedisQ ZKillFeed;
         private List<ZKillKill> ZKillKills = new List<ZKillKill>();
+        public Queue<ZKillKill> OBSZKills = new Queue<ZKillKill>();
 
         private EveScoutManager EveScoutProcessor;
 
@@ -568,6 +568,21 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                         }
                     }
                     ZKillKills.RemoveAll(o => o.Expired);
+                }
+
+                // expire zkills (OBS OPage)?
+                lock (OBSZKills)
+                {
+                    if (OBSZKills.Count > 0)
+                    {
+                        var k = OBSZKills.First();
+                        TimeSpan ts = DateTime.Now - k.TimeAdded;
+                        if (ts.TotalSeconds > Configuration.ExpireZKillSeconds)
+                        {
+                            k.Expired = true;
+                            OBSZKills.Dequeue();
+                        }
+                    }
                 }
 
                 TickCounts["SinceLastCleardown"] = 0;
@@ -1944,10 +1959,10 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         private void EnqueueZKill(ZKillKill kill)
         {
             // only add to new zkill list if not already in list. This should prevent multiple entries for same thing
-            var f = Kills.Where(o => o.ID == kill.ID).ToList();
+            var f = OBSZKills.Where(o => o.ID == kill.ID).ToList();
             if (f.Count == 0 || NewAlerts.Count == 0)
             {
-                Kills.Enqueue(kill);
+                OBSZKills.Enqueue(kill);
             }
         }
     }

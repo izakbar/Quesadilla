@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.Remoting.Metadata;
 using System.Threading.Tasks;
 using EVEStandard;
 using EVEStandard.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Quesadilla;
+using Quesadilla.Classes.ZKill;
 using Serilog.Core;
 
 namespace Quesadilla.Controllers
@@ -26,9 +28,9 @@ namespace Quesadilla.Controllers
             string zkillfeed = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
 
             int count = 0;
-            if (Program.q != null && Program.q.Kills != null)
+            if (Program.q != null && Program.q.OBSZKills != null)
             {
-                foreach (var k in Program.q.Kills.Reverse())
+                foreach (ZKillKill k in Program.q.OBSZKills.Reverse())
                 {
                     if (limit != null && count++ >= limit)
                     {
