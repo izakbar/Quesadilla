@@ -74,6 +74,7 @@ namespace Quesadilla.Classes
                 AlertPopupMinimapSystemColorFrom = AlertPopupMinimapSystemColorFrom,
                 AlertPopupMinimapSystemColorTo = AlertPopupMinimapSystemColorTo,
                 AlertPopupMinimapSystemColorText = AlertPopupMinimapSystemColorText,
+                IntegrationPort = IntegrationPort,
             };
 
             c.AlertPopupMinimapPosition = new Point(AlertPopupMinimapPosition.X, AlertPopupMinimapPosition.Y);
@@ -198,6 +199,8 @@ namespace Quesadilla.Classes
 
                 c.AlertPopupMinimapPosition = new Point(30, 0);
                 c.AlertPopupMinimapSize = new Point(232, 204);
+
+                c.IntegrationPort = 65432;
             }
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
@@ -376,5 +379,7 @@ namespace Quesadilla.Classes
 
         public Point AlertPopupMinimapPosition { get; set; }
         public Point AlertPopupMinimapSize { get; set; }
+
+        public int IntegrationPort { get; set; }
     }
 }

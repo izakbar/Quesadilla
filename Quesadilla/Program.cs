@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Forms;
 using Microsoft.AspNetCore.Hosting;
+using Quesadilla.Classes.SolarSystems;
 using Serilog;
 using Serilog.Formatting.Display;
 using Serilog.Sinks.WinForms.Base;
@@ -15,11 +16,19 @@ namespace Quesadilla
         /// </summary>
 
         public static Quesadilla q = null;
+        public static UniverseManager Universe = new UniverseManager();
+
+        public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
 
         [STAThread]
         static void Main()
         {
             ConfigureSerilog();
+
+            Universe.ReadSolarSystems("Quesadilla.Systems.Json");
+            Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
+            Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
+            Universe.SetupESI();
 
             var webhost = new WebHostBuilder()
                 .UseKestrel()
@@ -30,7 +39,8 @@ namespace Quesadilla
                 ;
             webhost.Build().RunAsync();
 
-            Application.EnableVisualStyles();
+
+        Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(q = new Quesadilla());
         }

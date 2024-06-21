@@ -138,7 +138,7 @@ namespace Quesadilla
 
                 pAlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
                 Image RoundedImage = ClipToCircle(pAlertImage.Image, new PointF(pAlertImage.Image.Width / 2, pAlertImage.Image.Height / 2), pAlertImage.Image.Width / 2, 
-                    Color.Transparent ,_main.Configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, _main.Configuration.ZKillIskColour, _main.Configuration.ZKillShowBar, _main.Configuration.ZKillBarColour);
+                    Color.Transparent ,_main.MainConfiguration.ZKillCircleColour, 10, alert.Kill.TotalValue, _main.MainConfiguration.ZKillIskColour, _main.MainConfiguration.ZKillShowBar, _main.MainConfiguration.ZKillBarColour);
                 Bitmap killBitmap = new Bitmap(RoundedImage);
                 killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
                 pAlertImage.Image = killBitmap;
@@ -151,24 +151,24 @@ namespace Quesadilla
                 ShipName.Text = "";
             }
 
-            if (_main.Configuration.AlertPopupMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0) )
+            if (_main.MainConfiguration.AlertPopupMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0) )
             {
                 Image minimapImage = ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path ,
-                    _main.Configuration.AlertPopupMinimapShowSystemText, 
-                    _main.Configuration.AlertPopupShowMinimapBorder, _main.Configuration.AlertPopupMinimapBorderColor,
-                    _main.Configuration.AlertPopupMinimapLineColorNormal,
-                    _main.Configuration.AlertPopupMinimapLineColorRoute,
-                    _main.Configuration.AlertPopupMinimapSystemColorNormal,
-                    _main.Configuration.AlertPopupMinimapSystemColorRoute,
-                    _main.Configuration.AlertPopupMinimapSystemColorFrom,
-                    _main.Configuration.AlertPopupMinimapSystemColorTo,
-                    _main.Configuration.AlertPopupMinimapSystemColorText
+                    _main.MainConfiguration.AlertPopupMinimapShowSystemText, 
+                    _main.MainConfiguration.AlertPopupShowMinimapBorder, _main.MainConfiguration.AlertPopupMinimapBorderColor,
+                    _main.MainConfiguration.AlertPopupMinimapLineColorNormal,
+                    _main.MainConfiguration.AlertPopupMinimapLineColorRoute,
+                    _main.MainConfiguration.AlertPopupMinimapSystemColorNormal,
+                    _main.MainConfiguration.AlertPopupMinimapSystemColorRoute,
+                    _main.MainConfiguration.AlertPopupMinimapSystemColorFrom,
+                    _main.MainConfiguration.AlertPopupMinimapSystemColorTo,
+                    _main.MainConfiguration.AlertPopupMinimapSystemColorText
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
                 pMinimapImage.Image = minimapBitmap;
-                pMinimapImage.Location = _main.Configuration.AlertPopupMinimapPosition;
-                pMinimapImage.Size = (Size)_main.Configuration.AlertPopupMinimapSize;
+                pMinimapImage.Location = _main.MainConfiguration.AlertPopupMinimapPosition;
+                pMinimapImage.Size = (Size)_main.MainConfiguration.AlertPopupMinimapSize;
                 pMinimapImage.Visible = true;
             }
             else
@@ -179,51 +179,51 @@ namespace Quesadilla
             BackgroundImage = background;
 
             // position on screen
-            if (_main.Configuration.AlertTransparent)
+            if (_main.MainConfiguration.AlertTransparent)
             {
                 // use current eve window (for transparent)
-                switch (_main.Configuration.DPSLocation)
+                switch (_main.MainConfiguration.DPSLocation)
                 {
                     case PopupLocationType.TopLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left + _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Left + _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.TopCenter:
                         Location = new Point()
                         {
                             X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.TopRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width - _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Right - Width - _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left + _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Left + _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomCenter:
                         Location = new Point()
                         {
                             X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            Y = _main.currentEveWindowRect.Bottom - Height - _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width - _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Right - Width - _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.Center:
@@ -496,7 +496,7 @@ namespace Quesadilla
                     }
                 }
 
-                var FromSystem = _main._universe.SolarSystems[path.FromSystemId];
+                var FromSystem = Program.Universe.SolarSystems[path.FromSystemId];
 
 
                 // add route systems
@@ -504,7 +504,7 @@ namespace Quesadilla
 
                 foreach(var pathSystem in path.PathSystems)
                 {
-                    var _solarSystem = _main._universe.SolarSystems[pathSystem];
+                    var _solarSystem = Program.Universe.SolarSystems[pathSystem];
 
                     minimapSystems.Add(new MinimapSystem()
                     {

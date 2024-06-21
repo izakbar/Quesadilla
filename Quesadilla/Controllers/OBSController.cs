@@ -45,7 +45,7 @@ namespace Quesadilla.Controllers
                     {
                         break;
                     }
-                    var zkillVictim = Program.q._universe.GetCharacterName((int)k.VictimCharacterId);
+                    var zkillVictim = Program.Universe.GetCharacterName((int)k.VictimCharacterId);
                     string kf = $"<div class=zkillkill><div class=zkill-ship><a href=https://zkillboard.com/kill/{k.ID}><img class=\"rounded-corners\" width=98% src=https://images.evetech.net/types/{k.VictimShipTypeId}/render></a>" +
                 "</div>" +
                 $"<div class=zkill-value>{k.TotalValue}</div>" +
@@ -102,7 +102,7 @@ img.rounded-corners {
         [Route("[controller]/latestAlert")]
         public ActionResult latestAlert(int? seconds)
         {
-            if (seconds is null) { seconds = Program.q.Configuration.AlertPopupSeconds; }
+            if (seconds is null) { seconds = Program.q.MainConfiguration.AlertPopupSeconds; }
             string output = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
             if (Program.q != null && Program.q.latestAlertBitmap != null)
             {

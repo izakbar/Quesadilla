@@ -34,7 +34,7 @@ namespace Quesadilla
         private void SetSystem(ComboBox cmb, string systemName)
         {
             cmb.Items.Clear();
-            cmb.DataSource = _mainForm._universe.Names.Keys.OrderBy(x => x).ToList();
+            cmb.DataSource = Program.Universe.Names.Keys.OrderBy(x => x).ToList();
             cmb.Text = systemName;
         }
         private void SetBackground(ComboBox cmb, string background)
@@ -188,7 +188,7 @@ namespace Quesadilla
         private void buttonSave_Click(object sender, EventArgs e)
         {
             // Store items into config
-            _mainForm.Configuration = _configuration;
+            _mainForm.MainConfiguration = _configuration;
             _configuration.Save(_mainForm.configuration_filename);
             _mainForm.ReloadConfiguration();
             Close();
