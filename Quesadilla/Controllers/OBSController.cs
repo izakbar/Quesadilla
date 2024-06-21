@@ -32,7 +32,7 @@ namespace Quesadilla.Controllers
             return Ok("Welcome To Quesadilla");
         }
         [Route("[controller]/zkillfeed")]
-        public ActionResult zkillfeed(int? limit)
+        public ActionResult zkillfeed(int? limit = 10 , bool bigbois = false)
         {
             string output = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
             int count = 0;
@@ -41,6 +41,9 @@ namespace Quesadilla.Controllers
                 output += "<div class=zkill>";
                 foreach (ZKillKill k in Program.ZKillHandler.OBSZKills.Reverse())
                 {
+                    // check this matches criteria 
+                    if ( bigbois && ! k.TotalValue.Contains("B") ) continue;
+
                     if (limit != null && count++ >= limit)
                     {
                         break;
