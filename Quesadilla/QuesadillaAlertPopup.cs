@@ -138,7 +138,7 @@ namespace Quesadilla
 
                 pAlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
                 Image RoundedImage = ClipToCircle(pAlertImage.Image, new PointF(pAlertImage.Image.Width / 2, pAlertImage.Image.Height / 2), pAlertImage.Image.Width / 2, 
-                    Color.Transparent ,_main.MainConfiguration.ZKillCircleColour, 10, alert.Kill.TotalValue, _main.MainConfiguration.ZKillIskColour, _main.MainConfiguration.ZKillShowBar, _main.MainConfiguration.ZKillBarColour);
+                    Color.Transparent ,Program.MainConfiguration.ZKillCircleColour, 10, alert.Kill.TotalValue, Program.MainConfiguration.ZKillIskColour, Program.MainConfiguration.ZKillShowBar, Program.MainConfiguration.ZKillBarColour);
                 Bitmap killBitmap = new Bitmap(RoundedImage);
                 killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
                 pAlertImage.Image = killBitmap;
@@ -151,24 +151,24 @@ namespace Quesadilla
                 ShipName.Text = "";
             }
 
-            if (_main.MainConfiguration.AlertPopupMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0) )
+            if (Program.MainConfiguration.AlertPopupMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0) )
             {
                 Image minimapImage = ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path ,
-                    _main.MainConfiguration.AlertPopupMinimapShowSystemText, 
-                    _main.MainConfiguration.AlertPopupShowMinimapBorder, _main.MainConfiguration.AlertPopupMinimapBorderColor,
-                    _main.MainConfiguration.AlertPopupMinimapLineColorNormal,
-                    _main.MainConfiguration.AlertPopupMinimapLineColorRoute,
-                    _main.MainConfiguration.AlertPopupMinimapSystemColorNormal,
-                    _main.MainConfiguration.AlertPopupMinimapSystemColorRoute,
-                    _main.MainConfiguration.AlertPopupMinimapSystemColorFrom,
-                    _main.MainConfiguration.AlertPopupMinimapSystemColorTo,
-                    _main.MainConfiguration.AlertPopupMinimapSystemColorText
+                    Program.MainConfiguration.AlertPopupMinimapShowSystemText, 
+                    Program.MainConfiguration.AlertPopupShowMinimapBorder, Program.MainConfiguration.AlertPopupMinimapBorderColor,
+                    Program.MainConfiguration.AlertPopupMinimapLineColorNormal,
+                    Program.MainConfiguration.AlertPopupMinimapLineColorRoute,
+                    Program.MainConfiguration.AlertPopupMinimapSystemColorNormal,
+                    Program.MainConfiguration.AlertPopupMinimapSystemColorRoute,
+                    Program.MainConfiguration.AlertPopupMinimapSystemColorFrom,
+                    Program.MainConfiguration.AlertPopupMinimapSystemColorTo,
+                    Program.MainConfiguration.AlertPopupMinimapSystemColorText
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
                 pMinimapImage.Image = minimapBitmap;
-                pMinimapImage.Location = _main.MainConfiguration.AlertPopupMinimapPosition;
-                pMinimapImage.Size = (Size)_main.MainConfiguration.AlertPopupMinimapSize;
+                pMinimapImage.Location = Program.MainConfiguration.AlertPopupMinimapPosition;
+                pMinimapImage.Size = (Size)Program.MainConfiguration.AlertPopupMinimapSize;
                 pMinimapImage.Visible = true;
             }
             else
@@ -179,51 +179,51 @@ namespace Quesadilla
             BackgroundImage = background;
 
             // position on screen
-            if (_main.MainConfiguration.AlertTransparent)
+            if (Program.MainConfiguration.AlertTransparent)
             {
                 // use current eve window (for transparent)
-                switch (_main.MainConfiguration.DPSLocation)
+                switch (Program.MainConfiguration.DPSLocation)
                 {
                     case PopupLocationType.TopLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left + _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Left + Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.TopCenter:
                         Location = new Point()
                         {
                             X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.TopRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width - _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Right - Width - Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left + _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Left + Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomCenter:
                         Location = new Point()
                         {
                             X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            Y = _main.currentEveWindowRect.Bottom - Height - Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width - _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Right - Width - Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.Center:

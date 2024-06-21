@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Quesadilla.Classes;
 using Quesadilla.Classes.SolarSystems;
 using Quesadilla.Classes.ZKill;
 using Serilog;
@@ -21,15 +24,19 @@ namespace Quesadilla
         public static Quesadilla q = null;
 
         public static ZKill ZKillHandler = new ZKill();
+        public static Config MainConfiguration = new Config();
 
         public static UniverseManager Universe = new UniverseManager();
 
+        public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
 
         [STAThread]
         static void Main()
         {
             ConfigureSerilog();
+
+            MainConfiguration = Config.Load(configuration_filename);
 
             Universe.ReadSolarSystems("Quesadilla.Systems.Json");
             Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
@@ -39,16 +46,26 @@ namespace Quesadilla
             var webhost = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
-//                .UseIISIntegration()
+                //                .UseIISIntegration()
                 .UseStartup<Startup>()
                 .UseUrls("http://localhost:65432") // <-----
                 ;
             webhost.Build().RunAsync();
 
 
-        Application.EnableVisualStyles();
+            Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(q = new Quesadilla());
+
+            MainConfiguration.Save(configuration_filename);
+        }
+
+        public static void SaveAndReloadConfiguration(Config c)
+        {
+            // Store items into config
+            Program.MainConfiguration = c;
+            c.Save(configuration_filename);
+            q.ReloadConfiguration();
         }
 
         private static void ConfigureSerilog()

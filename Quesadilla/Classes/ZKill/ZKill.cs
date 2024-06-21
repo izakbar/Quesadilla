@@ -46,7 +46,7 @@ namespace Quesadilla.Classes.ZKill
                 {
                     var k = OBSZKills.First();
                     TimeSpan ts = DateTime.Now - k.TimeAdded;
-                    if (ts.TotalSeconds > Program.q.MainConfiguration.ExpireZKillSeconds)
+                    if (ts.TotalSeconds > Program.MainConfiguration.ExpireZKillSeconds)
                     {
                         k.Expired = true;
                         OBSZKills.Dequeue();
@@ -67,7 +67,7 @@ namespace Quesadilla.Classes.ZKill
                 foreach (var k in ZKillKills)
                 {
                     TimeSpan ts = DateTime.Now - k.TimeAdded;
-                    if (ts.TotalSeconds > Program.q.MainConfiguration.ExpireZKillSeconds)
+                    if (ts.TotalSeconds > Program.MainConfiguration.ExpireZKillSeconds)
                     {
                         Program.Universe.SolarSystems[(int)k.SolarSystemId].Kills.Remove(k);
                         k.Expired = true;

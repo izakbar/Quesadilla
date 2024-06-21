@@ -25,14 +25,14 @@ namespace Quesadilla
         public QuesadillaDPSGraph(Quesadilla mainForm)
         {
             _main = mainForm;
-            TopMost = _main.MainConfiguration.DPSGraphStayOnTop;
-            if ( _main.MainConfiguration.DPSGraphTransparent )
+            TopMost = Program.MainConfiguration.DPSGraphStayOnTop;
+            if ( Program.MainConfiguration.DPSGraphTransparent )
             {
                 this.TransparencyKey = this.BackColor = TransparentColour;
             }
             InitializeComponent();
 
-            if ( _main.MainConfiguration.DPSGraphTransparent )
+            if ( Program.MainConfiguration.DPSGraphTransparent )
             {
                 this.Text = "";
                 this.ControlBox = false;
@@ -41,8 +41,8 @@ namespace Quesadilla
             }
 
 
-            Width = _main.MainConfiguration.DPSGraphWindowSize.X <= 100 ? 100 : _main.MainConfiguration.DPSGraphWindowSize.X;
-            Height = _main.MainConfiguration.DPSGraphWindowSize.Y <= 50 ? 50 : _main.MainConfiguration.DPSGraphWindowSize.Y;
+            Width = Program.MainConfiguration.DPSGraphWindowSize.X <= 100 ? 100 : Program.MainConfiguration.DPSGraphWindowSize.X;
+            Height = Program.MainConfiguration.DPSGraphWindowSize.Y <= 50 ? 50 : Program.MainConfiguration.DPSGraphWindowSize.Y;
 
             SetScreenPosition();
         }
@@ -50,51 +50,51 @@ namespace Quesadilla
         public void SetScreenPosition()
         {
             // position on screen
-            if ( _main.MainConfiguration.DPSGraphTransparent )
+            if ( Program.MainConfiguration.DPSGraphTransparent )
             {
                 // use current eve window (for transparent)
-                switch (_main.MainConfiguration.DPSLocation)
+                switch (Program.MainConfiguration.DPSLocation)
                 {
                     case PopupLocationType.TopLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left + _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Left + Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.TopCenter:
                         Location = new Point()
                         {
                             X = ( (_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.TopRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width - _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Right - Width - Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left + _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Left + Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomCenter:
                         Location = new Point()
                         {
                             X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            Y = _main.currentEveWindowRect.Bottom - Height - Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width - _main.MainConfiguration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Right - Width - Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.Center:
@@ -111,7 +111,7 @@ namespace Quesadilla
             {
                 // use screen position
                 Screen screen = Screen.FromControl(this);
-                switch (_main.MainConfiguration.DPSLocation)
+                switch (Program.MainConfiguration.DPSLocation)
                 {
                     case PopupLocationType.TopLeft:
                         Location = new Point()
@@ -154,21 +154,21 @@ namespace Quesadilla
         }
         private void QuesadillaDPSGraph_Load(object sender, EventArgs e)
         {
-            if (_main.MainConfiguration.DPSGraphTransparent)
+            if (Program.MainConfiguration.DPSGraphTransparent)
             {
                 this.chartDPS.BackColor = this.BackColor;
                 ShowInTaskbar = false;
                 this.chartDPS.AntiAliasing = AntiAliasingStyles.None;
             }
-            chartDPS.Legends.First().Enabled = _main.MainConfiguration.DPSGraphLegends;
+            chartDPS.Legends.First().Enabled = Program.MainConfiguration.DPSGraphLegends;
         }
 
         public void UpdateDPSGraph()
         {
-            int maxPoints = _main.MainConfiguration.GraphCombatMaxPoints;
-            int minSpanSize = _main.MainConfiguration.GraphCombatMinPointSeconds;
+            int maxPoints = Program.MainConfiguration.GraphCombatMaxPoints;
+            int minSpanSize = Program.MainConfiguration.GraphCombatMinPointSeconds;
 
-            int LineSize = _main.MainConfiguration.DPSGraphLineSize;
+            int LineSize = Program.MainConfiguration.DPSGraphLineSize;
 
             // default to total dps
             chartDPS.Series.Clear();
@@ -215,7 +215,7 @@ namespace Quesadilla
                 SetScreenPosition();
             }
 
-            if ( _main.MainConfiguration.DPSAllToons )
+            if ( Program.MainConfiguration.DPSAllToons )
             {
                 Toon = "*ALL*";
             }
@@ -338,9 +338,9 @@ namespace Quesadilla
 
             DateTime curr = start;
             // check range
-            if (totalTime.TotalSeconds > _main.MainConfiguration.GraphCombatSeconds)
+            if (totalTime.TotalSeconds > Program.MainConfiguration.GraphCombatSeconds)
             {
-                curr = end.AddSeconds(-1 * _main.MainConfiguration.GraphCombatSeconds);
+                curr = end.AddSeconds(-1 * Program.MainConfiguration.GraphCombatSeconds);
                 totalTime = end - curr;
             }
 
@@ -512,7 +512,7 @@ namespace Quesadilla
 
 
             // dump to csv
-            if (_main.MainConfiguration.DPSSaveCSV)
+            if (Program.MainConfiguration.DPSSaveCSV)
             {
                 using (var file = File.CreateText(Toon + "_raw_combat.csv"))
                 {
@@ -556,7 +556,7 @@ namespace Quesadilla
                 // Set the form click-through
                 if (_main != null)
                 {
-                    if (_main.MainConfiguration.DPSGraphTransparent)
+                    if (Program.MainConfiguration.DPSGraphTransparent)
                     {
                         cp.ExStyle |=
                             0x80000 /* WS_EX_LAYERED */ |

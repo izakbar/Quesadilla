@@ -187,10 +187,7 @@ namespace Quesadilla
 
         private void buttonSave_Click(object sender, EventArgs e)
         {
-            // Store items into config
-            _mainForm.MainConfiguration = _configuration;
-            _configuration.Save(_mainForm.configuration_filename);
-            _mainForm.ReloadConfiguration();
+            Program.SaveAndReloadConfiguration(_configuration);
             Close();
         }
         private Color ChooseColour(Color c)

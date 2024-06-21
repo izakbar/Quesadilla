@@ -78,7 +78,6 @@ namespace Quesadilla
 
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
 
-        public Config MainConfiguration = new Config();
         private List<LogWatcher> watchers = new List<LogWatcher>();
 
         public Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
@@ -87,7 +86,6 @@ namespace Quesadilla
         private List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
         public List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
 
-        public string configuration_filename = "Quesadilla.config.json";
         private int _intelSizeMax = 200;
         private int _intelSizeMin = 48;
         private int _windowExtraHeight = 80;
@@ -160,8 +158,6 @@ namespace Quesadilla
             InitializeComponent();
             InitializeResources();
 
-            MainConfiguration = Config.Load(configuration_filename);
-
             // Initialize tray
             trayIcon = new NotifyIcon()
             {
@@ -187,14 +183,14 @@ namespace Quesadilla
             menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
 
-            menuConfiguration.MenuItems.Add(menuConfigurationAlwaysOnTop = new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = MainConfiguration.StayOnTop, });
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSShowDPS = new MenuItem("Show DPS", trayIconMenuDPSShowWindow) { Checked = MainConfiguration.DPSShowWindow, });
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSShowZkill = new MenuItem("Show ZKill Alerts", trayIconMenuShowZKillAlerts) { Checked = MainConfiguration.ShowZKillAlerts, });
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSStayOnTop = new MenuItem("DPS Always on top", trayIconMenuDPSAlwaysOnTop) { Checked = MainConfiguration.DPSGraphStayOnTop, });
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSTransparent = new MenuItem("DPS Transparent", trayIconMenuDPSTransparent) { Checked = MainConfiguration.DPSGraphTransparent, });
-            menuConfiguration.MenuItems.Add(menuConfigurationAlertTransparent = new MenuItem("Alert Transparent", trayIconMenuAlertTransparent) { Checked = MainConfiguration.AlertTransparent, });
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSSaveCSV = new MenuItem("DPS Save CSV", trayIconMenuDPSSaveCSV) { Checked = MainConfiguration.DPSSaveCSV, });
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSShowAll = new MenuItem("DPS Combine", trayIconMenuDPSAllToons) { Checked = MainConfiguration.DPSAllToons, });
+            menuConfiguration.MenuItems.Add(menuConfigurationAlwaysOnTop = new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = Program.MainConfiguration.StayOnTop, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSShowDPS = new MenuItem("Show DPS", trayIconMenuDPSShowWindow) { Checked = Program.MainConfiguration.DPSShowWindow, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSShowZkill = new MenuItem("Show ZKill Alerts", trayIconMenuShowZKillAlerts) { Checked = Program.MainConfiguration.ShowZKillAlerts, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSStayOnTop = new MenuItem("DPS Always on top", trayIconMenuDPSAlwaysOnTop) { Checked = Program.MainConfiguration.DPSGraphStayOnTop, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSTransparent = new MenuItem("DPS Transparent", trayIconMenuDPSTransparent) { Checked = Program.MainConfiguration.DPSGraphTransparent, });
+            menuConfiguration.MenuItems.Add(menuConfigurationAlertTransparent = new MenuItem("Alert Transparent", trayIconMenuAlertTransparent) { Checked = Program.MainConfiguration.AlertTransparent, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSSaveCSV = new MenuItem("DPS Save CSV", trayIconMenuDPSSaveCSV) { Checked = Program.MainConfiguration.DPSSaveCSV, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSShowAll = new MenuItem("DPS Combine", trayIconMenuDPSAllToons) { Checked = Program.MainConfiguration.DPSAllToons, });
 
             menuConfiguration.MenuItems.Add(menuBackgrounds);
             menuConfiguration.MenuItems.Add(menuConfiguredAlerts);
@@ -322,7 +318,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             bool first = true;
             DateTime now = DateTime.Now;
 
-            foreach (var alert in ActiveAlerts.Reverse().Take(MainConfiguration.ShowLastUnexpiredAlerts).ToList())
+            foreach (var alert in ActiveAlerts.Reverse().Take(Program.MainConfiguration.ShowLastUnexpiredAlerts).ToList())
             {
                 DateTime timeAdded = alert.Entry != null ? alert.Entry.TimeAdded : alert.Kill.TimeAdded;
                 TimeSpan timeAgo = now - timeAdded;
@@ -346,7 +342,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         private void RebuildAlertsMenu()
         {
             menuConfiguredAlerts.MenuItems.Clear();
-            foreach (var alertConfigItem in MainConfiguration.AlertConfiguration)
+            foreach (var alertConfigItem in Program.MainConfiguration.AlertConfiguration)
             {
                 MenuItem menuAlert = new MenuItem(alertConfigItem.FriendlyName, trayIconMenuAlertClick);
                 menuAlert.Checked = alertConfigItem.Enabled;
@@ -359,7 +355,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             foreach (var background in Backgrounds.OrderBy(o => o.BackgroundName).ToList())
             {
                 MenuItem menuBackground = new MenuItem(background.BackgroundName, trayIconMenuBackgroundClick);
-                if (MainConfiguration.AlertPopupBackground == background.BackgroundName) menuBackground.Checked = true;
+                if (Program.MainConfiguration.AlertPopupBackground == background.BackgroundName) menuBackground.Checked = true;
                 menuBackgrounds.MenuItems.Add(menuBackground);
             }
         }
@@ -369,9 +365,9 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             RebuildBackgroundsMenu();
             RebuildLatestAlertsMenu();
 
-            if (MainConfiguration.InitialPosition != null)
+            if (Program.MainConfiguration.InitialPosition != null)
             {
-                this.Location = MainConfiguration.InitialPosition;
+                this.Location = Program.MainConfiguration.InitialPosition;
                 if (this.Location.X > Screen.FromControl(this).Bounds.Width || this.Location.X < Screen.FromControl(this).Bounds.X ||
                     this.Location.Y > Screen.FromControl(this).Bounds.Height || this.Location.Y < Screen.FromControl(this).Bounds.Y
                     )
@@ -383,17 +379,17 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                 //Height = Configuration.WindowSize.Y >= 100 ? Configuration.WindowSize.Y : 100;
             }
 
-            TopMost = MainConfiguration.StayOnTop;
-            menuConfigurationAlwaysOnTop.Checked = MainConfiguration.StayOnTop;
-            menuConfigurationDPSShowDPS.Checked = MainConfiguration.DPSShowWindow;
-            menuConfigurationDPSStayOnTop.Checked = MainConfiguration.DPSGraphStayOnTop;
-            menuConfigurationDPSTransparent.Checked = MainConfiguration.DPSGraphTransparent;
-            menuConfigurationDPSSaveCSV.Checked = MainConfiguration.DPSSaveCSV;
-            menuConfigurationDPSShowAll.Checked = MainConfiguration.DPSAllToons;
+            TopMost = Program.MainConfiguration.StayOnTop;
+            menuConfigurationAlwaysOnTop.Checked = Program.MainConfiguration.StayOnTop;
+            menuConfigurationDPSShowDPS.Checked = Program.MainConfiguration.DPSShowWindow;
+            menuConfigurationDPSStayOnTop.Checked = Program.MainConfiguration.DPSGraphStayOnTop;
+            menuConfigurationDPSTransparent.Checked = Program.MainConfiguration.DPSGraphTransparent;
+            menuConfigurationDPSSaveCSV.Checked = Program.MainConfiguration.DPSSaveCSV;
+            menuConfigurationDPSShowAll.Checked = Program.MainConfiguration.DPSAllToons;
 
-            Program.Universe.HomeSolarSystemID = Program.Universe.Names[MainConfiguration.HomeSystem];
+            Program.Universe.HomeSolarSystemID = Program.Universe.Names[Program.MainConfiguration.HomeSystem];
 
-            mainTimer.Interval = MainConfiguration.TickMiliseconds;
+            mainTimer.Interval = Program.MainConfiguration.TickMiliseconds;
 
         }
         private void Quesadilla_Load(object sender, EventArgs e)
@@ -473,7 +469,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
 
             // dequeue Alerts
             TickCounts["SinceLastAlert"]++;
-            if (NewAlerts.Count > 0 && TickCounts["SinceLastAlert"] > MainConfiguration.HowManyTicksBeforeAlert)
+            if (NewAlerts.Count > 0 && TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert)
             {
                 var NewAlert = NewAlerts.Dequeue();
                 Log.Error(NewAlert.AlertText);
@@ -483,7 +479,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
 
 
                 // try to prevent new alert stealing focus
-                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, MainConfiguration, LoadImageFromFile(MainConfiguration.AlertPopupBackground), this);
+                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Program.MainConfiguration, LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
                 var ptr = this._processMonitor.GetForegroundWindowHandle();
                 NewAlertWindow.Show(this);
                 var ptr2 = this._processMonitor.SetForegroundWindowHandle(ptr);
@@ -496,7 +492,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
 
 
             // do cleardown/rebuild of alerts menu - if number of ticks passed
-            if ( ++TickCounts["SinceLastCleardown"] > MainConfiguration.HowManyTicksBeforeCleardown)
+            if ( ++TickCounts["SinceLastCleardown"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
             {
                 // Show number of recent alerts
                 if (ActiveAlerts.Count > 0)
@@ -505,7 +501,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                     var a = ActiveAlerts.First();
                     DateTime timeAdded = a.Entry != null ? a.Entry.TimeAdded : a.Kill.TimeAdded;
                     var diffInSeconds = (DateTime.Now - timeAdded).TotalSeconds;
-                    if (diffInSeconds > MainConfiguration.ExpireAlertSeconds)
+                    if (diffInSeconds > Program.MainConfiguration.ExpireAlertSeconds)
                     {
                         // expired so dequeue
                         a = ActiveAlerts.Dequeue();
@@ -524,7 +520,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                     if (_combat[k].Count > 0)
                     {
                         TimeSpan ts = DateTime.Now - _combat[k].First().TimeAdded;
-                        if (ts.TotalSeconds > MainConfiguration.ExpireCombatSeconds)
+                        if (ts.TotalSeconds > Program.MainConfiguration.ExpireCombatSeconds)
                         {
                             _combat[k].Remove(_combat[k].First());
                         }
@@ -537,7 +533,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                     if (_ISK[k].Count > 0)
                     {
                         TimeSpan ts = DateTime.Now - _ISK[k].First().TimeAdded;
-                        if (ts.TotalSeconds > MainConfiguration.ExpireISKSeconds)
+                        if (ts.TotalSeconds > Program.MainConfiguration.ExpireISKSeconds)
                         {
                             _ISK[k].Remove(_ISK[k].First());
                         }
@@ -554,9 +550,9 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
 
             CombatFlag.Visible = InCombat;
             TickCounts["SinceLastDPSGraphUpdate"]++;
-            if (CombatAdded && TickCounts["SinceLastDPSGraphUpdate"] > MainConfiguration.HowManyTicksBeforeDPSGraphUpdate )
+            if (CombatAdded && TickCounts["SinceLastDPSGraphUpdate"] > Program.MainConfiguration.HowManyTicksBeforeDPSGraphUpdate )
             {
-                if (MainConfiguration.DPSShowWindow && DPSGraphWindow == null)
+                if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow == null)
                 {
                     DPSGraphWindow = new QuesadillaDPSGraph(this);
                     DPSGraphWindow.Show();
@@ -631,7 +627,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             shouldAlert =
                 checkJumpsRangeComparison(path.TotalJumps, alert.Jumps1Comparison, alert.Jumps1Number) &&
                 checkJumpsRangeComparison(path.TotalJumps, alert.Jumps2Comparison, alert.Jumps2Number) &&
-                path.TotalJumps < MainConfiguration.IgnoreAsTooManyJumps;
+                path.TotalJumps < Program.MainConfiguration.IgnoreAsTooManyJumps;
 
             return shouldAlert;
         }
@@ -762,12 +758,12 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                 if (!entry.ParseSuccess)
                     return;
                 HashSet<int> intSet = new HashSet<int>();
-                if (!MainConfiguration.ignoreStrings.Any<Regex>((Func<Regex, bool>)(ignoreString => ignoreString.IsMatch(entry.LineContent))) && entry.LogType == LogFileType.ChatIntel)
+                if (!Program.MainConfiguration.ignoreStrings.Any<Regex>((Func<Regex, bool>)(ignoreString => ignoreString.IsMatch(entry.LineContent))) && entry.LogType == LogFileType.ChatIntel)
                 {
                     // try and find systems mentioned in intel
                     foreach (SolarSystem solarSystem in
                         Program.Universe.SolarSystems.Values.Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => tempSystem.MatchNameRegex(entry.LineContent)))
-                        .Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => !MainConfiguration.ignoreSystems.Contains(Program.Universe.Names[tempSystem.Name])))
+                        .Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => !Program.MainConfiguration.ignoreSystems.Contains(Program.Universe.Names[tempSystem.Name])))
                         )
                         intSet.Add(Program.Universe.Names[solarSystem.Name]);
                 }
@@ -797,7 +793,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                         }
 
                         // Range alerts
-                        foreach (AlertConfig alert in MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
+                        foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
                         {
                             if (!tempTrigger.Enabled)
                                 return false;
@@ -971,7 +967,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                 // check against custom alerts (no system name needed) - only if no alerts generated
                 if (alertCount == 0)
                 {
-                    foreach (AlertConfig alert in MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
+                    foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
                     {
                         if (!tempTrigger.Enabled)
                             return false;
@@ -1080,11 +1076,10 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
 
         private void Quesadilla_FormClosing(object sender, FormClosingEventArgs e)
         {
-            MainConfiguration.InitialPosition = Location;
-            MainConfiguration.WindowSize = new System.Drawing.Point(Width, Height);
-            MainConfiguration.StayOnTop = TopMost;
+            Program.MainConfiguration.InitialPosition = Location;
+            Program.MainConfiguration.WindowSize = new System.Drawing.Point(Width, Height);
+            Program.MainConfiguration.StayOnTop = TopMost;
             Program.Universe.WriteESICharacters(Program.CHARACTER_CACHE_FILE);
-            MainConfiguration.Save(configuration_filename);
         }
 
 
@@ -1094,13 +1089,13 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         }
         private void trayIconMenuAlwaysOnTop(object sender, EventArgs e)
         {
-            MainConfiguration.StayOnTop = !MainConfiguration.StayOnTop;
-            TopMost = MainConfiguration.StayOnTop;
+            Program.MainConfiguration.StayOnTop = !Program.MainConfiguration.StayOnTop;
+            TopMost = Program.MainConfiguration.StayOnTop;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
         }
         private void trayIconMenuDPSShowWindow(object sender, EventArgs e)
         {
-            MainConfiguration.DPSShowWindow = !MainConfiguration.DPSShowWindow;
+            Program.MainConfiguration.DPSShowWindow = !Program.MainConfiguration.DPSShowWindow;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
             if (DPSGraphWindow != null)
             {
@@ -1116,26 +1111,26 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         }
         private void trayIconMenuShowZKillAlerts(object sender, EventArgs e)
         {
-            MainConfiguration.ShowZKillAlerts = !MainConfiguration.ShowZKillAlerts;
+            Program.MainConfiguration.ShowZKillAlerts = !Program.MainConfiguration.ShowZKillAlerts;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
         }
         private void trayIconMenuDPSAlwaysOnTop(object sender, EventArgs e)
         {
-            MainConfiguration.DPSGraphStayOnTop = !MainConfiguration.DPSGraphStayOnTop;
+            Program.MainConfiguration.DPSGraphStayOnTop = !Program.MainConfiguration.DPSGraphStayOnTop;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
-            if (DPSGraphWindow != null) DPSGraphWindow.TopMost = MainConfiguration.DPSGraphStayOnTop;
+            if (DPSGraphWindow != null) DPSGraphWindow.TopMost = Program.MainConfiguration.DPSGraphStayOnTop;
         }
         private void trayIconMenuDPSSaveCSV(object sender, EventArgs e)
         {
-            MainConfiguration.DPSSaveCSV = !MainConfiguration.DPSSaveCSV;
+            Program.MainConfiguration.DPSSaveCSV = !Program.MainConfiguration.DPSSaveCSV;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
         }
         private void trayIconMenuDPSAllToons(object sender, EventArgs e)
         {
-            MainConfiguration.DPSAllToons = !MainConfiguration.DPSAllToons;
+            Program.MainConfiguration.DPSAllToons = !Program.MainConfiguration.DPSAllToons;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
 
-            if (InCombat && DPSGraphWindow != null && MainConfiguration.DPSShowWindow)
+            if (InCombat && DPSGraphWindow != null && Program.MainConfiguration.DPSShowWindow)
             {
                 DPSGraphWindow.Close();
                 DPSGraphWindow = null;
@@ -1145,7 +1140,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         private void trayIconMenuDPSTransparent(object sender, EventArgs e)
         {
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
-            MainConfiguration.DPSGraphTransparent = ((MenuItem)sender).Checked;
+            Program.MainConfiguration.DPSGraphTransparent = ((MenuItem)sender).Checked;
 
             if (DPSGraphWindow != null)
             {
@@ -1167,7 +1162,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         private void trayIconMenuAlertTransparent(object sender, EventArgs e)
         {
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
-            MainConfiguration.AlertTransparent = ((MenuItem)sender).Checked;
+            Program.MainConfiguration.AlertTransparent = ((MenuItem)sender).Checked;
         }
 
 
@@ -1189,7 +1184,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         {
             // enable / disable config item
             MenuItem m = (MenuItem)sender;
-            var configAlert = MainConfiguration.AlertConfiguration.Find(o => o.FriendlyName == m.Text);
+            var configAlert = Program.MainConfiguration.AlertConfiguration.Find(o => o.FriendlyName == m.Text);
             if (configAlert != null)
             {
                 m.Checked = !m.Checked;
@@ -1202,7 +1197,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             if (ActiveAlerts.Count > 0)
             {
                 var alert = ActiveAlerts.Reverse().Take(1).ToList().First();
-                var NewAlertWindow = new QuesadillaAlertPopup(alert, MainConfiguration, LoadImageFromFile(MainConfiguration.AlertPopupBackground), this);
+                var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
                 NewAlertWindow.Show(this);
             }
         }
@@ -1212,11 +1207,11 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             if (!ConfigurationWindowOpen)
             {
 
-                MainConfiguration.InitialPosition = Location;
-                MainConfiguration.WindowSize = new System.Drawing.Point(Width, Height);
-                MainConfiguration.StayOnTop = TopMost;
+                Program.MainConfiguration.InitialPosition = Location;
+                Program.MainConfiguration.WindowSize = new System.Drawing.Point(Width, Height);
+                Program.MainConfiguration.StayOnTop = TopMost;
 
-                var ConfigurationWindow = new QuesadillaConfiguration(MainConfiguration, menuConfigurationWindow, this);
+                var ConfigurationWindow = new QuesadillaConfiguration(Program.MainConfiguration, menuConfigurationWindow, this);
                 ((MenuItem)sender).Enabled = !((MenuItem)sender).Enabled;
                 ConfigurationWindow.Show(this);
             }
@@ -1243,7 +1238,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                 z.Checked = false;
             }
             m.Checked = true;
-            MainConfiguration.AlertPopupBackground = m.Text;
+            Program.MainConfiguration.AlertPopupBackground = m.Text;
         }
         private void logFile_ProcessCombat(object sender, ProcessCombatEventArgs e)
         {
@@ -1253,7 +1248,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             //Log.Information("COMBAT:" + e.CombatEvent);
             if (e.Entry != null)
             {
-                if (InCombat == false && MainConfiguration.DPSShowWindow)
+                if (InCombat == false && Program.MainConfiguration.DPSShowWindow)
                 {
                     DPSGraphWindow = new QuesadillaDPSGraph(this);
                     DPSGraphWindow.Show();
@@ -1348,7 +1343,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                     });
 
                     // check if faction 
-                    foreach (AlertConfig alert in MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
+                    foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
                     {
                         if (!tempTrigger.Enabled)
                             return false;
@@ -1456,7 +1451,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                 var c = CharacterList.Find(o => o.CharacterName.Equals(e.CharacterName));
                 string alertText = "";
 
-                foreach (AlertConfig alert in MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
+                foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
                 {
                     if (!tempTrigger.Enabled)
                         return false;
@@ -1572,7 +1567,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                     // sort out DPS Graph
                     if (previousToon == null || previousToon == "" || previousToon != CurrentActiveToon)
                     {
-                        if (MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
+                        if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
                         {
                             if (CurrentActiveToon == null || CurrentActiveToon == "")
                             {
@@ -1599,7 +1594,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                 }
                 else
                 {
-                    if (MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
+                    if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
                     {
                         DPSGraphWindow.Hide();
                     }
@@ -1670,13 +1665,13 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             }
 
             Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {Program.Universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
-            e.Kill.Context = generateZKillAlertText(e.Kill, null, MainConfiguration.ZKillContextText, "");
+            e.Kill.Context = generateZKillAlertText(e.Kill, null, Program.MainConfiguration.ZKillContextText, "");
 
             Program.ZKillHandler.EnqueueZKillOBS(e.Kill);
 
             // check if zkill system matches any range alerts
             // and that report zkill flag is set
-            if (!MainConfiguration.ShowZKillAlerts) return;
+            if (!Program.MainConfiguration.ShowZKillAlerts) return;
 
             var toSystemId = (int)e.Kill.SolarSystemId;
 
@@ -1696,7 +1691,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             }
 
             // Range alerts
-            foreach (AlertConfig alert in MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
+            foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
             {
                 if (!tempTrigger.Enabled)
                     return false;
@@ -1714,18 +1709,18 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                         sendAlert = checkJumpsRange(alert, path);
                         if (sendAlert)
                         {
-                            alertText = generateZKillAlertText(e.Kill, path, MainConfiguration.ZKillAlertText,"");
+                            alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText,"");
                             Log.Information("ALERT - " + alertText);
 
                             EnqueueAlert(
                                 new AlertQueueItem()
                                 {
                                     AlertText = alertText,
-                                    MenuText = generateZKillAlertText(e.Kill, path, MainConfiguration.ZKillMenuText, ""),
+                                    MenuText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillMenuText, ""),
                                     Kill = e.Kill,
                                     Path = path,
                                     Context = homeSystemPathInfo.FromSystemName,
-                                    SoundFile = MainConfiguration.ZKillSound,
+                                    SoundFile = Program.MainConfiguration.ZKillSound,
                                     FriendlyName = "zkill",
                                 }
                                 );
@@ -1738,17 +1733,17 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                         sendAlert = checkJumpsRange(alert, path);
                         if (sendAlert)
                         {
-                            alertText = generateZKillAlertText(e.Kill, path, MainConfiguration.ZKillAlertText, "");
+                            alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText, "");
                             Log.Information("ALERT - " + alertText);
                             EnqueueAlert(
                                 new AlertQueueItem()
                                 {
                                     AlertText = alertText,
-                                    MenuText = generateZKillAlertText(e.Kill, path, MainConfiguration.ZKillMenuText, ""),
+                                    MenuText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillMenuText, ""),
                                     Kill = e.Kill,
                                     Path = path,
                                     Context = path.FromSystemName,
-                                    SoundFile = MainConfiguration.ZKillSound,
+                                    SoundFile = Program.MainConfiguration.ZKillSound,
                                     FriendlyName = "zkill",
                                 }
                                 );
@@ -1765,7 +1760,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                                 sendAlert = checkJumpsRange(alert, path);
                                 if (sendAlert)
                                 {
-                                    alertText = generateZKillAlertText(e.Kill, path, MainConfiguration.ZKillAlertText, x.CharacterName);
+                                    alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText, x.CharacterName);
                                     Log.Information("ALERT - " + alertText);
                                     if (
                                         alert.AlertRangeType == AlertConfigRangeType.OneCharacter ||
@@ -1776,11 +1771,11 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                                         new AlertQueueItem()
                                         {
                                             AlertText = alertText,
-                                            MenuText = generateZKillAlertText(e.Kill, path, MainConfiguration.ZKillMenuText, x.CharacterName), 
+                                            MenuText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillMenuText, x.CharacterName), 
                                             Kill = e.Kill,
                                             Path = path,
                                             Context = x.CharacterName,
-                                            SoundFile = MainConfiguration.ZKillSound,
+                                            SoundFile = Program.MainConfiguration.ZKillSound,
                                             FriendlyName = alert.FriendlyName,
                                         }
                                         );
@@ -1800,7 +1795,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                                 sendAlert = checkJumpsRange(alert, path);
                                 if (sendAlert)
                                 {
-                                    alertText = generateZKillAlertText(e.Kill, path, MainConfiguration.ZKillAlertText, x.CharacterName);
+                                    alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText, x.CharacterName);
                                     Log.Information("ALERT - " + alertText);
                                     if (
                                         alert.AlertRangeType == AlertConfigRangeType.AllCharacters ||
@@ -1811,11 +1806,11 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                                         new AlertQueueItem()
                                         {
                                             AlertText = alertText,
-                                            MenuText = generateZKillAlertText(e.Kill, path, MainConfiguration.ZKillMenuText, x.CharacterName),
+                                            MenuText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillMenuText, x.CharacterName),
                                             Kill = e.Kill,
                                             Path = path,
                                             Context = x.CharacterName,
-                                            SoundFile = MainConfiguration.ZKillSound,
+                                            SoundFile = Program.MainConfiguration.ZKillSound,
                                             FriendlyName = "zkill",
                                         }
                                         );
@@ -1916,7 +1911,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         private void trayIconMenuShowHistoricAlert(object sender, EventArgs e)
         {
             AlertQueueItem alert = (AlertQueueItem)((MenuItem)sender).Tag;
-            var NewAlertWindow = new QuesadillaAlertPopup(alert, MainConfiguration, LoadImageFromFile(MainConfiguration.AlertPopupBackground), this);
+            var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
             NewAlertWindow.Show(this);
         }
 

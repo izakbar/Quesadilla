@@ -102,7 +102,7 @@ img.rounded-corners {
         [Route("[controller]/latestAlert")]
         public ActionResult latestAlert(int? seconds)
         {
-            if (seconds is null) { seconds = Program.q.MainConfiguration.AlertPopupSeconds; }
+            if (seconds is null) { seconds = Program.MainConfiguration.AlertPopupSeconds; }
             string output = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
             if (Program.q != null && Program.q.latestAlertBitmap != null)
             {
