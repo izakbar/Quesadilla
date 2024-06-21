@@ -81,8 +81,8 @@ namespace Quesadilla
         public Config MainConfiguration = new Config();
         private List<LogWatcher> watchers = new List<LogWatcher>();
 
-        private Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
-        private Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
+        public Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
+        public Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
 
         private List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
         public List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
@@ -111,7 +111,6 @@ namespace Quesadilla
 
         private ZKillRedisQ ZKillFeed;
         private List<ZKillKill> ZKillKills = new List<ZKillKill>();
-        public Queue<ZKillKill> OBSZKills = new Queue<ZKillKill>();
 
         private EveScoutManager EveScoutProcessor;
 
@@ -564,25 +563,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                     ZKillKills.RemoveAll(o => o.Expired);
                 }
 
-                // expire zkills (OBS OPage)?
-                lock (OBSZKills)
-                {
-                    bool removedOBSZkill = true;
-                    while (OBSZKills.Count > 0 && removedOBSZkill)
-                    {
-                        var k = OBSZKills.First();
-                        TimeSpan ts = DateTime.Now - k.TimeAdded;
-                        if (ts.TotalSeconds > MainConfiguration.ExpireZKillSeconds)
-                        {
-                            k.Expired = true;
-                            OBSZKills.Dequeue();
-                            removedOBSZkill = true;
-                        } else
-                        {
-                            removedOBSZkill = false;
-                        }
-                    }
-                }
+                Program.ExpireOBSZKillQueue();
 
                 TickCounts["SinceLastCleardown"] = 0;
             }
@@ -1711,7 +1692,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {Program.Universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
             e.Kill.Context = generateZKillAlertText(e.Kill, null, MainConfiguration.ZKillContextText, "");
 
-            EnqueueZKill(e.Kill);
+            Program.EnqueueZKill(e.Kill);
 
             // check if zkill system matches any range alerts
             // and that report zkill flag is set
@@ -1959,14 +1940,5 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             NewAlertWindow.Show(this);
         }
 
-        private void EnqueueZKill(ZKillKill kill)
-        {
-            // only add to new zkill list if not already in list. This should prevent multiple entries for same thing
-            var f = OBSZKills.Where(o => o.ID == kill.ID).ToList();
-            if (f.Count == 0 || NewAlerts.Count == 0)
-            {
-                OBSZKills.Enqueue(kill);
-            }
-        }
     }
 }
