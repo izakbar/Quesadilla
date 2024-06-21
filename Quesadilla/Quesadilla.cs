@@ -28,6 +28,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.WebPages;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using static Quesadilla.Classes.Processes.ProcessMonitor;
@@ -1671,9 +1672,13 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
             var expireTime = DateTime.Now.AddSeconds(-3600);
 
-            foreach (var i in _ISK[toon].Where(o => o.TimeAdded >= expireTime))
+            foreach (var t in CharacterList)
             {
-                isk += i.IskAmount;
+                if (!toon.IsEmpty() && t.CharacterName != toon || ! _ISK.ContainsKey(t.CharacterName) ) continue;
+                foreach (var i in _ISK[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
+                {
+                    isk += i.IskAmount;
+                }
             }
 
             if (isk > 0)

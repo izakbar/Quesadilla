@@ -1,14 +1,23 @@
 ﻿using System;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Metadata;
+using System.Security.Cryptography.Xml;
 using System.Threading.Tasks;
+using System.Web.WebPages;
 using EVEStandard;
 using EVEStandard.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.IdentityModel.Tokens;
 using Quesadilla;
 using Quesadilla.Classes.ZKill;
 using Serilog.Core;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Quesadilla.Controllers
 {
@@ -25,11 +34,11 @@ namespace Quesadilla.Controllers
         [Route("[controller]/zkillfeed")]
         public ActionResult zkillfeed(int? limit)
         {
-            string zkillfeed = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
+            string output = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
             int count = 0;
             if (Program.q != null && Program.q.OBSZKills != null && Program.q.OBSZKills.Count > 0)
             {
-                zkillfeed += "<div class=zkill>";
+                output += "<div class=zkill>";
                 foreach (ZKillKill k in Program.q.OBSZKills.Reverse())
                 {
                     if (limit != null && count++ >= limit)
@@ -42,12 +51,12 @@ namespace Quesadilla.Controllers
                 $"<div class=zkill-value>{k.TotalValue}</div>" +
                 $"<div class=zkill-victim>{zkillVictim}</div>" +
                 "</div>";
-                    zkillfeed += kf;
+                    output += kf;
                 }
-                zkillfeed += "</div>";
+                output += "</div>";
             }
 
-            zkillfeed += @"<style>
+            output += @"<style>
 .zkillkill {
   display: inline-grid;
   position: relative;
@@ -87,8 +96,100 @@ img.rounded-corners {
             return new ContentResult
             {
                 ContentType = "text/html",
-                Content = zkillfeed,
+                Content = output,
             };
         }
+        [Route("[controller]/latestAlert")]
+        public ActionResult latestAlert(int? seconds)
+        {
+            if (seconds is null) { seconds = Program.q.Configuration.AlertPopupSeconds; }
+            string output = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
+            if (Program.q != null && Program.q.latestAlertBitmap != null)
+            {
+                TimeSpan timeAgo = DateTime.Now - Program.q.latestAlertTimestamp;
+                if (timeAgo.Seconds > seconds)
+                {
+                    return new ContentResult
+                    {
+                        ContentType = "text/html",
+                        Content = output,
+                    };
+                }
+
+                output += "<img class=alert src=/OBS/latestAlertImage>";
+                output += @"<style>
+.alert {
+  border: 3px solid transparent;
+  border-radius: 15px;
+  outline: 2px solid Gold;
+
+  display: inline-block;
+  position: relative;
+}
+</style>";
+            }
+            return new ContentResult
+            {
+                ContentType = "text/html",
+                Content = output,
+            };
+        }
+
+        [HttpGet("[controller]/latestAlertImage")]
+        public IActionResult latestAlertImage()
+        {
+            if (Program.q != null && Program.q.latestAlertBitmap != null)
+            {
+                Byte[] b;
+                b = ImageToByteArray(Program.q.latestAlertBitmap);
+                return File(b, "image/jpeg");
+            }
+            return null;
+        }
+        [HttpGet("[controller]/iskPerHour")]
+        public IActionResult iskPerHour(string toon)
+        {
+            string output = "<meta http-equiv=\"refresh\" content=\"10\">\r\n";
+            if (Program.q != null)
+            {
+                string isk = Program.q.GetIskLastHour(toon);
+                if (!isk.IsNullOrEmpty())
+                {
+                    output += $"<div class=iskcontainer><div class=iskperhour>{isk}</div></div>";
+
+                    output += @"<style>
+.iskcontainer {
+  width: 100%;
+  position: relative;
+}
+.iskperhour {
+  border: 3px solid transparent;
+  border-radius: 15px;
+  outline: 2px solid Gold;
+
+  display: inline-block;
+  position: absolute;
+
+  color: green;
+  font-size: 24px;
+
+  margin: auto;
+}
+</style>";
+                }
+            }
+            return new ContentResult
+            {
+                ContentType = "text/html",
+                Content = output,
+            };                    
+        }
+        public byte[] ImageToByteArray(System.Drawing.Image imageIn)
+        {
+            MemoryStream ms = new MemoryStream();
+            imageIn.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            return ms.ToArray();
+        }
+
     }
 }
