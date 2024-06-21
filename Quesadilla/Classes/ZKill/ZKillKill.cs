@@ -34,6 +34,7 @@ namespace Quesadilla.Classes.ZKill
 
         public string href { get; set; }
         public string Context {  get; set; }
+        public bool Alert { get; set; }
         public string ToFeedHtml()
         {
             return 

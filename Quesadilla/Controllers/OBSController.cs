@@ -32,20 +32,19 @@ namespace Quesadilla.Controllers
             return Ok("Welcome To Quesadilla");
         }
         [Route("[controller]/zkillfeed")]
-        public ActionResult zkillfeed(int? limit = 10 , bool bigbois = false, string feedtype = "all")
+        public ActionResult zkillfeed(int? limit = 10, bool bigbois = false, string feedtype = "all")
         {
             string output = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
             int count = 0;
-            if (Program.ZKillHandler.OBSZKills != null && Program.ZKillHandler.OBSZKills.Count > 0)
+            if (Program.ZKillHandler.ZKillKills != null && Program.ZKillHandler.ZKillKills.Count > 0)
             {
                 output += "<div class=zkill>";
 
-
-
-                foreach (ZKillKill k in Program.ZKillHandler.OBSZKills.Reverse())
+                foreach (ZKillKill k in Program.ZKillHandler.ZKillKills.Reverse() )
                 {
                     // check this matches criteria 
-                    if ( bigbois && ! k.TotalValue.Contains("b") ) continue;
+                    if (feedtype.Equals("alerts") && !k.Alert) continue;
+                    if (bigbois && !k.TotalValue.Contains("b")) continue;
 
                     if (limit != null && count++ >= limit)
                     {
@@ -188,7 +187,7 @@ img.rounded-corners {
             {
                 ContentType = "text/html",
                 Content = output,
-            };                    
+            };
         }
         public byte[] ImageToByteArray(System.Drawing.Image imageIn)
         {

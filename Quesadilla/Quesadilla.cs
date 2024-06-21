@@ -459,8 +459,6 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
 
         private void mainTimer_Tick(object sender, EventArgs e)
         {
-
-
             // progress logfiles
             foreach (LogWatcher watcher in watchers)
             {
@@ -540,8 +538,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                     }
                 }
 
-                Program.ZKillHandler.ExpireZKillQueueAlerts();
-                Program.ZKillHandler.ExpireZKillQueueOBS();
+                Program.ZKillHandler.ExpireZKillQueue();
 
                 TickCounts["SinceLastCleardown"] = 0;
             }
@@ -1667,8 +1664,6 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {Program.Universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
             e.Kill.Context = generateZKillAlertText(e.Kill, null, Program.MainConfiguration.ZKillContextText, "");
 
-            Program.ZKillHandler.EnqueueZKillOBS(e.Kill);
-
             // check if zkill system matches any range alerts
             // and that report zkill flag is set
             if (!Program.MainConfiguration.ShowZKillAlerts) return;
@@ -1711,7 +1706,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                         {
                             alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText,"");
                             Log.Information("ALERT - " + alertText);
-
+                            e.Kill.Alert = true;
                             EnqueueAlert(
                                 new AlertQueueItem()
                                 {
@@ -1735,6 +1730,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                         {
                             alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText, "");
                             Log.Information("ALERT - " + alertText);
+                            e.Kill.Alert = true;
                             EnqueueAlert(
                                 new AlertQueueItem()
                                 {
@@ -1767,6 +1763,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                                         alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
                                         )
                                     {
+                                        e.Kill.Alert = true;
                                         EnqueueAlert(
                                         new AlertQueueItem()
                                         {
@@ -1802,6 +1799,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                                         alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive
                                         )
                                     {
+                                        e.Kill.Alert = true;
                                         EnqueueAlert(
                                         new AlertQueueItem()
                                         {

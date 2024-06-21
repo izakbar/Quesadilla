@@ -8,13 +8,11 @@ namespace Quesadilla.Classes.ZKill
 {
     public class ZKill
     {
-        public Queue<ZKillKill> OBSZKills {  get; set; }
         public Queue<ZKillKill> ZKillKills { get; set; }
         public ZKillRedisQ ZKillFeed { get; set; }
 
         public ZKill()
         {
-            OBSZKills  = new Queue<ZKillKill>();
             ZKillKills = new Queue<ZKillKill>();
             ZKillFeed = new ZKillRedisQ();
         }
@@ -32,10 +30,6 @@ namespace Quesadilla.Classes.ZKill
             }
         }
 
-        public void EnqueueZKillOBS(ZKillKill kill)
-        {
-            EnqueueZKillAlert(OBSZKills, kill);
-        }
         public void EnqueueZKillAlert(ZKillKill kill)
         {
             EnqueueZKillAlert(ZKillKills, kill);
@@ -64,11 +58,7 @@ namespace Quesadilla.Classes.ZKill
             }
         }
 
-        public void ExpireZKillQueueOBS()
-        {
-            ExpireZkillQueue(OBSZKills);
-        }
-        public void ExpireZKillQueueAlerts()
+        public void ExpireZKillQueue()
         {
             ExpireZkillQueue(ZKillKills);
         }
