@@ -26,10 +26,10 @@ namespace Quesadilla.Controllers
         public ActionResult zkillfeed(int? limit)
         {
             string zkillfeed = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
-
             int count = 0;
-            if (Program.q != null && Program.q.OBSZKills != null)
+            if (Program.q != null && Program.q.OBSZKills != null && Program.q.OBSZKills.Count > 0)
             {
+                zkillfeed += "<div class=zkill>";
                 foreach (ZKillKill k in Program.q.OBSZKills.Reverse())
                 {
                     if (limit != null && count++ >= limit)
@@ -37,21 +37,52 @@ namespace Quesadilla.Controllers
                         break;
                     }
                     var zkillVictim = Program.q._universe.GetCharacterName((int)k.VictimCharacterId);
-                    string kf = $"<div class=zkill><div class=zkill-ship><a href=https://zkillboard.com/kill/{k.ID}><img width=98% src=https://images.evetech.net/types/{k.VictimShipTypeId}/render></a>" +
+                    string kf = $"<div class=zkillkill><div class=zkill-ship><a href=https://zkillboard.com/kill/{k.ID}><img class=\"rounded-corners\" width=98% src=https://images.evetech.net/types/{k.VictimShipTypeId}/render></a>" +
                 "</div>" +
                 $"<div class=zkill-value>{k.TotalValue}</div>" +
                 $"<div class=zkill-victim>{zkillVictim}</div>" +
                 "</div>";
                     zkillfeed += kf;
                 }
+                zkillfeed += "</div>";
             }
 
-            zkillfeed += "<style>\r\n" +
-                ".zkill {\r\n    display: inline-grid;\r\n   position: relative;\r\nwidth:100px\r\n}\r\n" +
-                ".zkill-ship {\r\n  background-color:red\r\n  width:100px}\r\n" +
-                ".zkill-victim {\r\n  color: Gold;\r\n  position: absolute;\r\n  bottom: 7px;\r\n  font-size: 11px;\r\n    text-align: center; width: 100%;\r\n   \r\n}\r\n" +
-                ".zkill-value {\r\n  color: LimeGreen;\r\n  position: absolute;\r\n  top: 3px;\r\n  left: 3px;\r\nfont-size: 18px;\r\n}\r\n" +
-                "</style>";
+            zkillfeed += @"<style>
+.zkillkill {
+  display: inline-grid;
+  position: relative;
+  background-color: transparent;
+  width:100px
+}
+.zkill-ship {
+  width:100px;
+}
+.zkill-victim {
+  color: Gold;
+  position: absolute;
+  bottom: 7px;
+  font-size: 11px;
+  text-align: center; width: 100%;
+}
+.zkill-value {
+  color: LimeGreen;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  font-size: 18px;
+}
+img.rounded-corners {
+  border-radius: 10%;
+}
+.zkill {
+  border: 3px solid transparent;
+  border-radius: 15px;
+  outline: 2px solid Gold;
+
+  display: inline-block;
+  position: relative;
+}
+</style>";
 
             return new ContentResult
             {
