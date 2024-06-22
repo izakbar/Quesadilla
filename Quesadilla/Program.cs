@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
+using Quesadilla.Classes.Events;
+using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.Resources;
 using Quesadilla.Classes.SolarSystems;
@@ -76,6 +78,35 @@ namespace Quesadilla
             Program.MainConfiguration = c;
             c.Save(configuration_filename);
             q.ReloadConfiguration();
+        }
+
+        public static void SetupLogfileWatchers()
+        {
+            watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel, "Catch Intel"));
+            watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel, "Fountain Intel"));
+            watchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.ChatIntel, "Period Basis Intel"));
+
+            watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel, "Querious Intel"));
+            watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel, "Delve Intel"));
+
+            //            watchers.Add(new LogWatcher("cr", Classes.Logfile.LogFileType.ChatIntel, "Cloud Ring Intel"));
+            watchers.Add(new LogWatcher("paragon", Classes.Logfile.LogFileType.ChatIntel, "Paragon Soul Intel"));
+
+            watchers.Add(new LogWatcher("Quer_Catch", Classes.Logfile.LogFileType.ChatIntel, "Querious/Catch Intel"));
+
+            watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
+
+            watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
+            watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
+        }
+
+        public static void StartLogfileWatchers()
+        {
+            // start watchers
+            foreach (LogWatcher watcher in watchers)
+            {
+                watcher.StartWatch();
+            }
         }
 
         private static void ConfigureSerilog()

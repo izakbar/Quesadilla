@@ -198,24 +198,7 @@ namespace Quesadilla
             EveScoutProcessor = new EveScoutManager();
             EveScoutProcessor.EveScoutEventHandler += new EventHandler<EveScoutEventArgs>(this.EveScout_ProcessNewData);
 
-            Program.watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel, "Catch Intel"));
-            Program.watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel, "Fountain Intel"));
-            Program.watchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.ChatIntel, "Period Basis Intel"));
-
-            Program.watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel, "Querious Intel"));
-            Program.watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel, "Delve Intel"));
-
-            //            watchers.Add(new LogWatcher("cr", Classes.Logfile.LogFileType.ChatIntel, "Cloud Ring Intel"));
-            Program.watchers.Add(new LogWatcher("paragon", Classes.Logfile.LogFileType.ChatIntel, "Paragon Soul Intel"));
-
-            Program.watchers.Add(new LogWatcher("Quer_Catch", Classes.Logfile.LogFileType.ChatIntel, "Querious/Catch Intel"));
-
-Program.watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
-
-            Program.watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
-            Program.watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
-
-            RebuildLogfilesMenu();
+            Program.SetupLogfileWatchers();
 
             // setup event handlers
             foreach (LogWatcher watcher in Program.watchers)
@@ -223,7 +206,8 @@ Program.watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatI
                 if (watcher._logFileType == LogFileType.Local)
                 {
                     watcher.SystemChange += new EventHandler<ProcessSystemChangeEventArgs>(this._localWatcher_SystemChange);
-                    watcher.ChatServerChange += new EventHandler<ProcessChatServerChangeEventArgs>(this._localWatcher_ChatServerChange);
+                    watcher.ChatServerChange += new EventHandler<ProcessChatServerChangeEventArgs>(
+                        this._localWatcher_ChatServerChange);
                 }
                 else if (watcher._logFileType == LogFileType.Game)
                 {
@@ -237,11 +221,9 @@ Program.watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatI
                 }
             }
 
-            // start watchers
-            foreach (LogWatcher watcher in Program.watchers)
-            {
-                watcher.StartWatch();
-            }
+            RebuildLogfilesMenu();
+            Program.StartLogfileWatchers();
+
 
             // start main tick timer
             mainTimer.Enabled = true;
