@@ -35,6 +35,8 @@ namespace Quesadilla
         private int _opacitystep;
         private PopupLocationType _location;
 
+        private bool ShowShipname = false;
+
         private Quesadilla _main;
 
         public bool IsZkill = false;
@@ -677,13 +679,17 @@ namespace Quesadilla
         {
             if (IsZkill)
             {
-                ShipName.Visible = true;
+                //ShipName.Visible = true;
+                ShowShipname = true;
+                this.Invalidate();
             }
         }
 
         private void pAlertImage_MouseLeave(object sender, EventArgs e)
         {
-            ShipName.Visible = false;
+            //ShipName.Visible = false;
+            ShowShipname = false;
+            this.Invalidate();  
         }
 
         private void pMinimap_Click(object sender, EventArgs e)
@@ -697,7 +703,7 @@ namespace Quesadilla
             AlertDrawText(e, SystemName);
             AlertDrawText(e,RegionName);
             AlertDrawText(e,ContextInfo);
-            //AlertDrawText(e, ShipName);
+            if ( ShowShipname ) AlertDrawText(e, ShipName);
             AlertDrawText(e, ContextInfo);
             AlertDrawText(e, IntelLine);
 
