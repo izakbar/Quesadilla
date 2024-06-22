@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Resources;
 using System.Windows.Forms;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -126,6 +130,40 @@ namespace Quesadilla
                 IsClientActive = false,
             });
             Log.Information("New character found: " + characterName);
+        }
+        public static void InitializeResources()
+        {
+            // find all resources - put sounds into sound array, backgrounds in background
+            ResourceManager rm = Properties.Resources.ResourceManager;
+            ResourceSet rs = rm.GetResourceSet(new CultureInfo("en-US"), true, true);
+            if (rs != null)
+            {
+                foreach (var r in rs.Cast<DictionaryEntry>())
+                {
+                    string name = r.Key.ToString();
+                    if (r.Value is Image)
+                    {
+                        // if background - store in backgrounds
+                        if (name.StartsWith("background") || name.StartsWith("bg_"))
+                        {
+                            Backgrounds.Add(new QuesadillaBackground()
+                            {
+                                BackgroundName = name,
+                                background = (Bitmap)r.Value,
+                            });
+                        }
+                    }
+                    if (r.Value is UnmanagedMemoryStream)
+                    {
+                        // sound file
+                        Sounds.Add(new QuesadillaSound()
+                        {
+                            SoundName = r.Key.ToString(),
+                            stream = (UnmanagedMemoryStream)r.Value,
+                        });
+                    }
+                }
+            }
         }
 
         private static void ConfigureSerilog()

@@ -145,7 +145,7 @@ namespace Quesadilla
             OriginalBackgroundColour = BackColor;
 
             InitializeComponent();
-            InitializeResources();
+            Program.InitializeResources();
 
             // Initialize tray
             trayIcon = new NotifyIcon()
@@ -220,7 +220,6 @@ namespace Quesadilla
             RebuildLogfilesMenu();
             Program.StartLogfileWatchers();
 
-
             // start main tick timer
             mainTimer.Enabled = true;
 
@@ -236,41 +235,6 @@ namespace Quesadilla
         private void ShowSplashScreen()
         {
             Application.Run(splashScreen = new QuesadillaSplashScreen());
-        }
-
-        private void InitializeResources()
-        {
-            // find all resources - put sounds into sound array, backgrounds in background
-            ResourceManager rm = Properties.Resources.ResourceManager;
-            ResourceSet rs = rm.GetResourceSet(new CultureInfo("en-US"), true, true);
-            if (rs != null)
-            {
-                foreach (var r in rs.Cast<DictionaryEntry>())
-                {
-                    string name = r.Key.ToString();
-                    if (r.Value is Image)
-                    {
-                        // if background - store in backgrounds
-                        if (name.StartsWith("background") || name.StartsWith("bg_"))
-                        {
-                            Program.Backgrounds.Add(new QuesadillaBackground()
-                            {
-                                BackgroundName = name,
-                                background = (Bitmap)r.Value,
-                            });
-                        }
-                    }
-                    if (r.Value is UnmanagedMemoryStream)
-                    {
-                        // sound file
-                        Program.Sounds.Add(new QuesadillaSound()
-                        {
-                            SoundName = r.Key.ToString(),
-                            stream = (UnmanagedMemoryStream)r.Value,
-                        });
-                    }
-                }
-            }
         }
         private void RebuildLogfilesMenu()
         {
