@@ -729,7 +729,7 @@ namespace Quesadilla
             _main.latestAlertBitmap = new Bitmap(this.Width, this.Height);
             this.DrawToBitmap(_main.latestAlertBitmap, new Rectangle(Point.Empty, _main.latestAlertBitmap.Size));
             _main.latestAlertTimestamp = DateTime.Now;
-            _main.latestAlertBitmap.Save("QuesadillaLatestAlert.png");
+            // _main.latestAlertBitmap.Save("QuesadillaLatestAlert.png");
         }
     }
 }

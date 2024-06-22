@@ -382,7 +382,6 @@ namespace Quesadilla.Classes
             File.WriteAllText(filename, json);
         }
 
-
         public int TickMiliseconds { get; set; }
         public int HowManyTicksBeforeCleardown { get; set; }
         public int HowManyTicksBeforeAlert { get; set; }
@@ -452,7 +451,6 @@ namespace Quesadilla.Classes
 
         public Point AlertPopupMinimapPosition { get; set; }
         public Point AlertPopupMinimapSize { get; set; }
-
         public int IntegrationPort { get; set; }
     }
 }

@@ -70,12 +70,14 @@ namespace Quesadilla
 
             CharacterList = new List<Character>();
 
+            string listeningPort = MainConfiguration.IntegrationPort.ToString();
+
             var webhost = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 //                .UseIISIntegration()
                 .UseStartup<Startup>()
-                .UseUrls("http://localhost:65432") // <-----
+                .UseUrls($"http://localhost:{listeningPort}") // <-----
                 ;
             webhost.Build().RunAsync();
 
