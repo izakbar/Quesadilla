@@ -5,7 +5,9 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Resources;
+using System.Web.WebPages;
 using System.Windows.Forms;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -43,10 +45,13 @@ namespace Quesadilla
         public static Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
         public static Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
 
-        public static  List<LogWatcher> watchers = new List<LogWatcher>();
+        public static  List<LogWatcher> logfileWatchers = new List<LogWatcher>();
         public static List<Character> CharacterList { get; set; }
 
-        public static ProcessMonitor _processMonitor = new ProcessMonitor();
+        public static ProcessMonitor ProcessMonitorHandler = new ProcessMonitor();
+
+        public static Dictionary<string, List<CombatLine>> Combat = new Dictionary<string, List<CombatLine>>();
+        public static Dictionary<string, List<IskLine>> ISK = new Dictionary<string, List<IskLine>>();
 
         public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
@@ -92,28 +97,28 @@ namespace Quesadilla
 
         public static void SetupLogfileWatchers()
         {
-            watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel, "Catch Intel"));
-            watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel, "Fountain Intel"));
-            watchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.ChatIntel, "Period Basis Intel"));
+            logfileWatchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel, "Catch Intel"));
+            logfileWatchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel, "Fountain Intel"));
+            logfileWatchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.ChatIntel, "Period Basis Intel"));
 
-            watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel, "Querious Intel"));
-            watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel, "Delve Intel"));
+            logfileWatchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel, "Querious Intel"));
+            logfileWatchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel, "Delve Intel"));
 
             //            watchers.Add(new LogWatcher("cr", Classes.Logfile.LogFileType.ChatIntel, "Cloud Ring Intel"));
-            watchers.Add(new LogWatcher("paragon", Classes.Logfile.LogFileType.ChatIntel, "Paragon Soul Intel"));
+            logfileWatchers.Add(new LogWatcher("paragon", Classes.Logfile.LogFileType.ChatIntel, "Paragon Soul Intel"));
 
-            watchers.Add(new LogWatcher("Quer_Catch", Classes.Logfile.LogFileType.ChatIntel, "Querious/Catch Intel"));
+            logfileWatchers.Add(new LogWatcher("Quer_Catch", Classes.Logfile.LogFileType.ChatIntel, "Querious/Catch Intel"));
 
-            watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
+            logfileWatchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
 
-            watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
-            watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
+            logfileWatchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
+            logfileWatchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
         }
 
         public static void StartLogfileWatchers()
         {
             // start watchers
-            foreach (LogWatcher watcher in watchers)
+            foreach (LogWatcher watcher in logfileWatchers)
             {
                 watcher.StartWatch();
             }
@@ -166,6 +171,145 @@ namespace Quesadilla
             }
         }
 
+        public static void EnqueueAlert(AlertQueueItem alert)
+        {
+            // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
+            var f = NewAlerts.Where(o =>
+            (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
+            || (o.AlertText == alert.AlertText)
+            ).ToList();
+            if (f.Count == 0 || NewAlerts.Count == 0)
+            {
+                alert.RouteText = Program.Universe.PathToString(alert.Path);
+                NewAlerts.Enqueue(alert);
+            }
+            if (f.Count != 0)
+            {
+                if (f.First().Path != null && alert.Path != null && alert.Path.TotalJumps < f.First().Path.TotalJumps)
+                {
+                    f.First().Path = alert.Path;
+                    f.First().AlertText = alert.AlertText;
+                    f.First().Entry = alert.Entry;
+                    f.First().Context = alert.Context;
+                    f.First().RouteText = alert.RouteText;
+                    f.First().SoundFile = alert.SoundFile;
+                }
+            }
+        }
+
+        public static string GetIskLastHour(string toon)
+        {
+            var ret = "";
+            double isk = 0;
+
+            //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
+            var expireTime = DateTime.Now.AddSeconds(-3600);
+
+            foreach (var t in CharacterList)
+            {
+                if (!toon.IsEmpty() && t.CharacterName != toon || !ISK.ContainsKey(t.CharacterName)) continue;
+                foreach (var i in ISK[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
+                {
+                    isk += i.IskAmount;
+                }
+            }
+
+            if (isk > 0)
+            {
+                ret = Math.Truncate(isk).ToString("0,000 ISK");
+            }
+
+            return ret;
+        }
+
+        public static void ExpireISK()
+        {
+            // expire ISK ?
+            foreach (var k in ISK.Keys)
+            {
+                if (ISK[k].Count > 0)
+                {
+                    TimeSpan ts = DateTime.Now - ISK[k].First().TimeAdded;
+                    if (ts.TotalSeconds > MainConfiguration.ExpireISKSeconds)
+                    {
+                        ISK[k].Remove(ISK[k].First());
+                    }
+                }
+            }
+        }
+        public static void ExpireCombat()
+        {
+            // expire combats ?
+            foreach (var k in Combat.Keys)
+            {
+                if (Combat[k].Count > 0)
+                {
+                    TimeSpan ts = DateTime.Now - Combat[k].First().TimeAdded;
+                    if (ts.TotalSeconds > MainConfiguration.ExpireCombatSeconds)
+                    {
+                        Combat[k].Remove(Combat[k].First());
+                    }
+                }
+            }
+        }
+        public static SoundPlayer LoadSoundFromFile(string fileName)
+        {
+            Stream soundStream = null;
+
+            if (Sounds.Find(o => o.SoundName == fileName) != null)
+            {
+                soundStream = (Stream)Sounds.Find(o => o.SoundName == fileName).stream;
+                soundStream.Seek(0, SeekOrigin.Begin);
+                SoundPlayer soundPlayer = new SoundPlayer(soundStream);
+                soundPlayer.Load();
+                return soundPlayer;
+            }
+
+            if (File.Exists(fileName))
+            {
+                using (FileStream fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    try
+                    {
+                        SoundPlayer soundPlayer = new SoundPlayer((Stream)fileStream);
+                        soundPlayer.Load();
+                        return soundPlayer;
+                    }
+                    catch (Exception ex)
+                    {
+                        return (SoundPlayer)null;
+                    }
+                }
+            }
+            return (SoundPlayer)null;
+        }
+        public static Image LoadImageFromFile(string fileName)
+        {
+            Bitmap imageStream = null;
+
+            if (Backgrounds.Find(o => o.BackgroundName == fileName) != null)
+            {
+                imageStream = (Bitmap)Backgrounds.Find(o => o.BackgroundName == fileName).background;
+                return imageStream;
+            }
+
+            if (File.Exists(fileName))
+            {
+                Image imageFile = Image.FromFile(fileName);
+                return imageFile;
+            }
+            return (Image)null;
+        }
+
+        public static void LogfileWatchersProcessing()
+        {
+            // progress logfiles
+            foreach (LogWatcher watcher in logfileWatchers)
+            {
+                watcher.Tick();
+            }
+
+        }
         private static void ConfigureSerilog()
         {
             Log.Logger = new LoggerConfiguration()

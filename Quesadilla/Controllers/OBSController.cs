@@ -157,7 +157,7 @@ img.rounded-corners {
             string output = "<meta http-equiv=\"refresh\" content=\"10\">\r\n";
             if (Program.q != null)
             {
-                string isk = Program.q.GetIskLastHour(toon);
+                string isk = Program.GetIskLastHour(toon);
                 if (!isk.IsNullOrEmpty())
                 {
                     output += $"<div class=iskcontainer><div class=iskperhour>{isk}</div></div>";

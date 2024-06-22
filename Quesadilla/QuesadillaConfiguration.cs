@@ -169,7 +169,7 @@ namespace Quesadilla
             {
                 _alertPopup.Close();
             }
-            _alertPopup = new QuesadillaAlertPopup(_dummyAlert, _configuration, _mainForm.LoadImageFromFile(_configuration.AlertPopupBackground), _mainForm);
+            _alertPopup = new QuesadillaAlertPopup(_dummyAlert, _configuration, Program.LoadImageFromFile(_configuration.AlertPopupBackground), _mainForm);
             _alertPopup.Show();
             _alertPopup.Hide();
             alertDemo.Image = GetFormImageWithoutBorders(_alertPopup);

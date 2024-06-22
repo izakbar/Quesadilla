@@ -177,20 +177,20 @@ namespace Quesadilla
 
             /*
             // pick first toon in list;
-            Toon = _main._combat.Keys.First().ToString();
+            Toon = Program.Combat.Keys.First().ToString();
 
             // pick last active dps
             DateTime LastCombat = DateTime.Now.AddDays(-1);
-            if ( _main._combat.Keys.Count > 1 )
+            if ( Program.Combat.Keys.Count > 1 )
             {
                 // find toon with latest combat on
-                foreach(var x in _main._combat.Keys)
+                foreach(var x in Program.Combat.Keys)
                 {
-                    if (_main._combat[x].Count > 0 )
+                    if (Program.Combat[x].Count > 0 )
                     {
-                        if (_main._combat[x].Last().TimeAdded > LastCombat )
+                        if (Program.Combat[x].Last().TimeAdded > LastCombat )
                         {
-                            LastCombat = _main._combat[x].Last().TimeAdded;
+                            LastCombat = Program.Combat[x].Last().TimeAdded;
                             Toon = x;
                         } 
                     }
@@ -204,7 +204,7 @@ namespace Quesadilla
                 Toon = _main.CurrentActiveToon;
             }
 
-            if ( Toon == null || Toon == "" || !_main._combat.ContainsKey(Toon))
+            if ( Toon == null || Toon == "" || !Program.Combat.ContainsKey(Toon))
             {
                 chartDPS.Visible = false;
                 return;
@@ -322,14 +322,14 @@ namespace Quesadilla
             DateTime end = start;
 
             // work out start/end times of combat - for cuirrent/all toons
-            foreach (var currToon in _main._combat.Keys)
+            foreach (var currToon in Program.Combat.Keys)
             {
                 if (currToon == Toon || Toon == "*ALL*")
                 {
-                    if (_main._combat[currToon].Count > 0)
+                    if (Program.Combat[currToon].Count > 0)
                     {
-                        if (_main._combat[currToon].First().TimeAdded < start) start = _main._combat[currToon].First().TimeAdded;
-                        if (_main._combat[currToon].Last().TimeAdded > end) end = _main._combat[currToon].Last().TimeAdded;
+                        if (Program.Combat[currToon].First().TimeAdded < start) start = Program.Combat[currToon].First().TimeAdded;
+                        if (Program.Combat[currToon].Last().TimeAdded > end) end = Program.Combat[currToon].Last().TimeAdded;
                     }
                 }
             }
@@ -347,12 +347,12 @@ namespace Quesadilla
             var span = Math.Truncate(totalTime.TotalSeconds > maxPoints ? totalTime.TotalSeconds / maxPoints : 1);
             if (span < minSpanSize) span = minSpanSize;
 
-            foreach (var currToon in _main._combat.Keys)
+            foreach (var currToon in Program.Combat.Keys)
             {
                 if (currToon == Toon || Toon == "*ALL*")
                 {
                     // setup second slots
-                    foreach (var c in _main._combat[currToon].OrderBy(o => o.TimeAdded).ToList())
+                    foreach (var c in Program.Combat[currToon].OrderBy(o => o.TimeAdded).ToList())
                     {
                         var slot = (int)Math.Truncate((c.TimeAdded - start).TotalSeconds);
                         if (!_combatGraphData.ContainsKey(slot))

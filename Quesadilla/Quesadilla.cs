@@ -119,9 +119,6 @@ namespace Quesadilla
 
         private Color OriginalBackgroundColour;
 
-        public Dictionary<string, List<CombatLine>> _combat = new Dictionary<string, List<CombatLine>>();
-        public Dictionary<string, List<IskLine>> _ISK = new Dictionary<string, List<IskLine>>();
-
         private List<ProcessInfo> knowProcesses = new List<ProcessInfo>();
         public string CurrentActiveToon;
 
@@ -188,7 +185,6 @@ namespace Quesadilla
             // stop main tick timer!
             mainTimer.Enabled = false;
 
-
             ReloadConfiguration();
 
             EveScoutProcessor = new EveScoutManager();
@@ -196,26 +192,7 @@ namespace Quesadilla
 
             Program.SetupLogfileWatchers();
 
-            // setup event handlers
-            foreach (LogWatcher watcher in Program.watchers)
-            {
-                if (watcher._logFileType == LogFileType.Local)
-                {
-                    watcher.SystemChange += new EventHandler<ProcessSystemChangeEventArgs>(this._localWatcher_SystemChange);
-                    watcher.ChatServerChange += new EventHandler<ProcessChatServerChangeEventArgs>(
-                        this._localWatcher_ChatServerChange);
-                }
-                else if (watcher._logFileType == LogFileType.Game)
-                {
-                    watcher.ProcessCombat += new EventHandler<ProcessCombatEventArgs>(this.logFile_ProcessCombat);
-                    watcher.ProcessISK += new EventHandler<ProcessISKEventArgs>(this.logFile_ProcessISK);
-                    watcher.ProcessDecloak += new EventHandler<ProcessDecloakEventArgs>(this.logFile_ProcessDecloak);
-                }
-                else
-                {
-                    watcher.ProcessNewData += new EventHandler<ProcessNewDataEventArgs>(this.logFile_ProcessNewData);
-                }
-            }
+            SetupLogfileEvents();
 
             RebuildLogfilesMenu();
             Program.StartLogfileWatchers();
@@ -224,7 +201,6 @@ namespace Quesadilla
             mainTimer.Enabled = true;
 
             Program.ZKillHandler.ZKillFeed.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
-
         }
 
         private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
@@ -239,7 +215,7 @@ namespace Quesadilla
         private void RebuildLogfilesMenu()
         {
             menuLogWatchers.MenuItems.Clear();
-            foreach (var watcher in Program.watchers)
+            foreach (var watcher in Program.logfileWatchers)
             {
                 MenuItem menuLogfile = new MenuItem(watcher.FriendlyName, trayIconMenuLogfileClick);
                 menuLogfile.Checked = watcher.Enabled;
@@ -324,7 +300,6 @@ namespace Quesadilla
             Program.Universe.HomeSolarSystemID = Program.Universe.Names[Program.MainConfiguration.HomeSystem];
 
             mainTimer.Interval = Program.MainConfiguration.TickMiliseconds;
-
         }
         private void Quesadilla_Load(object sender, EventArgs e)
         {
@@ -341,63 +316,11 @@ namespace Quesadilla
             this.Text = "Quesadilla v" + version.ToString();
 
         }
-        private SoundPlayer LoadSoundFromFile(string fileName)
-        {
-
-            Stream soundStream = null;
-
-            if (Program.Sounds.Find(o => o.SoundName == fileName) != null)
-            {
-                soundStream = (Stream)Program.Sounds.Find(o => o.SoundName == fileName).stream;
-                soundStream.Seek(0, SeekOrigin.Begin);
-                SoundPlayer soundPlayer = new SoundPlayer(soundStream);
-                soundPlayer.Load();
-                return soundPlayer;
-            }
-
-            if (File.Exists(fileName))
-            {
-                using (FileStream fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                {
-                    try
-                    {
-                        SoundPlayer soundPlayer = new SoundPlayer((Stream)fileStream);
-                        soundPlayer.Load();
-                        return soundPlayer;
-                    }
-                    catch (Exception ex)
-                    {
-                        return (SoundPlayer)null;
-                    }
-                }
-            }
-            return (SoundPlayer)null;
-        }
-        public Image LoadImageFromFile(string fileName)
-        {
-            Bitmap imageStream = null;
-
-            if (Program.Backgrounds.Find(o => o.BackgroundName == fileName) != null)
-            {
-                imageStream = (Bitmap)Program.Backgrounds.Find(o => o.BackgroundName == fileName).background;
-                return imageStream;
-            }
-
-            if (File.Exists(fileName))
-            {
-                Image imageFile = Image.FromFile(fileName);
-                return imageFile;
-            }
-            return (Image)null;
-        }
 
         private void mainTimer_Tick(object sender, EventArgs e)
         {
-            // progress logfiles
-            foreach (LogWatcher watcher in Program.watchers)
-            {
-                watcher.Tick();
-            }
+
+            Program.LogfileWatchersProcessing();
 
             // dequeue Alerts
             TickCounts["SinceLastAlert"]++;
@@ -409,19 +332,17 @@ namespace Quesadilla
                 Program.ActiveAlerts.Enqueue(NewAlert);
                 // do any extra processing 
 
-
                 // try to prevent new alert stealing focus
-                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Program.MainConfiguration, LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
-                var ptr = Program._processMonitor.GetForegroundWindowHandle();
+                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
+                var ptr = Program.ProcessMonitorHandler.GetForegroundWindowHandle();
                 NewAlertWindow.Show(this);
-                var ptr2 = Program._processMonitor.SetForegroundWindowHandle(ptr);
-                SoundPlayer sound = LoadSoundFromFile(NewAlert.SoundFile);
+                var ptr2 = Program.ProcessMonitorHandler.SetForegroundWindowHandle(ptr);
+                SoundPlayer sound = Program.LoadSoundFromFile(NewAlert.SoundFile);
                 if (sound != null) sound.Play();
                 RebuildLatestAlertsMenu();
 
                 TickCounts["SinceLastAlert"] = 0;
             }
-
 
             // do cleardown/rebuild of alerts menu - if number of ticks passed
             if ( ++TickCounts["SinceLastCleardown"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
@@ -446,32 +367,8 @@ namespace Quesadilla
                     alertsOutstanding.Text = "";
                 }
 
-                // expire combats ?
-                foreach (var k in _combat.Keys)
-                {
-                    if (_combat[k].Count > 0)
-                    {
-                        TimeSpan ts = DateTime.Now - _combat[k].First().TimeAdded;
-                        if (ts.TotalSeconds > Program.MainConfiguration.ExpireCombatSeconds)
-                        {
-                            _combat[k].Remove(_combat[k].First());
-                        }
-                    }
-                }
-
-                // expire ISK ?
-                foreach (var k in _ISK.Keys)
-                {
-                    if (_ISK[k].Count > 0)
-                    {
-                        TimeSpan ts = DateTime.Now - _ISK[k].First().TimeAdded;
-                        if (ts.TotalSeconds > Program.MainConfiguration.ExpireISKSeconds)
-                        {
-                            _ISK[k].Remove(_ISK[k].First());
-                        }
-                    }
-                }
-
+                Program.ExpireCombat();
+                Program.ExpireISK();
                 Program.ZKillHandler.ExpireZKillQueue();
 
                 TickCounts["SinceLastCleardown"] = 0;
@@ -497,9 +394,9 @@ namespace Quesadilla
                 TickCounts["SinceLastDPSGraphUpdate"] = 0;
             }
 
-            if (_ISK.ContainsKey(CurrentActiveToon))
+            if (Program.ISK.ContainsKey(CurrentActiveToon))
             {
-                lblISK.Text = GetIskLastHour(CurrentActiveToon);
+                lblISK.Text = Program.GetIskLastHour(CurrentActiveToon);
                 lblISK.Visible = true;
             }
             else
@@ -550,19 +447,6 @@ namespace Quesadilla
 
             return shouldAlert;
         }
-        private string PathToString(PathInfo path)
-        {
-            string route = "";
-            if (path != null)
-            {
-                foreach (int systemId in path.PathSystems)
-                {
-                    if (route.Length > 0) route += " -> ";
-                    route += systemId == path.FromSystemId ? "" : Program.Universe.SolarSystems[systemId].Name;
-                }
-            }
-            return route;
-        }
         private string generateAlertText(LogEntry entry, PathInfo path, AlertConfig alert, string characterName, int type, string context)
         {
             // type == 0 - Alert Text, 1 == Menu text
@@ -580,7 +464,7 @@ namespace Quesadilla
             if (path != null)
             {
                 returnString = returnString.Replace("{jumps}", path.TotalJumps.ToString());
-                returnString = returnString.Replace("{route}", PathToString(path));
+                returnString = returnString.Replace("{route}", Program.Universe.PathToString(path));
                 returnString = returnString.Replace("{tosystem}", Program.Universe.SolarSystems[path.ToSystemId].Name);
                 returnString = returnString.Replace("{region}", Program.Universe.SolarSystems[path.ToSystemId].RegionName);
                 returnString = returnString.Replace("{fromsystem}", Program.Universe.SolarSystems[path.FromSystemId].Name);
@@ -599,7 +483,7 @@ namespace Quesadilla
             if (path != null)
             {
                 returnString = returnString.Replace("{jumps}", path.TotalJumps.ToString());
-                returnString = returnString.Replace("{route}", PathToString(path));
+                returnString = returnString.Replace("{route}", Program.Universe.PathToString(path));
                 returnString = returnString.Replace("{tosystem}", Program.Universe.SolarSystems[path.ToSystemId].Name);
                 returnString = returnString.Replace("{region}", Program.Universe.SolarSystems[path.ToSystemId].RegionName);
                 returnString = returnString.Replace("{fromsystem}", Program.Universe.SolarSystems[path.FromSystemId].Name);
@@ -615,31 +499,6 @@ namespace Quesadilla
             returnString = returnString.Replace("{killership}", Program.Universe.ItemTypes.ContainsKey((int)kill.KillerShipTypeId) ? Program.Universe.ItemTypes[(int)kill.KillerShipTypeId].Name : kill.KillerShipTypeId.ToString());
             returnString = returnString.Replace("{killerweapon}", kill.KillerWeaponTypeId.ToString());
             return returnString;
-        }
-        private void EnqueueAlert(AlertQueueItem alert)
-        {
-            // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
-            var f = Program.NewAlerts.Where(o =>
-            (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
-            || (o.AlertText == alert.AlertText)
-            ).ToList();
-            if (f.Count == 0 || Program.NewAlerts.Count == 0)
-            {
-                alert.RouteText = PathToString(alert.Path);
-                Program.NewAlerts.Enqueue(alert);
-            }
-            if (f.Count != 0)
-            {
-                if (f.First().Path != null && alert.Path != null && alert.Path.TotalJumps < f.First().Path.TotalJumps)
-                {
-                    f.First().Path = alert.Path;
-                    f.First().AlertText = alert.AlertText;
-                    f.First().Entry = alert.Entry;
-                    f.First().Context = alert.Context;
-                    f.First().RouteText = alert.RouteText;
-                    f.First().SoundFile = alert.SoundFile;
-                }
-            }
         }
         private void logFile_ProcessNewData(object sender, ProcessNewDataEventArgs e)
         {
@@ -732,7 +591,7 @@ namespace Quesadilla
                                     {
                                         alertText = generateAlertText(entry, path, alert, "", 0, "");
                                         Log.Debug("ALERT - " + alertText);
-                                        EnqueueAlert(
+                                        Program.EnqueueAlert(
                                             new AlertQueueItem()
                                             {
                                                 AlertText = alertText,
@@ -756,7 +615,7 @@ namespace Quesadilla
                                     {
                                         alertText = generateAlertText(entry, path, alert, "", 0, "");
                                         Log.Debug("ALERT - " + alertText);
-                                        EnqueueAlert(
+                                        Program.EnqueueAlert(
                                             new AlertQueueItem()
                                             {
                                                 AlertText = alertText,
@@ -789,7 +648,7 @@ namespace Quesadilla
                                                     alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
                                                     )
                                                 {
-                                                    EnqueueAlert(
+                                                    Program.EnqueueAlert(
                                                     new AlertQueueItem()
                                                     {
                                                         AlertText = alertText,
@@ -825,7 +684,7 @@ namespace Quesadilla
                                                     alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive
                                                     )
                                                 {
-                                                    EnqueueAlert(
+                                                    Program.EnqueueAlert(
                                                     new AlertQueueItem()
                                                     {
                                                         AlertText = alertText,
@@ -853,7 +712,7 @@ namespace Quesadilla
 
                                             alertText = generateAlertText(entry, path, alert, alert.TriggerText, 0, alert.TriggerText);
                                             Log.Debug("ALERT - " + alertText);
-                                            EnqueueAlert(
+                                            Program.EnqueueAlert(
                                                 new AlertQueueItem()
                                                 {
                                                     AlertText = alertText,
@@ -898,7 +757,7 @@ namespace Quesadilla
 
                             string alertText = generateAlertText(entry, null, alert, alert.TriggerText, 0, alert.TriggerText);
                             Log.Debug("ALERT - " + alertText);
-                            EnqueueAlert(
+                            Program.EnqueueAlert(
                                 new AlertQueueItem()
                                 {
                                     AlertText = alertText,
@@ -1116,7 +975,7 @@ namespace Quesadilla
             if (Program.ActiveAlerts.Count > 0)
             {
                 var alert = Program.ActiveAlerts.Reverse().Take(1).ToList().First();
-                var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
+                var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
                 NewAlertWindow.Show(this);
             }
         }
@@ -1140,7 +999,7 @@ namespace Quesadilla
         {
             // enable / disable config item
             MenuItem m = (MenuItem)sender;
-            var watcher = Program.watchers.Find(o => o.FriendlyName == m.Text);
+            var watcher = Program.logfileWatchers.Find(o => o.FriendlyName == m.Text);
             //Configuration.AlertConfiguration.Find(o => o.FriendlyName == m.Text);
             if (watcher != null)
             {
@@ -1174,16 +1033,16 @@ namespace Quesadilla
                 }
 
                 InCombat = true;
-                if (!_combat.ContainsKey(e.Entry.CharacterName))
+                if (!Program.Combat.ContainsKey(e.Entry.CharacterName))
                 {
-                    _combat.Add(e.Entry.CharacterName, new List<CombatLine>());
+                    Program.Combat.Add(e.Entry.CharacterName, new List<CombatLine>());
                 }
                 //Log.Information(e.Entry.LineContent);
 
                 Match match = _CombatRegexMissesYouCompletely.Match(e.Entry.LineContent);
                 if (match.Success)
                 {
-                    _combat[e.Entry.CharacterName].Add(new CombatLine()
+                    Program.Combat[e.Entry.CharacterName].Add(new CombatLine()
                     {
                         TimeAdded = e.Entry.TimeAdded,
                         Entity = match.Groups["combatEntity"].ToString(),
@@ -1247,7 +1106,7 @@ namespace Quesadilla
                         }
                     }
 
-                    _combat[e.Entry.CharacterName].Add(new CombatLine()
+                    Program.Combat[e.Entry.CharacterName].Add(new CombatLine()
                     {
                         TimeAdded = e.Entry.TimeAdded,
                         Entity = match.Groups["combatEntity"].ToString(),
@@ -1304,7 +1163,7 @@ namespace Quesadilla
                                 LastFactionAlert = DateTime.Now;
                                 if (c != null) { c.LastFactionAlert = LastFactionAlert; }
                                 Log.Debug("ALERT - " + alertText);
-                                EnqueueAlert(
+                                Program.EnqueueAlert(
                                     new AlertQueueItem()
                                     {
                                         AlertText = alertText,
@@ -1339,9 +1198,9 @@ namespace Quesadilla
             //Log.Information("COMBAT:" + e.CombatEvent);
             if (e.Entry != null)
             {
-                if (!_ISK.ContainsKey(e.Entry.CharacterName))
+                if (!Program.ISK.ContainsKey(e.Entry.CharacterName))
                 {
-                    _ISK.Add(e.Entry.CharacterName, new List<IskLine>());
+                    Program.ISK.Add(e.Entry.CharacterName, new List<IskLine>());
                 }
 
                 Match match = _ISKRegexISKData.Match(e.Entry.LineContent);
@@ -1352,7 +1211,7 @@ namespace Quesadilla
                     var amount = match.Groups["iskAmount"].ToString();
                     iskAmount = Double.Parse(amount.Trim());
 
-                    _ISK[e.Entry.CharacterName].Add(new IskLine()
+                    Program.ISK[e.Entry.CharacterName].Add(new IskLine()
                     {
                         TimeAdded = e.Entry.TimeAdded,
                         IskAmount = iskAmount,
@@ -1392,7 +1251,7 @@ namespace Quesadilla
                         Log.Information("DECLOAK: proximity to " + alertText);
                     }
 
-                    EnqueueAlert(
+                    Program.EnqueueAlert(
                     new AlertQueueItem()
                     {
                         AlertText = alertText,
@@ -1456,11 +1315,11 @@ namespace Quesadilla
 
         private void UpdateEveProcesses()
         {
-            Program._processMonitor.GetUpdatedProcesses(out List<ProcessInfo> addedProcesses, out List<ProcessInfo> updatedProcesses, out List<ProcessInfo> removedProcesses);
+            Program.ProcessMonitorHandler.GetUpdatedProcesses(out List<ProcessInfo> addedProcesses, out List<ProcessInfo> updatedProcesses, out List<ProcessInfo> removedProcesses);
             string previousToon = CurrentActiveToon;
 
             string foregroundWindowTitle = null;
-            var ptr = Program._processMonitor.GetForegroundWindowHandle();
+            var ptr = Program.ProcessMonitorHandler.GetForegroundWindowHandle();
 
             var PrevRect = new Rect()
             {
@@ -1470,11 +1329,11 @@ namespace Quesadilla
                 Right = currentEveWindowRect.Right,
             };
 
-            var result = Program._processMonitor.GetWindowDimensions(ptr, ref currentEveWindowRect, ref currentEveClientPoint);
+            var result = Program.ProcessMonitorHandler.GetWindowDimensions(ptr, ref currentEveWindowRect, ref currentEveClientPoint);
 
             if (ptr != null)
             {
-                foregroundWindowTitle = Program._processMonitor.GetTitleOfKnownProcess(ptr);
+                foregroundWindowTitle = Program.ProcessMonitorHandler.GetTitleOfKnownProcess(ptr);
                 if (foregroundWindowTitle != null)
                 {
                     lblCurrentClient.Visible = true;
@@ -1531,32 +1390,8 @@ namespace Quesadilla
             // just double check thru charachter list active clients to make sure there is still an active client.
             foreach (var c in Program.CharacterList)
             {
-                c.IsClientActive = Program._processMonitor.IsCharStillActive(c.CharacterName);
+                c.IsClientActive = Program.ProcessMonitorHandler.IsCharStillActive(c.CharacterName);
             }
-        }
-        public string GetIskLastHour(string toon)
-        {
-            var ret = "";
-            double isk = 0;
-
-            //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
-            var expireTime = DateTime.Now.AddSeconds(-3600);
-
-            foreach (var t in Program.CharacterList)
-            {
-                if (!toon.IsEmpty() && t.CharacterName != toon || ! _ISK.ContainsKey(t.CharacterName) ) continue;
-                foreach (var i in _ISK[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
-                {
-                    isk += i.IskAmount;
-                }
-            }
-
-            if (isk > 0)
-            {
-                ret = Math.Truncate(isk).ToString("0,000 ISK");
-            }
-
-            return ret;
         }
 
         private void ZKill_ProcessNewData(object sender, ZKillEventArgs e)
@@ -1629,7 +1464,7 @@ namespace Quesadilla
                             alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText,"");
                             Log.Information("ALERT - " + alertText);
                             e.Kill.Alert = true;
-                            EnqueueAlert(
+                            Program.EnqueueAlert(
                                 new AlertQueueItem()
                                 {
                                     AlertText = alertText,
@@ -1653,7 +1488,7 @@ namespace Quesadilla
                             alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText, "");
                             Log.Information("ALERT - " + alertText);
                             e.Kill.Alert = true;
-                            EnqueueAlert(
+                            Program.EnqueueAlert(
                                 new AlertQueueItem()
                                 {
                                     AlertText = alertText,
@@ -1686,7 +1521,7 @@ namespace Quesadilla
                                         )
                                     {
                                         e.Kill.Alert = true;
-                                        EnqueueAlert(
+                                        Program.EnqueueAlert(
                                         new AlertQueueItem()
                                         {
                                             AlertText = alertText,
@@ -1722,7 +1557,7 @@ namespace Quesadilla
                                         )
                                     {
                                         e.Kill.Alert = true;
-                                        EnqueueAlert(
+                                        Program.EnqueueAlert(
                                         new AlertQueueItem()
                                         {
                                             AlertText = alertText,
@@ -1831,9 +1666,32 @@ namespace Quesadilla
         private void trayIconMenuShowHistoricAlert(object sender, EventArgs e)
         {
             AlertQueueItem alert = (AlertQueueItem)((MenuItem)sender).Tag;
-            var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
+            var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
             NewAlertWindow.Show(this);
         }
 
+        private void SetupLogfileEvents()
+        {
+            // setup event handlers
+            foreach (LogWatcher watcher in Program.logfileWatchers)
+            {
+                if (watcher._logFileType == LogFileType.Local)
+                {
+                    watcher.SystemChange += new EventHandler<ProcessSystemChangeEventArgs>(this._localWatcher_SystemChange);
+                    watcher.ChatServerChange += new EventHandler<ProcessChatServerChangeEventArgs>(
+                        this._localWatcher_ChatServerChange);
+                }
+                else if (watcher._logFileType == LogFileType.Game)
+                {
+                    watcher.ProcessCombat += new EventHandler<ProcessCombatEventArgs>(this.logFile_ProcessCombat);
+                    watcher.ProcessISK += new EventHandler<ProcessISKEventArgs>(this.logFile_ProcessISK);
+                    watcher.ProcessDecloak += new EventHandler<ProcessDecloakEventArgs>(this.logFile_ProcessDecloak);
+                }
+                else
+                {
+                    watcher.ProcessNewData += new EventHandler<ProcessNewDataEventArgs>(this.logFile_ProcessNewData);
+                }
+            }
+        }
     }
 }

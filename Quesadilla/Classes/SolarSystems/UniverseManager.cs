@@ -208,6 +208,20 @@ namespace Quesadilla.Classes.SolarSystems
             }
         }
 
+        public string PathToString(PathInfo path)
+        {
+            string route = "";
+            if (path != null)
+            {
+                foreach (int systemId in path.PathSystems)
+                {
+                    if (route.Length > 0) route += " -> ";
+                    route += systemId == path.FromSystemId ? "" : Program.Universe.SolarSystems[systemId].Name;
+                }
+            }
+            return route;
+        }
+
         public void AddAlert(int systemId)
         {
             SolarSystems[systemId].AlertTime = DateTime.Now;
