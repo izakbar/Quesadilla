@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
+using Quesadilla.Classes.Resources;
 using Quesadilla.Classes.SolarSystems;
 using Quesadilla.Classes.ZKill;
 using Serilog;
@@ -27,6 +28,9 @@ namespace Quesadilla
         public static Config MainConfiguration = new Config();
 
         public static UniverseManager Universe = new UniverseManager();
+
+        public static List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
+        public static List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
 
         public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";

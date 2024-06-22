@@ -40,7 +40,7 @@ namespace Quesadilla
         private void SetBackground(ComboBox cmb, string background)
         {
             cmb.Items.Clear();
-            cmb.DataSource = _mainForm.Backgrounds.Select(o => o.BackgroundName).ToList();
+            cmb.DataSource = Program.Backgrounds.Select(o => o.BackgroundName).ToList();
             cmb.Text = background;
         }
         private void QuesadillaConfiguration_Load(object sender, EventArgs e)

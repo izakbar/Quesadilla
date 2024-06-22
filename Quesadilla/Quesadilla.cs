@@ -83,9 +83,6 @@ namespace Quesadilla
         public Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
         public Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
 
-        private List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
-        public List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
-
         private int _intelSizeMax = 200;
         private int _intelSizeMin = 48;
         private int _windowExtraHeight = 80;
@@ -283,7 +280,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                         // if background - store in backgrounds
                         if (name.StartsWith("background") || name.StartsWith("bg_"))
                         {
-                            Backgrounds.Add(new QuesadillaBackground()
+                            Program.Backgrounds.Add(new QuesadillaBackground()
                             {
                                 BackgroundName = name,
                                 background = (Bitmap)r.Value,
@@ -293,7 +290,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
                     if (r.Value is UnmanagedMemoryStream)
                     {
                         // sound file
-                        Sounds.Add(new QuesadillaSound()
+                        Program.Sounds.Add(new QuesadillaSound()
                         {
                             SoundName = r.Key.ToString(),
                             stream = (UnmanagedMemoryStream)r.Value,
@@ -352,7 +349,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         private void RebuildBackgroundsMenu()
         {
             menuBackgrounds.MenuItems.Clear();
-            foreach (var background in Backgrounds.OrderBy(o => o.BackgroundName).ToList())
+            foreach (var background in Program.Backgrounds.OrderBy(o => o.BackgroundName).ToList())
             {
                 MenuItem menuBackground = new MenuItem(background.BackgroundName, trayIconMenuBackgroundClick);
                 if (Program.MainConfiguration.AlertPopupBackground == background.BackgroundName) menuBackground.Checked = true;
@@ -412,9 +409,9 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
 
             Stream soundStream = null;
 
-            if (Sounds.Find(o => o.SoundName == fileName) != null)
+            if (Program.Sounds.Find(o => o.SoundName == fileName) != null)
             {
-                soundStream = (Stream)Sounds.Find(o => o.SoundName == fileName).stream;
+                soundStream = (Stream)Program.Sounds.Find(o => o.SoundName == fileName).stream;
                 soundStream.Seek(0, SeekOrigin.Begin);
                 SoundPlayer soundPlayer = new SoundPlayer(soundStream);
                 soundPlayer.Load();
@@ -443,9 +440,9 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         {
             Bitmap imageStream = null;
 
-            if (Backgrounds.Find(o => o.BackgroundName == fileName) != null)
+            if (Program.Backgrounds.Find(o => o.BackgroundName == fileName) != null)
             {
-                imageStream = (Bitmap)Backgrounds.Find(o => o.BackgroundName == fileName).background;
+                imageStream = (Bitmap)Program.Backgrounds.Find(o => o.BackgroundName == fileName).background;
                 return imageStream;
             }
 
