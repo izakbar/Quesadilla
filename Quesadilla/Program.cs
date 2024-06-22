@@ -97,20 +97,14 @@ namespace Quesadilla
 
         public static void SetupLogfileWatchers()
         {
-            logfileWatchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel, "Catch Intel"));
-            logfileWatchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel, "Fountain Intel"));
-            logfileWatchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.ChatIntel, "Period Basis Intel"));
 
-            logfileWatchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel, "Querious Intel"));
-            logfileWatchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel, "Delve Intel"));
+            // load from config
+            foreach(var l in MainConfiguration.Logfiles.Where(o => o.Enabled == true))
+            {
+                logfileWatchers.Add(new LogWatcher(l.Logfile, l.LogType, l.FriendlyName));
+            }
 
-            //            watchers.Add(new LogWatcher("cr", Classes.Logfile.LogFileType.ChatIntel, "Cloud Ring Intel"));
-            logfileWatchers.Add(new LogWatcher("paragon", Classes.Logfile.LogFileType.ChatIntel, "Paragon Soul Intel"));
-
-            logfileWatchers.Add(new LogWatcher("Quer_Catch", Classes.Logfile.LogFileType.ChatIntel, "Querious/Catch Intel"));
-
-            logfileWatchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
-
+            // always add gamelogs and local !
             logfileWatchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
             logfileWatchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
         }

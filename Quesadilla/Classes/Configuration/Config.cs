@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Quesadilla.Classes
 {
@@ -83,6 +84,7 @@ namespace Quesadilla.Classes
             c.ignoreStrings = new List<Regex>();
             c.ignoreSystems = new List<int>();
             c.AlertConfiguration = new List<AlertConfig>();
+            c.Logfiles = new List<LogfileConfig>();
 
             foreach (var s in ignoreStrings)
             {
@@ -92,7 +94,7 @@ namespace Quesadilla.Classes
             {
                 c.ignoreSystems.Add(s);
             }
-            foreach(var a in AlertConfiguration)
+            foreach (var a in AlertConfiguration)
             {
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
@@ -110,6 +112,10 @@ namespace Quesadilla.Classes
                     Jumps2Number = a.Jumps2Number,
                     TriggerText = a.TriggerText
                 });
+            }
+            foreach (var l in Logfiles)
+            {
+                c.Logfiles.Add(l);
             }
 
             c.InitialPosition = new Point(InitialPosition.X, InitialPosition.Y);
@@ -169,9 +175,9 @@ namespace Quesadilla.Classes
                 c.ShowZKillAlerts = true;
 
                 c.AlertPopupSystemNameColour = Color.Lime;
-                c.AlertPopupRegionNameColour = Color.FromArgb(125,255,255);
+                c.AlertPopupRegionNameColour = Color.FromArgb(125, 255, 255);
                 c.AlertPopupContextInfoColour = Color.Yellow;
-                c.AlertPopupIntelLineColour = Color.White ;
+                c.AlertPopupIntelLineColour = Color.White;
                 c.AlertPopupAlertTextColour = Color.White;
 
                 c.ShowLastUnexpiredAlerts = 7;
@@ -300,6 +306,73 @@ namespace Quesadilla.Classes
                 });
             }
 
+            if (c.Logfiles == null)
+            {
+                c.Logfiles = new List<LogfileConfig> { };
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "Catch Intel",
+                    Logfile = "catch.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "Fountain Intel",
+                    Logfile = "ftn.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "Period Basis Intel",
+                    Logfile = "period.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "Querious Intel",
+                    Logfile = "querious.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "Delve Intel",
+                    Logfile = "delve.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = false,
+                    FriendlyName = "Cloud Ring Intel",
+                    Logfile = "cr.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "Paragon Soul Intel",
+                    Logfile = "paragon.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "Querious/Catch Intel",
+                    Logfile = "Quer_Catch.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = false,
+                    FriendlyName = "Izakbar DEBUG",
+                    Logfile = "izakbar.debug",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+            }
             return (c);
         }
 
@@ -310,7 +383,7 @@ namespace Quesadilla.Classes
         }
 
 
-        public int TickMiliseconds {  get; set; }
+        public int TickMiliseconds { get; set; }
         public int HowManyTicksBeforeCleardown { get; set; }
         public int HowManyTicksBeforeAlert { get; set; }
         public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
@@ -340,7 +413,7 @@ namespace Quesadilla.Classes
         public int GraphCombatMaxPoints { get; set; }
         public int GraphCombatMinPointSeconds { get; set; }
         public List<AlertConfig> AlertConfiguration { get; set; }
-
+        public List<LogfileConfig> Logfiles { get; set; }
         public int AlertPopupSeconds { get; set; }
         public int AlertPopupOpacity { get; set; }
         public int AlertPopupOpacityStep { get; set; }
