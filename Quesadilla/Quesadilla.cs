@@ -129,8 +129,6 @@ namespace Quesadilla
 
         private NotifyIcon trayIcon;
 
-        private ProcessMonitor _processMonitor = new ProcessMonitor();
-
         private DateTime LastFactionAlert = DateTime.Now;
 
         public Rect currentEveWindowRect = new Rect();
@@ -450,9 +448,9 @@ namespace Quesadilla
 
                 // try to prevent new alert stealing focus
                 var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Program.MainConfiguration, LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
-                var ptr = this._processMonitor.GetForegroundWindowHandle();
+                var ptr = Program._processMonitor.GetForegroundWindowHandle();
                 NewAlertWindow.Show(this);
-                var ptr2 = this._processMonitor.SetForegroundWindowHandle(ptr);
+                var ptr2 = Program._processMonitor.SetForegroundWindowHandle(ptr);
                 SoundPlayer sound = LoadSoundFromFile(NewAlert.SoundFile);
                 if (sound != null) sound.Play();
                 RebuildLatestAlertsMenu();
@@ -1494,11 +1492,11 @@ namespace Quesadilla
 
         private void UpdateEveProcesses()
         {
-            this._processMonitor.GetUpdatedProcesses(out List<ProcessInfo> addedProcesses, out List<ProcessInfo> updatedProcesses, out List<ProcessInfo> removedProcesses);
+            Program._processMonitor.GetUpdatedProcesses(out List<ProcessInfo> addedProcesses, out List<ProcessInfo> updatedProcesses, out List<ProcessInfo> removedProcesses);
             string previousToon = CurrentActiveToon;
 
             string foregroundWindowTitle = null;
-            var ptr = this._processMonitor.GetForegroundWindowHandle();
+            var ptr = Program._processMonitor.GetForegroundWindowHandle();
 
             var PrevRect = new Rect()
             {
@@ -1508,11 +1506,11 @@ namespace Quesadilla
                 Right = currentEveWindowRect.Right,
             };
 
-            var result = this._processMonitor.GetWindowDimensions(ptr, ref currentEveWindowRect, ref currentEveClientPoint);
+            var result = Program._processMonitor.GetWindowDimensions(ptr, ref currentEveWindowRect, ref currentEveClientPoint);
 
             if (ptr != null)
             {
-                foregroundWindowTitle = this._processMonitor.GetTitleOfKnownProcess(ptr);
+                foregroundWindowTitle = Program._processMonitor.GetTitleOfKnownProcess(ptr);
                 if (foregroundWindowTitle != null)
                 {
                     lblCurrentClient.Visible = true;
@@ -1569,7 +1567,7 @@ namespace Quesadilla
             // just double check thru charachter list active clients to make sure there is still an active client.
             foreach (var c in Program.CharacterList)
             {
-                c.IsClientActive = _processMonitor.IsCharStillActive(c.CharacterName);
+                c.IsClientActive = Program._processMonitor.IsCharStillActive(c.CharacterName);
             }
         }
         public string GetIskLastHour(string toon)

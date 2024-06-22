@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.Logfile;
+using Quesadilla.Classes.Processes;
 using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.Resources;
 using Quesadilla.Classes.SolarSystems;
@@ -40,6 +41,8 @@ namespace Quesadilla
 
         public static  List<LogWatcher> watchers = new List<LogWatcher>();
         public static List<Character> CharacterList { get; set; }
+
+        public static ProcessMonitor _processMonitor = new ProcessMonitor();
 
         public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
