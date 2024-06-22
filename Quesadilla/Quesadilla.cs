@@ -126,7 +126,6 @@ namespace Quesadilla
         public string CurrentActiveToon;
 
         // TODO - config things - really need to go into config structure later
-        public List<Character> CharacterList { get; set; }
 
         private NotifyIcon trayIcon;
 
@@ -191,7 +190,6 @@ namespace Quesadilla
             // stop main tick timer!
             mainTimer.Enabled = false;
 
-            CharacterList = new List<Character>();
 
             ReloadConfiguration();
 
@@ -548,18 +546,6 @@ namespace Quesadilla
             }
         }
 
-        private void AddNewCharacter(string characterName)
-        {
-            if (characterName.Trim().Length == 0)
-                return;
-
-            this.CharacterList.Add(new Character()
-            {
-                CharacterName = characterName.Trim(),
-                IsClientActive = false,
-            });
-            Log.Information("New character found: " + characterName);
-        }
         private bool checkJumpsRange(AlertConfig alert, PathInfo path)
         {
             bool checkJumpsRangeComparison(int jumps, AlertConfigJumpsComparison comparison, int? comparisonNumber)
@@ -702,8 +688,8 @@ namespace Quesadilla
                 return;
             if (entry.EntryType != LogEntryType.ChatEvent && entry.EntryType != LogEntryType.UnknownChatLogEvent && entry.EntryType != LogEntryType.UnknownGameLogEvent)
             {
-                if (this.CharacterList.Where(o => o.CharacterName == entry.CharacterName).ToList().Count == 0)
-                    this.AddNewCharacter(entry.CharacterName);
+                if (Program.CharacterList.Where(o => o.CharacterName == entry.CharacterName).ToList().Count == 0)
+                    Program.AddNewCharacter(entry.CharacterName);
                 switch (entry.EntryType)
                 {
                     case LogEntryType.OpenChatLogEvent:
@@ -754,7 +740,7 @@ namespace Quesadilla
                             Log.Debug("Jumps from HOME:" + Program.Universe.SolarSystems[homeSystemId].Name + " to " + Program.Universe.SolarSystems[toSystemId].Name + " is " + homeSystemPathInfo.TotalJumps);
                         }
 
-                        foreach (var c in CharacterList.Where(o => o.LocationId > 0))
+                        foreach (var c in Program.CharacterList.Where(o => o.LocationId > 0))
                         {
                             var CurrectLocationPathInfo = Program.Universe.FindAndCachePath(c.LocationId, toSystemId);
                             if (CurrectLocationPathInfo != null)
@@ -826,7 +812,7 @@ namespace Quesadilla
                                 case AlertConfigRangeType.OneCharacter:
                                 case AlertConfigRangeType.OneOnlineCharacter:
                                     // check against one specific character
-                                    foreach (var x in CharacterList.Where(o => o.CharacterName == alert.TriggerText))
+                                    foreach (var x in Program.CharacterList.Where(o => o.CharacterName == alert.TriggerText))
                                     {
                                         if (x.LocationId != 0)
                                         {
@@ -862,7 +848,7 @@ namespace Quesadilla
                                 case AlertConfigRangeType.AllCharacters:
                                 case AlertConfigRangeType.AllOnlineCharacters:
                                     // check against all characters
-                                    foreach (var x in CharacterList)
+                                    foreach (var x in Program.CharacterList)
                                     {
                                         if (x.LocationId != 0)
                                         {
@@ -899,7 +885,7 @@ namespace Quesadilla
                                     // must be custom text
                                     if (entry.LineContent.Contains(alert.TriggerText, StringComparison.OrdinalIgnoreCase))
                                     {
-                                        foreach (var x in CharacterList)
+                                        foreach (var x in Program.CharacterList)
                                         {
                                             path = Program.Universe.FindAndCachePath(x.LocationId, toSystemId);
 
@@ -1009,7 +995,7 @@ namespace Quesadilla
 
             if (!string.IsNullOrEmpty(characterName) && foundSystemId != -1)
             {
-                var c = CharacterList.Where(o => o.CharacterName == characterName).FirstOrDefault();
+                var c = Program.CharacterList.Where(o => o.CharacterName == characterName).FirstOrDefault();
                 if (c != null)
                 {
                     c.LocationId = foundSystemId;
@@ -1023,7 +1009,7 @@ namespace Quesadilla
                         LocationId = foundSystemId,
                         Location = foundSystemName,
                     };
-                    CharacterList.Add(c);
+                    Program.CharacterList.Add(c);
                 }
 
                 CheckEveScoutConnection(c);
@@ -1328,7 +1314,7 @@ namespace Quesadilla
                         {
                             string alertText = generateAlertText(e.Entry, null, alert, "Faction Spawn", 0, match.Groups["combatEntity"].ToString());
                             PathInfo path = null;
-                            var c = CharacterList.Find(o => o.CharacterName.Equals(e.CharacterName));
+                            var c = Program.CharacterList.Find(o => o.CharacterName.Equals(e.CharacterName));
 
                             bool sendAlert = true;
 
@@ -1419,7 +1405,7 @@ namespace Quesadilla
             {
 
                 PathInfo path = null;
-                var c = CharacterList.Find(o => o.CharacterName.Equals(e.CharacterName));
+                var c = Program.CharacterList.Find(o => o.CharacterName.Equals(e.CharacterName));
                 string alertText = "";
 
                 foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
@@ -1581,7 +1567,7 @@ namespace Quesadilla
             }
 
             // just double check thru charachter list active clients to make sure there is still an active client.
-            foreach (var c in CharacterList)
+            foreach (var c in Program.CharacterList)
             {
                 c.IsClientActive = _processMonitor.IsCharStillActive(c.CharacterName);
             }
@@ -1594,7 +1580,7 @@ namespace Quesadilla
             //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
             var expireTime = DateTime.Now.AddSeconds(-3600);
 
-            foreach (var t in CharacterList)
+            foreach (var t in Program.CharacterList)
             {
                 if (!toon.IsEmpty() && t.CharacterName != toon || ! _ISK.ContainsKey(t.CharacterName) ) continue;
                 foreach (var i in _ISK[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
@@ -1650,7 +1636,7 @@ namespace Quesadilla
             {
                 Log.Debug("Jumps from HOME:" + Program.Universe.SolarSystems[homeSystemId].Name + " to " + Program.Universe.SolarSystems[toSystemId].Name + " is " + homeSystemPathInfo.TotalJumps);
             }
-            foreach (var c in CharacterList.Where(o => o.LocationId > 0))
+            foreach (var c in Program.CharacterList.Where(o => o.LocationId > 0))
             {
                 var CurrectLocationPathInfo = Program.Universe.FindAndCachePath(c.LocationId, toSystemId);
                 if (CurrectLocationPathInfo != null)
@@ -1722,7 +1708,7 @@ namespace Quesadilla
                     case AlertConfigRangeType.OneCharacter:
                     case AlertConfigRangeType.OneOnlineCharacter:
                         // check against one specific character
-                        foreach (var x in CharacterList.Where(o => o.CharacterName == alert.TriggerText))
+                        foreach (var x in Program.CharacterList.Where(o => o.CharacterName == alert.TriggerText))
                         {
                             if (x.LocationId != 0)
                             {
@@ -1758,7 +1744,7 @@ namespace Quesadilla
                     case AlertConfigRangeType.AllCharacters:
                     case AlertConfigRangeType.AllOnlineCharacters:
                         // check against all characters
-                        foreach (var x in CharacterList)
+                        foreach (var x in Program.CharacterList)
                         {
                             if (x.LocationId != 0)
                             {
@@ -1802,7 +1788,7 @@ namespace Quesadilla
 
             if (CurrentActiveToon != null && CurrentActiveToon != "")
             {
-                var c = CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
+                var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
                 if (c != null)
                 {
                     if (c.ClosestThera != null)
@@ -1875,7 +1861,7 @@ namespace Quesadilla
         }
         private void EveScout_ProcessNewData(object sender, EveScoutEventArgs e)
         {
-            foreach(var c in CharacterList.Where(o => o.IsClientActive)) { 
+            foreach(var c in Program.CharacterList.Where(o => o.IsClientActive)) { 
                 CheckEveScoutConnection(c);
             }
         }

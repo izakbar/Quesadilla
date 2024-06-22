@@ -39,6 +39,7 @@ namespace Quesadilla
         public static Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
 
         public static  List<LogWatcher> watchers = new List<LogWatcher>();
+        public static List<Character> CharacterList { get; set; }
 
         public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
@@ -54,6 +55,8 @@ namespace Quesadilla
             Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
             Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
             Universe.SetupESI();
+
+            CharacterList = new List<Character>();
 
             var webhost = new WebHostBuilder()
                 .UseKestrel()
@@ -107,6 +110,19 @@ namespace Quesadilla
             {
                 watcher.StartWatch();
             }
+        }
+
+        public static void AddNewCharacter(string characterName)
+        {
+            if (characterName.Trim().Length == 0)
+                return;
+
+            CharacterList.Add(new Character()
+            {
+                CharacterName = characterName.Trim(),
+                IsClientActive = false,
+            });
+            Log.Information("New character found: " + characterName);
         }
 
         private static void ConfigureSerilog()
