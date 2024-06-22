@@ -36,6 +36,8 @@ namespace Quesadilla
         public static Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
         public static Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
 
+        public static  List<LogWatcher> watchers = new List<LogWatcher>();
+
         public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
 

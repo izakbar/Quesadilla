@@ -78,8 +78,6 @@ namespace Quesadilla
 
         private Queue<LogEntry> _newIntelQueue = new Queue<LogEntry>();
 
-        private List<LogWatcher> watchers = new List<LogWatcher>();
-
         private int _intelSizeMax = 200;
         private int _intelSizeMin = 48;
         private int _windowExtraHeight = 80;
@@ -200,27 +198,27 @@ namespace Quesadilla
             EveScoutProcessor = new EveScoutManager();
             EveScoutProcessor.EveScoutEventHandler += new EventHandler<EveScoutEventArgs>(this.EveScout_ProcessNewData);
 
-            watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel, "Catch Intel"));
-            watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel, "Fountain Intel"));
-            watchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.ChatIntel, "Period Basis Intel"));
+            Program.watchers.Add(new LogWatcher("catch", Classes.Logfile.LogFileType.ChatIntel, "Catch Intel"));
+            Program.watchers.Add(new LogWatcher("ftn", Classes.Logfile.LogFileType.ChatIntel, "Fountain Intel"));
+            Program.watchers.Add(new LogWatcher("period", Classes.Logfile.LogFileType.ChatIntel, "Period Basis Intel"));
 
-            watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel, "Querious Intel"));
-            watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel, "Delve Intel"));
+            Program.watchers.Add(new LogWatcher("querious", Classes.Logfile.LogFileType.ChatIntel, "Querious Intel"));
+            Program.watchers.Add(new LogWatcher("delve", Classes.Logfile.LogFileType.ChatIntel, "Delve Intel"));
 
             //            watchers.Add(new LogWatcher("cr", Classes.Logfile.LogFileType.ChatIntel, "Cloud Ring Intel"));
-            watchers.Add(new LogWatcher("paragon", Classes.Logfile.LogFileType.ChatIntel, "Paragon Soul Intel"));
+            Program.watchers.Add(new LogWatcher("paragon", Classes.Logfile.LogFileType.ChatIntel, "Paragon Soul Intel"));
 
-            watchers.Add(new LogWatcher("Quer_Catch", Classes.Logfile.LogFileType.ChatIntel, "Querious/Catch Intel"));
+            Program.watchers.Add(new LogWatcher("Quer_Catch", Classes.Logfile.LogFileType.ChatIntel, "Querious/Catch Intel"));
 
-watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
+Program.watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "Izakbar debug"));
 
-            watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
-            watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
+            Program.watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
+            Program.watchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
 
             RebuildLogfilesMenu();
 
             // setup event handlers
-            foreach (LogWatcher watcher in watchers)
+            foreach (LogWatcher watcher in Program.watchers)
             {
                 if (watcher._logFileType == LogFileType.Local)
                 {
@@ -240,7 +238,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             }
 
             // start watchers
-            foreach (LogWatcher watcher in watchers)
+            foreach (LogWatcher watcher in Program.watchers)
             {
                 watcher.StartWatch();
             }
@@ -299,7 +297,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         private void RebuildLogfilesMenu()
         {
             menuLogWatchers.MenuItems.Clear();
-            foreach (var watcher in watchers)
+            foreach (var watcher in Program.watchers)
             {
                 MenuItem menuLogfile = new MenuItem(watcher.FriendlyName, trayIconMenuLogfileClick);
                 menuLogfile.Checked = watcher.Enabled;
@@ -454,7 +452,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         private void mainTimer_Tick(object sender, EventArgs e)
         {
             // progress logfiles
-            foreach (LogWatcher watcher in watchers)
+            foreach (LogWatcher watcher in Program.watchers)
             {
                 watcher.Tick();
             }
@@ -1212,7 +1210,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         {
             // enable / disable config item
             MenuItem m = (MenuItem)sender;
-            var watcher = watchers.Find(o => o.FriendlyName == m.Text);
+            var watcher = Program.watchers.Find(o => o.FriendlyName == m.Text);
             //Configuration.AlertConfiguration.Find(o => o.FriendlyName == m.Text);
             if (watcher != null)
             {
