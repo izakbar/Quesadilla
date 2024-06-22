@@ -61,42 +61,8 @@ namespace Quesadilla.Controllers
                 output += "</div>";
             }
 
-            output += @"<style>
-.zkillkill {
-  display: inline-grid;
-  position: relative;
-  background-color: transparent;
-  width:100px
-}
-.zkill-ship {
-  width:100px;
-}
-.zkill-victim {
-  color: Gold;
-  position: absolute;
-  bottom: 7px;
-  font-size: 11px;
-  text-align: center; width: 100%;
-}
-.zkill-value {
-  color: LimeGreen;
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  font-size: 18px;
-}
-img.rounded-corners {
-  border-radius: 10%;
-}
-.zkill {
-  border: 3px solid transparent;
-  border-radius: 15px;
-  outline: 2px solid Gold;
-
-  display: inline-block;
-  position: relative;
-}
-</style>";
+            var css = Program.MainConfiguration.CSSData.Where(o => o.Name == "OBS.ZkillList").First().CSS;
+            output += $"<style>{css}</style>";
 
             return new ContentResult
             {
@@ -122,16 +88,9 @@ img.rounded-corners {
                 }
 
                 output += "<img class=alert src=/OBS/latestAlertImage>";
-                output += @"<style>
-.alert {
-  border: 3px solid transparent;
-  border-radius: 15px;
-  outline: 2px solid Gold;
 
-  display: inline-block;
-  position: relative;
-}
-</style>";
+                var css = Program.MainConfiguration.CSSData.Where(o => o.Name == "OBS.LatestAlert").First().CSS;
+                output += $"<style>{css}</style>";
             }
             return new ContentResult
             {
@@ -162,25 +121,8 @@ img.rounded-corners {
                 {
                     output += $"<div class=iskcontainer><div class=iskperhour>{isk}</div></div>";
 
-                    output += @"<style>
-.iskcontainer {
-  width: 100%;
-  position: relative;
-}
-.iskperhour {
-  border: 3px solid transparent;
-  border-radius: 15px;
-  outline: 2px solid Gold;
-
-  display: inline-block;
-  position: absolute;
-
-  color: green;
-  font-size: 24px;
-
-  margin: auto;
-}
-</style>";
+                    var css = Program.MainConfiguration.CSSData.Where(o => o.Name == "OBS.ISK").First().CSS;
+                    output += $"<style>{css}</style>";
                 }
             }
             return new ContentResult

@@ -85,6 +85,7 @@ namespace Quesadilla.Classes
             c.ignoreSystems = new List<int>();
             c.AlertConfiguration = new List<AlertConfig>();
             c.Logfiles = new List<LogfileConfig>();
+            c.CSSData = new List<CSSData>();
 
             foreach (var s in ignoreStrings)
             {
@@ -116,6 +117,10 @@ namespace Quesadilla.Classes
             foreach (var l in Logfiles)
             {
                 c.Logfiles.Add(l);
+            }
+            foreach (var css in CSSData)
+            {
+                c.CSSData.Add(css);
             }
 
             c.InitialPosition = new Point(InitialPosition.X, InitialPosition.Y);
@@ -373,6 +378,91 @@ namespace Quesadilla.Classes
                     LogType = Logfile.LogFileType.ChatIntel,
                 });
             }
+
+            if (c.CSSData== null)
+            {
+                c.CSSData = new List<CSSData> { };
+                c.CSSData.Add(new CSSData()
+                {
+                    Name = "OBS.ISK",
+                    FriendlyName = "OBS ISK Value",
+                    CSS = @"
+.iskcontainer {
+  width: 100%;
+  position: relative;
+}
+.iskperhour {
+  border: 3px solid transparent;
+  border-radius: 15px;
+  outline: 2px solid Gold;
+
+  display: inline-block;
+  position: absolute;
+
+  color: green;
+  font-size: 24px;
+
+  margin: auto;
+}
+",
+                });
+                c.CSSData.Add(new CSSData()
+                {
+                    Name = "OBS.LatestAlert",
+                    FriendlyName = "OBS Latest Alert",
+                    CSS = @"
+.alert {
+  border: 3px solid transparent;
+  border-radius: 15px;
+  outline: 2px solid Gold;
+
+  display: inline-block;
+  position: relative;
+}
+",
+                });
+                c.CSSData.Add(new CSSData()
+                {
+                    Name = "OBS.ZkillList",
+                    FriendlyName = "OBS Zkill Listing",
+                    CSS = @"
+.zkillkill {
+  display: inline-grid;
+  position: relative;
+  background-color: transparent;
+  width:100px
+}
+.zkill-ship {
+  width:100px;
+}
+.zkill-victim {
+  color: Gold;
+  position: absolute;
+  bottom: 7px;
+  font-size: 11px;
+  text-align: center; width: 100%;
+}
+.zkill-value {
+  color: LimeGreen;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  font-size: 18px;
+}
+img.rounded-corners {
+  border-radius: 10%;
+}
+.zkill {
+  border: 3px solid transparent;
+  border-radius: 15px;
+  outline: 2px solid Gold;
+
+  display: inline-block;
+  position: relative;
+}
+",
+                });
+            }
             return (c);
         }
 
@@ -413,6 +503,7 @@ namespace Quesadilla.Classes
         public int GraphCombatMinPointSeconds { get; set; }
         public List<AlertConfig> AlertConfiguration { get; set; }
         public List<LogfileConfig> Logfiles { get; set; }
+        public List<CSSData> CSSData { get; set; }
         public int AlertPopupSeconds { get; set; }
         public int AlertPopupOpacity { get; set; }
         public int AlertPopupOpacityStep { get; set; }
