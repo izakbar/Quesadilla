@@ -80,9 +80,6 @@ namespace Quesadilla
 
         private List<LogWatcher> watchers = new List<LogWatcher>();
 
-        public Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
-        public Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
-
         private int _intelSizeMax = 200;
         private int _intelSizeMin = 48;
         private int _windowExtraHeight = 80;
@@ -315,7 +312,7 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             bool first = true;
             DateTime now = DateTime.Now;
 
-            foreach (var alert in ActiveAlerts.Reverse().Take(Program.MainConfiguration.ShowLastUnexpiredAlerts).ToList())
+            foreach (var alert in Program.ActiveAlerts.Reverse().Take(Program.MainConfiguration.ShowLastUnexpiredAlerts).ToList())
             {
                 DateTime timeAdded = alert.Entry != null ? alert.Entry.TimeAdded : alert.Kill.TimeAdded;
                 TimeSpan timeAgo = now - timeAdded;
@@ -464,12 +461,12 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
 
             // dequeue Alerts
             TickCounts["SinceLastAlert"]++;
-            if (NewAlerts.Count > 0 && TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert)
+            if (Program.NewAlerts.Count > 0 && TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert)
             {
-                var NewAlert = NewAlerts.Dequeue();
+                var NewAlert = Program.NewAlerts.Dequeue();
                 Log.Error(NewAlert.AlertText);
 
-                ActiveAlerts.Enqueue(NewAlert);
+                Program.ActiveAlerts.Enqueue(NewAlert);
                 // do any extra processing 
 
 
@@ -490,19 +487,19 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
             if ( ++TickCounts["SinceLastCleardown"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
             {
                 // Show number of recent alerts
-                if (ActiveAlerts.Count > 0)
+                if (Program.ActiveAlerts.Count > 0)
                 {
                     // check if we should expire first entry
-                    var a = ActiveAlerts.First();
+                    var a = Program.ActiveAlerts.First();
                     DateTime timeAdded = a.Entry != null ? a.Entry.TimeAdded : a.Kill.TimeAdded;
                     var diffInSeconds = (DateTime.Now - timeAdded).TotalSeconds;
                     if (diffInSeconds > Program.MainConfiguration.ExpireAlertSeconds)
                     {
                         // expired so dequeue
-                        a = ActiveAlerts.Dequeue();
+                        a = Program.ActiveAlerts.Dequeue();
                         RebuildLatestAlertsMenu();
                     }
-                    alertsOutstanding.Text = ActiveAlerts.Count.ToString();
+                    alertsOutstanding.Text = Program.ActiveAlerts.Count.ToString();
                 }
                 else
                 {
@@ -694,14 +691,14 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
         private void EnqueueAlert(AlertQueueItem alert)
         {
             // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
-            var f = NewAlerts.Where(o =>
+            var f = Program.NewAlerts.Where(o =>
             (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
             || (o.AlertText == alert.AlertText)
             ).ToList();
-            if (f.Count == 0 || NewAlerts.Count == 0)
+            if (f.Count == 0 || Program.NewAlerts.Count == 0)
             {
                 alert.RouteText = PathToString(alert.Path);
-                NewAlerts.Enqueue(alert);
+                Program.NewAlerts.Enqueue(alert);
             }
             if (f.Count != 0)
             {
@@ -1188,9 +1185,9 @@ watchers.Add(new LogWatcher("izakbar", Classes.Logfile.LogFileType.ChatIntel, "I
 
         private void trayIconDoubleClick(object sender, EventArgs e)
         {
-            if (ActiveAlerts.Count > 0)
+            if (Program.ActiveAlerts.Count > 0)
             {
-                var alert = ActiveAlerts.Reverse().Take(1).ToList().First();
+                var alert = Program.ActiveAlerts.Reverse().Take(1).ToList().First();
                 var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
                 NewAlertWindow.Show(this);
             }
