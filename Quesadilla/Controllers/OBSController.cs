@@ -36,9 +36,11 @@ namespace Quesadilla.Controllers
         {
             string output = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
             int count = 0;
+
+            string ZKillOutput = "";
             if (Program.ZKillHandler.ZKillKills != null && Program.ZKillHandler.ZKillKills.Count > 0)
             {
-                output += "<div class=zkill>";
+                ZKillOutput += "<div class=zkill>";
 
                 foreach (ZKillKill k in Program.ZKillHandler.ZKillKills.Reverse() )
                 {
@@ -56,10 +58,12 @@ namespace Quesadilla.Controllers
                 $"<div class=zkill-value>{k.TotalValue}</div>" +
                 $"<div class=zkill-victim>{zkillVictim}</div>" +
                 "</div>";
-                    output += kf;
+                    ZKillOutput += kf;
                 }
-                output += "</div>";
+                ZKillOutput += "</div>";
             }
+
+            if (count > 0) output += ZKillOutput;
 
             var css = Program.MainConfiguration.CSSData.Where(o => o.Name == "OBS.ZkillList").First().CSS;
             output += $"<style>{css}</style>";

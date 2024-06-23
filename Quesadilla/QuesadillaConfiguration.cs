@@ -76,7 +76,6 @@ namespace Quesadilla
                     RawLine = "rawXXXraw",
                 },
             };
-            ShowAlertBitmap();
             trackOpacity.Value = _configuration.AlertPopupOpacity;
             trackPopupTime.Value = _configuration.AlertPopupSeconds;
             trackDPSGraphLineSize.Value = _configuration.DPSGraphLineSize;
@@ -146,6 +145,8 @@ namespace Quesadilla
             trackAlertPopupMinimapSizeHeight.Value = _configuration.AlertPopupMinimapSize.Y; 
             trackAlertPopupMinimapPositionX.Value = _configuration.AlertPopupMinimapPosition.X;
             trackAlertPopupMinimapPositionY.Value = _configuration.AlertPopupMinimapPosition.Y;
+
+            ShowAlertBitmap();
 
         }
         private Bitmap GetControlImage(Control ctl)
