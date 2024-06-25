@@ -52,7 +52,7 @@
             // 
             // intelLog
             // 
-            this.intelLog.BackColor = System.Drawing.SystemColors.Info;
+            this.intelLog.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.intelLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.intelLog.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.intelLog.Enabled = false;
@@ -161,6 +161,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(1116, 562);
             this.Controls.Add(this.lblAlertsOutstanding);
             this.Controls.Add(this.lblCurrentClient);
@@ -171,6 +172,7 @@
             this.Controls.Add(this.intelLog);
             this.Controls.Add(this.pCombat);
             this.Controls.Add(this.pMinimapImage);
+            this.ForeColor = System.Drawing.Color.Lime;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);

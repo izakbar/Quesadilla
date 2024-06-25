@@ -314,6 +314,11 @@ namespace Quesadilla
             lblISK.Text = "";
             lblAlertsOutstanding.Text = "";
 
+            BackColor = Program.MainConfiguration.MainWindowBackgroundColorText;
+            ForeColor = Program.MainConfiguration.MainWindowColorText;
+            intelLog.ForeColor = Program.MainConfiguration.MainWindowLogColorText;
+//            intelLog.BackColor = Program.MainConfiguration.MainWindowLogBackgroundColorText;
+
             this.Invalidate();
 
             ReloadConfiguration();

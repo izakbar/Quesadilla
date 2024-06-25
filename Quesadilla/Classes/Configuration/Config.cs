@@ -76,6 +76,10 @@ namespace Quesadilla.Classes
                 AlertPopupMinimapSystemColorTo = AlertPopupMinimapSystemColorTo,
                 AlertPopupMinimapSystemColorText = AlertPopupMinimapSystemColorText,
                 IntegrationPort = IntegrationPort,
+                MainWindowColorText = MainWindowColorText,
+                MainWindowBackgroundColorText = MainWindowBackgroundColorText,
+                MainWindowLogBackgroundColorText = MainWindowLogBackgroundColorText,
+                MainWindowLogColorText = MainWindowLogColorText,
             };
 
             c.AlertPopupMinimapPosition = new Point(AlertPopupMinimapPosition.X, AlertPopupMinimapPosition.Y);
@@ -209,9 +213,14 @@ namespace Quesadilla.Classes
                 c.AlertPopupMinimapSystemColorText = Color.LemonChiffon;
 
                 c.AlertPopupMinimapPosition = new Point(30, 0);
-                c.AlertPopupMinimapSize = new Point(232, 204);
+                c.AlertPopupMinimapSize = new Point(232, 150);
 
                 c.IntegrationPort = 65432;
+
+                c.MainWindowColorText = Color.LightGoldenrodYellow;
+                c.MainWindowBackgroundColorText = System.Drawing.ColorTranslator.FromHtml("#0f0f11");
+                c.MainWindowLogBackgroundColorText = Color.Red;
+                c.MainWindowLogColorText = Color.Black;
             }
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
@@ -543,5 +552,10 @@ img.rounded-corners {
         public Point AlertPopupMinimapPosition { get; set; }
         public Point AlertPopupMinimapSize { get; set; }
         public int IntegrationPort { get; set; }
+
+        public Color MainWindowColorText { get; set; }
+        public Color MainWindowBackgroundColorText { get; set; }
+        public Color MainWindowLogBackgroundColorText { get; set; }
+        public Color MainWindowLogColorText { get; set; }
     }
 }
