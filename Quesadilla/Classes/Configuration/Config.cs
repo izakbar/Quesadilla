@@ -64,7 +64,7 @@ namespace Quesadilla.Classes
                 ZKillBarColour = ZKillBarColour,
                 ZKillShowBar = ZKillShowBar,
                 ZKillSound = ZKillSound,
-                AlertPopupMinimap = AlertPopupMinimap,
+                AlertPopupShowMinimap = AlertPopupShowMinimap,
                 AlertPopupMinimapShowSystemText = AlertPopupMinimapShowSystemText,
                 AlertPopupShowMinimapBorder = AlertPopupShowMinimapBorder,
                 AlertPopupMinimapBorderColour = AlertPopupMinimapBorderColour,
@@ -76,13 +76,13 @@ namespace Quesadilla.Classes
                 AlertPopupMinimapSystemColourTo = AlertPopupMinimapSystemColourTo,
                 AlertPopupMinimapSystemColourText = AlertPopupMinimapSystemColourText,
                 AlertPopupMinimapZKillColour = AlertPopupMinimapZKillColour,
-                AlertPopupMinimapAlertColour = AlertPopupMinimapAlertColour,
+                AlertPopupMinimapIntelColour = AlertPopupMinimapIntelColour,
                 IntegrationPort = IntegrationPort,
                 MainWindowColourText = MainWindowColourText,
                 MainWindowBackgroundColour = MainWindowBackgroundColour,
                 MainWindowLogBackgroundColour = MainWindowLogBackgroundColour,
                 MainWindowLogColourText = MainWindowLogColourText,
-                Minimap = Minimap,
+                ShowMinimap = ShowMinimap,
                 MinimapShowSystemText = MinimapShowSystemText,
                 ShowMinimapBorder = ShowMinimapBorder,
                 MinimapBorderColour = MinimapBorderColour,
@@ -94,7 +94,7 @@ namespace Quesadilla.Classes
                 MinimapSystemColourTo = MinimapSystemColourTo,
                 MinimapSystemColourText = MinimapSystemColourText,
                 MinimapZKillColour = AlertPopupMinimapZKillColour,
-                MinimapAlertColour = AlertPopupMinimapAlertColour,
+                MinimapIntelColour = AlertPopupMinimapIntelColour,
 
                 CurrentCharacterColour = CurrentCharacterColour,
                 ISKColour = ISKColour,
@@ -221,7 +221,7 @@ namespace Quesadilla.Classes
                 c.ZKillShowBar = true;
                 c.ZKillSound = "quiet_click";
 
-                c.AlertPopupMinimap = true;
+                c.AlertPopupShowMinimap = true;
                 c.AlertPopupShowMinimapBorder = false;
                 c.AlertPopupMinimapBorderColour = Color.SteelBlue;
                 c.AlertPopupMinimapLineColourNormal = Color.Gainsboro;
@@ -234,7 +234,7 @@ namespace Quesadilla.Classes
                 c.AlertPopupMinimapSystemColourText = Color.LemonChiffon;
 
                 c.AlertPopupMinimapZKillColour = Color.Red;
-                c.AlertPopupMinimapAlertColour = Color.Orange;
+                c.AlertPopupMinimapIntelColour = Color.Orange;
 
                 c.AlertPopupMinimapPosition = new Point(30, 0);
                 c.AlertPopupMinimapSize = new Point(232, 150);
@@ -246,7 +246,7 @@ namespace Quesadilla.Classes
                 c.MainWindowLogBackgroundColour = System.Drawing.ColorTranslator.FromHtml("#0f0f11");
                 c.MainWindowLogColourText = Color.LightGoldenrodYellow;
 
-                c.Minimap = true;
+                c.ShowMinimap = true;
                 c.ShowMinimapBorder = false;
                 c.MinimapBorderColour = Color.SteelBlue;
                 c.MinimapLineColourNormal = Color.Gainsboro;
@@ -259,7 +259,7 @@ namespace Quesadilla.Classes
                 c.MinimapSystemColourText = Color.LemonChiffon;
 
                 c.MinimapZKillColour = Color.Red;
-                c.MinimapAlertColour = Color.Orange;
+                c.MinimapIntelColour = Color.Orange;
 
 
                 c.CurrentCharacterColour = Color.Blue;
@@ -583,7 +583,7 @@ img.rounded-corners {
         public int DPSGraphLineSize { get; set; }
         public int ShowLastUnexpiredAlerts { get; set; }
 
-        public bool AlertPopupMinimap { get; set; }
+        public bool AlertPopupShowMinimap { get; set; }
         public bool AlertPopupShowMinimapBorder { get; set; }
         public bool AlertPopupMinimapShowSystemText { get; set; }
         public Color AlertPopupMinimapBorderColour { get; set; }
@@ -595,7 +595,7 @@ img.rounded-corners {
         public Color AlertPopupMinimapSystemColourTo { get; set; }
         public Color AlertPopupMinimapSystemColourText { get; set; }
         public Color AlertPopupMinimapZKillColour { get; set; }
-        public Color AlertPopupMinimapAlertColour { get; set; }
+        public Color AlertPopupMinimapIntelColour { get; set; }
 
         public Point AlertPopupMinimapPosition { get; set; }
         public Point AlertPopupMinimapSize { get; set; }
@@ -606,7 +606,7 @@ img.rounded-corners {
         public Color MainWindowLogBackgroundColour { get; set; }
         public Color MainWindowLogColourText { get; set; }
 
-        public bool Minimap { get; set; }
+        public bool ShowMinimap { get; set; }
         public bool ShowMinimapBorder { get; set; }
         public bool MinimapShowSystemText { get; set; }
         public Color MinimapBorderColour { get; set; }
@@ -618,7 +618,7 @@ img.rounded-corners {
         public Color MinimapSystemColourTo { get; set; }
         public Color MinimapSystemColourText { get; set; }
         public Color MinimapZKillColour { get; set; }
-        public Color MinimapAlertColour { get; set; }
+        public Color MinimapIntelColour { get; set; }
 
         public Color CurrentCharacterColour { get; set; }
         public Color ISKColour { get; set; }

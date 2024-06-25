@@ -153,7 +153,7 @@ namespace Quesadilla
                 ShipName.Text = "";
             }
 
-            if (configuration.AlertPopupMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0) )
+            if (configuration.AlertPopupShowMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0) )
             {
                 pMinimapImage.Size = (Size)configuration.AlertPopupMinimapSize;
                 Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path , 0,100,

@@ -316,6 +316,8 @@ namespace Quesadilla
 
             Program.Universe.HomeSolarSystemID = Program.Universe.Names[Program.MainConfiguration.HomeSystem];
 
+            RecalculateWindowHeight();
+
             mainTimer.Interval = Program.MainConfiguration.TickMiliseconds;
         }
         private void Quesadilla_Load(object sender, EventArgs e)
@@ -397,7 +399,7 @@ namespace Quesadilla
 
             UpdateEveProcesses();
 
-            pCombat.Visible = InCombat;
+//            pCombat.Visible = InCombat;
 
             TickCounts["SinceLastDPSGraphUpdate"]++;
             if (CombatAdded && TickCounts["SinceLastDPSGraphUpdate"] > Program.MainConfiguration.HowManyTicksBeforeDPSGraphUpdate )
@@ -1084,8 +1086,16 @@ namespace Quesadilla
                     DPSGraphWindow = new QuesadillaDPSGraph(this);
                     DPSGraphWindow.Show();
                 }
+                if (InCombat == false)
+                {
+                    InCombat = true;
+                    this.Invalidate();
+                }
+                else
+                {
+                    InCombat = true;
+                }
 
-                InCombat = true;
                 if (!Program.Combat.ContainsKey(e.Entry.CharacterName))
                 {
                     Program.Combat.Add(e.Entry.CharacterName, new List<CombatLine>());
@@ -1239,6 +1249,7 @@ namespace Quesadilla
             else
             {
                 InCombat = false;
+                this.Invalidate();
                 if (DPSGraphWindow != null)
                 {
                     DPSGraphWindow.Close();
@@ -1323,42 +1334,47 @@ namespace Quesadilla
             }
         }
 
-        private void buttonIntelSize_Click(object sender, EventArgs e)
+        private void RecalculateWindowHeight()
         {
-            if (intelLog.Height == _intelSizeMin)
-            {
-                // max it big
-                intelLog.Height = _intelSizeMax;
-                Height = intelLog.Height + _windowExtraHeight + (Program.MainConfiguration.Minimap ? pMinimapImage.Height : 20);
-                buttonIntelSize.Text = "▼";
-            }
-            else
-            {
-                // make it small
-                intelLog.Height = _intelSizeMin;
-                Height = intelLog.Height + _windowExtraHeight + (Program.MainConfiguration.Minimap ? pMinimapImage.Height : 20);
-                buttonIntelSize.Text = "▲";
-            }
+            Height = intelLog.Height + _windowExtraHeight + (Program.MainConfiguration.ShowMinimap ? pMinimapImage.Height : 20);
 
-            if (Program.MainConfiguration.Minimap)
+            if (Program.MainConfiguration.ShowMinimap)
             {
-                pCombat.Left = pMinimapImage.Left + 1;
-                pCombat.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - pCombat.Height;
+                //pCombat.Left = pMinimapImage.Left + 1;
+                //pCombat.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - pCombat.Height;
 
                 lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
                 lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
             }
             else
             {
-                pCombat.Left = lblAlertsOutstanding.Left + lblAlertsOutstanding.Width - pCombat.Width;
-                pCombat.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
+                //pCombat.Left = lblAlertsOutstanding.Left + lblAlertsOutstanding.Width - pCombat.Width;
+                //pCombat.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
 
                 lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
-                lblISK.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5 ;
+                lblISK.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
             }
 
             buttonIntelSize.Top = intelLog.Top + 2;
             buttonIntelSize.Left = intelLog.Width - buttonIntelSize.Width - 2;
+        }
+        private void buttonIntelSize_Click(object sender, EventArgs e)
+        {
+            if (intelLog.Height == _intelSizeMin)
+            {
+                // max it big
+                intelLog.Height = _intelSizeMax;
+                buttonIntelSize.Text = "▼";
+            }
+            else
+            {
+                // make it small
+                intelLog.Height = _intelSizeMin;
+                buttonIntelSize.Text = "▲";
+            }
+
+            RecalculateWindowHeight();
+
             intelLog.ScrollToCaret();
         }
 
@@ -1795,7 +1811,7 @@ namespace Quesadilla
                 };
             }
 
-            if (Program.MainConfiguration.Minimap)
+            if (Program.MainConfiguration.ShowMinimap)
             {
                 Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath, 3, mapScale,
                     Program.MainConfiguration.MinimapShowSystemText,
@@ -1829,6 +1845,30 @@ namespace Quesadilla
             ImageGenerator.PaintDrawText(e, lblCurrentClient);
             ImageGenerator.PaintDrawText(e, lblISK);
             ImageGenerator.PaintDrawText(e, lblAlertsOutstanding);
+
+            // draw red dot
+            if ( InCombat )
+            {
+                int combatTop = 0;
+                int combatLeft = 0;
+
+                int CIRCLE_RADIUS = 5;
+
+                if (Program.MainConfiguration.ShowMinimap)
+                {
+                    combatLeft = pMinimapImage.Left + 10;
+                    combatTop = pMinimapImage.Top + pMinimapImage.Height - 3 - 10;
+                }
+                else
+                {
+                    combatLeft = lblAlertsOutstanding.Left + lblAlertsOutstanding.Width - 10;
+                    combatTop = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 8;
+                }
+
+                Brush systemBrush = new SolidBrush(Color.Red);
+                e.Graphics.FillEllipse(systemBrush, combatLeft - CIRCLE_RADIUS, combatTop - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+
+            }
         }
     }
 }

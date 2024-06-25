@@ -38,10 +38,8 @@
             this.lblISK = new System.Windows.Forms.Label();
             this.lblStatus = new System.Windows.Forms.Label();
             this.pMinimapImage = new System.Windows.Forms.PictureBox();
-            this.pCombat = new System.Windows.Forms.PictureBox();
             this.lblAlertsOutstanding = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pMinimapImage)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pCombat)).BeginInit();
             this.SuspendLayout();
             // 
             // mainTimer
@@ -125,24 +123,11 @@
             // pMinimapImage
             // 
             this.pMinimapImage.BackColor = System.Drawing.Color.Transparent;
-            this.pMinimapImage.Location = new System.Drawing.Point(4, 9);
+            this.pMinimapImage.Location = new System.Drawing.Point(4, 4);
             this.pMinimapImage.Name = "pMinimapImage";
-            this.pMinimapImage.Size = new System.Drawing.Size(220, 133);
+            this.pMinimapImage.Size = new System.Drawing.Size(220, 143);
             this.pMinimapImage.TabIndex = 10;
             this.pMinimapImage.TabStop = false;
-            // 
-            // pCombat
-            // 
-            this.pCombat.BackColor = System.Drawing.Color.Transparent;
-            this.pCombat.Image = global::Quesadilla.Properties.Resources.red_dot;
-            this.pCombat.Location = new System.Drawing.Point(5, 127);
-            this.pCombat.Margin = new System.Windows.Forms.Padding(2);
-            this.pCombat.Name = "pCombat";
-            this.pCombat.Size = new System.Drawing.Size(13, 13);
-            this.pCombat.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pCombat.TabIndex = 11;
-            this.pCombat.TabStop = false;
-            this.pCombat.Visible = false;
             // 
             // lblAlertsOutstanding
             // 
@@ -169,7 +154,6 @@
             this.Controls.Add(this.lblISK);
             this.Controls.Add(this.ChatServerDown);
             this.Controls.Add(this.intelLog);
-            this.Controls.Add(this.pCombat);
             this.Controls.Add(this.pMinimapImage);
             this.ForeColor = System.Drawing.Color.Lime;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -181,7 +165,6 @@
             this.Load += new System.EventHandler(this.Quesadilla_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Quesadilla_Paint);
             ((System.ComponentModel.ISupportInitialize)(this.pMinimapImage)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pCombat)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -197,7 +180,6 @@
         private System.Windows.Forms.Label lblISK;
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.PictureBox pMinimapImage;
-        private System.Windows.Forms.PictureBox pCombat;
         private System.Windows.Forms.Label lblAlertsOutstanding;
     }
 }

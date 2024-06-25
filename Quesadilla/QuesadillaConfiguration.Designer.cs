@@ -84,7 +84,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.trackShowLastUnexpiredAlerts = new System.Windows.Forms.TrackBar();
             this.cbAlertPopupMinimap = new System.Windows.Forms.CheckBox();
-            this.buttonPickMinimapBorderColour = new System.Windows.Forms.Button();
+            this.buttonPickAlertPopupMinimapBorderColour = new System.Windows.Forms.Button();
             this.cbAlertPopupShowMinimapBorder = new System.Windows.Forms.CheckBox();
             this.cbAlertPopupMinimapShowSystemText = new System.Windows.Forms.CheckBox();
             this.buttonPickAlertPopupMinimapLineColorNormal = new System.Windows.Forms.Button();
@@ -106,6 +106,25 @@
             this.buttonPickMainWindowColourText = new System.Windows.Forms.Button();
             this.buttonPickMainWindowLogColourText = new System.Windows.Forms.Button();
             this.buttonPickMainWindowLogBackgroundColour = new System.Windows.Forms.Button();
+            this.cbMinimapShowSystemText = new System.Windows.Forms.CheckBox();
+            this.cbShowMinimapBorder = new System.Windows.Forms.CheckBox();
+            this.cbShowMinimap = new System.Windows.Forms.CheckBox();
+            this.buttonPickMinimapSystemColourText = new System.Windows.Forms.Button();
+            this.buttonPickMinimapSystemColourTo = new System.Windows.Forms.Button();
+            this.buttonPickMinimapSystemColourFrom = new System.Windows.Forms.Button();
+            this.buttonPickMinimapSystemColourRoute = new System.Windows.Forms.Button();
+            this.buttonPickMinimapSystemColourNormal = new System.Windows.Forms.Button();
+            this.buttonPickMinimapLineColourRoute = new System.Windows.Forms.Button();
+            this.buttonPickMinimapLineColourNormal = new System.Windows.Forms.Button();
+            this.buttonPickMinimapBorderColour = new System.Windows.Forms.Button();
+            this.buttonPickAlertPopupMinimapZKillColour = new System.Windows.Forms.Button();
+            this.buttonPickAlertPopupMinimapIntelColour = new System.Windows.Forms.Button();
+            this.buttonPickCurrentCharacterColour = new System.Windows.Forms.Button();
+            this.buttonPickISKColour = new System.Windows.Forms.Button();
+            this.buttonPickEvescoutColour = new System.Windows.Forms.Button();
+            this.buttonPickAlsrtsOutstandingColour = new System.Windows.Forms.Button();
+            this.buttonPickMinimapIntelColour = new System.Windows.Forms.Button();
+            this.buttonPickMinimapZKillColour = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.alertDemo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackOpacity)).BeginInit();
@@ -756,16 +775,16 @@
             this.cbAlertPopupMinimap.UseVisualStyleBackColor = true;
             this.cbAlertPopupMinimap.CheckedChanged += new System.EventHandler(this.cbShowMinimap_CheckedChanged);
             // 
-            // buttonPickMinimapBorderColour
+            // buttonPickAlertPopupMinimapBorderColour
             // 
-            this.buttonPickMinimapBorderColour.Location = new System.Drawing.Point(789, 4);
-            this.buttonPickMinimapBorderColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
-            this.buttonPickMinimapBorderColour.Name = "buttonPickMinimapBorderColour";
-            this.buttonPickMinimapBorderColour.Size = new System.Drawing.Size(125, 26);
-            this.buttonPickMinimapBorderColour.TabIndex = 47;
-            this.buttonPickMinimapBorderColour.Text = "Minimap Border colour";
-            this.buttonPickMinimapBorderColour.UseVisualStyleBackColor = true;
-            this.buttonPickMinimapBorderColour.Click += new System.EventHandler(this.buttonPickMinimapBorderColour_Click);
+            this.buttonPickAlertPopupMinimapBorderColour.Location = new System.Drawing.Point(789, 4);
+            this.buttonPickAlertPopupMinimapBorderColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickAlertPopupMinimapBorderColour.Name = "buttonPickAlertPopupMinimapBorderColour";
+            this.buttonPickAlertPopupMinimapBorderColour.Size = new System.Drawing.Size(125, 26);
+            this.buttonPickAlertPopupMinimapBorderColour.TabIndex = 47;
+            this.buttonPickAlertPopupMinimapBorderColour.Text = "Minimap Border colour";
+            this.buttonPickAlertPopupMinimapBorderColour.UseVisualStyleBackColor = true;
+            this.buttonPickAlertPopupMinimapBorderColour.Click += new System.EventHandler(this.buttonPickAlertPopupMinimapBorderColour_Click);
             // 
             // cbAlertPopupShowMinimapBorder
             // 
@@ -974,10 +993,10 @@
             // buttonPickMainWindowsBackgroundColour
             // 
             this.buttonPickMainWindowsBackgroundColour.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.buttonPickMainWindowsBackgroundColour.Location = new System.Drawing.Point(134, 325);
+            this.buttonPickMainWindowsBackgroundColour.Location = new System.Drawing.Point(8, 420);
             this.buttonPickMainWindowsBackgroundColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.buttonPickMainWindowsBackgroundColour.Name = "buttonPickMainWindowsBackgroundColour";
-            this.buttonPickMainWindowsBackgroundColour.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMainWindowsBackgroundColour.Size = new System.Drawing.Size(145, 26);
             this.buttonPickMainWindowsBackgroundColour.TabIndex = 65;
             this.buttonPickMainWindowsBackgroundColour.Text = "Main Window Background";
             this.buttonPickMainWindowsBackgroundColour.UseVisualStyleBackColor = false;
@@ -986,10 +1005,10 @@
             // buttonPickMainWindowColourText
             // 
             this.buttonPickMainWindowColourText.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.buttonPickMainWindowColourText.Location = new System.Drawing.Point(301, 325);
+            this.buttonPickMainWindowColourText.Location = new System.Drawing.Point(8, 448);
             this.buttonPickMainWindowColourText.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.buttonPickMainWindowColourText.Name = "buttonPickMainWindowColourText";
-            this.buttonPickMainWindowColourText.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMainWindowColourText.Size = new System.Drawing.Size(145, 26);
             this.buttonPickMainWindowColourText.TabIndex = 66;
             this.buttonPickMainWindowColourText.Text = "Main Window Foreground";
             this.buttonPickMainWindowColourText.UseVisualStyleBackColor = false;
@@ -998,10 +1017,10 @@
             // buttonPickMainWindowLogColourText
             // 
             this.buttonPickMainWindowLogColourText.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.buttonPickMainWindowLogColourText.Location = new System.Drawing.Point(304, 351);
+            this.buttonPickMainWindowLogColourText.Location = new System.Drawing.Point(157, 448);
             this.buttonPickMainWindowLogColourText.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.buttonPickMainWindowLogColourText.Name = "buttonPickMainWindowLogColourText";
-            this.buttonPickMainWindowLogColourText.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMainWindowLogColourText.Size = new System.Drawing.Size(135, 26);
             this.buttonPickMainWindowLogColourText.TabIndex = 68;
             this.buttonPickMainWindowLogColourText.Text = "Log Window Foreground";
             this.buttonPickMainWindowLogColourText.UseVisualStyleBackColor = false;
@@ -1010,20 +1029,275 @@
             // buttonPickMainWindowLogBackgroundColour
             // 
             this.buttonPickMainWindowLogBackgroundColour.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.buttonPickMainWindowLogBackgroundColour.Location = new System.Drawing.Point(137, 351);
+            this.buttonPickMainWindowLogBackgroundColour.Location = new System.Drawing.Point(154, 420);
             this.buttonPickMainWindowLogBackgroundColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.buttonPickMainWindowLogBackgroundColour.Name = "buttonPickMainWindowLogBackgroundColour";
-            this.buttonPickMainWindowLogBackgroundColour.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMainWindowLogBackgroundColour.Size = new System.Drawing.Size(138, 26);
             this.buttonPickMainWindowLogBackgroundColour.TabIndex = 67;
             this.buttonPickMainWindowLogBackgroundColour.Text = "Log Window Background";
             this.buttonPickMainWindowLogBackgroundColour.UseVisualStyleBackColor = false;
             this.buttonPickMainWindowLogBackgroundColour.Click += new System.EventHandler(this.buttonPickMainWindowLogBackgroundColour_Click);
+            // 
+            // cbMinimapShowSystemText
+            // 
+            this.cbMinimapShowSystemText.AutoSize = true;
+            this.cbMinimapShowSystemText.Location = new System.Drawing.Point(134, 395);
+            this.cbMinimapShowSystemText.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.cbMinimapShowSystemText.Name = "cbMinimapShowSystemText";
+            this.cbMinimapShowSystemText.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.cbMinimapShowSystemText.Size = new System.Drawing.Size(158, 17);
+            this.cbMinimapShowSystemText.TabIndex = 71;
+            this.cbMinimapShowSystemText.Text = "Show minimap system name";
+            this.cbMinimapShowSystemText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.cbMinimapShowSystemText.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.cbMinimapShowSystemText.UseVisualStyleBackColor = true;
+            this.cbMinimapShowSystemText.CheckedChanged += new System.EventHandler(this.cbMinimapShowSystemText_CheckedChanged);
+            // 
+            // cbShowMinimapBorder
+            // 
+            this.cbShowMinimapBorder.AutoSize = true;
+            this.cbShowMinimapBorder.Location = new System.Drawing.Point(165, 357);
+            this.cbShowMinimapBorder.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.cbShowMinimapBorder.Name = "cbShowMinimapBorder";
+            this.cbShowMinimapBorder.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.cbShowMinimapBorder.Size = new System.Drawing.Size(127, 17);
+            this.cbShowMinimapBorder.TabIndex = 70;
+            this.cbShowMinimapBorder.Text = "Show minimap border";
+            this.cbShowMinimapBorder.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.cbShowMinimapBorder.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.cbShowMinimapBorder.UseVisualStyleBackColor = true;
+            this.cbShowMinimapBorder.CheckedChanged += new System.EventHandler(this.cbShowMinimapBorder_CheckedChanged);
+            // 
+            // cbShowMinimap
+            // 
+            this.cbShowMinimap.AutoSize = true;
+            this.cbShowMinimap.Location = new System.Drawing.Point(198, 376);
+            this.cbShowMinimap.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.cbShowMinimap.Name = "cbShowMinimap";
+            this.cbShowMinimap.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.cbShowMinimap.Size = new System.Drawing.Size(94, 17);
+            this.cbShowMinimap.TabIndex = 69;
+            this.cbShowMinimap.Text = "Show minimap";
+            this.cbShowMinimap.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.cbShowMinimap.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            this.cbShowMinimap.UseVisualStyleBackColor = true;
+            this.cbShowMinimap.CheckedChanged += new System.EventHandler(this.cbShowMinimap_CheckedChanged_1);
+            // 
+            // buttonPickMinimapSystemColourText
+            // 
+            this.buttonPickMinimapSystemColourText.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMinimapSystemColourText.Location = new System.Drawing.Point(296, 494);
+            this.buttonPickMinimapSystemColourText.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMinimapSystemColourText.Name = "buttonPickMinimapSystemColourText";
+            this.buttonPickMinimapSystemColourText.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMinimapSystemColourText.TabIndex = 79;
+            this.buttonPickMinimapSystemColourText.Text = "Minimap System Colour Text";
+            this.buttonPickMinimapSystemColourText.UseVisualStyleBackColor = false;
+            this.buttonPickMinimapSystemColourText.Click += new System.EventHandler(this.buttonPickMinimapSystemColourText_Click);
+            // 
+            // buttonPickMinimapSystemColourTo
+            // 
+            this.buttonPickMinimapSystemColourTo.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMinimapSystemColourTo.Location = new System.Drawing.Point(296, 466);
+            this.buttonPickMinimapSystemColourTo.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMinimapSystemColourTo.Name = "buttonPickMinimapSystemColourTo";
+            this.buttonPickMinimapSystemColourTo.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMinimapSystemColourTo.TabIndex = 78;
+            this.buttonPickMinimapSystemColourTo.Text = "Minimap System Colour To";
+            this.buttonPickMinimapSystemColourTo.UseVisualStyleBackColor = false;
+            this.buttonPickMinimapSystemColourTo.Click += new System.EventHandler(this.buttonPickMinimapSystemColourTo_Click);
+            // 
+            // buttonPickMinimapSystemColourFrom
+            // 
+            this.buttonPickMinimapSystemColourFrom.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMinimapSystemColourFrom.Location = new System.Drawing.Point(296, 438);
+            this.buttonPickMinimapSystemColourFrom.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMinimapSystemColourFrom.Name = "buttonPickMinimapSystemColourFrom";
+            this.buttonPickMinimapSystemColourFrom.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMinimapSystemColourFrom.TabIndex = 77;
+            this.buttonPickMinimapSystemColourFrom.Text = "Minimap System Colour From";
+            this.buttonPickMinimapSystemColourFrom.UseVisualStyleBackColor = false;
+            this.buttonPickMinimapSystemColourFrom.Click += new System.EventHandler(this.buttonPickMinimapSystemColourFrom_Click);
+            // 
+            // buttonPickMinimapSystemColourRoute
+            // 
+            this.buttonPickMinimapSystemColourRoute.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMinimapSystemColourRoute.Location = new System.Drawing.Point(296, 410);
+            this.buttonPickMinimapSystemColourRoute.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMinimapSystemColourRoute.Name = "buttonPickMinimapSystemColourRoute";
+            this.buttonPickMinimapSystemColourRoute.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMinimapSystemColourRoute.TabIndex = 76;
+            this.buttonPickMinimapSystemColourRoute.Text = "Minimap System Colour Route";
+            this.buttonPickMinimapSystemColourRoute.UseVisualStyleBackColor = false;
+            this.buttonPickMinimapSystemColourRoute.Click += new System.EventHandler(this.buttonPickMinimapSystemColourRoute_Click);
+            // 
+            // buttonPickMinimapSystemColourNormal
+            // 
+            this.buttonPickMinimapSystemColourNormal.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMinimapSystemColourNormal.Location = new System.Drawing.Point(296, 382);
+            this.buttonPickMinimapSystemColourNormal.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMinimapSystemColourNormal.Name = "buttonPickMinimapSystemColourNormal";
+            this.buttonPickMinimapSystemColourNormal.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMinimapSystemColourNormal.TabIndex = 75;
+            this.buttonPickMinimapSystemColourNormal.Text = "Minimap System Colour Normal";
+            this.buttonPickMinimapSystemColourNormal.UseVisualStyleBackColor = false;
+            this.buttonPickMinimapSystemColourNormal.Click += new System.EventHandler(this.buttonPickMinimapSystemColourNormal_Click);
+            // 
+            // buttonPickMinimapLineColourRoute
+            // 
+            this.buttonPickMinimapLineColourRoute.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMinimapLineColourRoute.Location = new System.Drawing.Point(296, 353);
+            this.buttonPickMinimapLineColourRoute.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMinimapLineColourRoute.Name = "buttonPickMinimapLineColourRoute";
+            this.buttonPickMinimapLineColourRoute.Size = new System.Drawing.Size(147, 26);
+            this.buttonPickMinimapLineColourRoute.TabIndex = 74;
+            this.buttonPickMinimapLineColourRoute.Text = "Minimap Line Colour Route";
+            this.buttonPickMinimapLineColourRoute.UseVisualStyleBackColor = false;
+            this.buttonPickMinimapLineColourRoute.Click += new System.EventHandler(this.buttonPickMinimapLineColourRoute_Click);
+            // 
+            // buttonPickMinimapLineColourNormal
+            // 
+            this.buttonPickMinimapLineColourNormal.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMinimapLineColourNormal.Location = new System.Drawing.Point(296, 325);
+            this.buttonPickMinimapLineColourNormal.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMinimapLineColourNormal.Name = "buttonPickMinimapLineColourNormal";
+            this.buttonPickMinimapLineColourNormal.Size = new System.Drawing.Size(147, 26);
+            this.buttonPickMinimapLineColourNormal.TabIndex = 73;
+            this.buttonPickMinimapLineColourNormal.Text = "Minimap Line Colour Normal";
+            this.buttonPickMinimapLineColourNormal.UseVisualStyleBackColor = false;
+            this.buttonPickMinimapLineColourNormal.Click += new System.EventHandler(this.buttonPickMinimapLineColourNormal_Click);
+            // 
+            // buttonPickMinimapBorderColour
+            // 
+            this.buttonPickMinimapBorderColour.Location = new System.Drawing.Point(167, 325);
+            this.buttonPickMinimapBorderColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMinimapBorderColour.Name = "buttonPickMinimapBorderColour";
+            this.buttonPickMinimapBorderColour.Size = new System.Drawing.Size(125, 26);
+            this.buttonPickMinimapBorderColour.TabIndex = 72;
+            this.buttonPickMinimapBorderColour.Text = "Minimap Border colour";
+            this.buttonPickMinimapBorderColour.UseVisualStyleBackColor = true;
+            this.buttonPickMinimapBorderColour.Click += new System.EventHandler(this.buttonPickMinimapBorderColour_Click);
+            // 
+            // buttonPickAlertPopupMinimapZKillColour
+            // 
+            this.buttonPickAlertPopupMinimapZKillColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickAlertPopupMinimapZKillColour.Location = new System.Drawing.Point(624, 196);
+            this.buttonPickAlertPopupMinimapZKillColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickAlertPopupMinimapZKillColour.Name = "buttonPickAlertPopupMinimapZKillColour";
+            this.buttonPickAlertPopupMinimapZKillColour.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickAlertPopupMinimapZKillColour.TabIndex = 80;
+            this.buttonPickAlertPopupMinimapZKillColour.Text = "Minimap ZKill circle Colour";
+            this.buttonPickAlertPopupMinimapZKillColour.UseVisualStyleBackColor = false;
+            this.buttonPickAlertPopupMinimapZKillColour.Click += new System.EventHandler(this.buttonPickAlertPopupMinimapZKillColour_Click);
+            // 
+            // buttonPickAlertPopupMinimapIntelColour
+            // 
+            this.buttonPickAlertPopupMinimapIntelColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickAlertPopupMinimapIntelColour.Location = new System.Drawing.Point(476, 196);
+            this.buttonPickAlertPopupMinimapIntelColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickAlertPopupMinimapIntelColour.Name = "buttonPickAlertPopupMinimapIntelColour";
+            this.buttonPickAlertPopupMinimapIntelColour.Size = new System.Drawing.Size(143, 26);
+            this.buttonPickAlertPopupMinimapIntelColour.TabIndex = 81;
+            this.buttonPickAlertPopupMinimapIntelColour.Text = "Minimap Intel circle Colour";
+            this.buttonPickAlertPopupMinimapIntelColour.UseVisualStyleBackColor = false;
+            this.buttonPickAlertPopupMinimapIntelColour.Click += new System.EventHandler(this.PickAlertPopupMinimapIntelColour_Click);
+            // 
+            // buttonPickCurrentCharacterColour
+            // 
+            this.buttonPickCurrentCharacterColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickCurrentCharacterColour.Location = new System.Drawing.Point(10, 476);
+            this.buttonPickCurrentCharacterColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickCurrentCharacterColour.Name = "buttonPickCurrentCharacterColour";
+            this.buttonPickCurrentCharacterColour.Size = new System.Drawing.Size(145, 26);
+            this.buttonPickCurrentCharacterColour.TabIndex = 82;
+            this.buttonPickCurrentCharacterColour.Text = "Character colour";
+            this.buttonPickCurrentCharacterColour.UseVisualStyleBackColor = false;
+            this.buttonPickCurrentCharacterColour.Click += new System.EventHandler(this.buttonPickCurrentCharacterColour_Click);
+            // 
+            // buttonPickISKColour
+            // 
+            this.buttonPickISKColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickISKColour.Location = new System.Drawing.Point(11, 504);
+            this.buttonPickISKColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickISKColour.Name = "buttonPickISKColour";
+            this.buttonPickISKColour.Size = new System.Drawing.Size(145, 26);
+            this.buttonPickISKColour.TabIndex = 83;
+            this.buttonPickISKColour.Text = "ISK Colour";
+            this.buttonPickISKColour.UseVisualStyleBackColor = false;
+            this.buttonPickISKColour.Click += new System.EventHandler(this.buttonPickISKColour_Click);
+            // 
+            // buttonPickEvescoutColour
+            // 
+            this.buttonPickEvescoutColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickEvescoutColour.Location = new System.Drawing.Point(10, 532);
+            this.buttonPickEvescoutColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickEvescoutColour.Name = "buttonPickEvescoutColour";
+            this.buttonPickEvescoutColour.Size = new System.Drawing.Size(145, 26);
+            this.buttonPickEvescoutColour.TabIndex = 84;
+            this.buttonPickEvescoutColour.Text = "EveScout Colour";
+            this.buttonPickEvescoutColour.UseVisualStyleBackColor = false;
+            this.buttonPickEvescoutColour.Click += new System.EventHandler(this.buttonPickEvescoutColour_Click);
+            // 
+            // buttonPickAlsrtsOutstandingColour
+            // 
+            this.buttonPickAlsrtsOutstandingColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickAlsrtsOutstandingColour.Location = new System.Drawing.Point(11, 560);
+            this.buttonPickAlsrtsOutstandingColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickAlsrtsOutstandingColour.Name = "buttonPickAlsrtsOutstandingColour";
+            this.buttonPickAlsrtsOutstandingColour.Size = new System.Drawing.Size(145, 26);
+            this.buttonPickAlsrtsOutstandingColour.TabIndex = 85;
+            this.buttonPickAlsrtsOutstandingColour.Text = "Alerts Outstanding Colour";
+            this.buttonPickAlsrtsOutstandingColour.UseVisualStyleBackColor = false;
+            this.buttonPickAlsrtsOutstandingColour.Click += new System.EventHandler(this.buttonPickAlsrtsOutstandingColour_Click);
+            // 
+            // buttonPickMinimapIntelColour
+            // 
+            this.buttonPickMinimapIntelColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMinimapIntelColour.Location = new System.Drawing.Point(316, 522);
+            this.buttonPickMinimapIntelColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMinimapIntelColour.Name = "buttonPickMinimapIntelColour";
+            this.buttonPickMinimapIntelColour.Size = new System.Drawing.Size(143, 26);
+            this.buttonPickMinimapIntelColour.TabIndex = 87;
+            this.buttonPickMinimapIntelColour.Text = "Minimap Intel circle Colour";
+            this.buttonPickMinimapIntelColour.UseVisualStyleBackColor = false;
+            this.buttonPickMinimapIntelColour.Click += new System.EventHandler(this.buttonPickMinimapIntelColour_Click);
+            // 
+            // buttonPickMinimapZKillColour
+            // 
+            this.buttonPickMinimapZKillColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMinimapZKillColour.Location = new System.Drawing.Point(296, 550);
+            this.buttonPickMinimapZKillColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMinimapZKillColour.Name = "buttonPickMinimapZKillColour";
+            this.buttonPickMinimapZKillColour.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMinimapZKillColour.TabIndex = 86;
+            this.buttonPickMinimapZKillColour.Text = "Minimap ZKill circle Colour";
+            this.buttonPickMinimapZKillColour.UseVisualStyleBackColor = false;
+            this.buttonPickMinimapZKillColour.Click += new System.EventHandler(this.buttonPickMinimapZKillColour_Click_1);
             // 
             // QuesadillaConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 610);
+            this.Controls.Add(this.buttonPickMinimapIntelColour);
+            this.Controls.Add(this.buttonPickMinimapZKillColour);
+            this.Controls.Add(this.buttonPickAlsrtsOutstandingColour);
+            this.Controls.Add(this.buttonPickEvescoutColour);
+            this.Controls.Add(this.buttonPickISKColour);
+            this.Controls.Add(this.buttonPickCurrentCharacterColour);
+            this.Controls.Add(this.buttonPickAlertPopupMinimapIntelColour);
+            this.Controls.Add(this.buttonPickAlertPopupMinimapZKillColour);
+            this.Controls.Add(this.buttonPickMinimapSystemColourText);
+            this.Controls.Add(this.buttonPickMinimapSystemColourTo);
+            this.Controls.Add(this.buttonPickMinimapSystemColourFrom);
+            this.Controls.Add(this.buttonPickMinimapSystemColourRoute);
+            this.Controls.Add(this.buttonPickMinimapSystemColourNormal);
+            this.Controls.Add(this.buttonPickMinimapLineColourRoute);
+            this.Controls.Add(this.buttonPickMinimapLineColourNormal);
+            this.Controls.Add(this.buttonPickMinimapBorderColour);
+            this.Controls.Add(this.cbMinimapShowSystemText);
+            this.Controls.Add(this.cbShowMinimapBorder);
+            this.Controls.Add(this.cbShowMinimap);
             this.Controls.Add(this.buttonPickMainWindowLogColourText);
             this.Controls.Add(this.buttonPickMainWindowLogBackgroundColour);
             this.Controls.Add(this.buttonPickMainWindowColourText);
@@ -1045,7 +1319,7 @@
             this.Controls.Add(this.buttonPickAlertPopupMinimapLineColorNormal);
             this.Controls.Add(this.cbAlertPopupMinimapShowSystemText);
             this.Controls.Add(this.cbAlertPopupShowMinimapBorder);
-            this.Controls.Add(this.buttonPickMinimapBorderColour);
+            this.Controls.Add(this.buttonPickAlertPopupMinimapBorderColour);
             this.Controls.Add(this.cbAlertPopupMinimap);
             this.Controls.Add(this.lblShowLastUnexpiredAlerts);
             this.Controls.Add(this.label7);
@@ -1166,7 +1440,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TrackBar trackShowLastUnexpiredAlerts;
         private System.Windows.Forms.CheckBox cbAlertPopupMinimap;
-        private System.Windows.Forms.Button buttonPickMinimapBorderColour;
+        private System.Windows.Forms.Button buttonPickAlertPopupMinimapBorderColour;
         private System.Windows.Forms.CheckBox cbAlertPopupShowMinimapBorder;
         private System.Windows.Forms.CheckBox cbAlertPopupMinimapShowSystemText;
         private System.Windows.Forms.Button buttonPickAlertPopupMinimapLineColorNormal;
@@ -1188,5 +1462,24 @@
         private System.Windows.Forms.Button buttonPickMainWindowColourText;
         private System.Windows.Forms.Button buttonPickMainWindowLogColourText;
         private System.Windows.Forms.Button buttonPickMainWindowLogBackgroundColour;
+        private System.Windows.Forms.CheckBox cbMinimapShowSystemText;
+        private System.Windows.Forms.CheckBox cbShowMinimapBorder;
+        private System.Windows.Forms.CheckBox cbShowMinimap;
+        private System.Windows.Forms.Button buttonPickMinimapSystemColourText;
+        private System.Windows.Forms.Button buttonPickMinimapSystemColourTo;
+        private System.Windows.Forms.Button buttonPickMinimapSystemColourFrom;
+        private System.Windows.Forms.Button buttonPickMinimapSystemColourRoute;
+        private System.Windows.Forms.Button buttonPickMinimapSystemColourNormal;
+        private System.Windows.Forms.Button buttonPickMinimapLineColourRoute;
+        private System.Windows.Forms.Button buttonPickMinimapLineColourNormal;
+        private System.Windows.Forms.Button buttonPickMinimapBorderColour;
+        private System.Windows.Forms.Button buttonPickAlertPopupMinimapZKillColour;
+        private System.Windows.Forms.Button buttonPickAlertPopupMinimapIntelColour;
+        private System.Windows.Forms.Button buttonPickCurrentCharacterColour;
+        private System.Windows.Forms.Button buttonPickISKColour;
+        private System.Windows.Forms.Button buttonPickEvescoutColour;
+        private System.Windows.Forms.Button buttonPickAlsrtsOutstandingColour;
+        private System.Windows.Forms.Button buttonPickMinimapIntelColour;
+        private System.Windows.Forms.Button buttonPickMinimapZKillColour;
     }
 }

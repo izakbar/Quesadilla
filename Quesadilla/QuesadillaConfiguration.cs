@@ -134,7 +134,11 @@ namespace Quesadilla
             cbAlertPopupMinimapShowSystemText.Checked = _configuration.AlertPopupMinimapShowSystemText;
 
             cbAlertPopupShowMinimapBorder.Checked = _configuration.AlertPopupShowMinimapBorder ;
-            cbAlertPopupMinimap.Checked = _configuration.AlertPopupMinimap;
+            cbAlertPopupMinimap.Checked = _configuration.AlertPopupShowMinimap;
+
+            cbMinimapShowSystemText.Checked =_configuration.MinimapShowSystemText;
+            cbShowMinimapBorder.Checked = _configuration.ShowMinimapBorder;
+            cbShowMinimap.Checked = _configuration.ShowMinimap;
 
             trackAlertPopupMinimapSizeWidth.Minimum = 1;
             trackAlertPopupMinimapSizeHeight.Minimum = 1;
@@ -217,6 +221,9 @@ namespace Quesadilla
         private Color ChooseColour(Color c)
         {
             colourPicker.Color = c;
+            colourPicker.SolidColorOnly = false;
+            colourPicker.AnyColor = true;
+            colourPicker.AllowFullOpen = true;
             if (colourPicker.ShowDialog() == DialogResult.OK)
             {
                 return(colourPicker.Color);
@@ -407,13 +414,7 @@ namespace Quesadilla
 
         private void cbShowMinimap_CheckedChanged(object sender, EventArgs e)
         {
-            _configuration.AlertPopupMinimap = cbAlertPopupMinimap.Checked;
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickMinimapBorderColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapBorderColour = ChooseColour(_configuration.AlertPopupMinimapBorderColour);
+            _configuration.AlertPopupShowMinimap = cbAlertPopupMinimap.Checked;
             ShowAlertBitmap();
         }
 
@@ -514,6 +515,106 @@ namespace Quesadilla
         private void buttonPickMainWindowLogColourText_Click(object sender, EventArgs e)
         {
             _configuration.MainWindowLogColourText = ChooseColour(_configuration.MainWindowLogColourText);
+        }
+
+        private void cbShowMinimapBorder_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.ShowMinimapBorder = cbShowMinimapBorder.Checked;
+        }
+
+        private void cbShowMinimap_CheckedChanged_1(object sender, EventArgs e)
+        {
+            _configuration.ShowMinimap = cbShowMinimap.Checked;
+        }
+
+        private void buttonPickCurrentCharacterColour_Click(object sender, EventArgs e)
+        {
+            _configuration.CurrentCharacterColour = ChooseColour(_configuration.CurrentCharacterColour);
+        }
+
+        private void buttonPickISKColour_Click(object sender, EventArgs e)
+        {
+            _configuration.ISKColour = ChooseColour(_configuration.ISKColour);
+        }
+
+        private void buttonPickEvescoutColour_Click(object sender, EventArgs e)
+        {
+            _configuration.EvescoutColour= ChooseColour(_configuration.EvescoutColour);
+        }
+
+        private void buttonPickAlsrtsOutstandingColour_Click(object sender, EventArgs e)
+        {
+            _configuration.AlertsOutstandingColour = ChooseColour(_configuration.AlertsOutstandingColour);
+        }
+
+        private void buttonPickAlertPopupMinimapBorderColour_Click(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupMinimapBorderColour = ChooseColour(_configuration.AlertPopupMinimapBorderColour);
+        }
+
+        private void buttonPickMinimapBorderColour_Click(object sender, EventArgs e)
+        {
+            _configuration.MinimapBorderColour = ChooseColour(_configuration.MinimapBorderColour);
+        }
+
+        private void cbMinimapShowSystemText_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.MinimapShowSystemText = cbMinimapShowSystemText.Checked;
+        }
+
+        private void buttonPickMinimapLineColourNormal_Click(object sender, EventArgs e)
+        {
+            _configuration.MinimapLineColourNormal = ChooseColour(_configuration.MinimapLineColourNormal);
+        }
+
+        private void buttonPickMinimapLineColourRoute_Click(object sender, EventArgs e)
+        {
+            _configuration.MinimapLineColourRoute = ChooseColour(_configuration.MinimapLineColourRoute);
+        }
+
+        private void buttonPickMinimapSystemColourNormal_Click(object sender, EventArgs e)
+        {
+            _configuration.MinimapSystemColourNormal = ChooseColour(_configuration.MinimapSystemColourNormal);
+        }
+
+        private void buttonPickMinimapSystemColourRoute_Click(object sender, EventArgs e)
+        {
+            _configuration.MinimapSystemColourRoute = ChooseColour(_configuration.MinimapSystemColourRoute);
+        }
+
+        private void buttonPickMinimapSystemColourFrom_Click(object sender, EventArgs e)
+        {
+            _configuration.MinimapSystemColourFrom = ChooseColour(_configuration.MinimapSystemColourFrom);
+        }
+
+        private void buttonPickMinimapSystemColourTo_Click(object sender, EventArgs e)
+        {
+            _configuration.MinimapSystemColourTo = ChooseColour(_configuration.MinimapSystemColourTo);
+        }
+
+        private void buttonPickMinimapSystemColourText_Click(object sender, EventArgs e)
+        {
+            _configuration.MinimapSystemColourText = ChooseColour(_configuration.MinimapSystemColourText);
+        }
+
+        private void buttonPickMinimapZKillColour_Click_1(object sender, EventArgs e)
+        {
+            _configuration.MinimapZKillColour = ChooseColour(_configuration.MinimapZKillColour);
+        }
+
+        private void buttonPickAlertPopupMinimapZKillColour_Click(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupMinimapZKillColour = ChooseColour(_configuration.AlertPopupMinimapZKillColour);
+        }
+
+        private void PickAlertPopupMinimapIntelColour_Click(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupMinimapIntelColour = ChooseColour(_configuration.AlertPopupMinimapIntelColour);
+        }
+
+        private void buttonPickMinimapIntelColour_Click(object sender, EventArgs e)
+        {
+            _configuration.MinimapIntelColour = ChooseColour(_configuration.MinimapIntelColour);
         }
     }
 }
