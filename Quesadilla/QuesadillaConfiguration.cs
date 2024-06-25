@@ -141,8 +141,8 @@ namespace Quesadilla
             trackAlertPopupMinimapPositionX.Minimum = 0;
             trackAlertPopupMinimapPositionY.Minimum = 0;
 
-            trackAlertPopupMinimapSizeWidth.Value = _configuration.AlertPopupMinimapSize.X; 
-            trackAlertPopupMinimapSizeHeight.Value = _configuration.AlertPopupMinimapSize.Y; 
+            trackAlertPopupMinimapSizeWidth.Value = _configuration.AlertPopupMinimapSize.X > trackAlertPopupMinimapSizeWidth.Maximum ? trackAlertPopupMinimapSizeWidth.Maximum : _configuration.AlertPopupMinimapSize.X;
+            trackAlertPopupMinimapSizeHeight.Value = _configuration.AlertPopupMinimapSize.Y > trackAlertPopupMinimapSizeHeight.Maximum ? trackAlertPopupMinimapSizeHeight.Maximum : _configuration.AlertPopupMinimapSize.Y; 
             trackAlertPopupMinimapPositionX.Value = _configuration.AlertPopupMinimapPosition.X;
             trackAlertPopupMinimapPositionY.Value = _configuration.AlertPopupMinimapPosition.Y;
 

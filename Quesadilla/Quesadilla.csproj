@@ -569,12 +569,14 @@
     <Compile Include="Classes\Events\EveScoutEventArgs.cs" />
     <Compile Include="Classes\EveScout\EveScoutManager.cs" />
     <Compile Include="Classes\EveScout\EveScoutWH.cs" />
+    <Compile Include="Classes\ImageGenerator.cs" />
     <Compile Include="Classes\IskLine.cs" />
     <Compile Include="Classes\Processes\ProcessInfo.cs" />
     <Compile Include="Classes\Processes\ProcessMonitor.cs" />
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
     <Compile Include="Classes\Resources\QuesadillaSound.cs" />
     <Compile Include="Classes\ItemType.cs" />
+    <Compile Include="Classes\SolarSystems\MinimapConnection.cs" />
     <Compile Include="Classes\SolarSystems\MinimapSystem.cs" />
     <Compile Include="Classes\ZKill\ZKill.cs" />
     <Compile Include="Classes\ZKill\ZKillKill.cs" />
@@ -835,9 +837,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="images\red-dot.png" />
     <None Include="images\bg_vagabond_Lloyd_George.png" />
     <None Include="images\bg_zirnitra.png" />
     <None Include="images\bg_0001.png" />
+    <None Include="images\520-5204963_red-explosion-png-icons-explosion-clip-art-transparent.png" />
     <Content Include="images\bg_eve_infinite.jpg" />
     <None Include="images\bg_massacre_m2_xfe.png" />
     <None Include="images\bg_m2_monument.png" />

@@ -1,4 +1,5 @@
 ﻿using EVEStandard.Models;
+using Microsoft.IdentityModel.Tokens;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Events;
@@ -80,7 +81,7 @@ namespace Quesadilla
 
         private int _intelSizeMax = 200;
         private int _intelSizeMin = 48;
-        private int _windowExtraHeight = 80;
+        private int _windowExtraHeight = 60;
 
         private MenuItem menuConfiguredAlerts = new MenuItem("Configured Alerts");
         private MenuItem menuBackgrounds = new MenuItem("Popup Background");
@@ -118,6 +119,7 @@ namespace Quesadilla
         public QuesadillaDPSGraph DPSGraphWindow = null;
 
         private Color OriginalBackgroundColour;
+        private int mapScale = 100;
 
         private List<ProcessInfo> knowProcesses = new List<ProcessInfo>();
         public string CurrentActiveToon;
@@ -143,6 +145,9 @@ namespace Quesadilla
 
             InitializeComponent();
             Program.InitializeResources();
+
+            this.pMinimapImage.MouseWheel += pMinimapImage_MouseWheel;
+
 
             // Initialize tray
             trayIcon = new NotifyIcon()
@@ -303,6 +308,12 @@ namespace Quesadilla
         }
         private void Quesadilla_Load(object sender, EventArgs e)
         {
+            lblCurrentClient.Text = "";
+            lblISK.Text = "";
+            lblAlertsOutstanding.Text = "";
+
+            this.Invalidate();
+
             ReloadConfiguration();
             buttonIntelSize_Click(null, null);
 
@@ -360,11 +371,11 @@ namespace Quesadilla
                         a = Program.ActiveAlerts.Dequeue();
                         RebuildLatestAlertsMenu();
                     }
-                    alertsOutstanding.Text = Program.ActiveAlerts.Count.ToString();
+                    lblAlertsOutstanding.Text = Program.ActiveAlerts.Count.ToString();
                 }
                 else
                 {
-                    alertsOutstanding.Text = "";
+                    lblAlertsOutstanding.Text = "";
                 }
 
                 Program.ExpireCombat();
@@ -376,7 +387,8 @@ namespace Quesadilla
 
             UpdateEveProcesses();
 
-            CombatFlag.Visible = InCombat;
+            pCombat.Visible = InCombat;
+
             TickCounts["SinceLastDPSGraphUpdate"]++;
             if (CombatAdded && TickCounts["SinceLastDPSGraphUpdate"] > Program.MainConfiguration.HowManyTicksBeforeDPSGraphUpdate )
             {
@@ -397,11 +409,13 @@ namespace Quesadilla
             if (Program.ISK.ContainsKey(CurrentActiveToon))
             {
                 lblISK.Text = Program.GetIskLastHour(CurrentActiveToon);
-                lblISK.Visible = true;
+                this.Invalidate();
+                //lblISK.Visible = true;
             }
             else
             {
-                lblISK.Visible = false;
+                //lblISK.Visible = false;
+                lblISK.Text = "";
             }
         }
 
@@ -842,7 +856,7 @@ namespace Quesadilla
             if (foundSystemId == -1)
                 return;
             Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
-
+            UpdateMinimap();
         }
 
         private void _localWatcher_ChatServerChange(object sender, ProcessChatServerChangeEventArgs e)
@@ -1274,14 +1288,14 @@ namespace Quesadilla
             {
                 // max it big
                 intelLog.Height = _intelSizeMax;
-                Height = intelLog.Height + _windowExtraHeight;
+                Height = intelLog.Height + _windowExtraHeight + pMinimapImage.Height ;
                 buttonIntelSize.Text = "▼";
             }
             else
             {
                 // make it small
                 intelLog.Height = _intelSizeMin;
-                Height = intelLog.Height + _windowExtraHeight;
+                Height = intelLog.Height + _windowExtraHeight + pMinimapImage.Height;
                 buttonIntelSize.Text = "▲";
             }
             buttonIntelSize.Top = intelLog.Top + 2;
@@ -1336,7 +1350,7 @@ namespace Quesadilla
                 foregroundWindowTitle = Program.ProcessMonitorHandler.GetTitleOfKnownProcess(ptr);
                 if (foregroundWindowTitle != null)
                 {
-                    lblCurrentClient.Visible = true;
+                    //lblCurrentClient.Visible = true;
                     CurrentActiveToon = foregroundWindowTitle.Replace("EVE - ", "");
                     lblCurrentClient.Text = CurrentActiveToon;
 
@@ -1358,6 +1372,7 @@ namespace Quesadilla
                                 DPSGraphWindow.Show();
                             }
                         }
+                        UpdateMinimap();
                     }
 
                     if (DPSGraphWindow != null &&
@@ -1381,10 +1396,11 @@ namespace Quesadilla
 
             if (foregroundWindowTitle == null)
             {
-                lblCurrentClient.Visible = false;
+                //lblCurrentClient.Visible = false;
                 CurrentActiveToon = "";
                 lblCurrentClient.Text = CurrentActiveToon;
                 SetupStatusBar();
+                UpdateMinimap();
             }
 
             // just double check thru charachter list active clients to make sure there is still an active client.
@@ -1686,6 +1702,63 @@ namespace Quesadilla
                     watcher.ProcessNewData += new EventHandler<ProcessNewDataEventArgs>(this.logFile_ProcessNewData);
                 }
             }
+        }
+
+        private void UpdateMinimap()
+        {
+
+            this.Invalidate();
+
+            if (CurrentActiveToon.IsNullOrEmpty() ) {
+                pMinimapImage.Visible = false;
+                return; 
+            }
+
+            var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
+
+            PathInfo _dummyPath = null;
+            if (c != null)
+            {
+                _dummyPath = new PathInfo()
+                {
+                    FromSystemName = c.Location,
+                    FromSystemId = c.LocationId,
+                    ToSystemName = c.Location,
+                    ToSystemId = c.LocationId,
+                    ToSystemRegionName = "",
+                    PathSystems = new List<int> { c.LocationId },
+                };
+            }
+
+            Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath, 3, mapScale,
+                Program.MainConfiguration.AlertPopupMinimapShowSystemText,
+                Program.MainConfiguration.AlertPopupShowMinimapBorder, Program.MainConfiguration.AlertPopupMinimapBorderColor,
+                Program.MainConfiguration.AlertPopupMinimapLineColorNormal,
+                Program.MainConfiguration.AlertPopupMinimapLineColorRoute,
+                Program.MainConfiguration.AlertPopupMinimapSystemColorNormal,
+                Program.MainConfiguration.AlertPopupMinimapSystemColorRoute,
+                Program.MainConfiguration.AlertPopupMinimapSystemColorFrom,
+                Program.MainConfiguration.AlertPopupMinimapSystemColorTo,
+                Program.MainConfiguration.AlertPopupMinimapSystemColorText
+                );
+            Bitmap minimapBitmap = new Bitmap(minimapImage);
+            minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
+            pMinimapImage.Image = minimapBitmap;
+            pMinimapImage.Visible = true;
+        }
+        private void pMinimapImage_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (e.Delta > 0) mapScale += 10;
+            if (e.Delta < 0) mapScale -= 10;
+
+            UpdateMinimap();
+        }
+
+        private void Quesadilla_Paint(object sender, PaintEventArgs e)
+        {
+            ImageGenerator.PaintDrawText(e, lblCurrentClient);
+            ImageGenerator.PaintDrawText(e, lblISK);
+            ImageGenerator.PaintDrawText(e, lblAlertsOutstanding);
         }
     }
 }
