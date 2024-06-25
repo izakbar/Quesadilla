@@ -158,14 +158,14 @@ namespace Quesadilla
                 pMinimapImage.Size = (Size)configuration.AlertPopupMinimapSize;
                 Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path , 0,100,
                     configuration.AlertPopupMinimapShowSystemText,
-                    configuration.AlertPopupShowMinimapBorder, configuration.AlertPopupMinimapBorderColor,
-                    configuration.AlertPopupMinimapLineColorNormal,
-                    configuration.AlertPopupMinimapLineColorRoute,
-                    configuration.AlertPopupMinimapSystemColorNormal,
-                    configuration.AlertPopupMinimapSystemColorRoute,
-                    configuration.AlertPopupMinimapSystemColorFrom,
-                    configuration.AlertPopupMinimapSystemColorTo,
-                    configuration.AlertPopupMinimapSystemColorText
+                    configuration.AlertPopupShowMinimapBorder, configuration.AlertPopupMinimapBorderColour,
+                    configuration.AlertPopupMinimapLineColourNormal,
+                    configuration.AlertPopupMinimapLineColourRoute,
+                    configuration.AlertPopupMinimapSystemColourNormal,
+                    configuration.AlertPopupMinimapSystemColourRoute,
+                    configuration.AlertPopupMinimapSystemColourFrom,
+                    configuration.AlertPopupMinimapSystemColourTo,
+                    configuration.AlertPopupMinimapSystemColourText
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));

@@ -67,19 +67,40 @@ namespace Quesadilla.Classes
                 AlertPopupMinimap = AlertPopupMinimap,
                 AlertPopupMinimapShowSystemText = AlertPopupMinimapShowSystemText,
                 AlertPopupShowMinimapBorder = AlertPopupShowMinimapBorder,
-                AlertPopupMinimapBorderColor = AlertPopupMinimapBorderColor,
-                AlertPopupMinimapLineColorNormal = AlertPopupMinimapLineColorNormal,
-                AlertPopupMinimapLineColorRoute = AlertPopupMinimapLineColorRoute,
-                AlertPopupMinimapSystemColorNormal = AlertPopupMinimapSystemColorNormal,
-                AlertPopupMinimapSystemColorRoute = AlertPopupMinimapSystemColorRoute,
-                AlertPopupMinimapSystemColorFrom = AlertPopupMinimapSystemColorFrom,
-                AlertPopupMinimapSystemColorTo = AlertPopupMinimapSystemColorTo,
-                AlertPopupMinimapSystemColorText = AlertPopupMinimapSystemColorText,
+                AlertPopupMinimapBorderColour = AlertPopupMinimapBorderColour,
+                AlertPopupMinimapLineColourNormal = AlertPopupMinimapLineColourNormal,
+                AlertPopupMinimapLineColourRoute = AlertPopupMinimapLineColourRoute,
+                AlertPopupMinimapSystemColourNormal = AlertPopupMinimapSystemColourNormal,
+                AlertPopupMinimapSystemColourRoute = AlertPopupMinimapSystemColourRoute,
+                AlertPopupMinimapSystemColourFrom = AlertPopupMinimapSystemColourFrom,
+                AlertPopupMinimapSystemColourTo = AlertPopupMinimapSystemColourTo,
+                AlertPopupMinimapSystemColourText = AlertPopupMinimapSystemColourText,
+                AlertPopupMinimapZKillColour = AlertPopupMinimapZKillColour,
+                AlertPopupMinimapAlertColour = AlertPopupMinimapAlertColour,
                 IntegrationPort = IntegrationPort,
-                MainWindowColorText = MainWindowColorText,
-                MainWindowBackgroundColorText = MainWindowBackgroundColorText,
-                MainWindowLogBackgroundColorText = MainWindowLogBackgroundColorText,
-                MainWindowLogColorText = MainWindowLogColorText,
+                MainWindowColourText = MainWindowColourText,
+                MainWindowBackgroundColour = MainWindowBackgroundColour,
+                MainWindowLogBackgroundColour = MainWindowLogBackgroundColour,
+                MainWindowLogColourText = MainWindowLogColourText,
+                Minimap = Minimap,
+                MinimapShowSystemText = MinimapShowSystemText,
+                ShowMinimapBorder = ShowMinimapBorder,
+                MinimapBorderColour = MinimapBorderColour,
+                MinimapLineColourNormal = MinimapLineColourNormal,
+                MinimapLineColourRoute = MinimapLineColourRoute,
+                MinimapSystemColourNormal = MinimapSystemColourNormal,
+                MinimapSystemColourRoute = MinimapSystemColourRoute,
+                MinimapSystemColourFrom = MinimapSystemColourFrom,
+                MinimapSystemColourTo = MinimapSystemColourTo,
+                MinimapSystemColourText = MinimapSystemColourText,
+                MinimapZKillColour = AlertPopupMinimapZKillColour,
+                MinimapAlertColour = AlertPopupMinimapAlertColour,
+
+                CurrentCharacterColour = CurrentCharacterColour,
+                ISKColour = ISKColour,
+                AlertsOutstandingColour = AlertsOutstandingColour,
+                EvescoutColour = EvescoutColour,
+
             };
 
             c.AlertPopupMinimapPosition = new Point(AlertPopupMinimapPosition.X, AlertPopupMinimapPosition.Y);
@@ -202,25 +223,50 @@ namespace Quesadilla.Classes
 
                 c.AlertPopupMinimap = true;
                 c.AlertPopupShowMinimapBorder = false;
-                c.AlertPopupMinimapBorderColor = Color.SteelBlue;
-                c.AlertPopupMinimapLineColorNormal = Color.Gainsboro;
-                c.AlertPopupMinimapLineColorRoute = Color.Tomato;
-                c.AlertPopupMinimapSystemColorNormal = Color.Gainsboro;
-                c.AlertPopupMinimapSystemColorRoute = Color.Pink;
-                c.AlertPopupMinimapSystemColorFrom = Color.Red;
-                c.AlertPopupMinimapSystemColorTo = Color.Green;
+                c.AlertPopupMinimapBorderColour = Color.SteelBlue;
+                c.AlertPopupMinimapLineColourNormal = Color.Gainsboro;
+                c.AlertPopupMinimapLineColourRoute = Color.Tomato;
+                c.AlertPopupMinimapSystemColourNormal = Color.Gainsboro;
+                c.AlertPopupMinimapSystemColourRoute = Color.Pink;
+                c.AlertPopupMinimapSystemColourFrom = Color.Red;
+                c.AlertPopupMinimapSystemColourTo = Color.Green;
                 c.AlertPopupMinimapShowSystemText = true;
-                c.AlertPopupMinimapSystemColorText = Color.LemonChiffon;
+                c.AlertPopupMinimapSystemColourText = Color.LemonChiffon;
+
+                c.AlertPopupMinimapZKillColour = Color.Red;
+                c.AlertPopupMinimapAlertColour = Color.Orange;
 
                 c.AlertPopupMinimapPosition = new Point(30, 0);
                 c.AlertPopupMinimapSize = new Point(232, 150);
 
                 c.IntegrationPort = 65432;
 
-                c.MainWindowColorText = Color.LightGoldenrodYellow;
-                c.MainWindowBackgroundColorText = System.Drawing.ColorTranslator.FromHtml("#0f0f11");
-                c.MainWindowLogBackgroundColorText = Color.Red;
-                c.MainWindowLogColorText = Color.Black;
+                c.MainWindowColourText = Color.LightGoldenrodYellow;
+                c.MainWindowBackgroundColour = System.Drawing.ColorTranslator.FromHtml("#0f0f11");
+                c.MainWindowLogBackgroundColour = System.Drawing.ColorTranslator.FromHtml("#0f0f11");
+                c.MainWindowLogColourText = Color.LightGoldenrodYellow;
+
+                c.Minimap = true;
+                c.ShowMinimapBorder = false;
+                c.MinimapBorderColour = Color.SteelBlue;
+                c.MinimapLineColourNormal = Color.Gainsboro;
+                c.MinimapLineColourRoute = Color.Tomato;
+                c.MinimapSystemColourNormal = Color.Gainsboro;
+                c.MinimapSystemColourRoute = Color.Pink;
+                c.MinimapSystemColourFrom = Color.Red;
+                c.MinimapSystemColourTo = Color.Green;
+                c.MinimapShowSystemText = true;
+                c.MinimapSystemColourText = Color.LemonChiffon;
+
+                c.MinimapZKillColour = Color.Red;
+                c.MinimapAlertColour = Color.Orange;
+
+
+                c.CurrentCharacterColour = Color.Blue;
+                c.ISKColour = Color.Green;
+                c.AlertsOutstandingColour = Color.LightPink;
+                c.EvescoutColour = Color.Brown;
+
             }
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
@@ -540,22 +586,43 @@ img.rounded-corners {
         public bool AlertPopupMinimap { get; set; }
         public bool AlertPopupShowMinimapBorder { get; set; }
         public bool AlertPopupMinimapShowSystemText { get; set; }
-        public Color AlertPopupMinimapBorderColor { get; set; }
-        public Color AlertPopupMinimapLineColorNormal { get; set; }
-        public Color AlertPopupMinimapLineColorRoute { get; set; }
-        public Color AlertPopupMinimapSystemColorNormal { get; set; }
-        public Color AlertPopupMinimapSystemColorRoute { get; set; }
-        public Color AlertPopupMinimapSystemColorFrom { get; set; }
-        public Color AlertPopupMinimapSystemColorTo { get; set; }
-        public Color AlertPopupMinimapSystemColorText { get; set; }
+        public Color AlertPopupMinimapBorderColour { get; set; }
+        public Color AlertPopupMinimapLineColourNormal { get; set; }
+        public Color AlertPopupMinimapLineColourRoute { get; set; }
+        public Color AlertPopupMinimapSystemColourNormal { get; set; }
+        public Color AlertPopupMinimapSystemColourRoute { get; set; }
+        public Color AlertPopupMinimapSystemColourFrom { get; set; }
+        public Color AlertPopupMinimapSystemColourTo { get; set; }
+        public Color AlertPopupMinimapSystemColourText { get; set; }
+        public Color AlertPopupMinimapZKillColour { get; set; }
+        public Color AlertPopupMinimapAlertColour { get; set; }
 
         public Point AlertPopupMinimapPosition { get; set; }
         public Point AlertPopupMinimapSize { get; set; }
         public int IntegrationPort { get; set; }
 
-        public Color MainWindowColorText { get; set; }
-        public Color MainWindowBackgroundColorText { get; set; }
-        public Color MainWindowLogBackgroundColorText { get; set; }
-        public Color MainWindowLogColorText { get; set; }
+        public Color MainWindowColourText { get; set; }
+        public Color MainWindowBackgroundColour { get; set; }
+        public Color MainWindowLogBackgroundColour { get; set; }
+        public Color MainWindowLogColourText { get; set; }
+
+        public bool Minimap { get; set; }
+        public bool ShowMinimapBorder { get; set; }
+        public bool MinimapShowSystemText { get; set; }
+        public Color MinimapBorderColour { get; set; }
+        public Color MinimapLineColourNormal { get; set; }
+        public Color MinimapLineColourRoute { get; set; }
+        public Color MinimapSystemColourNormal { get; set; }
+        public Color MinimapSystemColourRoute { get; set; }
+        public Color MinimapSystemColourFrom { get; set; }
+        public Color MinimapSystemColourTo { get; set; }
+        public Color MinimapSystemColourText { get; set; }
+        public Color MinimapZKillColour { get; set; }
+        public Color MinimapAlertColour { get; set; }
+
+        public Color CurrentCharacterColour { get; set; }
+        public Color ISKColour { get; set; }
+        public Color AlertsOutstandingColour { get; set; }
+        public Color EvescoutColour { get; set; }
     }
 }

@@ -413,7 +413,7 @@ namespace Quesadilla
 
         private void buttonPickMinimapBorderColour_Click(object sender, EventArgs e)
         {
-            _configuration.AlertPopupMinimapBorderColor = ChooseColour(_configuration.AlertPopupMinimapBorderColor);
+            _configuration.AlertPopupMinimapBorderColour = ChooseColour(_configuration.AlertPopupMinimapBorderColour);
             ShowAlertBitmap();
         }
 
@@ -431,43 +431,43 @@ namespace Quesadilla
 
         private void buttonPickAlertPopupMinimapLineColorNormal_Click(object sender, EventArgs e)
         {
-            _configuration.AlertPopupMinimapLineColorNormal = ChooseColour(_configuration.AlertPopupMinimapLineColorNormal);
+            _configuration.AlertPopupMinimapLineColourNormal = ChooseColour(_configuration.AlertPopupMinimapLineColourNormal);
             ShowAlertBitmap();
         }
 
         private void buttonPickAlertPopupMinimapLineColorRoute_Click(object sender, EventArgs e)
         {
-            _configuration.AlertPopupMinimapLineColorRoute = ChooseColour(_configuration.AlertPopupMinimapLineColorRoute);
+            _configuration.AlertPopupMinimapLineColourRoute = ChooseColour(_configuration.AlertPopupMinimapLineColourRoute);
             ShowAlertBitmap();
         }
 
         private void buttonPickAlertPopupMinimapSystemColorNormal_Click(object sender, EventArgs e)
         {
-            _configuration.AlertPopupMinimapSystemColorNormal = ChooseColour(_configuration.AlertPopupMinimapSystemColorNormal);
+            _configuration.AlertPopupMinimapSystemColourNormal = ChooseColour(_configuration.AlertPopupMinimapSystemColourNormal);
             ShowAlertBitmap();
         }
 
         private void buttonPickAlertPopupMinimapSystemColorRoute_Click(object sender, EventArgs e)
         {
-            _configuration.AlertPopupMinimapSystemColorRoute = ChooseColour(_configuration.AlertPopupMinimapSystemColorRoute);
+            _configuration.AlertPopupMinimapSystemColourRoute = ChooseColour(_configuration.AlertPopupMinimapSystemColourRoute);
             ShowAlertBitmap();
         }
 
         private void buttonPickAlertPopupMinimapSystemColorFrom_Click(object sender, EventArgs e)
         {
-            _configuration.AlertPopupMinimapSystemColorFrom = ChooseColour(_configuration.AlertPopupMinimapSystemColorFrom);
+            _configuration.AlertPopupMinimapSystemColourFrom = ChooseColour(_configuration.AlertPopupMinimapSystemColourFrom);
             ShowAlertBitmap();
         }
 
         private void buttonPickAlertPopupMinimapSystemColorTo_Click(object sender, EventArgs e)
         {
-            _configuration.AlertPopupMinimapSystemColorTo = ChooseColour(_configuration.AlertPopupMinimapSystemColorTo);
+            _configuration.AlertPopupMinimapSystemColourTo = ChooseColour(_configuration.AlertPopupMinimapSystemColourTo);
             ShowAlertBitmap();
         }
 
         private void buttonPickAlertPopupMinimapSystemColorText_Click(object sender, EventArgs e)
         {
-            _configuration.AlertPopupMinimapSystemColorText = ChooseColour(_configuration.AlertPopupMinimapSystemColorText);
+            _configuration.AlertPopupMinimapSystemColourText = ChooseColour(_configuration.AlertPopupMinimapSystemColourText);
             ShowAlertBitmap();
         }
 
@@ -494,6 +494,26 @@ namespace Quesadilla
         {
             _configuration.AlertPopupMinimapPosition = (new Point(_configuration.AlertPopupMinimapPosition.X, ((TrackBar)sender).Value));
             ShowAlertBitmap();
+        }
+
+        private void buttonPickMainWindowsBackgroundColour_Click(object sender, EventArgs e)
+        {
+            _configuration.MainWindowBackgroundColour = ChooseColour(_configuration.MainWindowBackgroundColour);
+        }
+
+        private void buttonPickMainWindowColourText_Click(object sender, EventArgs e)
+        {
+            _configuration.MainWindowColourText = ChooseColour(_configuration.MainWindowColourText);
+        }
+
+        private void buttonPickMainWindowLogBackgroundColour_Click(object sender, EventArgs e)
+        {
+            _configuration.MainWindowLogBackgroundColour = ChooseColour(_configuration.MainWindowLogBackgroundColour);
+        }
+
+        private void buttonPickMainWindowLogColourText_Click(object sender, EventArgs e)
+        {
+            _configuration.MainWindowLogColourText = ChooseColour(_configuration.MainWindowLogColourText);
         }
     }
 }

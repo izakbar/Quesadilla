@@ -52,15 +52,15 @@
             // 
             // intelLog
             // 
-            this.intelLog.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.intelLog.BackColor = System.Drawing.SystemColors.Info;
             this.intelLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.intelLog.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.intelLog.Enabled = false;
             this.intelLog.ForContext = "";
-            this.intelLog.Location = new System.Drawing.Point(0, 276);
-            this.intelLog.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.intelLog.Location = new System.Drawing.Point(0, 178);
+            this.intelLog.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.intelLog.Name = "intelLog";
-            this.intelLog.Size = new System.Drawing.Size(1116, 286);
+            this.intelLog.ReadOnly = true;
+            this.intelLog.Size = new System.Drawing.Size(744, 187);
             this.intelLog.TabIndex = 0;
             this.intelLog.Text = "";
             this.intelLog.TextChanged += new System.EventHandler(this.intelLog_TextChanged);
@@ -69,10 +69,9 @@
             // 
             this.ChatServerDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ChatServerDown.ForeColor = System.Drawing.Color.Red;
-            this.ChatServerDown.Location = new System.Drawing.Point(893, 2);
-            this.ChatServerDown.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.ChatServerDown.Location = new System.Drawing.Point(595, 1);
             this.ChatServerDown.Name = "ChatServerDown";
-            this.ChatServerDown.Size = new System.Drawing.Size(223, 30);
+            this.ChatServerDown.Size = new System.Drawing.Size(149, 20);
             this.ChatServerDown.TabIndex = 3;
             this.ChatServerDown.Text = "Chat Server Down";
             this.ChatServerDown.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -80,12 +79,12 @@
             // 
             // buttonIntelSize
             // 
-            this.buttonIntelSize.BackColor = System.Drawing.Color.Transparent;
+            this.buttonIntelSize.BackColor = System.Drawing.SystemColors.Info;
             this.buttonIntelSize.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonIntelSize.Location = new System.Drawing.Point(1090, 274);
-            this.buttonIntelSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.buttonIntelSize.Location = new System.Drawing.Point(727, 178);
+            this.buttonIntelSize.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.buttonIntelSize.Name = "buttonIntelSize";
-            this.buttonIntelSize.Size = new System.Drawing.Size(26, 28);
+            this.buttonIntelSize.Size = new System.Drawing.Size(17, 18);
             this.buttonIntelSize.TabIndex = 6;
             this.buttonIntelSize.Text = "▼";
             this.buttonIntelSize.UseVisualStyleBackColor = false;
@@ -95,10 +94,9 @@
             // 
             this.lblCurrentClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCurrentClient.ForeColor = System.Drawing.Color.Blue;
-            this.lblCurrentClient.Location = new System.Drawing.Point(3, 3);
-            this.lblCurrentClient.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblCurrentClient.Location = new System.Drawing.Point(2, 2);
             this.lblCurrentClient.Name = "lblCurrentClient";
-            this.lblCurrentClient.Size = new System.Drawing.Size(403, 32);
+            this.lblCurrentClient.Size = new System.Drawing.Size(269, 21);
             this.lblCurrentClient.TabIndex = 7;
             this.lblCurrentClient.Text = "Current Client";
             this.lblCurrentClient.Visible = false;
@@ -106,9 +104,10 @@
             // lblISK
             // 
             this.lblISK.ForeColor = System.Drawing.Color.ForestGreen;
-            this.lblISK.Location = new System.Drawing.Point(6, 30);
+            this.lblISK.Location = new System.Drawing.Point(229, 127);
+            this.lblISK.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblISK.Name = "lblISK";
-            this.lblISK.Size = new System.Drawing.Size(171, 17);
+            this.lblISK.Size = new System.Drawing.Size(114, 11);
             this.lblISK.TabIndex = 8;
             this.lblISK.Text = "999999";
             this.lblISK.Visible = false;
@@ -117,20 +116,18 @@
             // 
             this.lblStatus.AutoSize = true;
             this.lblStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lblStatus.Location = new System.Drawing.Point(0, 256);
-            this.lblStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblStatus.Location = new System.Drawing.Point(0, 165);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(262, 20);
+            this.lblStatus.Size = new System.Drawing.Size(168, 13);
             this.lblStatus.TabIndex = 9;
             this.lblStatus.Text = "XXXXXXXXXXXXXXXXXXXXXXX";
             // 
             // pMinimapImage
             // 
             this.pMinimapImage.BackColor = System.Drawing.Color.Transparent;
-            this.pMinimapImage.Location = new System.Drawing.Point(6, 14);
-            this.pMinimapImage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.pMinimapImage.Location = new System.Drawing.Point(4, 9);
             this.pMinimapImage.Name = "pMinimapImage";
-            this.pMinimapImage.Size = new System.Drawing.Size(330, 205);
+            this.pMinimapImage.Size = new System.Drawing.Size(220, 133);
             this.pMinimapImage.TabIndex = 10;
             this.pMinimapImage.TabStop = false;
             // 
@@ -138,9 +135,10 @@
             // 
             this.pCombat.BackColor = System.Drawing.Color.Transparent;
             this.pCombat.Image = global::Quesadilla.Properties.Resources.red_dot;
-            this.pCombat.Location = new System.Drawing.Point(7, 195);
+            this.pCombat.Location = new System.Drawing.Point(5, 127);
+            this.pCombat.Margin = new System.Windows.Forms.Padding(2);
             this.pCombat.Name = "pCombat";
-            this.pCombat.Size = new System.Drawing.Size(20, 20);
+            this.pCombat.Size = new System.Drawing.Size(13, 13);
             this.pCombat.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pCombat.TabIndex = 11;
             this.pCombat.TabStop = false;
@@ -149,9 +147,10 @@
             // lblAlertsOutstanding
             // 
             this.lblAlertsOutstanding.ForeColor = System.Drawing.Color.LightCoral;
-            this.lblAlertsOutstanding.Location = new System.Drawing.Point(337, 18);
+            this.lblAlertsOutstanding.Location = new System.Drawing.Point(225, 3);
+            this.lblAlertsOutstanding.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblAlertsOutstanding.Name = "lblAlertsOutstanding";
-            this.lblAlertsOutstanding.Size = new System.Drawing.Size(171, 17);
+            this.lblAlertsOutstanding.Size = new System.Drawing.Size(114, 11);
             this.lblAlertsOutstanding.TabIndex = 12;
             this.lblAlertsOutstanding.Text = "999999";
             this.lblAlertsOutstanding.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -159,15 +158,15 @@
             // 
             // Quesadilla
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(1116, 562);
+            this.ClientSize = new System.Drawing.Size(744, 365);
+            this.Controls.Add(this.buttonIntelSize);
             this.Controls.Add(this.lblAlertsOutstanding);
             this.Controls.Add(this.lblCurrentClient);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.lblISK);
-            this.Controls.Add(this.buttonIntelSize);
             this.Controls.Add(this.ChatServerDown);
             this.Controls.Add(this.intelLog);
             this.Controls.Add(this.pCombat);
@@ -175,7 +174,7 @@
             this.ForeColor = System.Drawing.Color.Lime;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.MaximizeBox = false;
             this.Name = "Quesadilla";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Quesadilla_FormClosing);

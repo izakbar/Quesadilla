@@ -102,6 +102,10 @@
             this.trackAlertPopupMinimapPositionY = new System.Windows.Forms.TrackBar();
             this.label10 = new System.Windows.Forms.Label();
             this.trackAlertPopupMinimapPositionX = new System.Windows.Forms.TrackBar();
+            this.buttonPickMainWindowsBackgroundColour = new System.Windows.Forms.Button();
+            this.buttonPickMainWindowColourText = new System.Windows.Forms.Button();
+            this.buttonPickMainWindowLogColourText = new System.Windows.Forms.Button();
+            this.buttonPickMainWindowLogBackgroundColour = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.alertDemo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackOpacity)).BeginInit();
@@ -967,11 +971,63 @@
             this.trackAlertPopupMinimapPositionX.Value = 1;
             this.trackAlertPopupMinimapPositionX.Scroll += new System.EventHandler(this.trackAlertPopupMinimapPositionX_Scroll);
             // 
+            // buttonPickMainWindowsBackgroundColour
+            // 
+            this.buttonPickMainWindowsBackgroundColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMainWindowsBackgroundColour.Location = new System.Drawing.Point(134, 325);
+            this.buttonPickMainWindowsBackgroundColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMainWindowsBackgroundColour.Name = "buttonPickMainWindowsBackgroundColour";
+            this.buttonPickMainWindowsBackgroundColour.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMainWindowsBackgroundColour.TabIndex = 65;
+            this.buttonPickMainWindowsBackgroundColour.Text = "Main Window Background";
+            this.buttonPickMainWindowsBackgroundColour.UseVisualStyleBackColor = false;
+            this.buttonPickMainWindowsBackgroundColour.Click += new System.EventHandler(this.buttonPickMainWindowsBackgroundColour_Click);
+            // 
+            // buttonPickMainWindowColourText
+            // 
+            this.buttonPickMainWindowColourText.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMainWindowColourText.Location = new System.Drawing.Point(301, 325);
+            this.buttonPickMainWindowColourText.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMainWindowColourText.Name = "buttonPickMainWindowColourText";
+            this.buttonPickMainWindowColourText.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMainWindowColourText.TabIndex = 66;
+            this.buttonPickMainWindowColourText.Text = "Main Window Foreground";
+            this.buttonPickMainWindowColourText.UseVisualStyleBackColor = false;
+            this.buttonPickMainWindowColourText.Click += new System.EventHandler(this.buttonPickMainWindowColourText_Click);
+            // 
+            // buttonPickMainWindowLogColourText
+            // 
+            this.buttonPickMainWindowLogColourText.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMainWindowLogColourText.Location = new System.Drawing.Point(304, 351);
+            this.buttonPickMainWindowLogColourText.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMainWindowLogColourText.Name = "buttonPickMainWindowLogColourText";
+            this.buttonPickMainWindowLogColourText.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMainWindowLogColourText.TabIndex = 68;
+            this.buttonPickMainWindowLogColourText.Text = "Log Window Foreground";
+            this.buttonPickMainWindowLogColourText.UseVisualStyleBackColor = false;
+            this.buttonPickMainWindowLogColourText.Click += new System.EventHandler(this.buttonPickMainWindowLogColourText_Click);
+            // 
+            // buttonPickMainWindowLogBackgroundColour
+            // 
+            this.buttonPickMainWindowLogBackgroundColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMainWindowLogBackgroundColour.Location = new System.Drawing.Point(137, 351);
+            this.buttonPickMainWindowLogBackgroundColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMainWindowLogBackgroundColour.Name = "buttonPickMainWindowLogBackgroundColour";
+            this.buttonPickMainWindowLogBackgroundColour.Size = new System.Drawing.Size(163, 26);
+            this.buttonPickMainWindowLogBackgroundColour.TabIndex = 67;
+            this.buttonPickMainWindowLogBackgroundColour.Text = "Log Window Background";
+            this.buttonPickMainWindowLogBackgroundColour.UseVisualStyleBackColor = false;
+            this.buttonPickMainWindowLogBackgroundColour.Click += new System.EventHandler(this.buttonPickMainWindowLogBackgroundColour_Click);
+            // 
             // QuesadillaConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 610);
+            this.Controls.Add(this.buttonPickMainWindowLogColourText);
+            this.Controls.Add(this.buttonPickMainWindowLogBackgroundColour);
+            this.Controls.Add(this.buttonPickMainWindowColourText);
+            this.Controls.Add(this.buttonPickMainWindowsBackgroundColour);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.trackAlertPopupMinimapPositionY);
             this.Controls.Add(this.label10);
@@ -1128,5 +1184,9 @@
         private System.Windows.Forms.TrackBar trackAlertPopupMinimapPositionY;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TrackBar trackAlertPopupMinimapPositionX;
+        private System.Windows.Forms.Button buttonPickMainWindowsBackgroundColour;
+        private System.Windows.Forms.Button buttonPickMainWindowColourText;
+        private System.Windows.Forms.Button buttonPickMainWindowLogColourText;
+        private System.Windows.Forms.Button buttonPickMainWindowLogBackgroundColour;
     }
 }

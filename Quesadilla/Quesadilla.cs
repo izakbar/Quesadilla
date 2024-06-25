@@ -278,6 +278,16 @@ namespace Quesadilla
         }
         public void ReloadConfiguration()
         {
+            BackColor = Program.MainConfiguration.MainWindowBackgroundColour;
+            ForeColor = Program.MainConfiguration.MainWindowColourText;
+            intelLog.ForeColor = Program.MainConfiguration.MainWindowLogColourText;
+            intelLog.BackColor = Program.MainConfiguration.MainWindowLogBackgroundColour;
+
+            lblISK.ForeColor = Program.MainConfiguration.ISKColour;
+            lblAlertsOutstanding.ForeColor = Program.MainConfiguration.AlertsOutstandingColour;
+            lblCurrentClient.ForeColor = Program.MainConfiguration.CurrentCharacterColour;
+            lblStatus.ForeColor = Program.MainConfiguration.EvescoutColour;
+
             RebuildAlertsMenu();
             RebuildBackgroundsMenu();
             RebuildLatestAlertsMenu();
@@ -313,11 +323,6 @@ namespace Quesadilla
             lblCurrentClient.Text = "";
             lblISK.Text = "";
             lblAlertsOutstanding.Text = "";
-
-            BackColor = Program.MainConfiguration.MainWindowBackgroundColorText;
-            ForeColor = Program.MainConfiguration.MainWindowColorText;
-            intelLog.ForeColor = Program.MainConfiguration.MainWindowLogColorText;
-//            intelLog.BackColor = Program.MainConfiguration.MainWindowLogBackgroundColorText;
 
             this.Invalidate();
 
@@ -1324,16 +1329,34 @@ namespace Quesadilla
             {
                 // max it big
                 intelLog.Height = _intelSizeMax;
-                Height = intelLog.Height + _windowExtraHeight + pMinimapImage.Height ;
+                Height = intelLog.Height + _windowExtraHeight + (Program.MainConfiguration.Minimap ? pMinimapImage.Height : 20);
                 buttonIntelSize.Text = "▼";
             }
             else
             {
                 // make it small
                 intelLog.Height = _intelSizeMin;
-                Height = intelLog.Height + _windowExtraHeight + pMinimapImage.Height;
+                Height = intelLog.Height + _windowExtraHeight + (Program.MainConfiguration.Minimap ? pMinimapImage.Height : 20);
                 buttonIntelSize.Text = "▲";
             }
+
+            if (Program.MainConfiguration.Minimap)
+            {
+                pCombat.Left = pMinimapImage.Left + 1;
+                pCombat.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - pCombat.Height;
+
+                lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
+                lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
+            }
+            else
+            {
+                pCombat.Left = lblAlertsOutstanding.Left + lblAlertsOutstanding.Width - pCombat.Width;
+                pCombat.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
+
+                lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
+                lblISK.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5 ;
+            }
+
             buttonIntelSize.Top = intelLog.Top + 2;
             buttonIntelSize.Left = intelLog.Width - buttonIntelSize.Width - 2;
             intelLog.ScrollToCaret();
@@ -1772,21 +1795,27 @@ namespace Quesadilla
                 };
             }
 
-            Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath, 3, mapScale,
-                Program.MainConfiguration.AlertPopupMinimapShowSystemText,
-                Program.MainConfiguration.AlertPopupShowMinimapBorder, Program.MainConfiguration.AlertPopupMinimapBorderColor,
-                Program.MainConfiguration.AlertPopupMinimapLineColorNormal,
-                Program.MainConfiguration.AlertPopupMinimapLineColorRoute,
-                Program.MainConfiguration.AlertPopupMinimapSystemColorNormal,
-                Program.MainConfiguration.AlertPopupMinimapSystemColorRoute,
-                Program.MainConfiguration.AlertPopupMinimapSystemColorFrom,
-                Program.MainConfiguration.AlertPopupMinimapSystemColorTo,
-                Program.MainConfiguration.AlertPopupMinimapSystemColorText
-                );
-            Bitmap minimapBitmap = new Bitmap(minimapImage);
-            minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
-            pMinimapImage.Image = minimapBitmap;
-            pMinimapImage.Visible = true;
+            if (Program.MainConfiguration.Minimap)
+            {
+                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath, 3, mapScale,
+                    Program.MainConfiguration.MinimapShowSystemText,
+                    Program.MainConfiguration.ShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
+                    Program.MainConfiguration.MinimapLineColourNormal,
+                    Program.MainConfiguration.MinimapLineColourRoute,
+                    Program.MainConfiguration.MinimapSystemColourNormal,
+                    Program.MainConfiguration.MinimapSystemColourRoute,
+                    Program.MainConfiguration.MinimapSystemColourFrom,
+                    Program.MainConfiguration.MinimapSystemColourTo,
+                    Program.MainConfiguration.MinimapSystemColourText
+                    );
+                Bitmap minimapBitmap = new Bitmap(minimapImage);
+                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
+                pMinimapImage.Image = minimapBitmap;
+                pMinimapImage.Visible = true;
+            } else
+            {
+                pMinimapImage.Visible = false;
+            }
         }
         private void pMinimapImage_MouseWheel(object sender, MouseEventArgs e)
         {
