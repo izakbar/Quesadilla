@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.ZKill;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,8 @@ namespace Quesadilla.Classes.SolarSystems
         public Vector3 Xyz { get; set; }
         [JsonIgnore]
         public List<ZKillKill> Kills { get; set; }
+        [JsonIgnore]
+        public List<AlertQueueItem> Alerts { get; set; }
         [JsonIgnore]
         public DateTime AlertTime { get; set; }
         [JsonIgnore]

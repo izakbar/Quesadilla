@@ -235,7 +235,7 @@ namespace Quesadilla
             bool first = true;
             DateTime now = DateTime.Now;
 
-            foreach (var alert in Program.ActiveAlerts.Reverse().Take(Program.MainConfiguration.ShowLastUnexpiredAlerts).ToList())
+            foreach (var alert in Program.ActiveAlerts.Reverse().Where(o => o.ShowAlert).Take(Program.MainConfiguration.ShowLastUnexpiredAlerts).ToList())
             {
                 DateTime timeAdded = alert.Entry != null ? alert.Entry.TimeAdded : alert.Kill.TimeAdded;
                 TimeSpan timeAgo = now - timeAdded;
@@ -340,19 +340,22 @@ namespace Quesadilla
             if (Program.NewAlerts.Count > 0 && TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert)
             {
                 var NewAlert = Program.NewAlerts.Dequeue();
-                Log.Error(NewAlert.AlertText);
-
                 Program.ActiveAlerts.Enqueue(NewAlert);
                 // do any extra processing 
 
-                // try to prevent new alert stealing focus
-                var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
-                var ptr = Program.ProcessMonitorHandler.GetForegroundWindowHandle();
-                NewAlertWindow.Show(this);
-                var ptr2 = Program.ProcessMonitorHandler.SetForegroundWindowHandle(ptr);
-                SoundPlayer sound = Program.LoadSoundFromFile(NewAlert.SoundFile);
-                if (sound != null) sound.Play();
-                RebuildLatestAlertsMenu();
+                if (NewAlert.ShowAlert)
+                {
+                    Log.Error(NewAlert.AlertText);
+                    shouldUpdateMinimap = true;
+                    // try to prevent new alert stealing focus
+                    var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
+                    var ptr = Program.ProcessMonitorHandler.GetForegroundWindowHandle();
+                    NewAlertWindow.Show(this);
+                    var ptr2 = Program.ProcessMonitorHandler.SetForegroundWindowHandle(ptr);
+                    SoundPlayer sound = Program.LoadSoundFromFile(NewAlert.SoundFile);
+                    if (sound != null) sound.Play();
+                    RebuildLatestAlertsMenu();
+                }
 
                 TickCounts["SinceLastAlert"] = 0;
             }
@@ -360,19 +363,14 @@ namespace Quesadilla
             // do cleardown/rebuild of alerts menu - if number of ticks passed
             if ( ++TickCounts["SinceLastCleardown"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
             {
+
                 // Show number of recent alerts
                 if (Program.ActiveAlerts.Count > 0)
                 {
-                    // check if we should expire first entry
-                    var a = Program.ActiveAlerts.First();
-                    DateTime timeAdded = a.Entry != null ? a.Entry.TimeAdded : a.Kill.TimeAdded;
-                    var diffInSeconds = (DateTime.Now - timeAdded).TotalSeconds;
-                    if (diffInSeconds > Program.MainConfiguration.ExpireAlertSeconds)
-                    {
-                        // expired so dequeue
-                        a = Program.ActiveAlerts.Dequeue();
-                        RebuildLatestAlertsMenu();
-                    }
+
+                    var alertsExpired = Program.ExpireAlerts();
+
+                    if ( alertsExpired > 0 ) RebuildLatestAlertsMenu();
                     lblAlertsOutstanding.Text = Program.ActiveAlerts.Count.ToString();
                 }
                 else
@@ -570,6 +568,9 @@ namespace Quesadilla
 
                 if (intSet.Count > 0)
                 {
+
+                    AlertQueueItem insertedAlert = null;
+
                     Log.Information(entry.LineContent);
                     entry.MatchedIds = intSet;
                     foreach (int toSystemId in intSet)
@@ -613,18 +614,18 @@ namespace Quesadilla
                                     {
                                         alertText = generateAlertText(entry, path, alert, "", 0, "");
                                         Log.Debug("ALERT - " + alertText);
-                                        Program.EnqueueAlert(
-                                            new AlertQueueItem()
-                                            {
-                                                AlertText = alertText,
-                                                MenuText = generateAlertText(entry, path, alert, "", 1, ""),
-                                                Entry = entry,
-                                                Path = path,
-                                                Context = homeSystemPathInfo.FromSystemName,
-                                                SoundFile = alert.SoundFile,
-                                                FriendlyName = alert.FriendlyName,
-                                            }
-                                            );
+                                        insertedAlert = new AlertQueueItem()
+                                        {
+                                            AlertText = alertText,
+                                            MenuText = generateAlertText(entry, path, alert, "", 1, ""),
+                                            Entry = entry,
+                                            Path = path,
+                                            Context = homeSystemPathInfo.FromSystemName,
+                                            SoundFile = alert.SoundFile,
+                                            FriendlyName = alert.FriendlyName,
+                                            ShowAlert = true,
+                                        };
+                                        Program.EnqueueAlert(insertedAlert);
                                         alertCount++;
                                     }
                                     break;
@@ -637,8 +638,7 @@ namespace Quesadilla
                                     {
                                         alertText = generateAlertText(entry, path, alert, "", 0, "");
                                         Log.Debug("ALERT - " + alertText);
-                                        Program.EnqueueAlert(
-                                            new AlertQueueItem()
+                                        insertedAlert = new AlertQueueItem()
                                             {
                                                 AlertText = alertText,
                                                 MenuText = generateAlertText(entry, path, alert, "", 1, ""),
@@ -647,8 +647,9 @@ namespace Quesadilla
                                                 Context = path.FromSystemName,
                                                 SoundFile = alert.SoundFile,
                                                 FriendlyName = alert.FriendlyName,
-                                            }
-                                            );
+                                                ShowAlert = true,
+                                            };
+                                        Program.EnqueueAlert(insertedAlert);
                                         alertCount++;
                                     }
                                     break;
@@ -670,8 +671,7 @@ namespace Quesadilla
                                                     alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
                                                     )
                                                 {
-                                                    Program.EnqueueAlert(
-                                                    new AlertQueueItem()
+                                                    insertedAlert = new AlertQueueItem()
                                                     {
                                                         AlertText = alertText,
                                                         MenuText = generateAlertText(entry, path, alert, x.CharacterName, 1, ""),
@@ -680,8 +680,10 @@ namespace Quesadilla
                                                         Context = x.CharacterName,
                                                         SoundFile = alert.SoundFile,
                                                         FriendlyName = alert.FriendlyName,
-                                                    }
-                                                    );
+                                                        ShowAlert = true,
+                                                    };
+                                                    Program.EnqueueAlert(insertedAlert);
+
                                                     alertCount++;
                                                 }
                                             }
@@ -706,8 +708,7 @@ namespace Quesadilla
                                                     alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive
                                                     )
                                                 {
-                                                    Program.EnqueueAlert(
-                                                    new AlertQueueItem()
+                                                    insertedAlert = new AlertQueueItem()
                                                     {
                                                         AlertText = alertText,
                                                         MenuText = generateAlertText(entry, path, alert, x.CharacterName, 1, ""),
@@ -716,8 +717,10 @@ namespace Quesadilla
                                                         Context = x.CharacterName,
                                                         SoundFile = alert.SoundFile,
                                                         FriendlyName = alert.FriendlyName,
-                                                    }
-                                                    );
+                                                        ShowAlert = true,
+                                                    };
+                                                    Program.EnqueueAlert(insertedAlert);
+
                                                     alertCount++;
                                                 }
                                             }
@@ -734,8 +737,7 @@ namespace Quesadilla
 
                                             alertText = generateAlertText(entry, path, alert, alert.TriggerText, 0, alert.TriggerText);
                                             Log.Debug("ALERT - " + alertText);
-                                            Program.EnqueueAlert(
-                                                new AlertQueueItem()
+                                            insertedAlert = new AlertQueueItem()
                                                 {
                                                     AlertText = alertText,
                                                     MenuText = generateAlertText(entry, path, alert, alert.TriggerText, 1, alert.TriggerText),
@@ -744,8 +746,10 @@ namespace Quesadilla
                                                     Context = alert.TriggerText,
                                                     SoundFile = alert.SoundFile,
                                                     FriendlyName = alert.FriendlyName,
-                                                }
-                                                );
+                                                    ShowAlert = true,
+                                                };
+                                            Program.EnqueueAlert(insertedAlert);
+
                                             alertCount++;
                                         }
                                     }
@@ -758,7 +762,23 @@ namespace Quesadilla
                     int systemId1 = -1;
                     foreach (int systemId2 in intSet)
                     {
-                        Program.Universe.AddAlert(systemId2);
+                        if ( insertedAlert == null)
+                        {
+                            insertedAlert = new AlertQueueItem()
+                            {
+                                AlertText = "",
+                                MenuText = "",
+                                Entry = entry,
+                                Path = Program.Universe.FindAndCachePath(systemId2, systemId2),
+                                Context = "",
+                                SoundFile = "",
+                                FriendlyName = "",
+                                ShowAlert = false,
+                            };
+                            Program.EnqueueAlert(insertedAlert);
+                        }
+
+                        Program.Universe.AddAlert(systemId2, insertedAlert);
                         systemId1 = systemId2;
                     }
                     //                    if (this.CheckZoomTo(entry.LogPrefix)) this.ZoomTo(systemId1);
@@ -789,12 +809,13 @@ namespace Quesadilla
                                     Context = alert.TriggerText,
                                     SoundFile = alert.SoundFile,
                                     FriendlyName = alert.FriendlyName,
+                                    ShowAlert = true,
                                 }
                                 );
+                            alertCount++;
                         }
                     }
                 }
-
             }
         }
 
@@ -994,9 +1015,9 @@ namespace Quesadilla
 
         private void trayIconDoubleClick(object sender, EventArgs e)
         {
-            if (Program.ActiveAlerts.Count > 0)
+            if (Program.ActiveAlerts.Where(o => o.ShowAlert).Count() > 0)
             {
-                var alert = Program.ActiveAlerts.Reverse().Take(1).ToList().First();
+                var alert = Program.ActiveAlerts.Where(o => o.ShowAlert).Reverse().Take(1).ToList().First();
                 var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
                 NewAlertWindow.Show(this);
             }
@@ -1196,6 +1217,7 @@ namespace Quesadilla
                                         SoundFile = alert.SoundFile,
                                         FriendlyName = alert.FriendlyName,
                                         isFaction = true,
+                                        ShowAlert = true,
                                     }
                                     );
                             }
@@ -1284,6 +1306,7 @@ namespace Quesadilla
                         SoundFile = alert.SoundFile,
                         FriendlyName = alert.FriendlyName,
                         isDecloak = true,
+                        ShowAlert = true,
                     }
                     );
                 }
@@ -1492,6 +1515,7 @@ namespace Quesadilla
                                     Context = homeSystemPathInfo.FromSystemName,
                                     SoundFile = Program.MainConfiguration.ZKillSound,
                                     FriendlyName = "zkill",
+                                    ShowAlert = true,
                                 }
                                 );
                         }
@@ -1516,6 +1540,7 @@ namespace Quesadilla
                                     Context = path.FromSystemName,
                                     SoundFile = Program.MainConfiguration.ZKillSound,
                                     FriendlyName = "zkill",
+                                    ShowAlert = true,
                                 }
                                 );
                         }
@@ -1549,6 +1574,7 @@ namespace Quesadilla
                                             Context = x.CharacterName,
                                             SoundFile = Program.MainConfiguration.ZKillSound,
                                             FriendlyName = alert.FriendlyName,
+                                            ShowAlert = true,
                                         }
                                         );
                                     }
@@ -1585,6 +1611,7 @@ namespace Quesadilla
                                             Context = x.CharacterName,
                                             SoundFile = Program.MainConfiguration.ZKillSound,
                                             FriendlyName = "zkill",
+                                            ShowAlert = true,
                                         }
                                         );
                                     }

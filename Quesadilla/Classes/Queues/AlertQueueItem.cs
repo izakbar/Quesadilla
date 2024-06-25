@@ -23,5 +23,6 @@ namespace Quesadilla.Classes.Queues
         public string FriendlyName { get; set; }
         public bool isFaction { get; set; }
         public bool isDecloak { get; set; }
+        public bool ShowAlert { get; set; }
     }
 }
