@@ -83,6 +83,8 @@ namespace Quesadilla
         private int _intelSizeMin = 48;
         private int _windowExtraHeight = 60;
 
+        private bool shouldUpdateMinimap = false;
+
         private MenuItem menuConfiguredAlerts = new MenuItem("Configured Alerts");
         private MenuItem menuBackgrounds = new MenuItem("Popup Background");
         private MenuItem menuLatestAlerts = new MenuItem("Latest Alerts");
@@ -417,6 +419,12 @@ namespace Quesadilla
                 //lblISK.Visible = false;
                 lblISK.Text = "";
             }
+
+            if (shouldUpdateMinimap)
+            {
+                UpdateMinimap();
+            }
+
         }
 
         private bool checkJumpsRange(AlertConfig alert, PathInfo path)
@@ -856,7 +864,7 @@ namespace Quesadilla
             if (foundSystemId == -1)
                 return;
             Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
-            UpdateMinimap();
+            shouldUpdateMinimap = true;
         }
 
         private void _localWatcher_ChatServerChange(object sender, ProcessChatServerChangeEventArgs e)
@@ -1372,7 +1380,7 @@ namespace Quesadilla
                                 DPSGraphWindow.Show();
                             }
                         }
-                        UpdateMinimap();
+                        shouldUpdateMinimap = true;
                     }
 
                     if (DPSGraphWindow != null &&
@@ -1400,7 +1408,7 @@ namespace Quesadilla
                 CurrentActiveToon = "";
                 lblCurrentClient.Text = CurrentActiveToon;
                 SetupStatusBar();
-                UpdateMinimap();
+            shouldUpdateMinimap = true;
             }
 
             // just double check thru charachter list active clients to make sure there is still an active client.
@@ -1587,6 +1595,8 @@ namespace Quesadilla
                     default:
                         break;
                 }
+
+                shouldUpdateMinimap = sendAlert;
             }
         }
         public void SetupStatusBar()
@@ -1706,8 +1716,8 @@ namespace Quesadilla
 
         private void UpdateMinimap()
         {
-
             this.Invalidate();
+            shouldUpdateMinimap = false;
 
             if (CurrentActiveToon.IsNullOrEmpty() ) {
                 pMinimapImage.Visible = false;
@@ -1750,7 +1760,6 @@ namespace Quesadilla
         {
             if (e.Delta > 0) mapScale += 10;
             if (e.Delta < 0) mapScale -= 10;
-
             UpdateMinimap();
         }
 

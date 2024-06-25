@@ -33,6 +33,8 @@ namespace Quesadilla.Classes
             int BORDER_WIDTH = 1;
             int TEXT_SIZE = 8;
 
+            int CIRCLE_KILL_GAP = 1;
+
             double LY_SCALING = 9460000000000;
             double GUI_SCALING = 30;
 
@@ -232,8 +234,13 @@ namespace Quesadilla.Classes
                     if (currentSystem.fromSystem) systemBrushColour = SystemColorFrom;
                     if (currentSystem.toSystem) systemBrushColour = SystemColorTo;
                     Brush systemBrush = new SolidBrush(systemBrushColour);
-
                     g.FillEllipse(systemBrush, currentPoint.X - CIRCLE_RADIUS, currentPoint.Y - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+
+                    if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
+                    {
+                        var systemPen = new Pen(Color.Red);
+                        g.DrawEllipse(systemPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2);
+                    }
                 }
 
                 // draw text
