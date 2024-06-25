@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Quesadilla.Classes.SolarSystems;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,7 @@ namespace Quesadilla.Classes.ZKill
             ZKillFeed = new ZKillRedisQ();
         }
 
-        public void EnqueueZKillAlert(Queue<ZKillKill> q, ZKillKill kill)
+        public void EnqueueZKillAlert(Queue<ZKillKill> q, ZKillKill kill, SolarSystem system)
         {
             // only add to new zkill list if not already in list. This should prevent multiple entries for same thing
             var f = q.Where(o => o.ID == kill.ID).ToList();
@@ -26,13 +27,19 @@ namespace Quesadilla.Classes.ZKill
                 lock (q)
                 {
                     q.Enqueue(kill);
+
+                    if (system.Kills == null)
+                    {
+                        system.Kills = new List<ZKillKill>();
+                    }
+                    system.Kills.Add(kill);
                 }
             }
         }
 
-        public void EnqueueZKillAlert(ZKillKill kill)
+        public void EnqueueZKillAlert(ZKillKill kill, SolarSystem system)
         {
-            EnqueueZKillAlert(ZKillKills, kill);
+            EnqueueZKillAlert(ZKillKills, kill, system);
         }
 
         private void ExpireZkillQueue(Queue<ZKillKill> zq)
@@ -46,7 +53,11 @@ namespace Quesadilla.Classes.ZKill
                     TimeSpan ts = DateTime.Now - k.TimeAdded;
                     if (ts.TotalSeconds > Program.MainConfiguration.ExpireZKillSeconds)
                     {
+                        SolarSystem system = Program.Universe.SolarSystems[(int)k.SolarSystemId];
+                        system.Kills.Remove(k);
+
                         k.Expired = true;
+
                         zq.Dequeue();
                         removedOBSZkill = true;
                     }

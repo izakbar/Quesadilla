@@ -1409,13 +1409,7 @@ namespace Quesadilla
                 e.Kill.SolarSystemName = systemName;
                 e.Kill.RegionName = regionName;
 
-                if (Program.Universe.SolarSystems[(int)e.Kill.SolarSystemId].Kills == null)
-                {
-                    Program.Universe.SolarSystems[(int)e.Kill.SolarSystemId].Kills = new List<ZKillKill>();
-                }
-                Program.Universe.SolarSystems[(int)e.Kill.SolarSystemId].Kills.Add(e.Kill);
-
-                Program.ZKillHandler.EnqueueZKillAlert(e.Kill);
+                Program.ZKillHandler.EnqueueZKillAlert(e.Kill, Program.Universe.SolarSystems[(int)e.Kill.SolarSystemId]);
             }
 
             Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {Program.Universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
