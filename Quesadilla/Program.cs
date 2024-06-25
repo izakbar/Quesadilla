@@ -167,6 +167,33 @@ namespace Quesadilla
             }
         }
 
+        public static int ExpireAlerts()
+        {
+            int Expired = 0;
+
+            // check if we should expire first entry
+            var alert = ActiveAlerts.First();
+            DateTime timeAdded = alert.Entry != null ? alert.Entry.TimeAdded : alert.Kill.TimeAdded;
+            var diffInSeconds = (DateTime.Now - timeAdded).TotalSeconds;
+            if (diffInSeconds > Program.MainConfiguration.ExpireAlertSeconds)
+            {
+                // expired so dequeue
+                alert = Program.ActiveAlerts.Dequeue();
+                Expired++;
+
+                if (!alert.isFaction && !alert.isDecloak && alert.Kill == null && alert.Path != null)
+                {
+                    // remove alert to solarsystem info
+                    var solarSystem = Universe.SolarSystems[alert.Path.ToSystemId];
+                    if (solarSystem.Alerts != null)
+                    {
+                        solarSystem.Alerts.Remove(alert);
+                    }
+                }
+            }
+            return Expired;
+        }
+
         public static void EnqueueAlert(AlertQueueItem alert)
         {
             // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
@@ -189,6 +216,7 @@ namespace Quesadilla
                     f.First().Context = alert.Context;
                     f.First().RouteText = alert.RouteText;
                     f.First().SoundFile = alert.SoundFile;
+                    f.First().ShowAlert = alert.ShowAlert;
                 }
             }
         }

@@ -372,7 +372,7 @@ namespace Quesadilla.Classes
                 });
                 c.Logfiles.Add(new LogfileConfig()
                 {
-                    Enabled = false,
+                    Enabled = true,
                     FriendlyName = "Izakbar DEBUG",
                     Logfile = "izakbar.debug",
                     LogType = Logfile.LogFileType.ChatIntel,

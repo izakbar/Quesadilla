@@ -34,6 +34,7 @@ namespace Quesadilla.Classes
             int TEXT_SIZE = 8;
 
             int CIRCLE_KILL_GAP = 1;
+            int CIRCLE_ALERT_GAP = 2;
 
             double LY_SCALING = 9460000000000;
             double GUI_SCALING = 30;
@@ -240,6 +241,11 @@ namespace Quesadilla.Classes
                     {
                         var systemPen = new Pen(Color.Red);
                         g.DrawEllipse(systemPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2);
+                    }
+                    if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Count() > 0)
+                    {
+                        var systemPen = new Pen(Color.Orange);
+                        g.DrawEllipse(systemPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_ALERT_GAP), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_ALERT_GAP), (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2);
                     }
                 }
 

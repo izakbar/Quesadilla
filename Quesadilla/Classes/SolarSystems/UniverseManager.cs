@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
+using Quesadilla.Classes.Queues;
 
 namespace Quesadilla.Classes.SolarSystems
 {
@@ -222,10 +223,16 @@ namespace Quesadilla.Classes.SolarSystems
             return route;
         }
 
-        public void AddAlert(int systemId)
+        public void AddAlert(int systemId, AlertQueueItem alert)
         {
             SolarSystems[systemId].AlertTime = DateTime.Now;
-        }
 
+            if (!alert.isFaction && !alert.isDecloak && alert.Kill == null && alert.Path != null)
+            {
+                // add alert to solarsystem info
+                if (SolarSystems[systemId].Alerts == null) SolarSystems[systemId].Alerts = new List<AlertQueueItem>();
+                SolarSystems[systemId].Alerts.Add(alert);
+            }
+        }
     }
 }
