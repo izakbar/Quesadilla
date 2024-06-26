@@ -248,7 +248,7 @@ namespace Quesadilla.Classes
                 c.AlertPopupMinimapPosition = new Point(34, 3);
                 c.AlertPopupMinimapSize = new Point(193, 128);
 
-                c.AlertPopupMinimapRawXY = true;
+                c.AlertPopupMinimapRawXY = false;
 
                 c.IntegrationPort = 65432;
 
