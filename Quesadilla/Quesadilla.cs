@@ -1475,13 +1475,14 @@ namespace Quesadilla
                 CurrentActiveToon = "";
                 lblCurrentClient.Text = CurrentActiveToon;
                 SetupStatusBar();
-            shouldUpdateMinimap = true;
+                shouldUpdateMinimap = true;
             }
 
             // just double check thru charachter list active clients to make sure there is still an active client.
             foreach (var c in Program.CharacterList)
             {
                 c.IsClientActive = Program.ProcessMonitorHandler.IsCharStillActive(c.CharacterName);
+                c.IsCurrentlActiveClient = (c.CharacterName == CurrentActiveToon ? true : false);
             }
         }
 
@@ -1822,7 +1823,10 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapSystemColourRoute,
                     Program.MainConfiguration.MinimapSystemColourFrom,
                     Program.MainConfiguration.MinimapSystemColourTo,
-                    Program.MainConfiguration.MinimapSystemColourText
+                    Program.MainConfiguration.MinimapSystemColourText,
+                    Program.MainConfiguration.MinimapZKillColour,
+                    Program.MainConfiguration.MinimapIntelColour,
+                    Program.MainConfiguration.MinimapAltPositionColour
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));

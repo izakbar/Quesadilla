@@ -616,5 +616,15 @@ namespace Quesadilla
         {
             _configuration.MinimapIntelColour = ChooseColour(_configuration.MinimapIntelColour);
         }
+
+        private void buttonPickAlertPopupMinimapAltPositionColour_Click(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupMinimapAltPositionColour = ChooseColour(_configuration.AlertPopupMinimapAltPositionColour);
+        }
+
+        private void buttonPickMinimapAltPositionColour_Click(object sender, EventArgs e)
+        {
+            _configuration.MinimapAltPositionColour = ChooseColour(_configuration.MinimapAltPositionColour);
+        }
     }
 }

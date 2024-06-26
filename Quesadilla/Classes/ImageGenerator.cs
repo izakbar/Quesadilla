@@ -19,13 +19,16 @@ namespace Quesadilla.Classes
         public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale,
             bool showSystemText,
             bool Border, Color BorderColor,
-            Color LineColorNormal,
-            Color LineColorRoute,
-            Color SystemColorNormal,
-            Color SystemColorRoute,
-            Color SystemColorFrom,
-            Color SystemColorTo,
-            Color SystemColorText
+            Color LineColourNormal,
+            Color LineColourRoute,
+            Color SystemColourNormal,
+            Color SystemColourRoute,
+            Color SystemColourFrom,
+            Color SystemColourTo,
+            Color SystemColourText,
+            Color ZKillColour,
+            Color IntelColour,
+            Color AltColour
             )
         {
             Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
@@ -33,8 +36,9 @@ namespace Quesadilla.Classes
             int BORDER_WIDTH = 1;
             int TEXT_SIZE = 8;
 
-            int CIRCLE_KILL_GAP = 1;
-            int CIRCLE_ALERT_GAP = 2;
+            int CIRCLE_KILL_GAP = 4;
+            int CIRCLE_ALERT_GAP = 6;
+            int CIRCLE_ALT_GAP = 2;
 
             double LY_SCALING = 9460000000000;
             double GUI_SCALING = 30;
@@ -222,7 +226,7 @@ namespace Quesadilla.Classes
                 {
                     Point P1 = new Point(originPoint.X + connection.P1.X, originPoint.Y + connection.P1.Y);
                     Point P2 = new Point(originPoint.X + connection.P2.X, originPoint.Y + connection.P2.Y);
-                    Pen linePen = new Pen(connection.route ? LineColorRoute : LineColorNormal, 1);
+                    Pen linePen = new Pen(connection.route ? LineColourRoute : LineColourNormal, 1);
                     g.DrawLine(linePen, P1, P2);
                 }
 
@@ -230,22 +234,29 @@ namespace Quesadilla.Classes
                 foreach (var currentSystem in minimapSystems)
                 {
                     Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-                    Color systemBrushColour = SystemColorNormal;
-                    if (currentSystem.route) systemBrushColour = SystemColorRoute;
-                    if (currentSystem.fromSystem) systemBrushColour = SystemColorFrom;
-                    if (currentSystem.toSystem) systemBrushColour = SystemColorTo;
+                    Color systemBrushColour = SystemColourNormal;
+                    if (currentSystem.route) systemBrushColour = SystemColourRoute;
+                    if (currentSystem.fromSystem) systemBrushColour = SystemColourFrom;
+                    if (currentSystem.toSystem) systemBrushColour = SystemColourTo;
                     Brush systemBrush = new SolidBrush(systemBrushColour);
                     g.FillEllipse(systemBrush, currentPoint.X - CIRCLE_RADIUS, currentPoint.Y - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
 
                     if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
                     {
-                        var systemPen = new Pen(Color.Red);
-                        g.DrawEllipse(systemPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2);
+                        var zkillPen = new Pen(ZKillColour);
+                        g.DrawEllipse(zkillPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2);
                     }
                     if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Count() > 0)
                     {
-                        var systemPen = new Pen(Color.Orange);
-                        g.DrawEllipse(systemPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_ALERT_GAP), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_ALERT_GAP), (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2);
+                        var intelPen = new Pen(IntelColour);
+                        g.DrawEllipse(intelPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2);
+                    }
+
+                    // active alt in sytstem ?
+                    if (Program.CharacterList.Where(o => o.IsClientActive && o.IsCurrentlActiveClient == false && o.LocationId == currentSystem.solarSystem.Id).Count() > 0) 
+                    {
+                        var altPen = new Pen(AltColour);
+                        g.DrawEllipse(altPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP)), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP)), (CIRCLE_RADIUS + CIRCLE_ALT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALT_GAP) * 2);
                     }
                 }
 
@@ -262,7 +273,7 @@ namespace Quesadilla.Classes
                         {
                             g.TextRenderingHint = TextRenderingHint.AntiAlias;
 
-                            g.DrawString(currentSystem.solarSystem.Name, myfont, new SolidBrush(SystemColorText), currentPoint.X + CIRCLE_RADIUS + 2, currentPoint.Y + CIRCLE_RADIUS + 2, new StringFormat
+                            g.DrawString(currentSystem.solarSystem.Name, myfont, new SolidBrush(SystemColourText), currentPoint.X + CIRCLE_RADIUS + 2, currentPoint.Y + CIRCLE_RADIUS + 2, new StringFormat
                             {
                                 Alignment = StringAlignment.Far,
                                 LineAlignment = StringAlignment.Near,

@@ -125,6 +125,8 @@
             this.buttonPickAlsrtsOutstandingColour = new System.Windows.Forms.Button();
             this.buttonPickMinimapIntelColour = new System.Windows.Forms.Button();
             this.buttonPickMinimapZKillColour = new System.Windows.Forms.Button();
+            this.buttonPickAlertPopupMinimapAltPositionColour = new System.Windows.Forms.Button();
+            this.buttonPickMinimapAltPositionColour = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.alertDemo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackOpacity)).BeginInit();
@@ -1274,11 +1276,37 @@
             this.buttonPickMinimapZKillColour.UseVisualStyleBackColor = false;
             this.buttonPickMinimapZKillColour.Click += new System.EventHandler(this.buttonPickMinimapZKillColour_Click_1);
             // 
+            // buttonPickAlertPopupMinimapAltPositionColour
+            // 
+            this.buttonPickAlertPopupMinimapAltPositionColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickAlertPopupMinimapAltPositionColour.Location = new System.Drawing.Point(477, 168);
+            this.buttonPickAlertPopupMinimapAltPositionColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickAlertPopupMinimapAltPositionColour.Name = "buttonPickAlertPopupMinimapAltPositionColour";
+            this.buttonPickAlertPopupMinimapAltPositionColour.Size = new System.Drawing.Size(143, 26);
+            this.buttonPickAlertPopupMinimapAltPositionColour.TabIndex = 88;
+            this.buttonPickAlertPopupMinimapAltPositionColour.Text = "Minimap AltToon circle Colour";
+            this.buttonPickAlertPopupMinimapAltPositionColour.UseVisualStyleBackColor = false;
+            this.buttonPickAlertPopupMinimapAltPositionColour.Click += new System.EventHandler(this.buttonPickAlertPopupMinimapAltPositionColour_Click);
+            // 
+            // buttonPickMinimapAltPositionColour
+            // 
+            this.buttonPickMinimapAltPositionColour.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonPickMinimapAltPositionColour.Location = new System.Drawing.Point(316, 578);
+            this.buttonPickMinimapAltPositionColour.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.buttonPickMinimapAltPositionColour.Name = "buttonPickMinimapAltPositionColour";
+            this.buttonPickMinimapAltPositionColour.Size = new System.Drawing.Size(143, 26);
+            this.buttonPickMinimapAltPositionColour.TabIndex = 89;
+            this.buttonPickMinimapAltPositionColour.Text = "Minimap AltToon circle Colour";
+            this.buttonPickMinimapAltPositionColour.UseVisualStyleBackColor = false;
+            this.buttonPickMinimapAltPositionColour.Click += new System.EventHandler(this.buttonPickMinimapAltPositionColour_Click);
+            // 
             // QuesadillaConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 610);
+            this.Controls.Add(this.buttonPickMinimapAltPositionColour);
+            this.Controls.Add(this.buttonPickAlertPopupMinimapAltPositionColour);
             this.Controls.Add(this.buttonPickMinimapIntelColour);
             this.Controls.Add(this.buttonPickMinimapZKillColour);
             this.Controls.Add(this.buttonPickAlsrtsOutstandingColour);
@@ -1481,5 +1509,7 @@
         private System.Windows.Forms.Button buttonPickAlsrtsOutstandingColour;
         private System.Windows.Forms.Button buttonPickMinimapIntelColour;
         private System.Windows.Forms.Button buttonPickMinimapZKillColour;
+        private System.Windows.Forms.Button buttonPickAlertPopupMinimapAltPositionColour;
+        private System.Windows.Forms.Button buttonPickMinimapAltPositionColour;
     }
 }

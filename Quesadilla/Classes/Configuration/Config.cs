@@ -77,6 +77,7 @@ namespace Quesadilla.Classes
                 AlertPopupMinimapSystemColourText = AlertPopupMinimapSystemColourText,
                 AlertPopupMinimapZKillColour = AlertPopupMinimapZKillColour,
                 AlertPopupMinimapIntelColour = AlertPopupMinimapIntelColour,
+                AlertPopupMinimapAltPositionColour = AlertPopupMinimapAltPositionColour,
                 IntegrationPort = IntegrationPort,
                 MainWindowColourText = MainWindowColourText,
                 MainWindowBackgroundColour = MainWindowBackgroundColour,
@@ -95,6 +96,7 @@ namespace Quesadilla.Classes
                 MinimapSystemColourText = MinimapSystemColourText,
                 MinimapZKillColour = AlertPopupMinimapZKillColour,
                 MinimapIntelColour = AlertPopupMinimapIntelColour,
+                MinimapAltPositionColour = MinimapAltPositionColour,
 
                 CurrentCharacterColour = CurrentCharacterColour,
                 ISKColour = ISKColour,
@@ -235,6 +237,7 @@ namespace Quesadilla.Classes
 
                 c.AlertPopupMinimapZKillColour = Color.Red;
                 c.AlertPopupMinimapIntelColour = Color.Orange;
+                c.AlertPopupMinimapAltPositionColour = Color.Aqua;
 
                 c.AlertPopupMinimapPosition = new Point(30, 0);
                 c.AlertPopupMinimapSize = new Point(232, 150);
@@ -260,7 +263,7 @@ namespace Quesadilla.Classes
 
                 c.MinimapZKillColour = Color.Red;
                 c.MinimapIntelColour = Color.Orange;
-
+                c.MinimapAltPositionColour = Color.Aqua;
 
                 c.CurrentCharacterColour = Color.Blue;
                 c.ISKColour = Color.Green;
@@ -596,6 +599,7 @@ img.rounded-corners {
         public Color AlertPopupMinimapSystemColourText { get; set; }
         public Color AlertPopupMinimapZKillColour { get; set; }
         public Color AlertPopupMinimapIntelColour { get; set; }
+        public Color AlertPopupMinimapAltPositionColour { get; set; }
 
         public Point AlertPopupMinimapPosition { get; set; }
         public Point AlertPopupMinimapSize { get; set; }
@@ -619,6 +623,7 @@ img.rounded-corners {
         public Color MinimapSystemColourText { get; set; }
         public Color MinimapZKillColour { get; set; }
         public Color MinimapIntelColour { get; set; }
+        public Color MinimapAltPositionColour { get; set; }
 
         public Color CurrentCharacterColour { get; set; }
         public Color ISKColour { get; set; }

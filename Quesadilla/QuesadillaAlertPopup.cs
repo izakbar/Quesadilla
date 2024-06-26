@@ -165,7 +165,10 @@ namespace Quesadilla
                     configuration.AlertPopupMinimapSystemColourRoute,
                     configuration.AlertPopupMinimapSystemColourFrom,
                     configuration.AlertPopupMinimapSystemColourTo,
-                    configuration.AlertPopupMinimapSystemColourText
+                    configuration.AlertPopupMinimapSystemColourText,
+                    configuration.AlertPopupMinimapZKillColour,
+                    configuration.AlertPopupMinimapIntelColour,
+                    configuration.AlertPopupMinimapAltPositionColour
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));

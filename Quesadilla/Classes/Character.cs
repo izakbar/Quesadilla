@@ -14,6 +14,7 @@ namespace Quesadilla.Classes
         public string Location { get; set; }
         public int LocationId { get; set; }
         public bool IsClientActive { get; set; }
+        public bool IsCurrentlActiveClient { get; set; }
         public DateTime LastFactionAlert { get; set; }
 
         public EveScoutWH ClosestTurnur { get; set; }
