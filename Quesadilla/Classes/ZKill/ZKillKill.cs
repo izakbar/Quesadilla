@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Quesadilla.Classes.Queues;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Quesadilla.Classes.ZKill
 {
-    public class ZKillKill
+    public class ZKillKill : IEquatable<ZKillKill>
     {
         public long ID { get; set; }
         public System.DateTimeOffset Timestamp { get; set; }
@@ -44,6 +45,17 @@ namespace Quesadilla.Classes.ZKill
                 "<div class=zkill-value>" + TotalValue + "</div>" +
                 "<div class=zkill-victim>{zkillVictim}</div>" +
                 "</div>";
+        }
+
+        public Guid ZKillGUID { get; set; }
+        public ZKillKill()
+        {
+            ZKillGUID = Guid.NewGuid();
+        }
+
+        public bool Equals(ZKillKill other)
+        {
+            return this.ZKillGUID.Equals(other.ZKillGUID);
         }
     }
 }

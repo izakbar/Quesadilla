@@ -182,17 +182,17 @@ namespace Quesadilla
                     if (diffInSeconds > Program.MainConfiguration.ExpireAlertSeconds)
                     {
 
-                        // expired so dequeue
                         alert = Program.ActiveAlerts.Dequeue();
                         Expired++;
 
+                        // expired so dequeue
                         if (!alert.isFaction && !alert.isDecloak && alert.Kill == null && alert.Path != null)
                         {
                             // remove alert to solarsystem info
                             var solarSystem = Universe.SolarSystems[alert.Path.ToSystemId];
                             if (solarSystem.Alerts != null)
                             {
-                                solarSystem.Alerts.Remove(alert);
+                                var removed = solarSystem.Alerts.Remove(alert);
                             }
                         }
                         removedAlert = true;

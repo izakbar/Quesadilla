@@ -55,7 +55,7 @@ namespace Quesadilla.Classes.ZKill
                     if (ts.TotalSeconds > Program.MainConfiguration.ExpireZKillSeconds)
                     {
                         SolarSystem system = Program.Universe.SolarSystems[(int)k.SolarSystemId];
-                        system.Kills.Remove(k);
+                        var removed = system.Kills.Remove(k);
 
                         k.Expired = true;
 
