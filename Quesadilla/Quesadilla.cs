@@ -288,6 +288,9 @@ namespace Quesadilla
             lblCurrentClient.ForeColor = Program.MainConfiguration.CurrentCharacterColour;
             lblStatus.ForeColor = Program.MainConfiguration.EvescoutColour;
 
+            pMinimapImage.Height = Program.MainConfiguration.MinimapHeight;
+            pMinimapImage.Width = Program.MainConfiguration.MinimapHeight;
+
             RebuildAlertsMenu();
             RebuildBackgroundsMenu();
             RebuildLatestAlertsMenu();
@@ -339,7 +342,6 @@ namespace Quesadilla
 
             Version version = Assembly.GetEntryAssembly().GetName().Version;
             this.Text = "Quesadilla v" + version.ToString();
-
         }
 
         private void mainTimer_Tick(object sender, EventArgs e)

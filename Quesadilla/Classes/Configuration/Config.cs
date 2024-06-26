@@ -103,6 +103,8 @@ namespace Quesadilla.Classes
                 AlertsOutstandingColour = AlertsOutstandingColour,
                 EvescoutColour = EvescoutColour,
 
+                MinimapHeight = MinimapHeight,
+
             };
 
             c.AlertPopupMinimapPosition = new Point(AlertPopupMinimapPosition.X, AlertPopupMinimapPosition.Y);
@@ -270,6 +272,7 @@ namespace Quesadilla.Classes
                 c.AlertsOutstandingColour = Color.LightPink;
                 c.EvescoutColour = Color.Brown;
 
+                c.MinimapHeight = 200;
             }
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
@@ -624,6 +627,8 @@ img.rounded-corners {
         public Color MinimapZKillColour { get; set; }
         public Color MinimapIntelColour { get; set; }
         public Color MinimapAltPositionColour { get; set; }
+        public int MinimapHeight { get; set; }
+
 
         public Color CurrentCharacterColour { get; set; }
         public Color ISKColour { get; set; }
