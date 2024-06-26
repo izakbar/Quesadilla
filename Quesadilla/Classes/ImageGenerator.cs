@@ -16,7 +16,7 @@ namespace Quesadilla.Classes
 {
     public class ImageGenerator
     {
-        public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale,
+        public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, bool rawXY,
             bool showSystemText,
             bool Border, Color BorderColor,
             Color LineColourNormal,
@@ -97,8 +97,8 @@ namespace Quesadilla.Classes
                             toSystem = pathSystem == path.ToSystemId ? true : false,
                             route = true,
                             textDisplay = (pathSystem == path.FromSystemId || pathSystem == path.ToSystemId) ? true : false,
-                            X = (int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING),
-                            Y = (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING),
+                            X = (rawXY ? (int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING) : (int)Math.Round((FromSystem.DotlanX - nextSolarSystem.DotlanX)) ),
+                            Y = (rawXY ? (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING) : (int)Math.Round((FromSystem.DotlanY - nextSolarSystem.DotlanY)) ),
                         });
 
                         // add connection
@@ -109,8 +109,14 @@ namespace Quesadilla.Classes
                                 FromSystem = previousSystem,
                                 ToSystem = nextSolarSystem,
                                 route = true,
-                                P1 = new Point((int)Math.Round((FromSystem.X - previousSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - previousSystem.Y) / LY_SCALING)),
-                                P2 = new Point((int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING)),
+                                P1 = (rawXY 
+                                ? new Point((int)Math.Round((FromSystem.X - previousSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - previousSystem.Y) / LY_SCALING))
+                                : new Point((int)Math.Round((FromSystem.DotlanX - previousSystem.DotlanX) ), (int)Math.Round((FromSystem.DotlanY - previousSystem.DotlanY)))
+                                ),
+                                P2 = (rawXY
+                                ? new Point((int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING))
+                                : new Point((int)Math.Round((FromSystem.DotlanX - nextSolarSystem.DotlanX) ), (int)Math.Round((FromSystem.DotlanY - nextSolarSystem.DotlanY)))
+                                ),
                             });
                         }
                         previousSystem = nextSolarSystem;
@@ -140,8 +146,8 @@ namespace Quesadilla.Classes
                                         toSystem = false,
                                         route = false,
                                         textDisplay = false,
-                                        X = (int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING),
-                                        Y = (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING),
+                                        X = (rawXY ? (int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING) : (int)Math.Round((FromSystem.DotlanX - linkedSolarSystem.DotlanX) )),
+                                        Y = (rawXY ? (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING) : (int)Math.Round((FromSystem.DotlanY - linkedSolarSystem.DotlanY))),
                                     });
                                 }
 
@@ -157,8 +163,14 @@ namespace Quesadilla.Classes
                                         FromSystem = mapSystem.solarSystem,
                                         ToSystem = linkedSolarSystem,
                                         route = (mapSystem.route == true & (linkedMinimapSystem != null && linkedMinimapSystem.route == true)),
-                                        P1 = new Point((int)Math.Round((FromSystem.X - mapSystem.solarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - mapSystem.solarSystem.Y) / LY_SCALING)),
-                                        P2 = new Point((int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING)),
+                                        P1 = (rawXY 
+                                        ? new Point((int)Math.Round((FromSystem.X - mapSystem.solarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - mapSystem.solarSystem.Y) / LY_SCALING))
+                                        : new Point((int)Math.Round((FromSystem.DotlanX - mapSystem.solarSystem.DotlanX) ), (int)Math.Round((FromSystem.DotlanY - mapSystem.solarSystem.DotlanY)))
+                                        ),
+                                        P2 = (rawXY
+                                        ? new Point((int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING))
+                                        : new Point((int)Math.Round((FromSystem.DotlanX - linkedSolarSystem.DotlanX)), (int)Math.Round((FromSystem.DotlanY - linkedSolarSystem.DotlanY)))
+                                        ),
                                     });
                                 }
                             }
