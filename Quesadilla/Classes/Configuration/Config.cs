@@ -267,10 +267,10 @@ namespace Quesadilla.Classes
                 c.MinimapIntelColour = Color.Orange;
                 c.MinimapAltPositionColour = Color.Aqua;
 
-                c.CurrentCharacterColour = Color.Blue;
-                c.ISKColour = Color.Green;
+                c.CurrentCharacterColour = Color.MediumTurquoise;
+                c.ISKColour = Color.Aqua;
                 c.AlertsOutstandingColour = Color.LightPink;
-                c.EvescoutColour = Color.Brown;
+                c.EvescoutColour = Color.LimeGreen;
 
                 c.MinimapHeight = 200;
             }
