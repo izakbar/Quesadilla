@@ -100,6 +100,8 @@ namespace Quesadilla.Classes
                 MinimapAltPositionColour = MinimapAltPositionColour,
                 MinimapRawXY = MinimapRawXY,
 
+                MinimapJumps = MinimapJumps,
+
                 CurrentCharacterColour = CurrentCharacterColour,
                 ISKColour = ISKColour,
                 AlertsOutstandingColour = AlertsOutstandingColour,
@@ -243,8 +245,8 @@ namespace Quesadilla.Classes
                 c.AlertPopupMinimapIntelColour = Color.Orange;
                 c.AlertPopupMinimapAltPositionColour = Color.Aqua;
 
-                c.AlertPopupMinimapPosition = new Point(30, 0);
-                c.AlertPopupMinimapSize = new Point(232, 150);
+                c.AlertPopupMinimapPosition = new Point(34, 3);
+                c.AlertPopupMinimapSize = new Point(193, 128);
 
                 c.AlertPopupMinimapRawXY = true;
 
@@ -272,7 +274,7 @@ namespace Quesadilla.Classes
                 c.MinimapAltPositionColour = Color.Aqua;
 
                 c.MinimapRawXY = false;
-
+                c.MinimapJumps = 3;
                 c.CurrentCharacterColour = Color.MediumTurquoise;
                 c.ISKColour = Color.Aqua;
                 c.AlertsOutstandingColour = Color.LightPink;
@@ -637,7 +639,7 @@ img.rounded-corners {
         public Color MinimapAltPositionColour { get; set; }
         public int MinimapHeight { get; set; }
         public bool MinimapRawXY { get; set; }
-
+        public int MinimapJumps { get; set; }
 
         public Color CurrentCharacterColour { get; set; }
         public Color ISKColour { get; set; }
