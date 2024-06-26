@@ -385,8 +385,11 @@ namespace Quesadilla
                 {
 
                     var alertsExpired = Program.ExpireAlerts();
-
-                    if ( alertsExpired > 0 ) RebuildLatestAlertsMenu();
+                    if (alertsExpired > 0)
+                    {
+                        this.Invalidate();
+                        RebuildLatestAlertsMenu();
+                    }
                     lblAlertsOutstanding.Text = Program.ActiveAlerts.Count.ToString();
                 }
                 else
@@ -400,7 +403,8 @@ namespace Quesadilla
 
                 Program.ExpireCombat();
                 Program.ExpireISK();
-                Program.ZKillHandler.ExpireZKillQueue();
+                var zkillExpired = Program.ZKillHandler.ExpireZKillQueue();
+                if (zkillExpired > 0) this.Invalidate();
 
                 TickCounts["SinceLastCleardown"] = 0;
             }

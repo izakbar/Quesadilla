@@ -43,8 +43,9 @@ namespace Quesadilla.Classes.ZKill
             EnqueueZKillAlert(ZKillKills, kill, system);
         }
 
-        private void ExpireZkillQueue(Queue<ZKillKill> zq)
+        private int ExpireZkillQueue(Queue<ZKillKill> zq)
         {
+            int Expired = 0;
             lock (zq)
             {
                 bool removedOBSZkill = true;
@@ -60,6 +61,7 @@ namespace Quesadilla.Classes.ZKill
                         k.Expired = true;
 
                         zq.Dequeue();
+                        Expired++;
                         removedOBSZkill = true;
                     }
                     else
@@ -68,11 +70,12 @@ namespace Quesadilla.Classes.ZKill
                     }
                 }
             }
+            return Expired;
         }
 
-        public void ExpireZKillQueue()
+        public int ExpireZKillQueue()
         {
-            ExpireZkillQueue(ZKillKills);
+            return ExpireZkillQueue(ZKillKills);
         }
 
     }

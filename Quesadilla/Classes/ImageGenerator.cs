@@ -298,12 +298,12 @@ namespace Quesadilla.Classes
                         {
                             g.TextRenderingHint = TextRenderingHint.AntiAlias;
 
-                            g.DrawString(currentSystem.solarSystem.Name, myfont, new SolidBrush(SystemColourText), currentPoint.X + CIRCLE_RADIUS + 2, currentPoint.Y + CIRCLE_RADIUS + 2, new StringFormat
-                            {
-                                Alignment = StringAlignment.Far,
-                                LineAlignment = StringAlignment.Near,
-                                Trimming = StringTrimming.None,
-                            });
+                            var stringSize = g.MeasureString(currentSystem.solarSystem.Name, myfont);
+
+                            g.DrawString(currentSystem.solarSystem.Name, myfont, new SolidBrush(SystemColourText),
+                                currentPoint.X - (stringSize.Width / 2),
+                                currentPoint.Y + CIRCLE_RADIUS + 2 
+                                );
                         }
 
                     }
