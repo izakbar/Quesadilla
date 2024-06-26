@@ -128,13 +128,14 @@ EVE-O Preview (https://github.com/EveOPlus/eve-o-preview) which has been invalua
 EVE Combat Log Analyzer (http://evelog.mikk36.eu/) made working out DPS a bit easier !
 SMT for being so useful
 CCP for EVEOnline and GM's for giving me their time.
-EVEStandard for ESI Library</value>
+EVEStandard for ESI Library
+Cyotek.Windows.Forms.ColorPicker - so much nicer than standard :)</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="izakbar.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAjAAAAMzCAYAAAC4Eih1AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        DQAACw0B7QfALAAAAAd0SU1FB+gBCw0nNC8LSH0AAP+fSURBVHhe7P3tz21bXp6J+UMUJVHcihV3LEVU
+        DAAACwwBP0AiyAAAAAd0SU1FB+gBCw0nNC8LSH0AAP+fSURBVHhe7P3tz21bXp6J+UMUJVHcihV3LEVU
         O9CWsNuATFHCLqAwh3qhqDqFqTpQBacK7KIoTIELiQLzYoNlAw1uN1bHuAusDpaMHLflblvBbnekOGnH
         cdJyFEXptpKW/KnV/8mJ7vmsaz7XutdvzLX2Pq977/Xh1hjjN17my/PsZ1z7HmPO+Xtee+2133PXXXfd
         Nen7Xv3Ya+h7v/vlLf30xz/w2qufePm1z3/PR7e89epHPvDaj3z8pS3/gx9+75Z+/uWXXvvcR75pV+Lk

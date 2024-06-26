@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Quesadilla.Classes.SolarSystems;
 using System.Xml.Xsl;
+using Cyotek.Windows.Forms;
 
 namespace Quesadilla
 {
@@ -220,14 +221,34 @@ namespace Quesadilla
         }
         private Color ChooseColour(Color c)
         {
-            colourPicker.Color = c;
-            colourPicker.SolidColorOnly = false;
-            colourPicker.AnyColor = true;
-            colourPicker.AllowFullOpen = true;
-            if (colourPicker.ShowDialog() == DialogResult.OK)
+            /*
+                        colourPicker.Color = c;
+                        colourPicker.SolidColorOnly = false;
+                        colourPicker.AnyColor = true;
+                        colourPicker.AllowFullOpen = true;
+                        if (colourPicker.ShowDialog() == DialogResult.OK)
+                        {
+                            return(colourPicker.Color);
+                        }
+            */
+
+            using (ColorPickerDialog dialog = new ColorPickerDialog
             {
-                return(colourPicker.Color);
+                Color = c,
+            })
+            {
+                //dialog.CustomColorsLoading += this.DialogCustomColorsLoadingHandler;
+                //dialog.PreviewColorChanged += this.DialogColorChangedHandler;
+
+                if (dialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    c = dialog.Color;
+                }
+
+                //dialog.PreviewColorChanged -= this.DialogColorChangedHandler;
             }
+
+
             return (c);
         }
 
