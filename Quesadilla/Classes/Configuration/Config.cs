@@ -109,6 +109,8 @@ namespace Quesadilla.Classes
 
                 MinimapHeight = MinimapHeight,
 
+                MainWindowExtraInformationColour = MainWindowExtraInformationColour,
+                MainWindowShowExtraInformation = MainWindowShowExtraInformation,
             };
 
             c.AlertPopupMinimapPosition = new Point(AlertPopupMinimapPosition.X, AlertPopupMinimapPosition.Y);
@@ -195,10 +197,10 @@ namespace Quesadilla.Classes
                 c.DPSSaveCSV = false;
                 c.DPSAllToons = false;
                 c.IgnoreAsTooManyJumps = 12;
-                c.ExpireAlertSeconds = 500;
-                c.ExpireCombatSeconds = 1200;
+                c.ExpireAlertSeconds = 300; // 5 mins
+                c.ExpireCombatSeconds = 1200; // 20 mins
                 c.ExpireISKSeconds = 5400; // 90 mins
-                c.ExpireZKillSeconds = 900; // 15 mins
+                c.ExpireZKillSeconds = 600; // 10 mins
                 c.GraphCombatSeconds = 300;
                 c.GraphCombatMaxPoints = 30;
                 c.GraphCombatMinPointSeconds = 10;
@@ -279,6 +281,9 @@ namespace Quesadilla.Classes
                 c.ISKColour = Color.Aqua;
                 c.AlertsOutstandingColour = Color.LightPink;
                 c.EvescoutColour = Color.LimeGreen;
+
+                c.MainWindowExtraInformationColour = Color.LimeGreen;
+                c.MainWindowShowExtraInformation = true;
 
                 c.MinimapHeight = 200;
             }
@@ -645,5 +650,8 @@ img.rounded-corners {
         public Color ISKColour { get; set; }
         public Color AlertsOutstandingColour { get; set; }
         public Color EvescoutColour { get; set; }
+
+        public bool MainWindowShowExtraInformation { get; set; }
+        public Color MainWindowExtraInformationColour { get; set; }
     }
 }

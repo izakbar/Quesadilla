@@ -26,6 +26,7 @@ namespace Quesadilla.Classes.ZKill
             {
                 lock (q)
                 {
+                    kill.VictimCharacterName = Program.Universe.GetCharacterName((int)kill.VictimCharacterId);
                     q.Enqueue(kill);
 
                     if (system.Kills == null)

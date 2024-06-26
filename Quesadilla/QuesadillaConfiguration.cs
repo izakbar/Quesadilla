@@ -141,6 +141,8 @@ namespace Quesadilla
             cbShowMinimapBorder.Checked = _configuration.ShowMinimapBorder;
             cbShowMinimap.Checked = _configuration.ShowMinimap;
 
+            cbMainWindowShowExtraInformation.Checked = _configuration.MainWindowShowExtraInformation;
+
             trackAlertPopupMinimapSizeWidth.Minimum = 1;
             trackAlertPopupMinimapSizeHeight.Minimum = 1;
             trackAlertPopupMinimapPositionX.Minimum = 0;
@@ -646,6 +648,16 @@ namespace Quesadilla
         private void buttonPickMinimapAltPositionColour_Click(object sender, EventArgs e)
         {
             _configuration.MinimapAltPositionColour = ChooseColour(_configuration.MinimapAltPositionColour);
+        }
+
+        private void buttonPickMainWindowExtraInformationColour_Click(object sender, EventArgs e)
+        {
+            _configuration.MainWindowExtraInformationColour = ChooseColour(_configuration.MainWindowExtraInformationColour);
+        }
+
+        private void cbMainWindowShowExtraInformation_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.MainWindowShowExtraInformation = cbMainWindowShowExtraInformation.Checked;
         }
     }
 }

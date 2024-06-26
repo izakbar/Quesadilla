@@ -39,6 +39,7 @@
             this.lblStatus = new System.Windows.Forms.Label();
             this.pMinimapImage = new System.Windows.Forms.PictureBox();
             this.lblAlertsOutstanding = new System.Windows.Forms.Label();
+            this.lblEtxraInformation = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pMinimapImage)).BeginInit();
             this.SuspendLayout();
             // 
@@ -143,12 +144,23 @@
             this.lblAlertsOutstanding.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.lblAlertsOutstanding.Visible = false;
             // 
+            // lblEtxraInformation
+            // 
+            this.lblEtxraInformation.ForeColor = System.Drawing.Color.ForestGreen;
+            this.lblEtxraInformation.Location = new System.Drawing.Point(442, 55);
+            this.lblEtxraInformation.Name = "lblEtxraInformation";
+            this.lblEtxraInformation.Size = new System.Drawing.Size(476, 123);
+            this.lblEtxraInformation.TabIndex = 13;
+            this.lblEtxraInformation.Text = "999999";
+            this.lblEtxraInformation.Visible = false;
+            // 
             // Quesadilla
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(921, 642);
+            this.Controls.Add(this.lblEtxraInformation);
             this.Controls.Add(this.buttonIntelSize);
             this.Controls.Add(this.lblAlertsOutstanding);
             this.Controls.Add(this.lblCurrentClient);
@@ -183,6 +195,7 @@
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.PictureBox pMinimapImage;
         private System.Windows.Forms.Label lblAlertsOutstanding;
+        private System.Windows.Forms.Label lblEtxraInformation;
     }
 }
 

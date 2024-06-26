@@ -287,9 +287,10 @@ namespace Quesadilla
             lblAlertsOutstanding.ForeColor = Program.MainConfiguration.AlertsOutstandingColour;
             lblCurrentClient.ForeColor = Program.MainConfiguration.CurrentCharacterColour;
             lblStatus.ForeColor = Program.MainConfiguration.EvescoutColour;
+            lblEtxraInformation.ForeColor = Program.MainConfiguration.MainWindowExtraInformationColour;
 
             pMinimapImage.Height = Program.MainConfiguration.MinimapHeight;
-            pMinimapImage.Width = Program.MainConfiguration.MinimapHeight;
+            pMinimapImage.Width = (int)((double)Program.MainConfiguration.MinimapHeight*1.3);
 
             RebuildAlertsMenu();
             RebuildBackgroundsMenu();
@@ -328,6 +329,7 @@ namespace Quesadilla
             lblCurrentClient.Text = "";
             lblISK.Text = "";
             lblAlertsOutstanding.Text = "";
+            lblEtxraInformation.Text = "";
 
             this.Invalidate();
 
@@ -529,7 +531,7 @@ namespace Quesadilla
             returnString = returnString.Replace("{character}", characterName);
             returnString = returnString.Replace("{text}", kill.href);
             returnString = returnString.Replace("{value}", kill.TotalValue);
-            returnString = returnString.Replace("{victim}", Program.Universe.GetCharacterName((int)kill.VictimCharacterId));
+            returnString = returnString.Replace("{victim}", kill.VictimCharacterName);
             returnString = returnString.Replace("{system}", Program.Universe.SolarSystems.ContainsKey((int)kill.SolarSystemId) ? Program.Universe.SolarSystems[(int)kill.SolarSystemId].Name : kill.SolarSystemId.ToString());
             returnString = returnString.Replace("{killer}", kill.KillerCharacterId == 0 ? "NPC" : Program.Universe.GetCharacterName((int)kill.KillerCharacterId));
             returnString = returnString.Replace("{victimship}", Program.Universe.ItemTypes.ContainsKey((int)kill.VictimShipTypeId) ? Program.Universe.ItemTypes[(int)kill.VictimShipTypeId].Name : "Unknown:" + kill.VictimShipTypeId.ToString());
@@ -1348,6 +1350,9 @@ namespace Quesadilla
             {
                 lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
                 lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
+                lblEtxraInformation.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
+                lblEtxraInformation.Height = pMinimapImage.Height - (lblEtxraInformation.Top - pMinimapImage.Top - lblISK.Height - 5);
+                lblEtxraInformation.Left = pMinimapImage.Left + pMinimapImage.Width + 2;
             }
             else
             {
@@ -1788,11 +1793,11 @@ namespace Quesadilla
 
         private void UpdateMinimap()
         {
-            this.Invalidate();
             shouldUpdateMinimap = false;
 
             if (CurrentActiveToon.IsNullOrEmpty() ) {
                 pMinimapImage.Visible = false;
+                this.Invalidate();
                 return; 
             }
 
@@ -1814,8 +1819,9 @@ namespace Quesadilla
 
             if (Program.MainConfiguration.ShowMinimap)
             {
-                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath, 
-                    Program.MainConfiguration.MinimapJumps, mapScale, Program.MainConfiguration.MinimapRawXY,
+                string extraInformation = "";
+                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
+                    Program.MainConfiguration.MinimapJumps, mapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation,
                     Program.MainConfiguration.MinimapShowSystemText,
                     Program.MainConfiguration.ShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
                     Program.MainConfiguration.MinimapLineColourNormal,
@@ -1832,10 +1838,15 @@ namespace Quesadilla
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
                 pMinimapImage.Image = minimapBitmap;
+                lblEtxraInformation.Text = extraInformation;
                 pMinimapImage.Visible = true;
-            } else
+                this.Invalidate();
+            }
+            else
             {
+                lblEtxraInformation.Text = "";
                 pMinimapImage.Visible = false;
+                this.Invalidate();
             }
         }
         private void pMinimapImage_MouseWheel(object sender, MouseEventArgs e)
@@ -1850,6 +1861,8 @@ namespace Quesadilla
             ImageGenerator.PaintDrawText(e, lblCurrentClient);
             ImageGenerator.PaintDrawText(e, lblISK);
             ImageGenerator.PaintDrawText(e, lblAlertsOutstanding);
+
+            if (pMinimapImage.Visible && Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, lblEtxraInformation);
 
             // draw red dot
             if ( InCombat )

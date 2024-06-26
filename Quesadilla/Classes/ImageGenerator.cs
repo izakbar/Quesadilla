@@ -16,7 +16,7 @@ namespace Quesadilla.Classes
 {
     public class ImageGenerator
     {
-        public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, bool rawXY,
+        public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, bool rawXY,ref string extraInformation,
             bool showSystemText,
             bool Border, Color BorderColor,
             Color LineColourNormal,
@@ -46,6 +46,8 @@ namespace Quesadilla.Classes
             int CIRCLE_RADIUS = 3;
 
             int combinedBorder = TRANSPARENT_BORDER_WIDTH + BORDER_WIDTH;
+
+            StringBuilder sbExtraInformation = new StringBuilder();
 
             Point center = new Point((srcImage.Width / 2) - 1, (srcImage.Height / 2) - 1);
 
@@ -260,11 +262,19 @@ namespace Quesadilla.Classes
                     {
                         var zkillPen = new Pen(ZKillColour);
                         g.DrawEllipse(zkillPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2);
+                        foreach(var k in currentSystem.solarSystem.Kills)
+                        {
+                            sbExtraInformation.AppendLine($"ZKILL {k.SolarSystemName} {k.VictimShipName} {k.VictimCharacterName}");
+                        }
                     }
-                    if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Count() > 0)
+                    if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null).Count() > 0)
                     {
                         var intelPen = new Pen(IntelColour);
                         g.DrawEllipse(intelPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2);
+                        foreach (var a in currentSystem.solarSystem.Alerts.Where(o => ! o.isFaction && ! o.isDecloak && o.Kill is null))
+                        {
+                            sbExtraInformation.AppendLine($"{a.Entry.LineContent}");
+                        }
                     }
 
                     // active alt in sytstem ?
@@ -299,6 +309,7 @@ namespace Quesadilla.Classes
                     }
                 }
 
+                extraInformation = sbExtraInformation.ToString();
                 return dstImage;
             }
         }
