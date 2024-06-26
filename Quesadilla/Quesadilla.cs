@@ -380,14 +380,15 @@ namespace Quesadilla
             if ( ++TickCounts["SinceLastCleardown"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
             {
 
+                int alertsExpired = 0;
+                int zkillsExpired = 0;
                 // Show number of recent alerts
                 if (Program.ActiveAlerts.Count > 0)
                 {
 
-                    var alertsExpired = Program.ExpireAlerts();
+                    alertsExpired = Program.ExpireAlerts();
                     if (alertsExpired > 0)
                     {
-                        this.Invalidate();
                         RebuildLatestAlertsMenu();
                     }
                     lblAlertsOutstanding.Text = Program.ActiveAlerts.Count.ToString();
@@ -396,6 +397,7 @@ namespace Quesadilla
                 {
                     lblAlertsOutstanding.Text = "";
                 }
+
                 if (Program.ZKillHandler.ZKillKills.Count > 0 )
                 {
                     lblAlertsOutstanding.Text += "/" + Program.ZKillHandler.ZKillKills.Count.ToString();
@@ -403,8 +405,11 @@ namespace Quesadilla
 
                 Program.ExpireCombat();
                 Program.ExpireISK();
-                var zkillExpired = Program.ZKillHandler.ExpireZKillQueue();
-                if (zkillExpired > 0) this.Invalidate();
+                zkillsExpired = Program.ZKillHandler.ExpireZKillQueue();
+                if (zkillsExpired + alertsExpired > 0)
+                {
+                    UpdateMinimap();
+                }
 
                 TickCounts["SinceLastCleardown"] = 0;
             }
