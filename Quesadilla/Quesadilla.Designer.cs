@@ -54,11 +54,11 @@
             this.intelLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.intelLog.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.intelLog.ForContext = "";
-            this.intelLog.Location = new System.Drawing.Point(0, 178);
+            this.intelLog.Location = new System.Drawing.Point(0, 230);
             this.intelLog.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.intelLog.Name = "intelLog";
             this.intelLog.ReadOnly = true;
-            this.intelLog.Size = new System.Drawing.Size(744, 187);
+            this.intelLog.Size = new System.Drawing.Size(614, 187);
             this.intelLog.TabIndex = 0;
             this.intelLog.Text = "";
             this.intelLog.TextChanged += new System.EventHandler(this.intelLog_TextChanged);
@@ -67,7 +67,7 @@
             // 
             this.ChatServerDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ChatServerDown.ForeColor = System.Drawing.Color.Red;
-            this.ChatServerDown.Location = new System.Drawing.Point(595, 1);
+            this.ChatServerDown.Location = new System.Drawing.Point(463, 4);
             this.ChatServerDown.Name = "ChatServerDown";
             this.ChatServerDown.Size = new System.Drawing.Size(149, 20);
             this.ChatServerDown.TabIndex = 3;
@@ -79,7 +79,7 @@
             // 
             this.buttonIntelSize.BackColor = System.Drawing.SystemColors.Info;
             this.buttonIntelSize.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonIntelSize.Location = new System.Drawing.Point(727, 178);
+            this.buttonIntelSize.Location = new System.Drawing.Point(597, 230);
             this.buttonIntelSize.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.buttonIntelSize.Name = "buttonIntelSize";
             this.buttonIntelSize.Size = new System.Drawing.Size(17, 18);
@@ -102,7 +102,7 @@
             // lblISK
             // 
             this.lblISK.ForeColor = System.Drawing.Color.ForestGreen;
-            this.lblISK.Location = new System.Drawing.Point(229, 127);
+            this.lblISK.Location = new System.Drawing.Point(295, 203);
             this.lblISK.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblISK.Name = "lblISK";
             this.lblISK.Size = new System.Drawing.Size(114, 11);
@@ -114,7 +114,7 @@
             // 
             this.lblStatus.AutoSize = true;
             this.lblStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lblStatus.Location = new System.Drawing.Point(0, 165);
+            this.lblStatus.Location = new System.Drawing.Point(0, 217);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(168, 13);
             this.lblStatus.TabIndex = 9;
@@ -125,7 +125,7 @@
             this.pMinimapImage.BackColor = System.Drawing.Color.Transparent;
             this.pMinimapImage.Location = new System.Drawing.Point(4, 4);
             this.pMinimapImage.Name = "pMinimapImage";
-            this.pMinimapImage.Size = new System.Drawing.Size(220, 143);
+            this.pMinimapImage.Size = new System.Drawing.Size(286, 210);
             this.pMinimapImage.TabIndex = 10;
             this.pMinimapImage.TabStop = false;
             // 
@@ -146,7 +146,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(744, 365);
+            this.ClientSize = new System.Drawing.Size(614, 417);
             this.Controls.Add(this.buttonIntelSize);
             this.Controls.Add(this.lblAlertsOutstanding);
             this.Controls.Add(this.lblCurrentClient);

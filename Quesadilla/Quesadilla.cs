@@ -1340,17 +1340,11 @@ namespace Quesadilla
 
             if (Program.MainConfiguration.ShowMinimap)
             {
-                //pCombat.Left = pMinimapImage.Left + 1;
-                //pCombat.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - pCombat.Height;
-
                 lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
                 lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
             }
             else
             {
-                //pCombat.Left = lblAlertsOutstanding.Left + lblAlertsOutstanding.Width - pCombat.Width;
-                //pCombat.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
-
                 lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
                 lblISK.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
             }
