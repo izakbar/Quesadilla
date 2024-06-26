@@ -49,6 +49,9 @@ namespace Quesadilla.Classes
 
             Point center = new Point((srcImage.Width / 2) - 1, (srcImage.Height / 2) - 1);
 
+            // quick note on x/y coord calcs
+            // dotlan calcs need to be inverted to make sure map displays correctly - not an error
+
             using (Graphics g = Graphics.FromImage(dstImage))
             {
                 // main background
@@ -97,8 +100,8 @@ namespace Quesadilla.Classes
                             toSystem = pathSystem == path.ToSystemId ? true : false,
                             route = true,
                             textDisplay = (pathSystem == path.FromSystemId || pathSystem == path.ToSystemId) ? true : false,
-                            X = (rawXY ? (int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING) : (int)Math.Round((FromSystem.DotlanX - nextSolarSystem.DotlanX)) ),
-                            Y = (rawXY ? (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING) : (int)Math.Round((FromSystem.DotlanY - nextSolarSystem.DotlanY)) ),
+                            X = (rawXY ? (int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING) : (int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX)) ),
+                            Y = (rawXY ? (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING) : (int)Math.Round((nextSolarSystem.DotlanY - FromSystem.DotlanY)) ),
                         });
 
                         // add connection
@@ -111,11 +114,11 @@ namespace Quesadilla.Classes
                                 route = true,
                                 P1 = (rawXY 
                                 ? new Point((int)Math.Round((FromSystem.X - previousSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - previousSystem.Y) / LY_SCALING))
-                                : new Point((int)Math.Round((FromSystem.DotlanX - previousSystem.DotlanX) ), (int)Math.Round((FromSystem.DotlanY - previousSystem.DotlanY)))
+                                : new Point((int)Math.Round((previousSystem.DotlanX - FromSystem.DotlanX) ), (int)Math.Round((previousSystem.DotlanY - FromSystem.DotlanY)))
                                 ),
                                 P2 = (rawXY
                                 ? new Point((int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING))
-                                : new Point((int)Math.Round((FromSystem.DotlanX - nextSolarSystem.DotlanX) ), (int)Math.Round((FromSystem.DotlanY - nextSolarSystem.DotlanY)))
+                                : new Point((int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX) ), (int)Math.Round((nextSolarSystem.DotlanY - FromSystem.DotlanY)))
                                 ),
                             });
                         }
@@ -146,8 +149,8 @@ namespace Quesadilla.Classes
                                         toSystem = false,
                                         route = false,
                                         textDisplay = false,
-                                        X = (rawXY ? (int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING) : (int)Math.Round((FromSystem.DotlanX - linkedSolarSystem.DotlanX) )),
-                                        Y = (rawXY ? (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING) : (int)Math.Round((FromSystem.DotlanY - linkedSolarSystem.DotlanY))),
+                                        X = (rawXY ? (int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING) : (int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX) )),
+                                        Y = (rawXY ? (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING) : (int)Math.Round((linkedSolarSystem.DotlanY - FromSystem.DotlanY))),
                                     });
                                 }
 
@@ -164,12 +167,12 @@ namespace Quesadilla.Classes
                                         ToSystem = linkedSolarSystem,
                                         route = (mapSystem.route == true & (linkedMinimapSystem != null && linkedMinimapSystem.route == true)),
                                         P1 = (rawXY 
-                                        ? new Point((int)Math.Round((FromSystem.X - mapSystem.solarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - mapSystem.solarSystem.Y) / LY_SCALING))
-                                        : new Point((int)Math.Round((FromSystem.DotlanX - mapSystem.solarSystem.DotlanX) ), (int)Math.Round((FromSystem.DotlanY - mapSystem.solarSystem.DotlanY)))
+                                        ? new Point((int)Math.Round((mapSystem.solarSystem.X - FromSystem.X) / LY_SCALING), (int)Math.Round((mapSystem.solarSystem.Y - FromSystem.Y) / LY_SCALING))
+                                        : new Point((int)Math.Round((mapSystem.solarSystem.DotlanX - FromSystem.DotlanX) ), (int)Math.Round((mapSystem.solarSystem.DotlanY - FromSystem.DotlanY)))
                                         ),
                                         P2 = (rawXY
-                                        ? new Point((int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING))
-                                        : new Point((int)Math.Round((FromSystem.DotlanX - linkedSolarSystem.DotlanX)), (int)Math.Round((FromSystem.DotlanY - linkedSolarSystem.DotlanY)))
+                                        ? new Point((int)Math.Round((linkedSolarSystem.X - FromSystem.X) / LY_SCALING), (int)Math.Round((linkedSolarSystem.Y - FromSystem.Y) / LY_SCALING))
+                                        : new Point((int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((linkedSolarSystem.DotlanY - FromSystem.DotlanY)))
                                         ),
                                     });
                                 }
@@ -194,8 +197,8 @@ namespace Quesadilla.Classes
                     minY = Math.Min(minY, currentSystem.Y);
                 }
                 int maxSize = Math.Max((int)(maxX - minX), (int)(maxY - minY));
-                int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (CIRCLE_RADIUS * 2);
-                GUI_SCALING = (int)Math.Round(  (double)(maxSize) / (   (pictureSize * .8) )  );
+                int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (CIRCLE_ALERT_GAP*4);
+                GUI_SCALING = (int)Math.Round(  (double)(maxSize) / (   (pictureSize * (rawXY ? .8 : .8) ) )  );
                 GUI_SCALING = GUI_SCALING * (((double)mapScale / 100));
                 // Apply scale
                 maxX = 0; maxY = 0; minX = 0; minY = 0;
