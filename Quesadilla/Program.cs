@@ -171,23 +171,35 @@ namespace Quesadilla
         {
             int Expired = 0;
 
-            // check if we should expire first entry
-            var alert = ActiveAlerts.First();
-            DateTime timeAdded = alert.Entry != null ? alert.Entry.TimeAdded : alert.Kill.TimeAdded;
-            var diffInSeconds = (DateTime.Now - timeAdded).TotalSeconds;
-            if (diffInSeconds > Program.MainConfiguration.ExpireAlertSeconds)
+            lock (ActiveAlerts)
             {
-                // expired so dequeue
-                alert = Program.ActiveAlerts.Dequeue();
-                Expired++;
-
-                if (!alert.isFaction && !alert.isDecloak && alert.Kill == null && alert.Path != null)
+                bool removedAlert = true;
+                while (ActiveAlerts.Count > 0 && removedAlert)
                 {
-                    // remove alert to solarsystem info
-                    var solarSystem = Universe.SolarSystems[alert.Path.ToSystemId];
-                    if (solarSystem.Alerts != null)
+                    var alert = ActiveAlerts.First();
+                    DateTime timeAdded = alert.Entry != null ? alert.Entry.TimeAdded : alert.Kill.TimeAdded;
+                    var diffInSeconds = (DateTime.Now - timeAdded).TotalSeconds;
+                    if (diffInSeconds > Program.MainConfiguration.ExpireAlertSeconds)
                     {
-                        solarSystem.Alerts.Remove(alert);
+
+                        // expired so dequeue
+                        alert = Program.ActiveAlerts.Dequeue();
+                        Expired++;
+
+                        if (!alert.isFaction && !alert.isDecloak && alert.Kill == null && alert.Path != null)
+                        {
+                            // remove alert to solarsystem info
+                            var solarSystem = Universe.SolarSystems[alert.Path.ToSystemId];
+                            if (solarSystem.Alerts != null)
+                            {
+                                solarSystem.Alerts.Remove(alert);
+                            }
+                        }
+                        removedAlert = true;
+                    }
+                    else
+                    {
+                        removedAlert = false;
                     }
                 }
             }

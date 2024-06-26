@@ -391,6 +391,10 @@ namespace Quesadilla
                 {
                     lblAlertsOutstanding.Text = "";
                 }
+                if (Program.ZKillHandler.ZKillKills.Count > 0 )
+                {
+                    lblAlertsOutstanding.Text += "/" + Program.ZKillHandler.ZKillKills.Count.ToString();
+                }
 
                 Program.ExpireCombat();
                 Program.ExpireISK();
