@@ -82,6 +82,7 @@ namespace Quesadilla.Classes
                     }
                 }
 
+                if (path is null || path.FromSystemId == 0) return dstImage;
                 var FromSystem = Program.Universe.SolarSystems[path.FromSystemId];
 
                 // add route systems

@@ -179,9 +179,9 @@ namespace Quesadilla.Classes
             if (c is null)
             {
                 c = new Config();
-                c.TickMiliseconds = 350;
-                c.HowManyTicksBeforeCleardown = 20;
-                c.HowManyTicksBeforeAlert = 3;
+                c.TickMiliseconds = 150;
+                c.HowManyTicksBeforeCleardown = 30;
+                c.HowManyTicksBeforeAlert = 4;
                 c.HowManyTicksBeforeDPSGraphUpdate = 8;
                 c.HowManyTicksBeforeLogfileCheck = 3;
                 c.HomeSystem = "K7D-II";
