@@ -1094,7 +1094,10 @@ namespace Quesadilla
             {
                 if (InCombat == false && Program.MainConfiguration.DPSShowWindow)
                 {
-                    DPSGraphWindow = new QuesadillaDPSGraph(this);
+                    if (DPSGraphWindow == null)
+                    {
+                        DPSGraphWindow = new QuesadillaDPSGraph(this);
+                    }
                     DPSGraphWindow.Show();
                 }
                 if (InCombat == false)
