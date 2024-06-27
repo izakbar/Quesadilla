@@ -24,6 +24,7 @@ namespace Quesadilla.Classes
                 HowManyTicksBeforeCleardown = HowManyTicksBeforeCleardown,
                 HowManyTicksBeforeAlert = HowManyTicksBeforeAlert,
                 HowManyTicksBeforeDPSGraphUpdate = HowManyTicksBeforeDPSGraphUpdate,
+                HowManyTicksBeforeLogfileCheck = HowManyTicksBeforeLogfileCheck,
                 AlertPopupOpacityStep = AlertPopupOpacityStep,
                 AlertPopupOpacity = AlertPopupOpacity,
                 AlertPopupAlertTextColour = AlertPopupAlertTextColour,
@@ -178,10 +179,11 @@ namespace Quesadilla.Classes
             if (c is null)
             {
                 c = new Config();
-                c.TickMiliseconds = 590;
-                c.HowManyTicksBeforeCleardown = 8;
+                c.TickMiliseconds = 350;
+                c.HowManyTicksBeforeCleardown = 20;
                 c.HowManyTicksBeforeAlert = 3;
-                c.HowManyTicksBeforeDPSGraphUpdate = 4;
+                c.HowManyTicksBeforeDPSGraphUpdate = 8;
+                c.HowManyTicksBeforeLogfileCheck = 3;
                 c.HomeSystem = "K7D-II";
                 c.InitialPosition = new Point(0, 0);
                 c.WindowSize = new Point(760, 404);
@@ -550,6 +552,7 @@ img.rounded-corners {
         public int HowManyTicksBeforeCleardown { get; set; }
         public int HowManyTicksBeforeAlert { get; set; }
         public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
+        public int HowManyTicksBeforeLogfileCheck { get; set; }
         public string HomeSystem { get; set; }
         public List<Regex> ignoreStrings { get; set; }
         public List<int> ignoreSystems { get; set; }

@@ -172,6 +172,7 @@ namespace Quesadilla
             TickCounts["SinceLastCleardown"] = 0;
             TickCounts["SinceLastAlert"] = 0;
             TickCounts["SinceLastDPSGraphUpdate"] = 0;
+            TickCounts["LogfileCheck"] = 0;
 
             menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
@@ -349,11 +350,21 @@ namespace Quesadilla
         private void mainTimer_Tick(object sender, EventArgs e)
         {
 
-            Program.LogfileWatchersProcessing();
+            if (++TickCounts["LogfileCheck"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
+            {
+                Program.LogfileWatchersProcessing();
+                TickCounts["LogfileCheck"] = 0;
+                UpdateISK();
+            }
+
+            if (shouldUpdateMinimap)
+            {
+                UpdateMinimap();
+            }
+
 
             // dequeue Alerts
-            TickCounts["SinceLastAlert"]++;
-            if (Program.NewAlerts.Count > 0 && TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert)
+            if (++TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert && Program.NewAlerts.Count >0 )
             {
                 var NewAlert = Program.NewAlerts.Dequeue();
 
@@ -418,8 +429,7 @@ namespace Quesadilla
 
 //            pCombat.Visible = InCombat;
 
-            TickCounts["SinceLastDPSGraphUpdate"]++;
-            if (CombatAdded && TickCounts["SinceLastDPSGraphUpdate"] > Program.MainConfiguration.HowManyTicksBeforeDPSGraphUpdate )
+            if (++TickCounts["SinceLastDPSGraphUpdate"] > Program.MainConfiguration.HowManyTicksBeforeDPSGraphUpdate && CombatAdded)
             {
                 if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow == null)
                 {
@@ -435,22 +445,6 @@ namespace Quesadilla
                 TickCounts["SinceLastDPSGraphUpdate"] = 0;
             }
 
-            if (Program.ISK.ContainsKey(CurrentActiveToon))
-            {
-                lblISK.Text = Program.GetIskLastHour(CurrentActiveToon);
-                this.Invalidate();
-                //lblISK.Visible = true;
-            }
-            else
-            {
-                //lblISK.Visible = false;
-                lblISK.Text = "";
-            }
-
-            if (shouldUpdateMinimap)
-            {
-                UpdateMinimap();
-            }
 
         }
 
@@ -1461,6 +1455,7 @@ namespace Quesadilla
                                 DPSGraphWindow.Show();
                             }
                         }
+                        UpdateISK();
                         shouldUpdateMinimap = true;
                     }
 
@@ -1810,6 +1805,8 @@ namespace Quesadilla
                 return; 
             }
 
+            UpdateISK();
+
             var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
 
             PathInfo _dummyPath = null;
@@ -1896,6 +1893,26 @@ namespace Quesadilla
                 e.Graphics.FillEllipse(systemBrush, combatLeft - CIRCLE_RADIUS, combatTop - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
 
             }
+        }
+
+        private void UpdateISK()
+        {
+            if (CurrentActiveToon != null && Program.ISK.ContainsKey(CurrentActiveToon))
+            {
+                lblISK.Text = Program.GetIskLastHour(CurrentActiveToon);
+                this.Invalidate();
+                //lblISK.Visible = true;
+            }
+            else
+            {
+                //lblISK.Visible = false;
+                lblISK.Text = "";
+            }
+        }
+
+        private void lblEtxraInformation_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
