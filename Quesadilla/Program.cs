@@ -206,7 +206,7 @@ namespace Quesadilla
             return Expired;
         }
 
-        public static void EnqueueAlert(AlertQueueItem alert)
+        public static void EnqueueNewAlert(AlertQueueItem alert)
         {
             // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
             var f = NewAlerts.Where(o =>
@@ -230,6 +230,15 @@ namespace Quesadilla
                     f.First().SoundFile = alert.SoundFile;
                     f.First().ShowAlert = alert.ShowAlert;
                 }
+            }
+        }
+
+        public static void EnqueueActiveAlert(AlertQueueItem alert)
+        {
+            ActiveAlerts.Enqueue(alert);
+            if ( alert.Path != null && alert.Path.ToSystemId != null )
+            {
+                Program.Universe.AddAlert(alert.Path.ToSystemId, alert);
             }
         }
 

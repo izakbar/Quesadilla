@@ -134,6 +134,9 @@ namespace Quesadilla
             cbZkillShowBar.Checked = _configuration.ZKillShowBar;
             cbAlertPopupMinimapShowSystemText.Checked = _configuration.AlertPopupMinimapShowSystemText;
 
+            cbMinimapRawXY.Checked = !_configuration.MinimapRawXY;
+            cbAlertPopupMinimapRawXY.Checked = !_configuration.AlertPopupMinimapRawXY;
+
             cbAlertPopupShowMinimapBorder.Checked = _configuration.AlertPopupShowMinimapBorder ;
             cbAlertPopupMinimap.Checked = _configuration.AlertPopupShowMinimap;
 
@@ -658,6 +661,16 @@ namespace Quesadilla
         private void cbMainWindowShowExtraInformation_CheckedChanged(object sender, EventArgs e)
         {
             _configuration.MainWindowShowExtraInformation = cbMainWindowShowExtraInformation.Checked;
+        }
+
+        private void cbAlertPopupMinimapRawXY_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.AlertPopupMinimapRawXY = ! cbAlertPopupMinimapRawXY.Checked;
+        }
+
+        private void cbMinimapRawXY_CheckedChanged(object sender, EventArgs e)
+        {
+            _configuration.MinimapRawXY = !cbMinimapRawXY.Checked;
         }
     }
 }

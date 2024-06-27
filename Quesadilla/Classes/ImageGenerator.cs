@@ -169,11 +169,11 @@ namespace Quesadilla.Classes
                                         ToSystem = linkedSolarSystem,
                                         route = (mapSystem.route == true & (linkedMinimapSystem != null && linkedMinimapSystem.route == true)),
                                         P1 = (rawXY 
-                                        ? new Point((int)Math.Round((mapSystem.solarSystem.X - FromSystem.X) / LY_SCALING), (int)Math.Round((mapSystem.solarSystem.Y - FromSystem.Y) / LY_SCALING))
+                                        ? new Point((int)Math.Round((FromSystem.X - mapSystem.solarSystem.X ) / LY_SCALING), (int)Math.Round((FromSystem.Y -mapSystem.solarSystem.Y ) / LY_SCALING))
                                         : new Point((int)Math.Round((mapSystem.solarSystem.DotlanX - FromSystem.DotlanX) ), (int)Math.Round((mapSystem.solarSystem.DotlanY - FromSystem.DotlanY)))
                                         ),
                                         P2 = (rawXY
-                                        ? new Point((int)Math.Round((linkedSolarSystem.X - FromSystem.X) / LY_SCALING), (int)Math.Round((linkedSolarSystem.Y - FromSystem.Y) / LY_SCALING))
+                                        ? new Point((int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y -linkedSolarSystem.Y) / LY_SCALING))
                                         : new Point((int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((linkedSolarSystem.DotlanY - FromSystem.DotlanY)))
                                         ),
                                     });

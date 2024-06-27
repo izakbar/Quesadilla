@@ -356,8 +356,8 @@ namespace Quesadilla
             if (Program.NewAlerts.Count > 0 && TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert)
             {
                 var NewAlert = Program.NewAlerts.Dequeue();
-                Program.ActiveAlerts.Enqueue(NewAlert);
-                // do any extra processing 
+
+                Program.EnqueueActiveAlert(NewAlert);
 
                 if (NewAlert.ShowAlert)
                 {
@@ -654,7 +654,7 @@ namespace Quesadilla
                                             FriendlyName = alert.FriendlyName,
                                             ShowAlert = true,
                                         };
-                                        Program.EnqueueAlert(insertedAlert);
+                                        Program.EnqueueNewAlert(insertedAlert);
                                         alertCount++;
                                     }
                                     break;
@@ -678,7 +678,7 @@ namespace Quesadilla
                                                 FriendlyName = alert.FriendlyName,
                                                 ShowAlert = true,
                                             };
-                                        Program.EnqueueAlert(insertedAlert);
+                                        Program.EnqueueNewAlert(insertedAlert);
                                         alertCount++;
                                     }
                                     break;
@@ -711,7 +711,7 @@ namespace Quesadilla
                                                         FriendlyName = alert.FriendlyName,
                                                         ShowAlert = true,
                                                     };
-                                                    Program.EnqueueAlert(insertedAlert);
+                                                    Program.EnqueueNewAlert(insertedAlert);
 
                                                     alertCount++;
                                                 }
@@ -748,7 +748,7 @@ namespace Quesadilla
                                                         FriendlyName = alert.FriendlyName,
                                                         ShowAlert = true,
                                                     };
-                                                    Program.EnqueueAlert(insertedAlert);
+                                                    Program.EnqueueNewAlert(insertedAlert);
 
                                                     alertCount++;
                                                 }
@@ -777,7 +777,7 @@ namespace Quesadilla
                                                     FriendlyName = alert.FriendlyName,
                                                     ShowAlert = true,
                                                 };
-                                            Program.EnqueueAlert(insertedAlert);
+                                            Program.EnqueueNewAlert(insertedAlert);
 
                                             alertCount++;
                                         }
@@ -804,10 +804,10 @@ namespace Quesadilla
                                 FriendlyName = "",
                                 ShowAlert = false,
                             };
-                            Program.EnqueueAlert(insertedAlert);
+                            Program.EnqueueNewAlert(insertedAlert);
                         }
 
-                        Program.Universe.AddAlert(systemId2, insertedAlert);
+                        //Program.Universe.AddAlert(systemId2, insertedAlert);
                         systemId1 = systemId2;
                     }
                     //                    if (this.CheckZoomTo(entry.LogPrefix)) this.ZoomTo(systemId1);
@@ -828,7 +828,7 @@ namespace Quesadilla
 
                             string alertText = generateAlertText(entry, null, alert, alert.TriggerText, 0, alert.TriggerText);
                             Log.Debug("ALERT - " + alertText);
-                            Program.EnqueueAlert(
+                            Program.EnqueueNewAlert(
                                 new AlertQueueItem()
                                 {
                                     AlertText = alertText,
@@ -1243,7 +1243,7 @@ namespace Quesadilla
                                 LastFactionAlert = DateTime.Now;
                                 if (c != null) { c.LastFactionAlert = LastFactionAlert; }
                                 Log.Debug("ALERT - " + alertText);
-                                Program.EnqueueAlert(
+                                Program.EnqueueNewAlert(
                                     new AlertQueueItem()
                                     {
                                         AlertText = alertText,
@@ -1333,7 +1333,7 @@ namespace Quesadilla
                         Log.Information("DECLOAK: proximity to " + alertText);
                     }
 
-                    Program.EnqueueAlert(
+                    Program.EnqueueNewAlert(
                     new AlertQueueItem()
                     {
                         AlertText = alertText,
@@ -1564,7 +1564,7 @@ namespace Quesadilla
                             alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText,"");
                             Log.Information("ALERT - " + alertText);
                             e.Kill.Alert = true;
-                            Program.EnqueueAlert(
+                            Program.EnqueueNewAlert(
                                 new AlertQueueItem()
                                 {
                                     AlertText = alertText,
@@ -1589,7 +1589,7 @@ namespace Quesadilla
                             alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText, "");
                             Log.Information("ALERT - " + alertText);
                             e.Kill.Alert = true;
-                            Program.EnqueueAlert(
+                            Program.EnqueueNewAlert(
                                 new AlertQueueItem()
                                 {
                                     AlertText = alertText,
@@ -1623,7 +1623,7 @@ namespace Quesadilla
                                         )
                                     {
                                         e.Kill.Alert = true;
-                                        Program.EnqueueAlert(
+                                        Program.EnqueueNewAlert(
                                         new AlertQueueItem()
                                         {
                                             AlertText = alertText,
@@ -1660,7 +1660,7 @@ namespace Quesadilla
                                         )
                                     {
                                         e.Kill.Alert = true;
-                                        Program.EnqueueAlert(
+                                        Program.EnqueueNewAlert(
                                         new AlertQueueItem()
                                         {
                                             AlertText = alertText,
