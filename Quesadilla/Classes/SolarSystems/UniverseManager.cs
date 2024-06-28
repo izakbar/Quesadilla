@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using Quesadilla.Classes.Queues;
+using System.Windows.Forms;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Quesadilla.Classes.SolarSystems
 {
@@ -30,6 +32,7 @@ namespace Quesadilla.Classes.SolarSystems
         public Dictionary<int, ESICharacter> ESICharacters = new Dictionary<int, ESICharacter>();
 
         private Dictionary<string, PathInfo> _pathfindingCache = new Dictionary<string, PathInfo>();
+
         public int HomeSolarSystemID { get; set; }
 
         public void ReadSolarSystems(string jsonFile)
@@ -234,5 +237,24 @@ namespace Quesadilla.Classes.SolarSystems
                 SolarSystems[systemId].Alerts.Add(alert);
             }
         }
+
+        public List<MinimapSystem> MouseOverSystem(int X, int Y, List<MinimapSystem> mSystems)
+        {
+            List<MinimapSystem> returnSystems = new List<MinimapSystem>();
+            const int tolerance = 2;
+
+            foreach(var m in mSystems)
+            {
+                if (
+                    (m.X >= X - tolerance && m.X <= X + tolerance) &&
+                    (m.Y >= Y - tolerance && m.Y <= Y + tolerance) )
+                {
+                    returnSystems.Add(m);
+                }
+            }
+
+            return returnSystems;
+        }
+
     }
 }

@@ -40,6 +40,7 @@
             this.pMinimapImage = new System.Windows.Forms.PictureBox();
             this.lblAlertsOutstanding = new System.Windows.Forms.Label();
             this.lblEtxraInformation = new System.Windows.Forms.Label();
+            this.lblSystemName = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pMinimapImage)).BeginInit();
             this.SuspendLayout();
             // 
@@ -132,6 +133,8 @@
             this.pMinimapImage.Size = new System.Drawing.Size(429, 323);
             this.pMinimapImage.TabIndex = 10;
             this.pMinimapImage.TabStop = false;
+            this.pMinimapImage.Click += new System.EventHandler(this.pMinimapImage_Click);
+            this.pMinimapImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pMinimapImage_MouseMove);
             // 
             // lblAlertsOutstanding
             // 
@@ -155,12 +158,24 @@
             this.lblEtxraInformation.Visible = false;
             this.lblEtxraInformation.Click += new System.EventHandler(this.lblEtxraInformation_Click);
             // 
+            // lblSystemName
+            // 
+            this.lblSystemName.ForeColor = System.Drawing.Color.ForestGreen;
+            this.lblSystemName.Location = new System.Drawing.Point(619, 312);
+            this.lblSystemName.Name = "lblSystemName";
+            this.lblSystemName.Size = new System.Drawing.Size(290, 17);
+            this.lblSystemName.TabIndex = 14;
+            this.lblSystemName.Text = "systemName";
+            this.lblSystemName.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.lblSystemName.Visible = false;
+            // 
             // Quesadilla
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(921, 642);
+            this.Controls.Add(this.lblSystemName);
             this.Controls.Add(this.lblEtxraInformation);
             this.Controls.Add(this.buttonIntelSize);
             this.Controls.Add(this.lblAlertsOutstanding);
@@ -197,6 +212,7 @@
         private System.Windows.Forms.PictureBox pMinimapImage;
         private System.Windows.Forms.Label lblAlertsOutstanding;
         private System.Windows.Forms.Label lblEtxraInformation;
+        private System.Windows.Forms.Label lblSystemName;
     }
 }
 

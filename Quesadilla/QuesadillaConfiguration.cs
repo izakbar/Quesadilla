@@ -67,7 +67,7 @@ namespace Quesadilla
                 {
                     CharacterName = "xxxYYYzzz",
                     EntryType = Classes.Logfile.LogEntryType.ChatEvent,
-                    FileName = "foo.txt",
+                    FileName = "fooe.txt",
                     LineContent = "XXpppPPPXXX",
                     LogPrefix = "foo",
                     LogTime = DateTime.Now.ToString(),

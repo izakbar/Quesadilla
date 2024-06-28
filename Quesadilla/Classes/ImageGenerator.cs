@@ -11,12 +11,38 @@ using System.Windows.Forms;
 using System.Diagnostics.Metrics;
 using System.ComponentModel;
 using System.Data;
+using Microsoft.CodeAnalysis;
 
 namespace Quesadilla.Classes
 {
     public class ImageGenerator
     {
-        public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, bool rawXY,ref string extraInformation,
+        private const int TRANSPARENT_BORDER_WIDTH = 1;
+        private const int BORDER_WIDTH = 1;
+        private const int TEXT_SIZE = 8;
+        private const int CIRCLE_KILL_GAP = 4;
+        private const int CIRCLE_ALERT_GAP = 6;
+        private const int CIRCLE_ALT_GAP = 2;
+
+        private const double LY_SCALING = 9460000000000;
+
+        private const int CIRCLE_RADIUS = 3;
+
+        public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c)
+        {
+            using (Font myfont = new Font("Verdana", TEXT_SIZE, FontStyle.Regular))
+            {
+                g.TextRenderingHint = TextRenderingHint.AntiAlias;
+
+                var stringSize = g.MeasureString(text, myfont);
+
+                g.DrawString(text, myfont, new SolidBrush(c),
+                    X - (stringSize.Width / 2),
+                    Y + CIRCLE_RADIUS + 2
+                    );
+            }
+        }
+        public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, bool rawXY, ref string extraInformation, ref List<MinimapSystem> returnMinimapSystems,
             bool showSystemText,
             bool Border, Color BorderColor,
             Color LineColourNormal,
@@ -31,19 +57,11 @@ namespace Quesadilla.Classes
             Color AltColour
             )
         {
-            Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
-            int TRANSPARENT_BORDER_WIDTH = 1;
-            int BORDER_WIDTH = 1;
-            int TEXT_SIZE = 8;
 
-            int CIRCLE_KILL_GAP = 4;
-            int CIRCLE_ALERT_GAP = 6;
-            int CIRCLE_ALT_GAP = 2;
-
-            double LY_SCALING = 9460000000000;
             double GUI_SCALING = 30;
 
-            int CIRCLE_RADIUS = 3;
+
+            Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
 
             int combinedBorder = TRANSPARENT_BORDER_WIDTH + BORDER_WIDTH;
 
@@ -103,8 +121,8 @@ namespace Quesadilla.Classes
                             toSystem = pathSystem == path.ToSystemId ? true : false,
                             route = true,
                             textDisplay = (pathSystem == path.FromSystemId || pathSystem == path.ToSystemId) ? true : false,
-                            X = (rawXY ? (int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING) : (int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX)) ),
-                            Y = (rawXY ? (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING) : (int)Math.Round((nextSolarSystem.DotlanY - FromSystem.DotlanY)) ),
+                            X = (rawXY ? (int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING) : (int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX))),
+                            Y = (rawXY ? (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING) : (int)Math.Round((nextSolarSystem.DotlanY - FromSystem.DotlanY))),
                         });
 
                         // add connection
@@ -115,13 +133,13 @@ namespace Quesadilla.Classes
                                 FromSystem = previousSystem,
                                 ToSystem = nextSolarSystem,
                                 route = true,
-                                P1 = (rawXY 
+                                P1 = (rawXY
                                 ? new Point((int)Math.Round((FromSystem.X - previousSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - previousSystem.Y) / LY_SCALING))
-                                : new Point((int)Math.Round((previousSystem.DotlanX - FromSystem.DotlanX) ), (int)Math.Round((previousSystem.DotlanY - FromSystem.DotlanY)))
+                                : new Point((int)Math.Round((previousSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((previousSystem.DotlanY - FromSystem.DotlanY)))
                                 ),
                                 P2 = (rawXY
                                 ? new Point((int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING))
-                                : new Point((int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX) ), (int)Math.Round((nextSolarSystem.DotlanY - FromSystem.DotlanY)))
+                                : new Point((int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((nextSolarSystem.DotlanY - FromSystem.DotlanY)))
                                 ),
                             });
                         }
@@ -138,12 +156,12 @@ namespace Quesadilla.Classes
                     {
                         foreach (var mapSystem in minimapSystems)
                         {
-                            foreach(var connection in mapSystem.solarSystem.ConnectedTo)
+                            foreach (var connection in mapSystem.solarSystem.ConnectedTo)
                             {
                                 var linkedSolarSystem = Program.Universe.SolarSystems[connection.ToSystemId];
                                 var linkedMinimapSystem = minimapSystems.Where(o => o.solarSystem.Id == linkedSolarSystem.Id).FirstOrDefault();
                                 if (minimapSystems.Where(o => o.solarSystem.Name == linkedSolarSystem.Name).Count() == 0 &&
-                                    minimapSystemsAdditional.Where(o => o.solarSystem.Name == linkedSolarSystem.Name).Count() == 0 )
+                                    minimapSystemsAdditional.Where(o => o.solarSystem.Name == linkedSolarSystem.Name).Count() == 0)
                                 {
                                     minimapSystemsAdditional.Add(new MinimapSystem()
                                     {
@@ -152,7 +170,7 @@ namespace Quesadilla.Classes
                                         toSystem = false,
                                         route = false,
                                         textDisplay = false,
-                                        X = (rawXY ? (int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING) : (int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX) )),
+                                        X = (rawXY ? (int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING) : (int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX))),
                                         Y = (rawXY ? (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING) : (int)Math.Round((linkedSolarSystem.DotlanY - FromSystem.DotlanY))),
                                     });
                                 }
@@ -169,12 +187,12 @@ namespace Quesadilla.Classes
                                         FromSystem = mapSystem.solarSystem,
                                         ToSystem = linkedSolarSystem,
                                         route = (mapSystem.route == true & (linkedMinimapSystem != null && linkedMinimapSystem.route == true)),
-                                        P1 = (rawXY 
-                                        ? new Point((int)Math.Round((FromSystem.X - mapSystem.solarSystem.X ) / LY_SCALING), (int)Math.Round((FromSystem.Y -mapSystem.solarSystem.Y ) / LY_SCALING))
-                                        : new Point((int)Math.Round((mapSystem.solarSystem.DotlanX - FromSystem.DotlanX) ), (int)Math.Round((mapSystem.solarSystem.DotlanY - FromSystem.DotlanY)))
+                                        P1 = (rawXY
+                                        ? new Point((int)Math.Round((FromSystem.X - mapSystem.solarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - mapSystem.solarSystem.Y) / LY_SCALING))
+                                        : new Point((int)Math.Round((mapSystem.solarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((mapSystem.solarSystem.DotlanY - FromSystem.DotlanY)))
                                         ),
                                         P2 = (rawXY
-                                        ? new Point((int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y -linkedSolarSystem.Y) / LY_SCALING))
+                                        ? new Point((int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING))
                                         : new Point((int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((linkedSolarSystem.DotlanY - FromSystem.DotlanY)))
                                         ),
                                     });
@@ -200,8 +218,8 @@ namespace Quesadilla.Classes
                     minY = Math.Min(minY, currentSystem.Y);
                 }
                 int maxSize = Math.Max((int)(maxX - minX), (int)(maxY - minY));
-                int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (CIRCLE_ALERT_GAP*4);
-                GUI_SCALING = (int)Math.Round(  (double)(maxSize) / (   (pictureSize * (rawXY ? .8 : .8) ) )  );
+                int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (CIRCLE_ALERT_GAP * 4);
+                GUI_SCALING = (int)Math.Round((double)(maxSize) / ((pictureSize * (rawXY ? .8 : .8))));
                 GUI_SCALING = GUI_SCALING * (((double)mapScale / 100));
                 // Apply scale
                 maxX = 0; maxY = 0; minX = 0; minY = 0;
@@ -218,7 +236,7 @@ namespace Quesadilla.Classes
                         minY = Math.Min(minY, currentSystem.Y);
                     }
 
-                    foreach(var connection in minimapConnectingSystems)
+                    foreach (var connection in minimapConnectingSystems)
                     {
                         connection.P1 = new Point((int)Math.Round(connection.P1.X / GUI_SCALING), (int)Math.Round(connection.P1.Y / GUI_SCALING));
                         connection.P2 = new Point((int)Math.Round(connection.P2.X / GUI_SCALING), (int)Math.Round(connection.P2.Y / GUI_SCALING));
@@ -240,7 +258,7 @@ namespace Quesadilla.Classes
                 Point originPoint = new Point(ox, oy);
 
                 // draw connections
-                foreach(var connection in minimapConnectingSystems)
+                foreach (var connection in minimapConnectingSystems)
                 {
                     Point P1 = new Point(originPoint.X + connection.P1.X, originPoint.Y + connection.P1.Y);
                     Point P2 = new Point(originPoint.X + connection.P2.X, originPoint.Y + connection.P2.Y);
@@ -263,7 +281,7 @@ namespace Quesadilla.Classes
                     {
                         var zkillPen = new Pen(ZKillColour);
                         g.DrawEllipse(zkillPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2);
-                        foreach(var k in currentSystem.solarSystem.Kills)
+                        foreach (var k in currentSystem.solarSystem.Kills)
                         {
                             sbExtraInformation.AppendLine($"ZKILL {k.SolarSystemName} {k.VictimShipName} {k.VictimCharacterName}");
                         }
@@ -272,14 +290,14 @@ namespace Quesadilla.Classes
                     {
                         var intelPen = new Pen(IntelColour);
                         g.DrawEllipse(intelPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2);
-                        foreach (var a in currentSystem.solarSystem.Alerts.Where(o => ! o.isFaction && ! o.isDecloak && o.Kill is null))
+                        foreach (var a in currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null))
                         {
                             sbExtraInformation.AppendLine($"{a.Entry.LineContent}");
                         }
                     }
 
                     // active alt in sytstem ?
-                    if (Program.CharacterList.Where(o => o.IsClientActive && o.IsCurrentlActiveClient == false && o.LocationId == currentSystem.solarSystem.Id).Count() > 0) 
+                    if (Program.CharacterList.Where(o => o.IsClientActive && o.IsCurrentlActiveClient == false && o.LocationId == currentSystem.solarSystem.Id).Count() > 0)
                     {
                         var altPen = new Pen(AltColour);
                         g.DrawEllipse(altPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP)), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP)), (CIRCLE_RADIUS + CIRCLE_ALT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALT_GAP) * 2);
@@ -295,22 +313,28 @@ namespace Quesadilla.Classes
 
                         Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
 
-                        using (Font myfont = new Font("Verdana", TEXT_SIZE, FontStyle.Regular))
-                        {
-                            g.TextRenderingHint = TextRenderingHint.AntiAlias;
-
-                            var stringSize = g.MeasureString(currentSystem.solarSystem.Name, myfont);
-
-                            g.DrawString(currentSystem.solarSystem.Name, myfont, new SolidBrush(SystemColourText),
-                                currentPoint.X - (stringSize.Width / 2),
-                                currentPoint.Y + CIRCLE_RADIUS + 2 
-                                );
-                        }
-
+                        DrawSystemName(g, currentPoint.X, currentPoint.Y, currentSystem.solarSystem.Name, SystemColourText);
                     }
                 }
 
                 extraInformation = sbExtraInformation.ToString();
+
+                if (returnMinimapSystems != null)
+                {
+                    lock (returnMinimapSystems)
+                    {
+                        returnMinimapSystems.Clear();
+
+                        foreach (var currentSystem in minimapSystems)
+                        {
+                            currentSystem.X += originPoint.X;
+                            currentSystem.Y += originPoint.Y;
+                        }
+
+                        returnMinimapSystems = minimapSystems;
+                    }
+                }
+
                 return dstImage;
             }
         }

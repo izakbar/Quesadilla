@@ -137,6 +137,9 @@ namespace Quesadilla
 
         private string ZKillRedisID = "Quesadilla_" + Guid.NewGuid().ToString();
 
+        private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
+        private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
+
         public Quesadilla()
         {
             splashScreenThread = new Thread(new ThreadStart(ShowSplashScreen));
@@ -290,6 +293,8 @@ namespace Quesadilla
             lblStatus.ForeColor = Program.MainConfiguration.EvescoutColour;
             lblEtxraInformation.ForeColor = Program.MainConfiguration.MainWindowExtraInformationColour;
 
+            lblSystemName.ForeColor = Program.MainConfiguration.MainWindowMouseoverSystemColour;
+
             pMinimapImage.Height = Program.MainConfiguration.MinimapHeight;
             pMinimapImage.Width = (int)((double)Program.MainConfiguration.MinimapHeight*1.3);
 
@@ -331,6 +336,7 @@ namespace Quesadilla
             lblISK.Text = "";
             lblAlertsOutstanding.Text = "";
             lblEtxraInformation.Text = "";
+            lblSystemName.Text = "";
 
             this.Invalidate();
 
@@ -1356,6 +1362,8 @@ namespace Quesadilla
             {
                 lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
                 lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
+                lblSystemName.Top = lblISK.Top;
+
                 lblEtxraInformation.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
                 lblEtxraInformation.Height = pMinimapImage.Height - (lblEtxraInformation.Top - pMinimapImage.Top - lblISK.Height - 5);
                 lblEtxraInformation.Left = pMinimapImage.Left + pMinimapImage.Width + 2;
@@ -1364,6 +1372,7 @@ namespace Quesadilla
             {
                 lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
                 lblISK.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
+                lblSystemName.Top = lblISK.Top;
             }
 
             buttonIntelSize.Top = intelLog.Top + 2;
@@ -1830,7 +1839,7 @@ namespace Quesadilla
             {
                 string extraInformation = "";
                 Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
-                    Program.MainConfiguration.MinimapJumps, mapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation,
+                    Program.MainConfiguration.MinimapJumps, mapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation, ref MinimapSystems,
                     Program.MainConfiguration.MinimapShowSystemText,
                     Program.MainConfiguration.ShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
                     Program.MainConfiguration.MinimapLineColourNormal,
@@ -1871,7 +1880,21 @@ namespace Quesadilla
             ImageGenerator.PaintDrawText(e, lblISK);
             ImageGenerator.PaintDrawText(e, lblAlertsOutstanding);
 
-            if (pMinimapImage.Visible && Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, lblEtxraInformation);
+            if (pMinimapImage.Visible) {
+                if ( Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, lblEtxraInformation);
+                if (mouseOverMinimapSystems.Count() > 0)
+                {
+                    lblSystemName.Text = "";
+                    foreach(var m in mouseOverMinimapSystems)
+                    {
+                        ImageGenerator.DrawSystemName(e.Graphics, m.X+pMinimapImage.Left, m.Y+pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.MinimapMMouseoverSystemColour);
+                        if (!lblSystemName.Text.IsNullOrEmpty()) lblSystemName.Text += ",";
+                        lblSystemName.Text += m.solarSystem.Name;
+                    }
+
+                    ImageGenerator.PaintDrawText(e, lblSystemName);
+                }
+            }
 
             // draw red dot
             if ( InCombat )
@@ -1914,6 +1937,20 @@ namespace Quesadilla
         }
 
         private void lblEtxraInformation_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pMinimapImage_MouseMove(object sender, MouseEventArgs e)
+        {
+            mouseOverMinimapSystems = Program.Universe.MouseOverSystem(e.X, e.Y, MinimapSystems);
+            if (mouseOverMinimapSystems.Count() > 0 )
+            {
+                this.Invalidate();
+            }
+        }
+
+        private void pMinimapImage_Click(object sender, EventArgs e)
         {
 
         }

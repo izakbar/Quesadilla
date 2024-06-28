@@ -112,6 +112,11 @@ namespace Quesadilla.Classes
 
                 MainWindowExtraInformationColour = MainWindowExtraInformationColour,
                 MainWindowShowExtraInformation = MainWindowShowExtraInformation,
+
+                PopupAlertMinimapMMouseoverSystemColour = PopupAlertMinimapMMouseoverSystemColour,
+                MinimapMMouseoverSystemColour = MinimapMMouseoverSystemColour,
+                MainWindowMouseoverSystemColour = MainWindowMouseoverSystemColour,
+
             };
 
             c.AlertPopupMinimapPosition = new Point(AlertPopupMinimapPosition.X, AlertPopupMinimapPosition.Y);
@@ -181,7 +186,7 @@ namespace Quesadilla.Classes
                 c = new Config();
                 c.TickMiliseconds = 150;
                 c.HowManyTicksBeforeCleardown = 30;
-                c.HowManyTicksBeforeAlert = 3;
+                c.HowManyTicksBeforeAlert = 2;
                 c.HowManyTicksBeforeDPSGraphUpdate = 8;
                 c.HowManyTicksBeforeLogfileCheck = 3;
                 c.HomeSystem = "K7D-II";
@@ -272,6 +277,10 @@ namespace Quesadilla.Classes
                 c.MinimapSystemColourTo = Color.Green;
                 c.MinimapShowSystemText = true;
                 c.MinimapSystemColourText = Color.LemonChiffon;
+
+                c.MinimapMMouseoverSystemColour = Color.OrangeRed;
+                c.PopupAlertMinimapMMouseoverSystemColour = Color.OrangeRed;
+                c.MainWindowMouseoverSystemColour = Color.Orchid;
 
                 c.MinimapZKillColour = Color.Red;
                 c.MinimapIntelColour = Color.Orange;
@@ -644,6 +653,9 @@ img.rounded-corners {
         public Color MinimapSystemColourText { get; set; }
         public Color MinimapZKillColour { get; set; }
         public Color MinimapIntelColour { get; set; }
+        public Color MinimapMMouseoverSystemColour { get; set; }
+        public Color MainWindowMouseoverSystemColour { get; set; }
+        public Color PopupAlertMinimapMMouseoverSystemColour { get; set; }
         public Color MinimapAltPositionColour { get; set; }
         public int MinimapHeight { get; set; }
         public bool MinimapRawXY { get; set; }

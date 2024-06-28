@@ -51,6 +51,9 @@ namespace Quesadilla
         private bool _rightMouseDown = false;
         private Point diffPoint;
 
+        private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
+        private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
+
         public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background, Quesadilla mainForm)
         {
             _main = mainForm;
@@ -157,7 +160,8 @@ namespace Quesadilla
             {
                 string extraInformation = "";
                 pMinimapImage.Size = (Size)configuration.AlertPopupMinimapSize;
-                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path , 0,100, configuration.AlertPopupMinimapRawXY, ref extraInformation, 
+                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path , 0,100, 
+                    configuration.AlertPopupMinimapRawXY, ref extraInformation, ref MinimapSystems,
                     configuration.AlertPopupMinimapShowSystemText,
                     configuration.AlertPopupShowMinimapBorder, configuration.AlertPopupMinimapBorderColour,
                     configuration.AlertPopupMinimapLineColourNormal,
@@ -461,6 +465,16 @@ namespace Quesadilla
             ImageGenerator.PaintDrawText(e, ContextInfo);
             ImageGenerator.PaintDrawText(e, IntelLine);
 
+            if (pMinimapImage.Visible)
+            {
+                if (mouseOverMinimapSystems.Count() > 0)
+                {
+                    foreach (var m in mouseOverMinimapSystems)
+                    {
+                        ImageGenerator.DrawSystemName(e.Graphics, m.X+ pMinimapImage.Left, m.Y+ pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.PopupAlertMinimapMMouseoverSystemColour);
+                    }
+                }
+            }
         }
 
         private void ShipName_Click(object sender, EventArgs e)
@@ -479,6 +493,15 @@ namespace Quesadilla
         private void ContextInfo_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void pMinimapImage_MouseMove(object sender, MouseEventArgs e)
+        {
+            mouseOverMinimapSystems = Program.Universe.MouseOverSystem(e.X, e.Y, MinimapSystems);
+            if (mouseOverMinimapSystems.Count() > 0)
+            {
+                this.Invalidate();
+            }
         }
     }
 }
