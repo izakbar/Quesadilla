@@ -12,6 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
+using Quesadilla.Classes.Queues;
+using System.Windows.Forms;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Quesadilla.Classes.SolarSystems
 {
@@ -29,6 +32,7 @@ namespace Quesadilla.Classes.SolarSystems
         public Dictionary<int, ESICharacter> ESICharacters = new Dictionary<int, ESICharacter>();
 
         private Dictionary<string, PathInfo> _pathfindingCache = new Dictionary<string, PathInfo>();
+
         public int HomeSolarSystemID { get; set; }
 
         public void ReadSolarSystems(string jsonFile)
@@ -208,9 +212,48 @@ namespace Quesadilla.Classes.SolarSystems
             }
         }
 
-        public void AddAlert(int systemId)
+        public string PathToString(PathInfo path)
+        {
+            string route = "";
+            if (path != null)
+            {
+                foreach (int systemId in path.PathSystems)
+                {
+                    if (route.Length > 0) route += " -> ";
+                    route += systemId == path.FromSystemId ? "" : Program.Universe.SolarSystems[systemId].Name;
+                }
+            }
+            return route;
+        }
+
+        public void AddAlert(int systemId, AlertQueueItem alert)
         {
             SolarSystems[systemId].AlertTime = DateTime.Now;
+
+            if (!alert.isFaction && !alert.isDecloak && alert.Kill == null && alert.Path != null)
+            {
+                // add alert to solarsystem info
+                if (SolarSystems[systemId].Alerts == null) SolarSystems[systemId].Alerts = new List<AlertQueueItem>();
+                SolarSystems[systemId].Alerts.Add(alert);
+            }
+        }
+
+        public List<MinimapSystem> MouseOverSystem(int X, int Y, List<MinimapSystem> mSystems)
+        {
+            List<MinimapSystem> returnSystems = new List<MinimapSystem>();
+            const int tolerance = 2;
+
+            foreach(var m in mSystems)
+            {
+                if (
+                    (m.X >= X - tolerance && m.X <= X + tolerance) &&
+                    (m.Y >= Y - tolerance && m.Y <= Y + tolerance) )
+                {
+                    returnSystems.Add(m);
+                }
+            }
+
+            return returnSystems;
         }
 
     }

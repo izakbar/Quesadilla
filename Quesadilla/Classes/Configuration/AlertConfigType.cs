@@ -10,6 +10,7 @@ namespace Quesadilla.Classes.Configuration
     {
         Range,
         FactionSpawn,
+        Decloak,
         Text
     }
 }

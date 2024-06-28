@@ -7,6 +7,7 @@ using Google.Protobuf.WellKnownTypes;
 using System.Text.Json.Serialization;
 using Quesadilla.Classes;
 using Newtonsoft.Json;
+using System.Xml;
 
 namespace QuesadillaExport
 {
@@ -18,20 +19,66 @@ namespace QuesadillaExport
             var solarSystems = DataAccess.mapSolarSystems.SelectAll();
             Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
 
+            XmlDocument xmldoc = new XmlDocument
+            {
+                XmlResolver = null
+            };
+            string previousRegion = "";
+            bool dotlanRegionDataLoaded = false;
+            XmlNodeList dotlanNodes = null;
+
             foreach (var solarSystem in solarSystems)
             {
-                SolarSystems.Add(solarSystem.solarSystemId,
-                    new SolarSystem()
+                if (previousRegion != solarSystem.RegionName)
+                {
+                    // load dotlan svg for this region
+                    previousRegion = solarSystem.RegionName;
+                    var dotlanRegionName = solarSystem.RegionName.Replace(" ", "_");
+                    try
                     {
-                        Name = solarSystem.solarSystemname,
-                        RegionName = solarSystem.RegionName,
-                        X = solarSystem.X,
-                        Y = solarSystem.Y,
-                        Z = solarSystem.Z,
-                        Id = solarSystem.solarSystemId,
-                        ConnectedTo = new List<SolarSystemConnectionData>(),
+                        FileStream fs = new FileStream($"dotlan_data\\{dotlanRegionName}.svg", FileMode.Open, FileAccess.Read);
+                        xmldoc.Load(fs);
+                        dotlanNodes = xmldoc.SelectNodes(@"//*[@id='sysuse']/*");
+                        dotlanRegionDataLoaded |= true;
                     }
-                );
+                    catch (Exception ex)
+                    {
+                        dotlanRegionDataLoaded |= false;
+                    }
+                }
+
+                double dotlanX = 0;
+                double dotlanY = 0;
+
+                if (dotlanRegionDataLoaded)
+                {
+                    foreach (XmlNode xn in dotlanNodes)
+                    {
+                        long systemID = long.Parse(xn.Attributes["id"].Value.Replace("sys",""));
+                        float x = float.Parse(xn.Attributes["x"].Value);
+                        float y = float.Parse(xn.Attributes["y"].Value);
+                        if (systemID == solarSystem.solarSystemId)
+                        {
+                            dotlanX = x;
+                            dotlanY = y;
+                        }
+                    }
+                }
+
+                SolarSystems.Add(solarSystem.solarSystemId,
+                new SolarSystem()
+                {
+                    Name = solarSystem.solarSystemname,
+                    RegionName = solarSystem.RegionName,
+                    X = solarSystem.X,
+                    Y = solarSystem.Y,
+                    Z = solarSystem.Z,
+                    DotlanX = dotlanX,
+                    DotlanY = dotlanY,
+                    Id = solarSystem.solarSystemId,
+                    ConnectedTo = new List<SolarSystemConnectionData>(),
+                }
+            );
             }
 
             var solarSystemJumps = DataAccess.mapSolarSystemJumps.SelectAll();

@@ -1,20 +1,28 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using EVEStandard.Models;
+using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Queues;
+using Quesadilla.Classes.SolarSystems;
+using Serilog.Debugging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Media;
+using System.Numerics;
 using System.Reflection.Emit;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace Quesadilla
 {
@@ -27,6 +35,8 @@ namespace Quesadilla
         private int _opacitystep;
         private PopupLocationType _location;
 
+        private bool ShowShipname = false;
+
         private Quesadilla _main;
 
         public bool IsZkill = false;
@@ -34,13 +44,23 @@ namespace Quesadilla
 
         private const string ALERT_TEXT = "Alert";
         private const string FACTION_TEXT = "Faction Spawn";
+        private const string DECLOAK_TEXT = "Pilot decloaked";
 
         private const int ZOOM_SIZE_INCREASE = 1;
+
+        private bool _rightMouseDown = false;
+        private Point diffPoint;
+
+        private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
+        private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
 
         public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background, Quesadilla mainForm)
         {
             _main = mainForm;
             InitializeComponent();
+
+            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+
             _alert = alert;
             _seconds = configuration.AlertPopupSeconds;
             _opacity = configuration.AlertPopupOpacity;
@@ -67,6 +87,10 @@ namespace Quesadilla
                 {
                     SystemName.Text = FACTION_TEXT;
                 }
+                else if (alert.isDecloak)
+                {
+                    SystemName.Text = DECLOAK_TEXT;
+                }
                 else
                 {
                     SystemName.Text = ALERT_TEXT;
@@ -81,10 +105,14 @@ namespace Quesadilla
             else
             {
                 RegionName.Text = "";
+                if ( alert.isDecloak)
+                {
+                    RegionName.Text = alert.Entry.CharacterName;
+                }
             }
 
             ContextInfo.ForeColor = configuration.AlertPopupContextInfoColour;
-            if (alert.Path != null && ! alert.isFaction)
+            if (alert.Path != null && ! (alert.isFaction|| alert.isDecloak))
             {
                 ContextInfo.Text = _alert.Path.TotalJumps.ToString() + " jump" + (_alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + _alert.Context;
             }
@@ -94,7 +122,12 @@ namespace Quesadilla
                 {
                     ContextInfo.Text = alert.Context;
                 }
+                else if (alert.isDecloak)
+                {
+                    ContextInfo.Text = alert.Context;
+                }
                 else
+
                 {
                     ContextInfo.Text = alert.FriendlyName;
                 }
@@ -109,66 +142,98 @@ namespace Quesadilla
                 IntelLine.Text = alert.Kill.Context;
 
                 pAlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
-                Image RoundedImage = ClipToCircle(pAlertImage.Image, new PointF(pAlertImage.Image.Width / 2, pAlertImage.Image.Height / 2), pAlertImage.Image.Width / 2, 
-                    Color.Transparent ,_main.Configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, _main.Configuration.ZKillIskColour, _main.Configuration.ZKillShowBar, _main.Configuration.ZKillBarColour);
-                Bitmap b = new Bitmap(RoundedImage);
-                b.MakeTransparent(b.GetPixel(0, 0));
-                pAlertImage.Image = b;
+                Image RoundedImage = ImageGenerator.ClipToCircle(pAlertImage.Image, new PointF(pAlertImage.Image.Width / 2, pAlertImage.Image.Height / 2), pAlertImage.Image.Width / 2, 
+                    Color.Transparent , configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, configuration.ZKillIskColour, configuration.ZKillShowBar, configuration.ZKillBarColour);
+                Bitmap killBitmap = new Bitmap(RoundedImage);
+                killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
+                pAlertImage.Image = killBitmap;
+
+                ShipName.Text = alert.Kill.VictimShipName;
             }
             else
             {
                 IntelLine.Text = _alert.Entry.LineContent;
+                ShipName.Text = "";
+            }
+
+            if (configuration.AlertPopupShowMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0) )
+            {
+                string extraInformation = "";
+                pMinimapImage.Size = (Size)configuration.AlertPopupMinimapSize;
+                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path , 0,100, 
+                    configuration.AlertPopupMinimapRawXY, ref extraInformation, ref MinimapSystems,
+                    configuration.AlertPopupMinimapShowSystemText,
+                    configuration.AlertPopupShowMinimapBorder, configuration.AlertPopupMinimapBorderColour,
+                    configuration.AlertPopupMinimapLineColourNormal,
+                    configuration.AlertPopupMinimapLineColourRoute,
+                    configuration.AlertPopupMinimapSystemColourNormal,
+                    configuration.AlertPopupMinimapSystemColourRoute,
+                    configuration.AlertPopupMinimapSystemColourFrom,
+                    configuration.AlertPopupMinimapSystemColourTo,
+                    configuration.AlertPopupMinimapSystemColourText,
+                    configuration.AlertPopupMinimapZKillColour,
+                    configuration.AlertPopupMinimapIntelColour,
+                    configuration.AlertPopupMinimapAltPositionColour
+                    );
+                Bitmap minimapBitmap = new Bitmap(minimapImage);
+                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
+                pMinimapImage.Image = minimapBitmap;
+                pMinimapImage.Location = configuration.AlertPopupMinimapPosition;
+                pMinimapImage.Visible = true;
+            }
+            else
+            {
+                pMinimapImage.Visible = false;
             }
 
             BackgroundImage = background;
 
-
             // position on screen
-            if (_main.Configuration.AlertTransparent)
+            if (configuration.AlertTransparent)
             {
                 // use current eve window (for transparent)
-                switch (_main.Configuration.DPSLocation)
+                switch (Program.MainConfiguration.DPSLocation)
                 {
                     case PopupLocationType.TopLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left + _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Left + configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.TopCenter:
                         Location = new Point()
                         {
                             X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.TopRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width - _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Right - Width - configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left + _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Left + configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomCenter:
                         Location = new Point()
                         {
                             X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            Y = _main.currentEveWindowRect.Bottom - Height - configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width - _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Right - Width - configuration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - configuration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.Center:
@@ -278,8 +343,18 @@ namespace Quesadilla
 
         private void QuesadillaAlertPopup_Click(object sender, EventArgs e)
         {
-            Opacity = 0;
-            CloseWindow();
+            MouseEventArgs e2 = (MouseEventArgs)e;
+            Point clickLocation = new Point(e2.X, e2.Y);
+            Rectangle r = new Rectangle(SystemName.Location.X, SystemName.Location.Y, SystemName.Width, SystemName.Height);
+            if (r.Contains(clickLocation))
+            {
+                SystemName_Click(sender, e);
+            }
+            else
+            {
+                Opacity = 0;
+                CloseWindow();
+            }
         }
 
         private void timerOpacityClose_Tick(object sender, EventArgs e)
@@ -312,76 +387,6 @@ namespace Quesadilla
             }
         }
 
-        // makes nice round ellipse/circle images from rectangle images
-        public Image ClipToCircle(Image srcImage, PointF center, float radius, Color backGround, Color circleColour, int circleWidth, string isk, Color iskColour, bool showBar, Color barColor)
-        {
-            int TEXT_SIZE = 135;
-            Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
-            
-            using (Graphics g = Graphics.FromImage(dstImage))
-            {
-                // Border
-                RectangleF r2 = new RectangleF(center.X - radius, center.Y - radius, (radius * 2), (radius * 2));
-
-                // Main picture
-                RectangleF r = new RectangleF(center.X - radius + circleWidth, center.Y - radius + circleWidth, (radius * 2)- (circleWidth*2), (radius * 2)- (circleWidth*2));
-
-                RectangleF rISK = new RectangleF(0, 0, srcImage.Width, srcImage.Height);
-
-                // enables smoothing of the edge of the circle (less pixelated)
-                g.SmoothingMode = SmoothingMode.AntiAlias;
-
-                if (backGround != Color.Transparent)
-                {
-                    // fills background color
-                    using (Brush br = new SolidBrush(backGround))
-                    {
-                        g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
-                    }
-                }
-
-                if (circleWidth > 0)
-                {
-                    GraphicsPath pathborder = new GraphicsPath();
-                    pathborder.AddEllipse(r2);
-                    g.SetClip(pathborder);
-                    using (Brush br = new SolidBrush(circleColour))
-                    {
-                        g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
-                    }
-                }
-
-                // adds the new ellipse & draws the image again 
-                GraphicsPath path = new GraphicsPath();
-                path.AddEllipse(r);
-                g.SetClip(path);
-                g.DrawImage(srcImage, 0, 0);
-
-                g.ResetClip();
-/*
-                using (Brush br = new SolidBrush(Color.Orange))
-                {
-                    g.FillRectangle(br, 0, srcImage.Height-100 , srcImage.Width, 100);
-                }
-*/
-
-                using (Font myfont = new Font("Arial", TEXT_SIZE - 20,FontStyle.Bold))
-                {
-                    var format = new StringFormat
-                    {
-                        Alignment = StringAlignment.Far,
-                        LineAlignment = StringAlignment.Center,
-                        Trimming = StringTrimming.None,
-                    };
-                    if ( showBar ) g.FillRectangle(new SolidBrush(barColor), 0, srcImage.Height - TEXT_SIZE , srcImage.Width, TEXT_SIZE );
-                    g.DrawString(isk, myfont, new SolidBrush(iskColour), new RectangleF(0, (srcImage.Height - TEXT_SIZE), srcImage.Width, TEXT_SIZE), format);
-                }
-
-
-                return dstImage;
-            }
-        }
-
         private void Zoom_MouseEnter(object sender, EventArgs e)
         {
             System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
@@ -399,6 +404,104 @@ namespace Quesadilla
         private void IntelLine_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void QuesadillaAlertPopup_MouseDown(object sender, MouseEventArgs e)
+        {
+            if ( e.Button == MouseButtons.Right)
+            {
+                _rightMouseDown = true;
+                diffPoint.X = System.Windows.Forms.Cursor.Position.X - this.Left;
+                diffPoint.Y = System.Windows.Forms.Cursor.Position.Y - this.Top;
+            }
+        }
+
+        private void QuesadillaAlertPopup_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                _rightMouseDown = false;
+            }
+        }
+
+        private void QuesadillaAlertPopup_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_rightMouseDown)
+            {
+                this.Left = System.Windows.Forms.Cursor.Position.X - diffPoint.X;
+                this.Top = System.Windows.Forms.Cursor.Position.Y - diffPoint.Y;
+            }
+        }
+
+        private void pAlertImage_MouseEnter(object sender, EventArgs e)
+        {
+            if (IsZkill)
+            {
+                //ShipName.Visible = true;
+                ShowShipname = true;
+                this.Invalidate();
+            }
+        }
+
+        private void pAlertImage_MouseLeave(object sender, EventArgs e)
+        {
+            //ShipName.Visible = false;
+            ShowShipname = false;
+            this.Invalidate();  
+        }
+
+        private void pMinimap_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void QuesadillaAlertPopup_Paint(object sender, PaintEventArgs e)
+        {
+            ImageGenerator.PaintDrawText(e, AlertText);
+            ImageGenerator.PaintDrawText(e, SystemName);
+            ImageGenerator.PaintDrawText(e,RegionName);
+            ImageGenerator.PaintDrawText(e,ContextInfo);
+            if ( ShowShipname ) ImageGenerator.PaintDrawText(e, ShipName);
+            ImageGenerator.PaintDrawText(e, ContextInfo);
+            ImageGenerator.PaintDrawText(e, IntelLine);
+
+            if (pMinimapImage.Visible)
+            {
+                if (mouseOverMinimapSystems.Count() > 0)
+                {
+                    foreach (var m in mouseOverMinimapSystems)
+                    {
+                        ImageGenerator.DrawSystemName(e.Graphics, m.X+ pMinimapImage.Left, m.Y+ pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.PopupAlertMinimapMMouseoverSystemColour);
+                    }
+                }
+            }
+        }
+
+        private void ShipName_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void QuesadillaAlertPopup_Shown(object sender, EventArgs e)
+        {
+            _main.latestAlertBitmap = new Bitmap(this.Width, this.Height);
+            this.DrawToBitmap(_main.latestAlertBitmap, new Rectangle(Point.Empty, _main.latestAlertBitmap.Size));
+            _main.latestAlertTimestamp = DateTime.Now;
+            // _main.latestAlertBitmap.Save("QuesadillaLatestAlert.png");
+        }
+
+        private void ContextInfo_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pMinimapImage_MouseMove(object sender, MouseEventArgs e)
+        {
+            mouseOverMinimapSystems = Program.Universe.MouseOverSystem(e.X, e.Y, MinimapSystems);
+            if (mouseOverMinimapSystems.Count() > 0)
+            {
+                this.Invalidate();
+            }
         }
     }
 }

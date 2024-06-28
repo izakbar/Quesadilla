@@ -25,14 +25,14 @@ namespace Quesadilla
         public QuesadillaDPSGraph(Quesadilla mainForm)
         {
             _main = mainForm;
-            TopMost = _main.Configuration.DPSGraphStayOnTop;
-            if ( _main.Configuration.DPSGraphTransparent )
+            TopMost = Program.MainConfiguration.DPSGraphStayOnTop;
+            if ( Program.MainConfiguration.DPSGraphTransparent )
             {
                 this.TransparencyKey = this.BackColor = TransparentColour;
             }
             InitializeComponent();
 
-            if ( _main.Configuration.DPSGraphTransparent )
+            if ( Program.MainConfiguration.DPSGraphTransparent )
             {
                 this.Text = "";
                 this.ControlBox = false;
@@ -41,8 +41,8 @@ namespace Quesadilla
             }
 
 
-            Width = _main.Configuration.DPSGraphWindowSize.X <= 100 ? 100 : _main.Configuration.DPSGraphWindowSize.X;
-            Height = _main.Configuration.DPSGraphWindowSize.Y <= 50 ? 50 : _main.Configuration.DPSGraphWindowSize.Y;
+            Width = Program.MainConfiguration.DPSGraphWindowSize.X <= 100 ? 100 : Program.MainConfiguration.DPSGraphWindowSize.X;
+            Height = Program.MainConfiguration.DPSGraphWindowSize.Y <= 50 ? 50 : Program.MainConfiguration.DPSGraphWindowSize.Y;
 
             SetScreenPosition();
         }
@@ -50,51 +50,51 @@ namespace Quesadilla
         public void SetScreenPosition()
         {
             // position on screen
-            if ( _main.Configuration.DPSGraphTransparent )
+            if ( Program.MainConfiguration.DPSGraphTransparent )
             {
                 // use current eve window (for transparent)
-                switch (_main.Configuration.DPSLocation)
+                switch (Program.MainConfiguration.DPSLocation)
                 {
                     case PopupLocationType.TopLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left + _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Left + Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.TopCenter:
                         Location = new Point()
                         {
                             X = ( (_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.TopRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width - _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Right - Width - Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomLeft:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Left + _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Left + Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomCenter:
                         Location = new Point()
                         {
                             X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            Y = _main.currentEveWindowRect.Bottom - Height - Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.BottomRight:
                         Location = new Point()
                         {
-                            X = _main.currentEveWindowRect.Right - Width - _main.Configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - _main.Configuration.DPSGraphWindowSizeAdjust.Y,
+                            X = _main.currentEveWindowRect.Right - Width - Program.MainConfiguration.DPSGraphWindowSizeAdjust.X,
+                            Y = _main.currentEveWindowRect.Bottom - Height - Program.MainConfiguration.DPSGraphWindowSizeAdjust.Y,
                         };
                         break;
                     case PopupLocationType.Center:
@@ -111,7 +111,7 @@ namespace Quesadilla
             {
                 // use screen position
                 Screen screen = Screen.FromControl(this);
-                switch (_main.Configuration.DPSLocation)
+                switch (Program.MainConfiguration.DPSLocation)
                 {
                     case PopupLocationType.TopLeft:
                         Location = new Point()
@@ -154,21 +154,21 @@ namespace Quesadilla
         }
         private void QuesadillaDPSGraph_Load(object sender, EventArgs e)
         {
-            if (_main.Configuration.DPSGraphTransparent)
+            if (Program.MainConfiguration.DPSGraphTransparent)
             {
                 this.chartDPS.BackColor = this.BackColor;
                 ShowInTaskbar = false;
                 this.chartDPS.AntiAliasing = AntiAliasingStyles.None;
             }
-            chartDPS.Legends.First().Enabled = _main.Configuration.DPSGraphLegends;
+            chartDPS.Legends.First().Enabled = Program.MainConfiguration.DPSGraphLegends;
         }
 
         public void UpdateDPSGraph()
         {
-            int maxPoints = _main.Configuration.GraphCombatMaxPoints;
-            int minSpanSize = _main.Configuration.GraphCombatMinPointSeconds;
+            int maxPoints = Program.MainConfiguration.GraphCombatMaxPoints;
+            int minSpanSize = Program.MainConfiguration.GraphCombatMinPointSeconds;
 
-            int LineSize = _main.Configuration.DPSGraphLineSize;
+            int LineSize = Program.MainConfiguration.DPSGraphLineSize;
 
             // default to total dps
             chartDPS.Series.Clear();
@@ -177,20 +177,20 @@ namespace Quesadilla
 
             /*
             // pick first toon in list;
-            Toon = _main._combat.Keys.First().ToString();
+            Toon = Program.Combat.Keys.First().ToString();
 
             // pick last active dps
             DateTime LastCombat = DateTime.Now.AddDays(-1);
-            if ( _main._combat.Keys.Count > 1 )
+            if ( Program.Combat.Keys.Count > 1 )
             {
                 // find toon with latest combat on
-                foreach(var x in _main._combat.Keys)
+                foreach(var x in Program.Combat.Keys)
                 {
-                    if (_main._combat[x].Count > 0 )
+                    if (Program.Combat[x].Count > 0 )
                     {
-                        if (_main._combat[x].Last().TimeAdded > LastCombat )
+                        if (Program.Combat[x].Last().TimeAdded > LastCombat )
                         {
-                            LastCombat = _main._combat[x].Last().TimeAdded;
+                            LastCombat = Program.Combat[x].Last().TimeAdded;
                             Toon = x;
                         } 
                     }
@@ -204,7 +204,7 @@ namespace Quesadilla
                 Toon = _main.CurrentActiveToon;
             }
 
-            if ( Toon == null || Toon == "" || !_main._combat.ContainsKey(Toon))
+            if ( Toon == null || Toon == "" || !Program.Combat.ContainsKey(Toon))
             {
                 chartDPS.Visible = false;
                 return;
@@ -215,7 +215,7 @@ namespace Quesadilla
                 SetScreenPosition();
             }
 
-            if ( _main.Configuration.DPSAllToons )
+            if ( Program.MainConfiguration.DPSAllToons )
             {
                 Toon = "*ALL*";
             }
@@ -293,28 +293,28 @@ namespace Quesadilla
             toon1HullReceived.BorderDashStyle = ChartDashStyle.Solid;
 
             var toon1HullGiven = chartDPS.Series.Add("LogiH OUT");
-            toon1ArmorGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            toon1ArmorGiven.Points.Clear();
-            toon1ArmorGiven.Color = Color.SlateGray;
-            toon1ArmorGiven.YAxisType = AxisType.Secondary;
-            toon1ArmorGiven.BorderWidth = LineSize;
-            toon1ArmorGiven.BorderDashStyle = ChartDashStyle.Solid;
+            toon1HullGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1HullGiven.Points.Clear();
+            toon1HullGiven.Color = Color.SlateGray;
+            toon1HullGiven.YAxisType = AxisType.Secondary;
+            toon1HullGiven.BorderWidth = LineSize;
+            toon1HullGiven.BorderDashStyle = ChartDashStyle.Solid;
 
             var toon1CapReceived = chartDPS.Series.Add("LogiC IN");
-            toon1ArmorReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            toon1ArmorReceived.Points.Clear();
-            toon1ArmorReceived.Color = Color.LightYellow;
-            toon1ArmorReceived.YAxisType = AxisType.Secondary;
-            toon1ArmorReceived.BorderWidth = LineSize;
-            toon1ArmorReceived.BorderDashStyle = ChartDashStyle.Solid;
+            toon1CapReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1CapReceived.Points.Clear();
+            toon1CapReceived.Color = Color.LightYellow;
+            toon1CapReceived.YAxisType = AxisType.Secondary;
+            toon1CapReceived.BorderWidth = LineSize;
+            toon1CapReceived.BorderDashStyle = ChartDashStyle.Solid;
 
             var toon1CapGiven = chartDPS.Series.Add("LogiC OUT");
-            toon1ArmorGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            toon1ArmorGiven.Points.Clear();
-            toon1ArmorGiven.Color = Color.OldLace;
-            toon1ArmorGiven.YAxisType = AxisType.Secondary;
-            toon1ArmorGiven.BorderWidth = LineSize;
-            toon1ArmorGiven.BorderDashStyle = ChartDashStyle.Solid;
+            toon1CapGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            toon1CapGiven.Points.Clear();
+            toon1CapGiven.Color = Color.DarkOrange;
+            toon1CapGiven.YAxisType = AxisType.Secondary;
+            toon1CapGiven.BorderWidth = LineSize;
+            toon1CapGiven.BorderDashStyle = ChartDashStyle.Solid;
 
             _combatGraphData.Clear();
 
@@ -322,14 +322,14 @@ namespace Quesadilla
             DateTime end = start;
 
             // work out start/end times of combat - for cuirrent/all toons
-            foreach (var currToon in _main._combat.Keys)
+            foreach (var currToon in Program.Combat.Keys)
             {
                 if (currToon == Toon || Toon == "*ALL*")
                 {
-                    if (_main._combat[currToon].Count > 0)
+                    if (Program.Combat[currToon].Count > 0)
                     {
-                        if (_main._combat[currToon].First().TimeAdded < start) start = _main._combat[currToon].First().TimeAdded;
-                        if (_main._combat[currToon].Last().TimeAdded > end) end = _main._combat[currToon].Last().TimeAdded;
+                        if (Program.Combat[currToon].First().TimeAdded < start) start = Program.Combat[currToon].First().TimeAdded;
+                        if (Program.Combat[currToon].Last().TimeAdded > end) end = Program.Combat[currToon].Last().TimeAdded;
                     }
                 }
             }
@@ -338,21 +338,21 @@ namespace Quesadilla
 
             DateTime curr = start;
             // check range
-            if (totalTime.TotalSeconds > _main.Configuration.GraphCombatSeconds)
+            if (totalTime.TotalSeconds > Program.MainConfiguration.GraphCombatSeconds)
             {
-                curr = end.AddSeconds(-1 * _main.Configuration.GraphCombatSeconds);
+                curr = end.AddSeconds(-1 * Program.MainConfiguration.GraphCombatSeconds);
                 totalTime = end - curr;
             }
 
             var span = Math.Truncate(totalTime.TotalSeconds > maxPoints ? totalTime.TotalSeconds / maxPoints : 1);
             if (span < minSpanSize) span = minSpanSize;
 
-            foreach (var currToon in _main._combat.Keys)
+            foreach (var currToon in Program.Combat.Keys)
             {
                 if (currToon == Toon || Toon == "*ALL*")
                 {
                     // setup second slots
-                    foreach (var c in _main._combat[currToon].OrderBy(o => o.TimeAdded).ToList())
+                    foreach (var c in Program.Combat[currToon].OrderBy(o => o.TimeAdded).ToList())
                     {
                         var slot = (int)Math.Truncate((c.TimeAdded - start).TotalSeconds);
                         if (!_combatGraphData.ContainsKey(slot))
@@ -512,7 +512,7 @@ namespace Quesadilla
 
 
             // dump to csv
-            if (_main.Configuration.DPSSaveCSV)
+            if (Program.MainConfiguration.DPSSaveCSV)
             {
                 using (var file = File.CreateText(Toon + "_raw_combat.csv"))
                 {
@@ -556,7 +556,7 @@ namespace Quesadilla
                 // Set the form click-through
                 if (_main != null)
                 {
-                    if (_main.Configuration.DPSGraphTransparent)
+                    if (Program.MainConfiguration.DPSGraphTransparent)
                     {
                         cp.ExStyle |=
                             0x80000 /* WS_EX_LAYERED */ |

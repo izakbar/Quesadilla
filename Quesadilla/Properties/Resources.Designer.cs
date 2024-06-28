@@ -72,6 +72,16 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap _520_5204963_red_explosion_png_icons_explosion_clip_art_transparent {
+            get {
+                object obj = ResourceManager.GetObject("520-5204963_red-explosion-png-icons-explosion-clip-art-transparent", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Attention {
             get {
                 object obj = ResourceManager.GetObject("Attention", resourceCulture);
@@ -325,6 +335,16 @@ namespace Quesadilla.Properties {
         internal static System.IO.UnmanagedMemoryStream quiet_click {
             get {
                 return ResourceManager.GetStream("quiet_click", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap red_dot {
+            get {
+                object obj = ResourceManager.GetObject("red-dot", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
