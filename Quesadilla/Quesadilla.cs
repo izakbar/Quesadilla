@@ -1887,7 +1887,7 @@ namespace Quesadilla
                     lblSystemName.Text = "";
                     foreach(var m in mouseOverMinimapSystems)
                     {
-                        ImageGenerator.DrawSystemName(e.Graphics, m.X+pMinimapImage.Left, m.Y+pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.MinimapMMouseoverSystemColour);
+                        ImageGenerator.DrawSystemName(e.Graphics, m.X+pMinimapImage.Left, m.Y+pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.MinimapMouseoverSystemColour);
                         if (!lblSystemName.Text.IsNullOrEmpty()) lblSystemName.Text += ",";
                         lblSystemName.Text += m.solarSystem.Name;
                     }

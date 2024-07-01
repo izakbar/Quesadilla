@@ -574,6 +574,7 @@
     <Compile Include="Classes\Events\EveScoutEventArgs.cs" />
     <Compile Include="Classes\EveScout\EveScoutManager.cs" />
     <Compile Include="Classes\EveScout\EveScoutWH.cs" />
+    <Compile Include="Classes\Extensions\PropertyGridExtensions.cs" />
     <Compile Include="Classes\ImageGenerator.cs" />
     <Compile Include="Classes\IskLine.cs" />
     <Compile Include="Classes\Processes\ProcessInfo.cs" />

@@ -416,35 +416,35 @@ img.rounded-corners {
         [Category("Tick Timing")]
         [DisplayName("Milliseconds for main tick")]
         [ReadOnly(true)]
-        [Description("")]
+        [Description("How many milliseconds the main tick is - smaller means more occur")]
         [DefaultValue(typeof(int), "120")]
         public int TickMiliseconds { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeCleardown")]
-        [Description("")]
+        [Description("How many ticks will occur between event cleardown checks")]
         [DefaultValue(typeof(int), "30")]
         public int HowManyTicksBeforeCleardown { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeAlert")]
-        [Description("")]
+        [Description("After an alert is put into the new alert queue - how many ticks before display")]
         [DefaultValue(typeof(int), "1")]
         public int HowManyTicksBeforeAlert { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeDPSGraphUpdate")]
-        [Description("")]
+        [Description("How many ticks between DPS graph update")]
         [DefaultValue(typeof(int), "6")]
         public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeLogfileCheck")]
-        [Description("")]
+        [Description("How many ticks between logfile checks")]
         [DefaultValue(typeof(int), "2")]
         public int HowManyTicksBeforeLogfileCheck { get; set; }
 
@@ -461,140 +461,141 @@ img.rounded-corners {
         public bool StayOnTop { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MainWindowTextColour")]
-        [Description("")]
+        [DisplayName("Text Colour")]
+        [Description("The Text Foreground colour for the main window")]
         [DefaultValue(typeof(Color), "LightGoldenrodYellow")]
         public Color MainWindowTextColour { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MainWindowBackgroundColour")]
-        [Description("")]
+        [DisplayName("Background Colour")]
+        [Description("Background Colour for the main window")]
         [DefaultValue(typeof(Color), "#0f0f11")]
         public Color MainWindowBackgroundColour { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MainWindowLogBackgroundColour")]
-        [Description("")]
+        [DisplayName("Log Background Colour")]
+        [Description("Background colour for the main window log")]
         [DefaultValue(typeof(Color), "#0f0f11")]
         public Color MainWindowLogBackgroundColour { get; set; }
         
         [Category("Main window")]
-        [DisplayName("MainWindowLogTextColour")]
-        [Description("")]
+        [DisplayName("Log Text Colour")]
+        [Description("Text colour for the main window log")]
         [DefaultValue(typeof(Color), "LightGoldenrodYellow")]
         public Color MainWindowLogTextColour { get; set; }
 
         [Category("Main window")]
-        [DisplayName("ShowMinimap")]
-        [Description("")]
+        [DisplayName("Show Minimap")]
+        [Description("Show minimap")]
         [DefaultValue(typeof(bool), "true")]
         public bool ShowMinimap { get; set; }
 
         [Category("Main window")]
         [DisplayName("Show Minimap Border")]
-        [Description("")]
+        [Description("Show border on the minimap")]
         [DefaultValue(typeof(bool), "false")]
         public bool ShowMinimapBorder { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapShowSystemText")]
+        [DisplayName("Show system text on minimap")]
         [Description("")]
         [DefaultValue(typeof(bool), "true")]
         public bool MinimapShowSystemText { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapBorderColour")]
+        [DisplayName("Minimap Border Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "SteelBlue")]
         public Color MinimapBorderColour { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapLineColourNormal")]
+        [DisplayName("Minimap Normal connection colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Gainsboro")]
         public Color MinimapLineColourNormal { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapLineColourRoute")]
+        [DisplayName("Minimap Route connection colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Tomato")]
         public Color MinimapLineColourRoute { get; set; }
         
         [Category("Main window")]
-        [DisplayName("MinimapSystemColourNormal")]
+        [DisplayName("Minimap normal system colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Gainsboro")]
         public Color MinimapSystemColourNormal { get; set; }
         
         [Category("Main window")]
-        [DisplayName("MinimapSystemColourRoute")]
+        [DisplayName("Minimap route system colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Pink")]
         public Color MinimapSystemColourRoute { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapSystemColourFrom")]
+        [DisplayName("Minimap from system colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Red")]
         public Color MinimapSystemColourFrom { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapSystemColourTo")]
+        [DisplayName("Minimap to system colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Green")]
         public Color MinimapSystemColourTo { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapSystemColourText")]
+        [DisplayName("Minimap system name colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "LemonChiffon")]
         public Color MinimapSystemColourText { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapZKillColour")]
+        [DisplayName("Minimap zkill indicator colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Red")]
         public Color MinimapZKillColour { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapIntelColour")]
+        [DisplayName("Minimap intel indicator colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Orange")]
         public Color MinimapIntelColour { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapMMouseoverSystemColour")]
+        [DisplayName("Minimap system name colour for mouseover")]
         [Description("")]
         [DefaultValue(typeof(Color), "OrangeRed")]
-        public Color MinimapMMouseoverSystemColour { get; set; }
+        public Color MinimapMouseoverSystemColour { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MainWindowMouseoverSystemColour")]
-        [Description("")]
+        [DisplayName("Mouse over System Colour")]
+        [Description("Colour of text to use to display the systemname in the mainform when user mouseover a system in the minimap")]
         [DefaultValue(typeof(Color), "Orchid")]
         public Color MainWindowMouseoverSystemColour { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapMMouseoverSystemColour")]
+        [DisplayName("Minimap system name colour for mouseover")]
         [Description("")]
         [DefaultValue(typeof(Color), "OrangeRed")]
-        public Color AlertPopupMinimapMMouseoverSystemColour { get; set; }
+        public Color AlertPopupMinimapMouseoverSystemColour { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertTransparent")]
-        [Description("")]
+        [DisplayName("Transparent")]
+        [Description("Sill the alert show as transparent window - this does not currently work amazingly")]
         [DefaultValue(typeof(bool), "false")]
+        [ReadOnly(true)]
         public bool AlertTransparent { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapAltPositionColour")]
-        [Description("")]
+        [DisplayName("Minimap Alt Indicator colour")]
+        [Description("Colour to use for the logged in alt indicators on the minimap")]
         [DefaultValue(typeof(Color), "Aqua")]
         public Color MinimapAltPositionColour { get; set; }
 
         [Category("Main window")]
-        [DisplayName("MinimapHeight")]
-        [Description("")]
+        [DisplayName("Minimap Height")]
+        [Description("Height of the minimap")]
         [DefaultValue(typeof(int), "200")]
         public int MinimapHeight { get; set; }
 
@@ -635,7 +636,7 @@ img.rounded-corners {
 
         [Category("Main window")]
         [DisplayName("Show Extra Information")]
-        [Description("")]
+        [Description("The extra information display shows zkill and alert activity recently in systems on the current minimap view")]
         [DefaultValue(typeof(bool), "true")]
         public bool MainWindowShowExtraInformation { get; set; }
 
@@ -650,140 +651,144 @@ img.rounded-corners {
         public PopupLocationType DPSLocation { get; set; }
 
         [Category("DPS")]
+        [DisplayName("DPS Graph Window size")]
+        [Description("Size of the DPS graph")]
         public Point DPSGraphWindowSize { get; set; }
 
         [Category("DPS")]
+        [DisplayName("DPS Graph Window size adjustment")]
+        [Description("Adjustment pixels to the DPS graph window size")]
         public Point DPSGraphWindowSizeAdjust { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphStayOnTop")]
-        [Description("")]
+        [DisplayName("Stay On Top")]
+        [Description("Should the DPS Graph stay on top")]
         [DefaultValue(typeof(bool), "true")]
         public bool DPSGraphStayOnTop { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphLegends")]
-        [Description("")]
+        [DisplayName("Legends")]
+        [Description("Show legends on the DPS graph")]
         [DefaultValue(typeof(bool), "false")]
         public bool DPSGraphLegends { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphTransparent")]
-        [Description("")]
+        [DisplayName("Transparent")]
+        [Description("Should the DPS graph be transparent. If so it will overlay the current eveonline window and be unclickable (clickthrough!)")]
         [DefaultValue(typeof(bool), "true")]
         public bool DPSGraphTransparent { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSShowWindow")]
+        [DisplayName("Show DPS")]
         [Description("")]
         [DefaultValue(typeof(bool), "true")]
         public bool DPSShowWindow { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSAllToons")]
-        [Description("")]
+        [DisplayName("Combine DPS")]
+        [Description("Should all DPS values be combined for the graph")]
         [DefaultValue(typeof(bool), "false")]
         public bool DPSAllToons { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSSaveCSV")]
-        [Description("")]
+        [DisplayName("Save to CSV")]
+        [Description("Should data be saved to CSV as graph is built")]
         [DefaultValue(typeof(bool), "false")]
         public bool DPSSaveCSV { get; set; }
 
         [Category("DPS")]
-        [DisplayName("GraphCombatSeconds")]
-        [Description("")]
+        [DisplayName("Combat Seconds")]
+        [Description("How many seconds combat the DPS graph should show")]
         [DefaultValue(typeof(int), "300")]
         public int GraphCombatSeconds { get; set; }
 
         [Category("DPS")]
-        [DisplayName("GraphCombatMaxPoints")]
-        [Description("")]
+        [DisplayName("Combat Max Points")]
+        [Description("Maximum number of data points the graph should show")]
         [DefaultValue(typeof(int), "30")]
         public int GraphCombatMaxPoints { get; set; }
 
         [Category("DPS")]
-        [DisplayName("GraphCombatMinPointSeconds")]
-        [Description("")]
+        [DisplayName("Combat Minimum Point Seconds")]
+        [Description("Minimum number of seconds per datapoint")]
         [DefaultValue(typeof(int), "10")]
         public int GraphCombatMinPointSeconds { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphLineSize")]
-        [Description("")]
+        [DisplayName("Line size")]
+        [Description("Width of the graph lines")]
         [DefaultValue(typeof(int), "2")]
         public int DPSGraphLineSize { get; set; }
 
 
         [Category("DPS")]
-        [DisplayName("DPSGraphDPSInColour")]
+        [DisplayName("DPS In Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Red")]
         public Color DPSGraphDPSInColour { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphDPSOutColour")]
+        [DisplayName("DPS Out Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Green")]
         public Color DPSGraphDPSOutColour { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphNeutInColour")]
+        [DisplayName("Neut In Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Orange")]
         public Color DPSGraphNeutInColour { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphNeutOutColour")]
+        [DisplayName("Neut Out Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "YellowGreen")]
         public Color DPSGraphNeutOutColour { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphLogiShieldsInColour")]
+        [DisplayName("Logi Shields In Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Aqua")]
         public Color DPSGraphLogiShieldsInColour { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphLogiShieldsOutColour")]
+        [DisplayName("Logi Shields Out Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "CornflowerBlue")]
         public Color DPSGraphLogiShieldsOutColour { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphLogiArmorInColour")]
+        [DisplayName("Logi Armor In Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Fuchsia")]
         public Color DPSGraphLogiArmorInColour { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphLogiArmorOutColour")]
+        [DisplayName("Logi Armor Out Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "DarkMagenta")]
         public Color DPSGraphLogiArmorOutColour { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphLogiHullInColour")]
+        [DisplayName("Logi Hull In Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Silver")]
         public Color DPSGraphLogiHullInColour { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphLogiHullOutColour")]
+        [DisplayName("Logi Hull Out Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "SlateGray")]
         public Color DPSGraphLogiHullOutColour { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphLogiCapacitorInColour")]
+        [DisplayName("Logi Capacitor In Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "LightYellow")]
         public Color DPSGraphLogiCapacitorInColour { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPSGraphLogiCapacitorOutColour")]
+        [DisplayName("Logi Capacitor Out Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "DarkOrange")]
         public Color DPSGraphLogiCapacitorOutColour { get; set; }
@@ -795,136 +800,141 @@ img.rounded-corners {
         public int AlertPopupSeconds { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupOpacity")]
+        [DisplayName("Popup Opacity")]
         [Description("")]
         [DefaultValue(typeof(int), "99")]
+        [ReadOnly(true)]
         public int AlertPopupOpacity { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupOpacityStep")]
-        [Description("")]
+        [DisplayName("Opacity Step")]
+        [Description("%age opacity to change at a time. smaller values means fade in/out slower")]
+        [ReadOnly(true)]
         [DefaultValue(typeof(int), "5")]
         public int AlertPopupOpacityStep { get; set; }
 
         [Category("Alert")]
+        [DisplayName("Alert Location")]
+        [Description("")]
         public PopupLocationType AlertPopupLocation { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupBackground")]
+        [DisplayName("Background")]
         [Description("")]
         [DefaultValue(typeof(string), "bg_paulmart2")]
+        [Browsable(false)]
         public string AlertPopupBackground { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupSystemNameColour")]
+        [DisplayName("System Name Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Lime")]
         public Color AlertPopupSystemNameColour { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupRegionNameColour")]
+        [DisplayName("Region Name Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Cyan")]
         public Color AlertPopupRegionNameColour { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupContextInfoColour")]
+        [DisplayName("Context Info Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Yellow")]
         public Color AlertPopupContextInfoColour { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupIntelLineColour")]
+        [DisplayName("Intel Line Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "White")]
         public Color AlertPopupIntelLineColour { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupAlertTextColour")]
+        [DisplayName("Alert Text Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "White")]
         public Color AlertPopupAlertTextColour { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupShowMinimap")]
-        [Description("")]
+        [DisplayName("Show Minimap")]
+        [Description("Show the minimap in alerts")]
         [DefaultValue(typeof(bool), "true")]
         public bool AlertPopupShowMinimap { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupShowMinimapBorder")]
+        [DisplayName("Show Minimap Border")]
         [Description("")]
         [DefaultValue(typeof(bool), "false")]
         public bool AlertPopupShowMinimapBorder { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapShowSystemText")]
-        [Description("")]
+        [DisplayName("Minimap Show System Text")]
+        [Description("Show to/from system names in minimap")]
         [DefaultValue(typeof(bool), "true")]
         public bool AlertPopupMinimapShowSystemText { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapBorderColour")]
+        [DisplayName("Minimap Border Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "SteelBlue")]
         public Color AlertPopupMinimapBorderColour { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapLineColourNormal")]
+        [DisplayName("Minimap Normal connection colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Gainsboro")]
         public Color AlertPopupMinimapLineColourNormal { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapLineColourRoute")]
+        [DisplayName("Minimap route connection colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Tomato")]
         public Color AlertPopupMinimapLineColourRoute { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapSystemColourNormal")]
+        [DisplayName("Minimap Normal system colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Gainsboro")]
         public Color AlertPopupMinimapSystemColourNormal { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapSystemColourRoute")]
+        [DisplayName("Minimap Route system colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Pink")]
         public Color AlertPopupMinimapSystemColourRoute { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapSystemColourFrom")]
+        [DisplayName("Minimap From system colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Red")]
         public Color AlertPopupMinimapSystemColourFrom { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapSystemColourTo")]
+        [DisplayName("Minimap To system colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Green")]
         public Color AlertPopupMinimapSystemColourTo { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapSystemColourText")]
+        [DisplayName("Minimap system name colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "LemonChiffon")]
         public Color AlertPopupMinimapSystemColourText { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapZKillColour")]
+        [DisplayName("Minimap zkill indicator colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Red")]
         public Color AlertPopupMinimapZKillColour { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapIntelColour")]
+        [DisplayName("Minimap intel indicator colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Orange")]
         public Color AlertPopupMinimapIntelColour { get; set; }
 
         [Category("Alert")]
-        [DisplayName("AlertPopupMinimapAltPositionColour")]
+        [DisplayName("Minimap logged in alt indicator colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Aqua")]
         public Color AlertPopupMinimapAltPositionColour { get; set; }
@@ -963,29 +973,30 @@ img.rounded-corners {
         [DisplayName("ZKillSound")]
         [Description("")]
         [DefaultValue(typeof(string), "quiet_click")]
+        [ReadOnly(true)]
         public string ZKillSound { get; set; }
 
         [Category("Alert")]
-        [DisplayName("ZKillCircleColour")]
-        [Description("")]
+        [DisplayName("ZKill Circle Colour")]
+        [Description("Colour of circle around ship picture for zkill alerts")]
         [DefaultValue(typeof(Color), "Red")]
         public Color ZKillCircleColour { get; set; }
 
         [Category("Alert")]
-        [DisplayName("ZKillIskColour")]
-        [Description("")]
+        [DisplayName("ZKill Isk Colour")]
+        [Description("Colour of ISK amount for zkill alerts")]
         [DefaultValue(typeof(Color), "White")]
         public Color ZKillIskColour { get; set; }
 
         [Category("Alert")]
         [DisplayName("ZKillBarColour")]
-        [Description("")]
+        [Description("Colour of bar under ISK amount for zkill alerts")]
         [DefaultValue(typeof(Color), "LimeGreen")]
         public Color ZKillBarColour { get; set; }
 
         [Category("Alert")]
         [DisplayName("ZKillShowBar")]
-        [Description("")]
+        [Description("Show coloured bar under zkill ISK amounts")]
         [DefaultValue(typeof(bool), "true")]
         public bool ZKillShowBar { get; set; }
 

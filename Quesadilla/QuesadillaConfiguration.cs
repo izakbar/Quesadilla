@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using Quesadilla.Classes.SolarSystems;
 using System.Xml.Xsl;
 using Cyotek.Windows.Forms;
+using Quesadilla.Classes.Extensions;
 
 namespace Quesadilla
 {
@@ -49,6 +50,9 @@ namespace Quesadilla
         }
         private void QuesadillaConfiguration_Load(object sender, EventArgs e)
         {
+
+            ConfigurationProperties.SetLabelColumnWidth(270);
+
             SetSystem(cmbHomeSystem, _configuration.HomeSystem);
             _dummyAlert = new AlertQueueItem()
             {
@@ -104,7 +108,7 @@ namespace Quesadilla
             formLoaded = true;
             ShowAlertBitmap();
 
-            ColourProperties.SelectedObject = new CustomPropertyExtractorWrapper(_configuration);
+            ConfigurationProperties.SelectedObject = new CustomPropertyExtractorWrapper(_configuration);
 
         }
         private Bitmap GetControlImage(Control ctl)
@@ -245,9 +249,9 @@ namespace Quesadilla
 
         private void trackOpacity_Scroll(object sender, EventArgs e)
         {
-            _alertPopup.Opacity = ((TrackBar)sender).Value;
             _configuration.AlertPopupOpacity = ((TrackBar)sender).Value;
             lblOpacity.Text = ((TrackBar)sender).Value.ToString();
+            ShowAlertBitmap();
         }
 
         private void trackPopupTime_Scroll(object sender, EventArgs e)
