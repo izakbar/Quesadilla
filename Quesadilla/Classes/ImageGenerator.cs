@@ -283,7 +283,7 @@ namespace Quesadilla.Classes
                         g.DrawEllipse(zkillPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2);
                         foreach (var k in currentSystem.solarSystem.Kills)
                         {
-                            sbExtraInformation.AppendLine($"ZKILL {k.SolarSystemName} {k.VictimShipName} {k.VictimCharacterName}");
+                            sbExtraInformation.AppendLine($"ZKILL {k.Timestamp.ToString("HH:mm:ss")} {k.SolarSystemName} {k.VictimShipName} {k.VictimCharacterName}");
                         }
                     }
                     if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null).Count() > 0)
@@ -292,7 +292,7 @@ namespace Quesadilla.Classes
                         g.DrawEllipse(intelPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2);
                         foreach (var a in currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null))
                         {
-                            sbExtraInformation.AppendLine($"{a.Entry.LineContent}");
+                            sbExtraInformation.AppendLine($"{a.Entry.LogTime} {a.Entry.LineContent}");
                         }
                     }
 
