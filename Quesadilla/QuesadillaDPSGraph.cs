@@ -223,7 +223,7 @@ namespace Quesadilla
             var toon1Received = chartDPS.Series.Add(Toon + " IN");
             toon1Received.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1Received.Points.Clear();
-            toon1Received.Color = Color.Red;
+            toon1Received.Color = Program.MainConfiguration.DPSGraphDPSInColour;
             toon1Received.YAxisType = AxisType.Primary;
             toon1Received.BorderWidth = LineSize;
             toon1Received.BorderDashStyle = ChartDashStyle.Solid;
@@ -231,7 +231,7 @@ namespace Quesadilla
             var toon1Given = chartDPS.Series.Add("OUT");
             toon1Given.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1Given.Points.Clear();
-            toon1Given.Color = Color.Green;
+            toon1Given.Color = Program.MainConfiguration.DPSGraphDPSOutColour;
             toon1Given.YAxisType = AxisType.Primary;
             toon1Given.BorderWidth = LineSize;
             toon1Given.BorderDashStyle = ChartDashStyle.Solid;
@@ -239,7 +239,7 @@ namespace Quesadilla
             var toon1NeutReceived = chartDPS.Series.Add("NeutIN");
             toon1NeutReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1NeutReceived.Points.Clear();
-            toon1NeutReceived.Color = Color.Orange;
+            toon1NeutReceived.Color = Program.MainConfiguration.DPSGraphNeutInColour; 
             toon1NeutReceived.YAxisType = AxisType.Secondary;
             toon1NeutReceived.BorderWidth = LineSize;
             toon1NeutReceived.BorderDashStyle = ChartDashStyle.Solid;
@@ -247,7 +247,7 @@ namespace Quesadilla
             var toon1NeutGiven = chartDPS.Series.Add("NeutOUT");
             toon1NeutGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1NeutGiven.Points.Clear();
-            toon1NeutGiven.Color = Color.YellowGreen;
+            toon1NeutGiven.Color = Program.MainConfiguration.DPSGraphNeutOutColour; 
             toon1NeutGiven.YAxisType = AxisType.Secondary;
             toon1NeutGiven.BorderWidth = LineSize;
             toon1NeutGiven.BorderDashStyle = ChartDashStyle.Solid;
@@ -255,7 +255,7 @@ namespace Quesadilla
             var toon1ShieldReceived = chartDPS.Series.Add("LogiS IN");
             toon1ShieldReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1ShieldReceived.Points.Clear();
-            toon1ShieldReceived.Color = Color.Aqua;
+            toon1ShieldReceived.Color = Program.MainConfiguration.DPSGraphLogiShieldsInColour; 
             toon1ShieldReceived.YAxisType = AxisType.Secondary;
             toon1ShieldReceived.BorderWidth = LineSize;
             toon1ShieldReceived.BorderDashStyle = ChartDashStyle.Solid;
@@ -263,7 +263,7 @@ namespace Quesadilla
             var toon1ShieldGiven = chartDPS.Series.Add("LogiS OUT");
             toon1ShieldGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1ShieldGiven.Points.Clear();
-            toon1ShieldGiven.Color = Color.CornflowerBlue;
+            toon1ShieldGiven.Color = Program.MainConfiguration.DPSGraphLogiShieldsOutColour; 
             toon1ShieldGiven.YAxisType = AxisType.Secondary;
             toon1ShieldGiven.BorderWidth = LineSize;
             toon1ShieldGiven.BorderDashStyle = ChartDashStyle.Solid;
@@ -271,7 +271,7 @@ namespace Quesadilla
             var toon1ArmorReceived = chartDPS.Series.Add("LogiA IN");
             toon1ArmorReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1ArmorReceived.Points.Clear();
-            toon1ArmorReceived.Color = Color.Fuchsia;
+            toon1ArmorReceived.Color = Program.MainConfiguration.DPSGraphLogiArmorInColour;  
             toon1ArmorReceived.YAxisType = AxisType.Secondary;
             toon1ArmorReceived.BorderWidth = LineSize;
             toon1ArmorReceived.BorderDashStyle = ChartDashStyle.Solid;
@@ -279,7 +279,7 @@ namespace Quesadilla
             var toon1ArmorGiven = chartDPS.Series.Add("LogiA OUT");
             toon1ArmorGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1ArmorGiven.Points.Clear();
-            toon1ArmorGiven.Color = Color.DarkMagenta;
+            toon1ArmorGiven.Color = Program.MainConfiguration.DPSGraphLogiArmorOutColour;
             toon1ArmorGiven.YAxisType = AxisType.Secondary;
             toon1ArmorGiven.BorderWidth = LineSize;
             toon1ArmorGiven.BorderDashStyle = ChartDashStyle.Solid;
@@ -287,7 +287,7 @@ namespace Quesadilla
             var toon1HullReceived = chartDPS.Series.Add("LogiH IN");
             toon1HullReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1HullReceived.Points.Clear();
-            toon1HullReceived.Color = Color.Silver;
+            toon1HullReceived.Color = Program.MainConfiguration.DPSGraphLogiHullInColour;
             toon1HullReceived.YAxisType = AxisType.Secondary;
             toon1HullReceived.BorderWidth = LineSize;
             toon1HullReceived.BorderDashStyle = ChartDashStyle.Solid;
@@ -295,7 +295,7 @@ namespace Quesadilla
             var toon1HullGiven = chartDPS.Series.Add("LogiH OUT");
             toon1HullGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1HullGiven.Points.Clear();
-            toon1HullGiven.Color = Color.SlateGray;
+            toon1HullGiven.Color = Program.MainConfiguration.DPSGraphLogiHullOutColour;  
             toon1HullGiven.YAxisType = AxisType.Secondary;
             toon1HullGiven.BorderWidth = LineSize;
             toon1HullGiven.BorderDashStyle = ChartDashStyle.Solid;
@@ -303,7 +303,7 @@ namespace Quesadilla
             var toon1CapReceived = chartDPS.Series.Add("LogiC IN");
             toon1CapReceived.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1CapReceived.Points.Clear();
-            toon1CapReceived.Color = Color.LightYellow;
+            toon1CapReceived.Color = Program.MainConfiguration.DPSGraphLogiCapacitorInColour;
             toon1CapReceived.YAxisType = AxisType.Secondary;
             toon1CapReceived.BorderWidth = LineSize;
             toon1CapReceived.BorderDashStyle = ChartDashStyle.Solid;
@@ -311,7 +311,7 @@ namespace Quesadilla
             var toon1CapGiven = chartDPS.Series.Add("LogiC OUT");
             toon1CapGiven.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             toon1CapGiven.Points.Clear();
-            toon1CapGiven.Color = Color.DarkOrange;
+            toon1CapGiven.Color = Program.MainConfiguration.DPSGraphLogiCapacitorOutColour; 
             toon1CapGiven.YAxisType = AxisType.Secondary;
             toon1CapGiven.BorderWidth = LineSize;
             toon1CapGiven.BorderDashStyle = ChartDashStyle.Solid;

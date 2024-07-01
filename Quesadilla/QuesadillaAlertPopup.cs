@@ -471,7 +471,7 @@ namespace Quesadilla
                 {
                     foreach (var m in mouseOverMinimapSystems)
                     {
-                        ImageGenerator.DrawSystemName(e.Graphics, m.X+ pMinimapImage.Left, m.Y+ pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.PopupAlertMinimapMMouseoverSystemColour);
+                        ImageGenerator.DrawSystemName(e.Graphics, m.X+ pMinimapImage.Left, m.Y+ pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.AlertPopupMinimapMouseoverSystemColour);
                     }
                 }
             }
