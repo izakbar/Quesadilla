@@ -1,9 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using Cyotek.Windows.Forms;
+using Newtonsoft.Json;
+using Quesadilla.Classes.Attributes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.SolarSystems;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -81,10 +86,10 @@ namespace Quesadilla.Classes
                 AlertPopupMinimapAltPositionColour = AlertPopupMinimapAltPositionColour,
                 AlertPopupMinimapRawXY = AlertPopupMinimapRawXY,
                 IntegrationPort = IntegrationPort,
-                MainWindowColourText = MainWindowColourText,
+                MainWindowTextColour = MainWindowTextColour,
                 MainWindowBackgroundColour = MainWindowBackgroundColour,
                 MainWindowLogBackgroundColour = MainWindowLogBackgroundColour,
-                MainWindowLogColourText = MainWindowLogColourText,
+                MainWindowLogTextColour = MainWindowLogTextColour,
                 ShowMinimap = ShowMinimap,
                 MinimapShowSystemText = MinimapShowSystemText,
                 ShowMinimapBorder = ShowMinimapBorder,
@@ -113,7 +118,7 @@ namespace Quesadilla.Classes
                 MainWindowExtraInformationColour = MainWindowExtraInformationColour,
                 MainWindowShowExtraInformation = MainWindowShowExtraInformation,
 
-                PopupAlertMinimapMMouseoverSystemColour = PopupAlertMinimapMMouseoverSystemColour,
+                AlertPopupMinimapMMouseoverSystemColour = AlertPopupMinimapMMouseoverSystemColour,
                 MinimapMMouseoverSystemColour = MinimapMMouseoverSystemColour,
                 MainWindowMouseoverSystemColour = MainWindowMouseoverSystemColour,
 
@@ -261,10 +266,10 @@ namespace Quesadilla.Classes
 
                 c.IntegrationPort = 65432;
 
-                c.MainWindowColourText = Color.LightGoldenrodYellow;
+                c.MainWindowTextColour = Color.LightGoldenrodYellow;
                 c.MainWindowBackgroundColour = System.Drawing.ColorTranslator.FromHtml("#0f0f11");
                 c.MainWindowLogBackgroundColour = System.Drawing.ColorTranslator.FromHtml("#0f0f11");
-                c.MainWindowLogColourText = Color.LightGoldenrodYellow;
+                c.MainWindowLogTextColour = Color.LightGoldenrodYellow;
 
                 c.ShowMinimap = true;
                 c.ShowMinimapBorder = false;
@@ -279,7 +284,7 @@ namespace Quesadilla.Classes
                 c.MinimapSystemColourText = Color.LemonChiffon;
 
                 c.MinimapMMouseoverSystemColour = Color.OrangeRed;
-                c.PopupAlertMinimapMMouseoverSystemColour = Color.OrangeRed;
+                c.AlertPopupMinimapMMouseoverSystemColour = Color.OrangeRed;
                 c.MainWindowMouseoverSystemColour = Color.Orchid;
 
                 c.MinimapZKillColour = Color.Red;
@@ -557,116 +562,242 @@ img.rounded-corners {
             File.WriteAllText(filename, json);
         }
 
-        public int TickMiliseconds { get; set; }
-        public int HowManyTicksBeforeCleardown { get; set; }
-        public int HowManyTicksBeforeAlert { get; set; }
-        public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
-        public int HowManyTicksBeforeLogfileCheck { get; set; }
+        [Category("General")]
         public string HomeSystem { get; set; }
-        public List<Regex> ignoreStrings { get; set; }
-        public List<int> ignoreSystems { get; set; }
-        public Point InitialPosition { get; set; }
-        public Point WindowSize { get; set; }
-        public Point DPSGraphWindowSize { get; set; }
-        public Point DPSGraphWindowSizeAdjust { get; set; }
-        public bool StayOnTop { get; set; }
-        public bool DPSGraphStayOnTop { get; set; }
-        public bool DPSGraphLegends { get; set; }
-        public bool DPSGraphTransparent { get; set; }
-        public bool AlertTransparent { get; set; }
-        public bool DPSShowWindow { get; set; }
-        public bool DPSAllToons { get; set; }
-        public bool DPSSaveCSV { get; set; }
-
+        [Category("General")]
         public bool ShowZKillAlerts { get; set; }
+        [Category("General")]
         public int IgnoreAsTooManyJumps { get; set; }
-        public int ExpireAlertSeconds { get; set; }
-        public int ExpireCombatSeconds { get; set; }
-        public int ExpireISKSeconds { get; set; }
-        public int ExpireZKillSeconds { get; set; }
+        [Category("General")]
+        public int ShowLastUnexpiredAlerts { get; set; }
+
+        [Category("Tick Timing")]
+        [DisplayName("Milliseconds for main tick")]
+        [ReadOnly(true)]
+        public int TickMiliseconds { get; set; }
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        public int HowManyTicksBeforeCleardown { get; set; }
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        public int HowManyTicksBeforeAlert { get; set; }
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        public int HowManyTicksBeforeLogfileCheck { get; set; }
+
+        [Category("Main window")]
+        public Point InitialPosition { get; set; }
+        [Category("Main window")]
+        public Point WindowSize { get; set; }
+        [Category("Main window")]
+        public bool StayOnTop { get; set; }
+        [Category("Main window")]
+        public Color MainWindowTextColour { get; set; }
+        [Category("Main window")]
+        public Color MainWindowBackgroundColour { get; set; }
+        [Category("Main window")]
+        public Color MainWindowLogBackgroundColour { get; set; }
+        [Category("Main window")]
+        public Color MainWindowLogTextColour { get; set; }
+
+        [Category("Main window")]
+        public bool ShowMinimap { get; set; }
+        [Category("Main window")]
+        public bool ShowMinimapBorder { get; set; }
+        [Category("Main window")]
+        public bool MinimapShowSystemText { get; set; }
+        [Category("Main window")]
+        public Color MinimapBorderColour { get; set; }
+        [Category("Main window")]
+        public Color MinimapLineColourNormal { get; set; }
+        [Category("Main window")]
+        public Color MinimapLineColourRoute { get; set; }
+        [Category("Main window")]
+        public Color MinimapSystemColourNormal { get; set; }
+        [Category("Main window")]
+        public Color MinimapSystemColourRoute { get; set; }
+        [Category("Main window")]
+        public Color MinimapSystemColourFrom { get; set; }
+        [Category("Main window")]
+        public Color MinimapSystemColourTo { get; set; }
+        [Category("Main window")]
+        public Color MinimapSystemColourText { get; set; }
+        [Category("Main window")]
+        public Color MinimapZKillColour { get; set; }
+        [Category("Main window")]
+        public Color MinimapIntelColour { get; set; }
+        [Category("Main window")]
+        public Color MinimapMMouseoverSystemColour { get; set; }
+        [Category("Main window")]
+        public Color MainWindowMouseoverSystemColour { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapMMouseoverSystemColour { get; set; }
+        [Category("Alert")]
+        public bool AlertTransparent { get; set; }
+
+        [Category("Main window")]
+        public Color MinimapAltPositionColour { get; set; }
+        [Category("Main window")]
+        public int MinimapHeight { get; set; }
+        [Category("Main window")]
+        public bool MinimapRawXY { get; set; }
+        [Category("Main window")]
+        public int MinimapJumps { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Current character colour")]
+        [Description("The colour to use for the currently active eveonline character on the main window")]
+        public Color CurrentCharacterColour { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("ISK/hr Colour")]
+        [Description("The colour to use for the ISK/HR show on the main window")]
+        public Color ISKColour { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("non-expired Alerts/Kills Colour")]
+        public Color AlertsOutstandingColour { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("EveScout Information Colour")]
+        public Color EvescoutColour { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Show Extra Information")]
+        public bool MainWindowShowExtraInformation { get; set; }
+        [Category("Main window")]
+        [DisplayName("Extra Information Colour")]
+        public Color MainWindowExtraInformationColour { get; set; }
+
+        [Category("DPS")]
+        public Point DPSGraphWindowSize { get; set; }
+        [Category("DPS")]
+        public Point DPSGraphWindowSizeAdjust { get; set; }
+        [Category("DPS")]
+        public bool DPSGraphStayOnTop { get; set; }
+        [Category("DPS")]
+        public bool DPSGraphLegends { get; set; }
+        [Category("DPS")]
+        public bool DPSGraphTransparent { get; set; }
+        [Category("DPS")]
+        public bool DPSShowWindow { get; set; }
+        [Category("DPS")]
+        public bool DPSAllToons { get; set; }
+        [Category("DPS")]
+        public bool DPSSaveCSV { get; set; }
+        [Category("DPS")]
         public int GraphCombatSeconds { get; set; }
+        [Category("DPS")]
         public int GraphCombatMaxPoints { get; set; }
+        [Category("DPS")]
         public int GraphCombatMinPointSeconds { get; set; }
+        [Category("DPS")]
+        public int DPSGraphLineSize { get; set; }
+
+        [Category("Alert")]
+        public int AlertPopupSeconds { get; set; }
+        [Category("Alert")]
+        [Range(0, 100)]
+        public int AlertPopupOpacity { get; set; }
+
+        [Category("Alert")]
+        [Range(0, 100)]
+        public int AlertPopupOpacityStep { get; set; }
+        [Category("Alert")]
+        public PopupLocationType AlertPopupLocation { get; set; }
+        [Category("Alert")]
+        public PopupLocationType DPSLocation { get; set; }
+        [Category("Alert")]
+        public string AlertPopupBackground { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupSystemNameColour { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupRegionNameColour { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupContextInfoColour { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupIntelLineColour { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupAlertTextColour { get; set; }
+        [Category("Alert")]
+        public bool AlertPopupShowMinimap { get; set; }
+        [Category("Alert")]
+        public bool AlertPopupShowMinimapBorder { get; set; }
+        [Category("Alert")]
+        public bool AlertPopupMinimapShowSystemText { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapBorderColour { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapLineColourNormal { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapLineColourRoute { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapSystemColourNormal { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapSystemColourRoute { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapSystemColourFrom { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapSystemColourTo { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapSystemColourText { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapZKillColour { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapIntelColour { get; set; }
+        [Category("Alert")]
+        public Color AlertPopupMinimapAltPositionColour { get; set; }
+        [Category("Alert")]
+        public bool AlertPopupMinimapRawXY { get; set; }
+
+        [Category("Alert")]
+        public Point AlertPopupMinimapPosition { get; set; }
+        [Category("Alert")]
+        public Point AlertPopupMinimapSize { get; set; }
+
+        [Category("Alert")]
+        public string ZKillAlertText { get; set; }
+        [Category("Alert")]
+        public string ZKillContextText { get; set; }
+        [Category("Alert")]
+        public string ZKillMenuText { get; set; }
+        [Category("Alert")]
+        public string ZKillSound { get; set; }
+        [Category("Alert")]
+        public Color ZKillCircleColour { get; set; }
+        [Category("Alert")]
+        public Color ZKillIskColour { get; set; }
+        [Category("Alert")]
+        public Color ZKillBarColour { get; set; }
+        [Category("Alert")]
+        public bool ZKillShowBar { get; set; }
+
+
+        [Category("General")]
+        public int ExpireAlertSeconds { get; set; }
+        [Category("General")]
+        public int ExpireCombatSeconds { get; set; }
+        [Category("General")]
+        public int ExpireISKSeconds { get; set; }
+
+        [Category("General")]
+        [DisplayName("ZKill expiry seconds")]
+        [Description("How many seconds to consider zkill entry as old and no longer need to track")]
+        public int ExpireZKillSeconds { get; set; }
+
+        [Category("General")]
+        [DisplayName("OBS Integration port")]
+        [Description("TCP/IP Port number to bind to for OBS integration")]
+        public int IntegrationPort { get; set; }
+
         public List<AlertConfig> AlertConfiguration { get; set; }
         public List<LogfileConfig> Logfiles { get; set; }
         public List<CSSData> CSSData { get; set; }
-        public int AlertPopupSeconds { get; set; }
-        public int AlertPopupOpacity { get; set; }
-        public int AlertPopupOpacityStep { get; set; }
-        public PopupLocationType AlertPopupLocation { get; set; }
-        public PopupLocationType DPSLocation { get; set; }
-        public string AlertPopupBackground { get; set; }
-        public Color AlertPopupSystemNameColour { get; set; }
-        public Color AlertPopupRegionNameColour { get; set; }
-        public Color AlertPopupContextInfoColour { get; set; }
-        public Color AlertPopupIntelLineColour { get; set; }
-        public Color AlertPopupAlertTextColour { get; set; }
 
-        public string ZKillAlertText { get; set; }
-        public string ZKillContextText { get; set; }
-        public string ZKillMenuText { get; set; }
-        public string ZKillSound { get; set; }
-        public Color ZKillCircleColour { get; set; }
-        public Color ZKillIskColour { get; set; }
-        public Color ZKillBarColour { get; set; }
-        public bool ZKillShowBar { get; set; }
-
-        public int DPSGraphLineSize { get; set; }
-        public int ShowLastUnexpiredAlerts { get; set; }
-
-        public bool AlertPopupShowMinimap { get; set; }
-        public bool AlertPopupShowMinimapBorder { get; set; }
-        public bool AlertPopupMinimapShowSystemText { get; set; }
-        public Color AlertPopupMinimapBorderColour { get; set; }
-        public Color AlertPopupMinimapLineColourNormal { get; set; }
-        public Color AlertPopupMinimapLineColourRoute { get; set; }
-        public Color AlertPopupMinimapSystemColourNormal { get; set; }
-        public Color AlertPopupMinimapSystemColourRoute { get; set; }
-        public Color AlertPopupMinimapSystemColourFrom { get; set; }
-        public Color AlertPopupMinimapSystemColourTo { get; set; }
-        public Color AlertPopupMinimapSystemColourText { get; set; }
-        public Color AlertPopupMinimapZKillColour { get; set; }
-        public Color AlertPopupMinimapIntelColour { get; set; }
-        public Color AlertPopupMinimapAltPositionColour { get; set; }
-        public bool AlertPopupMinimapRawXY { get; set; }
-
-        public Point AlertPopupMinimapPosition { get; set; }
-        public Point AlertPopupMinimapSize { get; set; }
-
-        public int IntegrationPort { get; set; }
-
-        public Color MainWindowColourText { get; set; }
-        public Color MainWindowBackgroundColour { get; set; }
-        public Color MainWindowLogBackgroundColour { get; set; }
-        public Color MainWindowLogColourText { get; set; }
-
-        public bool ShowMinimap { get; set; }
-        public bool ShowMinimapBorder { get; set; }
-        public bool MinimapShowSystemText { get; set; }
-        public Color MinimapBorderColour { get; set; }
-        public Color MinimapLineColourNormal { get; set; }
-        public Color MinimapLineColourRoute { get; set; }
-        public Color MinimapSystemColourNormal { get; set; }
-        public Color MinimapSystemColourRoute { get; set; }
-        public Color MinimapSystemColourFrom { get; set; }
-        public Color MinimapSystemColourTo { get; set; }
-        public Color MinimapSystemColourText { get; set; }
-        public Color MinimapZKillColour { get; set; }
-        public Color MinimapIntelColour { get; set; }
-        public Color MinimapMMouseoverSystemColour { get; set; }
-        public Color MainWindowMouseoverSystemColour { get; set; }
-        public Color PopupAlertMinimapMMouseoverSystemColour { get; set; }
-        public Color MinimapAltPositionColour { get; set; }
-        public int MinimapHeight { get; set; }
-        public bool MinimapRawXY { get; set; }
-        public int MinimapJumps { get; set; }
-
-        public Color CurrentCharacterColour { get; set; }
-        public Color ISKColour { get; set; }
-        public Color AlertsOutstandingColour { get; set; }
-        public Color EvescoutColour { get; set; }
-
-        public bool MainWindowShowExtraInformation { get; set; }
-        public Color MainWindowExtraInformationColour { get; set; }
+        public List<Regex> ignoreStrings { get; set; }
+        public List<int> ignoreSystems { get; set; }
     }
 }

@@ -24,6 +24,9 @@ namespace Quesadilla
         private QuesadillaAlertPopup _alertPopup;
         private AlertQueueItem _dummyAlert;
 
+        private bool formLoaded = false;
+
+
         public QuesadillaConfiguration(Config configuration, MenuItem configWindowMenu, Quesadilla mainForm)
         {
             InitializeComponent();
@@ -88,64 +91,6 @@ namespace Quesadilla
             lblDPSGraphLineSize.Text = _configuration.DPSGraphLineSize.ToString();
             lblShowLastUnexpiredAlerts.Text = _configuration.ShowLastUnexpiredAlerts.ToString();
 
-            switch (_configuration.AlertPopupLocation)
-            {
-                case Classes.Configuration.PopupLocationType.Center:
-                    radioAlertCenter.Checked = true; break;
-                case Classes.Configuration.PopupLocationType.TopLeft:
-                    radioAlertTopLeft.Checked = true; break;
-                case Classes.Configuration.PopupLocationType.TopCenter:
-                    radioAlertTopCenter.Checked = true; break;
-                case Classes.Configuration.PopupLocationType.TopRight:
-                    radioAlertTopRight.Checked = true; break;
-                case Classes.Configuration.PopupLocationType.BottomLeft:
-                    radioAlertBottomLeft.Checked = true;break;
-                case Classes.Configuration.PopupLocationType.BottomCenter:
-                    radioAlertBottomCenter.Checked = true; break;
-                case Classes.Configuration.PopupLocationType.BottomRight:
-                    radioAlertBottomRight.Checked = true;break;
-            }
-
-            switch (_configuration.DPSLocation)
-            {
-                case Classes.Configuration.PopupLocationType.Center:
-                    radioDPSCenter.Checked = true; break;
-                case Classes.Configuration.PopupLocationType.TopLeft:
-                    radioDPSTopLeft.Checked = true; break;
-                case Classes.Configuration.PopupLocationType.TopCenter:
-                    radioDPSTopCenter.Checked = true; break;
-                case Classes.Configuration.PopupLocationType.TopRight:
-                    radioDPSTopRight.Checked = true; break;
-                case Classes.Configuration.PopupLocationType.BottomLeft:
-                    radioDPSBottomLeft.Checked = true; break;
-                case Classes.Configuration.PopupLocationType.BottomCenter:
-                    radioDPSBottomCenter.Checked = true; break;
-                case Classes.Configuration.PopupLocationType.BottomRight:
-                    radioDPSBottomRight.Checked = true; break;
-            }
-
-            cbDPSStayOnTop.Checked = _configuration.DPSGraphStayOnTop;
-            cbDPSTransparent.Checked = _configuration.DPSGraphTransparent;
-            cbDPSShowWindow.Checked = _configuration.DPSShowWindow;
-            cbDPSAllToons.Checked = _configuration.DPSAllToons;
-            cbStayOnTop.Checked = _configuration.StayOnTop;
-            cbAlertTransparent.Checked = _configuration.AlertTransparent;
-            cbShowZKillAlerts.Checked = _configuration.ShowZKillAlerts;
-            cbZkillShowBar.Checked = _configuration.ZKillShowBar;
-            cbAlertPopupMinimapShowSystemText.Checked = _configuration.AlertPopupMinimapShowSystemText;
-
-            cbMinimapRawXY.Checked = !_configuration.MinimapRawXY;
-            cbAlertPopupMinimapRawXY.Checked = !_configuration.AlertPopupMinimapRawXY;
-
-            cbAlertPopupShowMinimapBorder.Checked = _configuration.AlertPopupShowMinimapBorder ;
-            cbAlertPopupMinimap.Checked = _configuration.AlertPopupShowMinimap;
-
-            cbMinimapShowSystemText.Checked =_configuration.MinimapShowSystemText;
-            cbShowMinimapBorder.Checked = _configuration.ShowMinimapBorder;
-            cbShowMinimap.Checked = _configuration.ShowMinimap;
-
-            cbMainWindowShowExtraInformation.Checked = _configuration.MainWindowShowExtraInformation;
-
             trackAlertPopupMinimapSizeWidth.Minimum = 1;
             trackAlertPopupMinimapSizeHeight.Minimum = 1;
             trackAlertPopupMinimapPositionX.Minimum = 0;
@@ -156,7 +101,10 @@ namespace Quesadilla
             trackAlertPopupMinimapPositionX.Value = _configuration.AlertPopupMinimapPosition.X;
             trackAlertPopupMinimapPositionY.Value = _configuration.AlertPopupMinimapPosition.Y;
 
+            formLoaded = true;
             ShowAlertBitmap();
+
+            ColourProperties.SelectedObject = new CustomPropertyExtractorWrapper(_configuration);
 
         }
         private Bitmap GetControlImage(Control ctl)
@@ -193,6 +141,8 @@ namespace Quesadilla
 
         private void ShowAlertBitmap()
         {
+            if (!formLoaded) return;
+
             if ( _alertPopup != null )
             {
                 _alertPopup.Close();
@@ -306,121 +256,6 @@ namespace Quesadilla
             lblPopupSeconds.Text = ((TrackBar)sender).Value.ToString();
         }
 
-        private void radioAlertTopLeft_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.TopLeft;
-        }
-
-        private void radioAlertTopRight_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.TopRight;
-        }
-
-        private void radioAlertBottomLeft_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.BottomLeft;
-        }
-
-        private void radioAlertBottomRight_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.BottomRight;
-        }
-
-        private void radioAlertCentre_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.Center;
-        }
-
-        private void cbDPSStayOnTop_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.DPSGraphStayOnTop = cbDPSStayOnTop.Checked;
-        }
-
-        private void cbStayOnTop_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.StayOnTop = cbStayOnTop.Checked;
-        }
-
-        private void cbDPSTransparent_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.DPSGraphTransparent= cbDPSTransparent.Checked;
-        }
-
-        private void radioDPSTopLeft_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.DPSLocation = Classes.Configuration.PopupLocationType.TopLeft;
-        }
-
-        private void radioDPSTopRight_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.DPSLocation = Classes.Configuration.PopupLocationType.TopRight;
-        }
-
-        private void radioDPSCenter_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.DPSLocation = Classes.Configuration.PopupLocationType.Center;
-        }
-
-        private void radioDPSBottomLeft_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.DPSLocation = Classes.Configuration.PopupLocationType.BottomLeft;
-        }
-
-        private void radioDPSBottomRight_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.DPSLocation = Classes.Configuration.PopupLocationType.BottomRight;
-        }
-
-        private void cbDPSShowWindow_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.DPSShowWindow= cbDPSShowWindow.Checked;
-        }
-
-        private void cbDPSAllToons_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.DPSAllToons= cbDPSAllToons.Checked;
-        }
-
-        private void radioAlertTopCenter_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.TopCenter;
-        }
-
-        private void radioAlertBottomCenter_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupLocation = Classes.Configuration.PopupLocationType.BottomCenter;
-        }
-
-        private void cbAlertTransparent_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertTransparent= cbAlertTransparent.Checked;
-        }
-
-        private void cbShowZKillAlerts_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.ShowZKillAlerts= cbShowZKillAlerts.Checked;
-        }
-
-        private void buttonPickZKillCircleColour_Click(object sender, EventArgs e)
-        {
-            _configuration.ZKillCircleColour = ChooseColour(_configuration.ZKillCircleColour);
-        }
-
-        private void buttonPickZKillIskColour_Click(object sender, EventArgs e)
-        {
-            _configuration.ZKillIskColour = ChooseColour(_configuration.ZKillIskColour);
-        }
-
-        private void buttonPickZKillBarColour_Click(object sender, EventArgs e)
-        {
-            _configuration.ZKillBarColour = ChooseColour(_configuration.ZKillBarColour);
-        }
-
-        private void cbZkillShowBar_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.ZKillShowBar = cbZkillShowBar.Checked;
-        }
-
         private void trackDPSGraphLineSize_Scroll(object sender, EventArgs e)
         {
             _configuration.DPSGraphLineSize = ((TrackBar)sender).Value;
@@ -436,66 +271,6 @@ namespace Quesadilla
         private void cmbHomeSystem_SelectedIndexChanged(object sender, EventArgs e)
         {
             _configuration.HomeSystem = cmbHomeSystem.Text;
-        }
-
-        private void cbShowMinimap_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupShowMinimap = cbAlertPopupMinimap.Checked;
-            ShowAlertBitmap();
-        }
-
-        private void cbAlertPopupShowMinimapBorder_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupShowMinimapBorder = cbAlertPopupShowMinimapBorder.Checked;
-            ShowAlertBitmap();
-        }
-
-        private void cbAlertPopupMinimapShowSystemText_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapShowSystemText = cbAlertPopupMinimapShowSystemText.Checked;
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickAlertPopupMinimapLineColorNormal_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapLineColourNormal = ChooseColour(_configuration.AlertPopupMinimapLineColourNormal);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickAlertPopupMinimapLineColorRoute_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapLineColourRoute = ChooseColour(_configuration.AlertPopupMinimapLineColourRoute);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickAlertPopupMinimapSystemColorNormal_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapSystemColourNormal = ChooseColour(_configuration.AlertPopupMinimapSystemColourNormal);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickAlertPopupMinimapSystemColorRoute_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapSystemColourRoute = ChooseColour(_configuration.AlertPopupMinimapSystemColourRoute);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickAlertPopupMinimapSystemColorFrom_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapSystemColourFrom = ChooseColour(_configuration.AlertPopupMinimapSystemColourFrom);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickAlertPopupMinimapSystemColorTo_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapSystemColourTo = ChooseColour(_configuration.AlertPopupMinimapSystemColourTo);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickAlertPopupMinimapSystemColorText_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapSystemColourText = ChooseColour(_configuration.AlertPopupMinimapSystemColourText);
-            ShowAlertBitmap();
         }
 
         private void trackAlertPopupMinimapSizeWidth_Scroll(object sender, EventArgs e)
@@ -523,154 +298,14 @@ namespace Quesadilla
             ShowAlertBitmap();
         }
 
-        private void buttonPickMainWindowsBackgroundColour_Click(object sender, EventArgs e)
+        private void Properties_Click(object sender, EventArgs e)
         {
-            _configuration.MainWindowBackgroundColour = ChooseColour(_configuration.MainWindowBackgroundColour);
+
         }
 
-        private void buttonPickMainWindowColourText_Click(object sender, EventArgs e)
+        private void ColourProperties_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            _configuration.MainWindowColourText = ChooseColour(_configuration.MainWindowColourText);
-        }
-
-        private void buttonPickMainWindowLogBackgroundColour_Click(object sender, EventArgs e)
-        {
-            _configuration.MainWindowLogBackgroundColour = ChooseColour(_configuration.MainWindowLogBackgroundColour);
-        }
-
-        private void buttonPickMainWindowLogColourText_Click(object sender, EventArgs e)
-        {
-            _configuration.MainWindowLogColourText = ChooseColour(_configuration.MainWindowLogColourText);
-        }
-
-        private void cbShowMinimapBorder_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.ShowMinimapBorder = cbShowMinimapBorder.Checked;
-        }
-
-        private void cbShowMinimap_CheckedChanged_1(object sender, EventArgs e)
-        {
-            _configuration.ShowMinimap = cbShowMinimap.Checked;
-        }
-
-        private void buttonPickCurrentCharacterColour_Click(object sender, EventArgs e)
-        {
-            _configuration.CurrentCharacterColour = ChooseColour(_configuration.CurrentCharacterColour);
-        }
-
-        private void buttonPickISKColour_Click(object sender, EventArgs e)
-        {
-            _configuration.ISKColour = ChooseColour(_configuration.ISKColour);
-        }
-
-        private void buttonPickEvescoutColour_Click(object sender, EventArgs e)
-        {
-            _configuration.EvescoutColour= ChooseColour(_configuration.EvescoutColour);
-        }
-
-        private void buttonPickAlsrtsOutstandingColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertsOutstandingColour = ChooseColour(_configuration.AlertsOutstandingColour);
-        }
-
-        private void buttonPickAlertPopupMinimapBorderColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapBorderColour = ChooseColour(_configuration.AlertPopupMinimapBorderColour);
-        }
-
-        private void buttonPickMinimapBorderColour_Click(object sender, EventArgs e)
-        {
-            _configuration.MinimapBorderColour = ChooseColour(_configuration.MinimapBorderColour);
-        }
-
-        private void cbMinimapShowSystemText_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.MinimapShowSystemText = cbMinimapShowSystemText.Checked;
-        }
-
-        private void buttonPickMinimapLineColourNormal_Click(object sender, EventArgs e)
-        {
-            _configuration.MinimapLineColourNormal = ChooseColour(_configuration.MinimapLineColourNormal);
-        }
-
-        private void buttonPickMinimapLineColourRoute_Click(object sender, EventArgs e)
-        {
-            _configuration.MinimapLineColourRoute = ChooseColour(_configuration.MinimapLineColourRoute);
-        }
-
-        private void buttonPickMinimapSystemColourNormal_Click(object sender, EventArgs e)
-        {
-            _configuration.MinimapSystemColourNormal = ChooseColour(_configuration.MinimapSystemColourNormal);
-        }
-
-        private void buttonPickMinimapSystemColourRoute_Click(object sender, EventArgs e)
-        {
-            _configuration.MinimapSystemColourRoute = ChooseColour(_configuration.MinimapSystemColourRoute);
-        }
-
-        private void buttonPickMinimapSystemColourFrom_Click(object sender, EventArgs e)
-        {
-            _configuration.MinimapSystemColourFrom = ChooseColour(_configuration.MinimapSystemColourFrom);
-        }
-
-        private void buttonPickMinimapSystemColourTo_Click(object sender, EventArgs e)
-        {
-            _configuration.MinimapSystemColourTo = ChooseColour(_configuration.MinimapSystemColourTo);
-        }
-
-        private void buttonPickMinimapSystemColourText_Click(object sender, EventArgs e)
-        {
-            _configuration.MinimapSystemColourText = ChooseColour(_configuration.MinimapSystemColourText);
-        }
-
-        private void buttonPickMinimapZKillColour_Click_1(object sender, EventArgs e)
-        {
-            _configuration.MinimapZKillColour = ChooseColour(_configuration.MinimapZKillColour);
-        }
-
-        private void buttonPickAlertPopupMinimapZKillColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapZKillColour = ChooseColour(_configuration.AlertPopupMinimapZKillColour);
-        }
-
-        private void PickAlertPopupMinimapIntelColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapIntelColour = ChooseColour(_configuration.AlertPopupMinimapIntelColour);
-        }
-
-        private void buttonPickMinimapIntelColour_Click(object sender, EventArgs e)
-        {
-            _configuration.MinimapIntelColour = ChooseColour(_configuration.MinimapIntelColour);
-        }
-
-        private void buttonPickAlertPopupMinimapAltPositionColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapAltPositionColour = ChooseColour(_configuration.AlertPopupMinimapAltPositionColour);
-        }
-
-        private void buttonPickMinimapAltPositionColour_Click(object sender, EventArgs e)
-        {
-            _configuration.MinimapAltPositionColour = ChooseColour(_configuration.MinimapAltPositionColour);
-        }
-
-        private void buttonPickMainWindowExtraInformationColour_Click(object sender, EventArgs e)
-        {
-            _configuration.MainWindowExtraInformationColour = ChooseColour(_configuration.MainWindowExtraInformationColour);
-        }
-
-        private void cbMainWindowShowExtraInformation_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.MainWindowShowExtraInformation = cbMainWindowShowExtraInformation.Checked;
-        }
-
-        private void cbAlertPopupMinimapRawXY_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapRawXY = ! cbAlertPopupMinimapRawXY.Checked;
-        }
-
-        private void cbMinimapRawXY_CheckedChanged(object sender, EventArgs e)
-        {
-            _configuration.MinimapRawXY = !cbMinimapRawXY.Checked;
+            ShowAlertBitmap();
         }
     }
 }

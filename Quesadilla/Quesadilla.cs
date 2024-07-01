@@ -283,8 +283,8 @@ namespace Quesadilla
         public void ReloadConfiguration()
         {
             BackColor = Program.MainConfiguration.MainWindowBackgroundColour;
-            ForeColor = Program.MainConfiguration.MainWindowColourText;
-            intelLog.ForeColor = Program.MainConfiguration.MainWindowLogColourText;
+            ForeColor = Program.MainConfiguration.MainWindowTextColour;
+            intelLog.ForeColor = Program.MainConfiguration.MainWindowLogTextColour;
             intelLog.BackColor = Program.MainConfiguration.MainWindowLogBackgroundColour;
 
             lblISK.ForeColor = Program.MainConfiguration.ISKColour;
