@@ -1034,6 +1034,12 @@ img.rounded-corners {
         [DefaultValue(typeof(int), "65432")]
         public int IntegrationPort { get; set; }
 
+        [Category("General")]
+        [DisplayName("Dotlan data expiry - minutes")]
+        [Description("How many minutes to consider dotlan data as old")]
+        [DefaultValue(typeof(int), "90")]
+        public int DotlanDataExpiresMinutes { get; set; }
+
         public List<AlertConfig> AlertConfiguration { get; set; }
         public List<LogfileConfig> Logfiles { get; set; }
         public List<CSSData> CSSData { get; set; }

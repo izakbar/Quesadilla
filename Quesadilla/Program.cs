@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Media;
+using System.Reflection;
 using System.Resources;
 using System.Web.WebPages;
 using System.Windows.Forms;
@@ -55,6 +56,8 @@ namespace Quesadilla
 
         public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
+
+        public static Version version = Assembly.GetEntryAssembly().GetName().Version;
 
         [STAThread]
         static void Main()

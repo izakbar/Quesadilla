@@ -567,7 +567,9 @@
     <Compile Include="Classes\Configuration\LogfileConfig.cs" />
     <Compile Include="Classes\Configuration\PopupLocationType.cs" />
     <Compile Include="Classes\Configuration\CustomPropertyExtractorWrapper.cs" />
+    <Compile Include="Classes\Dotlan\DotlanManager.cs" />
     <Compile Include="Classes\ESIData\ESICharacter.cs" />
+    <Compile Include="Classes\Events\DotlanEventArgs.cs" />
     <Compile Include="Classes\Events\ProcessDecloakEventArgs.cs" />
     <Compile Include="Classes\Events\ProcessISKEventArgs.cs" />
     <Compile Include="Classes\Events\ZKillEventArgs.cs" />

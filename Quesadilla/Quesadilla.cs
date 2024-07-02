@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
+using Quesadilla.Classes.Dotlan;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.EveScout;
 using Quesadilla.Classes.Logfile;
@@ -32,6 +33,7 @@ using System.Threading.Tasks;
 using System.Web.WebPages;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Xml;
 using static Quesadilla.Classes.Processes.ProcessMonitor;
 using static Quesadilla.Extensions.StringExtensions;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -103,6 +105,7 @@ namespace Quesadilla
         private MenuItem menuConfigurationDPSShowAll = new MenuItem("DPS Combine");
 
         private EveScoutManager EveScoutProcessor;
+        private DotlanManager DotlanProcessor;
 
         public bool AlertShowing = false;
 
@@ -200,6 +203,9 @@ namespace Quesadilla
 
             EveScoutProcessor = new EveScoutManager();
             EveScoutProcessor.EveScoutEventHandler += new EventHandler<EveScoutEventArgs>(this.EveScout_ProcessNewData);
+
+            DotlanProcessor = new DotlanManager();
+            DotlanProcessor.DotlanEventHandler += new EventHandler<DotlanEventArgs>(this.Dotlan_ProcessNewData);
 
             Program.SetupLogfileWatchers();
 
@@ -349,8 +355,7 @@ namespace Quesadilla
             Thread.Sleep(500);
             splashScreen = null;
 
-            Version version = Assembly.GetEntryAssembly().GetName().Version;
-            this.Text = "Quesadilla v" + version.ToString();
+            this.Text = "Quesadilla v" + Program.version.ToString();
         }
 
         private void mainTimer_Tick(object sender, EventArgs e)
@@ -903,6 +908,13 @@ namespace Quesadilla
                         Location = foundSystemName,
                     };
                     Program.CharacterList.Add(c);
+                }
+
+                // add to list of regions to check on dotlan
+                string region = Program.Universe.SolarSystems[foundSystemId].RegionName;
+                if (!DotlanProcessor.RegionsToCheck.Contains(region))
+                {
+                    DotlanProcessor.RegionsToCheck.Add(region);
                 }
 
                 CheckEveScoutConnection(c);
@@ -1771,9 +1783,46 @@ namespace Quesadilla
         }
         private void EveScout_ProcessNewData(object sender, EveScoutEventArgs e)
         {
-            foreach(var c in Program.CharacterList.Where(o => o.IsClientActive)) { 
+            foreach (var c in Program.CharacterList.Where(o => o.IsClientActive))
+            {
                 CheckEveScoutConnection(c);
             }
+        }
+        private void Dotlan_ProcessNewData(object sender, DotlanEventArgs e)
+        {
+            Log.Information($"Processing dotlan data for {e.RegionName}");
+
+            XmlDocument xmldoc = new XmlDocument
+            {
+                XmlResolver = null
+            };
+            XmlNodeList dotlanXYNodes = null;
+            XmlNodeList dotlanDEFNodes = null;
+            xmldoc.LoadXml(e.Content);
+            dotlanXYNodes = xmldoc.SelectNodes(@"//*[@id='sysuse']/*");
+
+            double dotlanX = 0;
+            double dotlanY = 0;
+
+            foreach (XmlNode xn in dotlanXYNodes)
+            {
+                long systemID = long.Parse(xn.Attributes["id"].Value.Replace("sys", ""));
+                float x = float.Parse(xn.Attributes["x"].Value);
+                float y = float.Parse(xn.Attributes["y"].Value);
+
+                string link = xn.Attributes["xlink:href"].Value.Replace("#","");
+                dotlanDEFNodes = xmldoc.SelectNodes($@"//*[@id='{link}']/*");
+
+                var s = Program.Universe.SolarSystems[(int)systemID];
+                s.DotlanX = x;
+                s.DotlanY = y;
+
+
+            }
+
+            // pull more information from dotlan data
+            // save Solarsystem data ?
+
         }
 
         private void trayIconMenuShowHistoricAlert(object sender, EventArgs e)
