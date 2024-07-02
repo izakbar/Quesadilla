@@ -10,6 +10,7 @@ namespace Quesadilla.Classes.EveScout
     public class DotlanEventArgs : EventArgs
     {
         public string RegionName { get; set; }
-        public string Content { get; set; }
+        public string MapContent { get; set; }
+        public string DeltaContent { get; set; }
     }
 }

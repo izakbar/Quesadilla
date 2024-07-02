@@ -1,5 +1,6 @@
 ﻿using EVEStandard.Models;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Dotlan;
@@ -1792,32 +1793,46 @@ namespace Quesadilla
         {
             Log.Information($"Processing dotlan data for {e.RegionName}");
 
-            XmlDocument xmldoc = new XmlDocument
+            // if update is map data
+            if (!e.MapContent.IsNullOrEmpty())
             {
-                XmlResolver = null
-            };
-            XmlNodeList dotlanXYNodes = null;
-            XmlNodeList dotlanDEFNodes = null;
-            xmldoc.LoadXml(e.Content);
-            dotlanXYNodes = xmldoc.SelectNodes(@"//*[@id='sysuse']/*");
+                XmlDocument xmldoc = new XmlDocument
+                {
+                    XmlResolver = null
+                };
+                XmlNodeList dotlanXYNodes = null;
+                XmlNodeList dotlanDEFNodes = null;
+                xmldoc.LoadXml(e.MapContent);
+                dotlanXYNodes = xmldoc.SelectNodes(@"//*[@id='sysuse']/*");
 
-            double dotlanX = 0;
-            double dotlanY = 0;
+                double dotlanX = 0;
+                double dotlanY = 0;
 
-            foreach (XmlNode xn in dotlanXYNodes)
+                foreach (XmlNode xn in dotlanXYNodes)
+                {
+                    long systemID = long.Parse(xn.Attributes["id"].Value.Replace("sys", ""));
+                    float x = float.Parse(xn.Attributes["x"].Value);
+                    float y = float.Parse(xn.Attributes["y"].Value);
+
+                    string link = xn.Attributes["xlink:href"].Value.Replace("#", "");
+                    dotlanDEFNodes = xmldoc.SelectNodes($@"//*[@id='{link}']/*");
+
+                    var s = Program.Universe.SolarSystems[(int)systemID];
+                    s.DotlanX = x;
+                    s.DotlanY = y;
+                }
+            }
+
+            // if update is delta data 
+            Dictionary<string, string> killdDeltadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(e.DeltaContent);
+            foreach (var kvp in killdDeltadata)
             {
-                long systemID = long.Parse(xn.Attributes["id"].Value.Replace("sys", ""));
-                float x = float.Parse(xn.Attributes["x"].Value);
-                float y = float.Parse(xn.Attributes["y"].Value);
+                int systemId = int.Parse(kvp.Key);
+                int killDelta = int.Parse(kvp.Value);
 
-                string link = xn.Attributes["xlink:href"].Value.Replace("#","");
-                dotlanDEFNodes = xmldoc.SelectNodes($@"//*[@id='{link}']/*");
-
-                var s = Program.Universe.SolarSystems[(int)systemID];
-                s.DotlanX = x;
-                s.DotlanY = y;
-
-
+                if ( Program.Universe.SolarSystems.ContainsKey(systemId) ) {
+                    Program.Universe.SolarSystems[systemId].NPCKillsDeltaLastHour = killDelta;
+                }
             }
 
             // pull more information from dotlan data
@@ -1938,7 +1953,7 @@ namespace Quesadilla
                     {
                         ImageGenerator.DrawSystemName(e.Graphics, m.X+pMinimapImage.Left, m.Y+pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.MinimapMouseoverSystemColour);
                         if (!lblSystemName.Text.IsNullOrEmpty()) lblSystemName.Text += ",";
-                        lblSystemName.Text += m.solarSystem.Name;
+                        lblSystemName.Text += m.solarSystem.Name + ( m.solarSystem.NPCKillsDeltaLastHour == null ? "" : $"  {m.solarSystem.NPCKillsDeltaLastHour}");
                     }
 
                     ImageGenerator.PaintDrawText(e, lblSystemName);

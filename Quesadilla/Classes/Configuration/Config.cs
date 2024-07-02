@@ -1035,10 +1035,16 @@ img.rounded-corners {
         public int IntegrationPort { get; set; }
 
         [Category("General")]
-        [DisplayName("Dotlan data expiry - minutes")]
-        [Description("How many minutes to consider dotlan data as old")]
+        [DisplayName("Dotlan map expiry - minutes")]
+        [Description("How many minutes to consider dotlan map data as old")]
         [DefaultValue(typeof(int), "90")]
-        public int DotlanDataExpiresMinutes { get; set; }
+        public int DotlanMapExpiresMinutes { get; set; }
+
+        [Category("General")]
+        [DisplayName("Dotlan delta data expiry - minutes")]
+        [Description("How many minutes to consider dotlan npc delta data as old")]
+        [DefaultValue(typeof(int), "61")]
+        public int DotlanDeltaExpiresMinutes { get; set; }
 
         public List<AlertConfig> AlertConfiguration { get; set; }
         public List<LogfileConfig> Logfiles { get; set; }

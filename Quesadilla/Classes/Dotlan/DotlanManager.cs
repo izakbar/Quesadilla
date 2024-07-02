@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
 using System.Threading;
@@ -29,7 +30,7 @@ namespace Quesadilla.Classes.Dotlan
 
         public List<string> RegionsToCheck = new List<string>();
 
-        //        public event EventHandler<ZKillEventArgs> ZKillEventHandler;
+        private string LastDotlanDeltaETAG = "";
 
         public DotlanManager()
         {
@@ -80,11 +81,17 @@ namespace Quesadilla.Classes.Dotlan
         private void DoWork(object sender, DoWorkEventArgs e)
         {
             string regionToProcess = "";
-            foreach(var region in Program.Universe.Regions.Keys)
+            DateTime NowCheck = DateTime.Now;
+
+
+            foreach(var region in Program.Universe.DotlanMapRegions.Keys)
             {
                 if (regionToProcess == "" &&
                     RegionsToCheck.Contains(region) &&
-                    Program.Universe.Regions[region].AddMinutes(Program.MainConfiguration.DotlanDataExpiresMinutes) < DateTime.Now 
+                    (
+                    Program.Universe.DotlanMapRegions[region].AddMinutes(Program.MainConfiguration.DotlanMapExpiresMinutes) < NowCheck ||
+                    Program.Universe.DotlanDeltaRegions.AddMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes) < NowCheck 
+                    )
                     )
                 {
                     regionToProcess = region;
@@ -93,26 +100,34 @@ namespace Quesadilla.Classes.Dotlan
 
             if (!regionToProcess.IsNullOrEmpty())
             {
-                // get region data
-                string content = GetDotlanData(regionToProcess, Program.Universe.Regions[regionToProcess]);
-
-                if (content != null && content != "Error")
+                // get region map data if required
+                string dotlanMapContent = "";
+                string dotlanDeltaContent = "";
+                if (Program.Universe.DotlanMapRegions[regionToProcess].AddMinutes(Program.MainConfiguration.DotlanMapExpiresMinutes) < NowCheck)
                 {
-                    Program.Universe.Regions[regionToProcess] = DateTime.Now;
+                    Program.Universe.DotlanMapRegions[regionToProcess] = NowCheck;
+                    dotlanMapContent = GetDotlanMapData(regionToProcess, Program.Universe.DotlanMapRegions[regionToProcess]);
+                }
 
-                    if (DotlanEventHandler != null)
+                if (Program.Universe.DotlanDeltaRegions.AddMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes) < NowCheck)
+                {
+                    Program.Universe.DotlanDeltaRegions = NowCheck;
+                    dotlanDeltaContent = GetDotlanDeltaData(Program.Universe.DotlanDeltaRegions);
+                }
+
+                if (DotlanEventHandler != null)
+                {
+                    DotlanEventHandler((object)this, new DotlanEventArgs()
                     {
-                        DotlanEventHandler((object)this, new DotlanEventArgs()
-                        {
-                            RegionName = regionToProcess,
-                            Content = content,
-                        });
-                    }
+                        RegionName = regionToProcess,
+                        MapContent = dotlanMapContent,
+                        DeltaContent = dotlanDeltaContent,
+                    });
                 }
             }
         }
 
-        private string GetDotlanData(string regionName, DateTime LastDotlanUpdate)
+        private string GetDotlanMapData(string regionName, DateTime LastDotlanUpdate)
         {
             string strContent = string.Empty;
             try
@@ -192,6 +207,77 @@ namespace Quesadilla.Classes.Dotlan
             catch (Exception ex)
             {
                 log.Error($"Dotlan for {regionName} request failed");
+                return null;
+            }
+        }
+        private string GetDotlanDeltaData(DateTime LastDotlanUpdate)
+        {
+            string strContent = string.Empty;
+            try
+            {
+                Log.Information($"Getting Delta from Dotlan");
+
+                string URL = "https://evemaps.dotlan.net/ajax/npcdelta";
+
+                using (var hc = new HttpClient())
+                {
+
+                    string versionNum = "1";
+                    string userAgent = $"Mozilla/5.0 (Quesadilla version {versionNum} )";
+                    hc.DefaultRequestHeaders.Add("User-Agent", userAgent);
+                    hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
+
+                    if (LastDotlanDeltaETAG != "")
+                    {
+                        hc.DefaultRequestHeaders.IfNoneMatch.Add(new EntityTagHeaderValue(LastDotlanDeltaETAG));
+                    }
+
+                    var response = hc.GetAsync(URL).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        strContent = response.Content.ReadAsStringAsync().Result;
+
+                        // if Last Modified set - then set expiry of data
+                        if (response.Content.Headers.LastModified.HasValue)
+                        {
+                            Random rndUpdateOffset = new Random();
+                            Program.Universe.DotlanDeltaRegions = response.Content.Headers.LastModified.Value.DateTime.ToLocalTime() + TimeSpan.FromMinutes(60) 
+                                + TimeSpan.FromSeconds(rndUpdateOffset.Next(1, 300)) 
+                                - TimeSpan.FromMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes);
+                        }
+
+                        if (response.Headers.ETag != null)
+                        {
+                            LastDotlanDeltaETAG = response.Headers.ETag.Tag;
+                        }
+                    }
+                    else
+                    {
+                        strContent = "Error";
+                    }
+                }
+            }
+            catch
+            {
+                log.Error($"Dotlan delta request failed");
+                return null;
+            }
+
+            // if we have an error - sleep a long time - consider pause
+            if (strContent == "Error")
+            {
+                log.Error("Getting error back from Dotlan - sleeping worker");
+                Thread.Sleep(500000);
+                return null;
+            }
+
+            try
+            {
+                return strContent;
+            }
+            catch (Exception ex)
+            {
+                log.Error($"Dotlan delta request failed");
                 return null;
             }
         }
