@@ -1825,13 +1825,17 @@ namespace Quesadilla
 
             // if update is delta data 
             Dictionary<string, string> killdDeltadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(e.DeltaContent);
-            foreach (var kvp in killdDeltadata)
+            if (killdDeltadata != null)
             {
-                int systemId = int.Parse(kvp.Key);
-                int killDelta = int.Parse(kvp.Value);
+                foreach (var kvp in killdDeltadata)
+                {
+                    int systemId = int.Parse(kvp.Key);
+                    int killDelta = int.Parse(kvp.Value);
 
-                if ( Program.Universe.SolarSystems.ContainsKey(systemId) ) {
-                    Program.Universe.SolarSystems[systemId].NPCKillsDeltaLastHour = killDelta;
+                    if (Program.Universe.SolarSystems.ContainsKey(systemId))
+                    {
+                        Program.Universe.SolarSystems[systemId].NPCKillsDeltaLastHour = killDelta;
+                    }
                 }
             }
 

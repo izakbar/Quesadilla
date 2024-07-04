@@ -1046,6 +1046,19 @@ img.rounded-corners {
         [DefaultValue(typeof(int), "61")]
         public int DotlanDeltaExpiresMinutes { get; set; }
 
+        [Category("General")]
+        [DisplayName("Pull dotlan map layout svg")]
+        [Description("Should dotlan svg be pulled and parsed regularly")]
+        [DefaultValue(typeof(bool), "false")]
+        [ReadOnly(true)]
+        public bool DotlanMapPull { get; set; }
+
+        [Category("General")]
+        [DisplayName("Pull dotlan delta information")]
+        [Description("Should dotlan npc delta feed be pulled regularly")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool DotlanDeltaPull { get; set; }
+
         public List<AlertConfig> AlertConfiguration { get; set; }
         public List<LogfileConfig> Logfiles { get; set; }
         public List<CSSData> CSSData { get; set; }

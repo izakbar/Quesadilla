@@ -89,8 +89,8 @@ namespace Quesadilla.Classes.Dotlan
                 if (regionToProcess == "" &&
                     RegionsToCheck.Contains(region) &&
                     (
-                    Program.Universe.DotlanMapRegions[region].AddMinutes(Program.MainConfiguration.DotlanMapExpiresMinutes) < NowCheck ||
-                    Program.Universe.DotlanDeltaRegions.AddMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes) < NowCheck 
+                    (Program.MainConfiguration.DotlanMapPull && Program.Universe.DotlanMapRegions[region].AddMinutes(Program.MainConfiguration.DotlanMapExpiresMinutes) < NowCheck) ||
+                    (Program.MainConfiguration.DotlanDeltaPull && Program.Universe.DotlanDeltaRegions.AddMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes) < NowCheck) 
                     )
                     )
                 {
@@ -103,13 +103,19 @@ namespace Quesadilla.Classes.Dotlan
                 // get region map data if required
                 string dotlanMapContent = "";
                 string dotlanDeltaContent = "";
-                if (Program.Universe.DotlanMapRegions[regionToProcess].AddMinutes(Program.MainConfiguration.DotlanMapExpiresMinutes) < NowCheck)
+                if (
+                    Program.MainConfiguration.DotlanMapPull &&
+                    (Program.Universe.DotlanMapRegions[regionToProcess].AddMinutes(Program.MainConfiguration.DotlanMapExpiresMinutes) < NowCheck)
+                    )
                 {
                     Program.Universe.DotlanMapRegions[regionToProcess] = NowCheck;
                     dotlanMapContent = GetDotlanMapData(regionToProcess, Program.Universe.DotlanMapRegions[regionToProcess]);
                 }
 
-                if (Program.Universe.DotlanDeltaRegions.AddMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes) < NowCheck)
+                if (
+                    Program.MainConfiguration.DotlanDeltaPull &&
+                    (Program.Universe.DotlanDeltaRegions.AddMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes) < NowCheck)
+                    )
                 {
                     Program.Universe.DotlanDeltaRegions = NowCheck;
                     dotlanDeltaContent = GetDotlanDeltaData(Program.Universe.DotlanDeltaRegions);
@@ -132,7 +138,7 @@ namespace Quesadilla.Classes.Dotlan
             string strContent = string.Empty;
             try
             {
-                Log.Information($"Getting Data from Dotlan for {regionName}");
+                log.Information($"Getting Data from Dotlan for {regionName}");
 
                 string URL = $"http://evemaps.dotlan.net/svg/{regionName.Replace(" ","_")}.svg";
 
@@ -215,7 +221,7 @@ namespace Quesadilla.Classes.Dotlan
             string strContent = string.Empty;
             try
             {
-                Log.Information($"Getting Delta from Dotlan");
+                log.Information($"Getting Delta from Dotlan");
 
                 string URL = "https://evemaps.dotlan.net/ajax/npcdelta";
 
@@ -244,6 +250,7 @@ namespace Quesadilla.Classes.Dotlan
                             Program.Universe.DotlanDeltaRegions = response.Content.Headers.LastModified.Value.DateTime.ToLocalTime() + TimeSpan.FromMinutes(60) 
                                 + TimeSpan.FromSeconds(rndUpdateOffset.Next(1, 300)) 
                                 - TimeSpan.FromMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes);
+                            log.Information($"dotlan delta - lastmodied {response.Content.Headers.LastModified} setting DotlanDeltaRegions {Program.Universe.DotlanDeltaRegions}");
                         }
 
                         if (response.Headers.ETag != null)
