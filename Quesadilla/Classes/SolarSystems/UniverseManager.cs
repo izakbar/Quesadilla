@@ -15,6 +15,7 @@ using System.Linq.Expressions;
 using Quesadilla.Classes.Queues;
 using System.Windows.Forms;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 
 namespace Quesadilla.Classes.SolarSystems
 {
@@ -33,6 +34,9 @@ namespace Quesadilla.Classes.SolarSystems
 
         private Dictionary<string, PathInfo> _pathfindingCache = new Dictionary<string, PathInfo>();
 
+        public Dictionary<string, DateTime> DotlanMapRegions = new Dictionary<string, DateTime>();
+        public DateTime DotlanDeltaRegions;
+
         public int HomeSolarSystemID { get; set; }
 
         public void ReadSolarSystems(string jsonFile)
@@ -41,11 +45,18 @@ namespace Quesadilla.Classes.SolarSystems
             var json = reader.ReadToEnd();
 
             SolarSystems = JsonConvert.DeserializeObject<Dictionary<int, SolarSystem>>(json);
+            DotlanDeltaRegions = DateTime.Now.AddDays(-10);
             foreach (var s in SolarSystems)
             {
                 Names.Add(s.Value.Name, s.Key);
                 s.Value.SetNameRegex();
+
+                if ( ! DotlanMapRegions.ContainsKey(s.Value.RegionName) )
+                {
+                    DotlanMapRegions.Add(s.Value.RegionName, DateTime.Now.AddDays(-10));
+                }
             }
+            reader.Close();
         }
         public void ReadItemTypes(string jsonFile)
         {

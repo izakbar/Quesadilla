@@ -17,7 +17,7 @@ namespace Quesadilla.Classes.EveScout
 {
     public class EveScoutManager
     {
-        private ILogger log = Log.ForContext<ZKillRedisQ>();
+        private ILogger log = Log.ForContext<EveScoutManager>();
         public List<EveScoutWH> Signatures = new List<EveScoutWH>();
 
         private BackgroundWorker Worker;
