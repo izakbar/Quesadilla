@@ -1371,10 +1371,12 @@ namespace Quesadilla
         {
             Height = intelLog.Height + _windowExtraHeight + (Program.MainConfiguration.ShowMinimap ? pMinimapImage.Height : 20);
 
+            lblISK.Top = lblAlertsOutstanding.Top;
+            lblISK.Left = Left - lblISK.Width + 20;
             if (Program.MainConfiguration.ShowMinimap)
             {
-                lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
-                lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
+                //lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
+                //lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
                 lblSystemName.Top = lblISK.Top;
 
                 lblEtxraInformation.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
@@ -1383,8 +1385,8 @@ namespace Quesadilla
             }
             else
             {
-                lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
-                lblISK.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
+                //lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
+                //lblISK.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
                 lblSystemName.Top = lblISK.Top;
             }
 
