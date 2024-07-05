@@ -53,6 +53,7 @@ namespace Quesadilla
 
         public static Dictionary<string, List<CombatLine>> Combat = new Dictionary<string, List<CombatLine>>();
         public static Dictionary<string, List<IskLine>> ISK = new Dictionary<string, List<IskLine>>();
+        public static Dictionary<string, List<MiningLine>> Mining = new Dictionary<string, List<MiningLine>>();
 
         public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
@@ -269,7 +270,27 @@ namespace Quesadilla
 
             return ret;
         }
-
+        public static void ExpireMining()
+        {
+            // expire ISK ?
+            foreach (var k in Mining.Keys)
+            {
+                if (Mining[k].Count > 0)
+                {
+                    bool removedEntry = true;
+                    while (removedEntry)
+                    {
+                        removedEntry = false;
+                        TimeSpan ts = DateTime.Now - Mining[k].First().TimeAdded;
+                        if (ts.TotalSeconds > MainConfiguration.ExpireMiningSeconds)
+                        {
+                            Mining[k].Remove(Mining[k].First());
+                            removedEntry = true;
+                        }
+                    }
+                }
+            }
+        }
         public static void ExpireISK()
         {
             // expire ISK ?
@@ -277,10 +298,16 @@ namespace Quesadilla
             {
                 if (ISK[k].Count > 0)
                 {
-                    TimeSpan ts = DateTime.Now - ISK[k].First().TimeAdded;
-                    if (ts.TotalSeconds > MainConfiguration.ExpireISKSeconds)
+                    bool removedEntry = true;
+                    while (removedEntry)
                     {
-                        ISK[k].Remove(ISK[k].First());
+                        removedEntry = false;
+                        TimeSpan ts = DateTime.Now - ISK[k].First().TimeAdded;
+                        if (ts.TotalSeconds > MainConfiguration.ExpireISKSeconds)
+                        {
+                            ISK[k].Remove(ISK[k].First());
+                            removedEntry = true;
+                        }
                     }
                 }
             }
@@ -290,12 +317,19 @@ namespace Quesadilla
             // expire combats ?
             foreach (var k in Combat.Keys)
             {
-                if (Combat[k].Count > 0)
+
+                bool removedEntry = true;
+                while (removedEntry)
                 {
-                    TimeSpan ts = DateTime.Now - Combat[k].First().TimeAdded;
-                    if (ts.TotalSeconds > MainConfiguration.ExpireCombatSeconds)
+                    removedEntry = false;
+                    if (Combat[k].Count > 0)
                     {
-                        Combat[k].Remove(Combat[k].First());
+                        TimeSpan ts = DateTime.Now - Combat[k].First().TimeAdded;
+                        if (ts.TotalSeconds > MainConfiguration.ExpireCombatSeconds)
+                        {
+                            Combat[k].Remove(Combat[k].First());
+                            removedEntry = true;
+                        }
                     }
                 }
             }

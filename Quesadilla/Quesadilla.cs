@@ -75,6 +75,10 @@ namespace Quesadilla
         private readonly Regex _CombatRegexMissesYouCompletely = new Regex("(?<combatEntity>.*)\\smisses\\syou\\scompletely", RegexOptions.Compiled);
         private readonly Regex _CombatRegexCombatData = new Regex("^<color=0x(?<combatColour>........)><b>(?<combatAmount>.*)</b>\\s*<color=0x........><font size=10>\\s*(?<combatContext>.*)\\s*</font>\\s*<b><color=0xffffffff>(?<combatEntity>.*)</b>(<font size=10>|<color=0x77ffffff>)*\\s-\\s(?<combatText>.*)", RegexOptions.Compiled);
 
+        private readonly Regex _MiningRegexRoidExploded = new Regex("(?<miningDevice>.*)\\sdeactivates as it finds the resource it was harvesting\\s(?<miningHowItEnded>.*)", RegexOptions.Compiled);
+        private readonly Regex _MiningRegexCargoFull = new Regex("Your\\s*(?<miningDevice>.*)\\s*has completed operations. Ship.s cargo hold is full.*", RegexOptions.Compiled);
+        private readonly Regex _MiningRegexAmounts = new Regex("^<color=0x........>\\s*You mined\\s*<font size=..><color=0x........>(?<miningAmount>.*)<color=0x........><font size=..>\\s*units* of\\s*<color=0x........><font size=..>\\s*(?<miningContext>.*)\\s*<color=0x........><font size=..>\\swith a lost residue of\\s*<font size=..><color=0x........>(?<miningResidue>.*)<color=0x........><font size=..>\\s*units*", RegexOptions.Compiled);
+
         private readonly Regex _DecloakRegexMobileObservatory = new Regex("cloak deactivates due to a pulse from a Mobile Observatory", RegexOptions.Compiled);
         private readonly Regex _DecloakRegexProximity = new Regex("Your cloak deactivates due to proximity to (?<decloakProximity>.*)", RegexOptions.Compiled);
 
@@ -428,6 +432,8 @@ namespace Quesadilla
 
                 Program.ExpireCombat();
                 Program.ExpireISK();
+                Program.ExpireMining();
+
                 zkillsExpired = Program.ZKillHandler.ExpireZKillQueue();
                 if (zkillsExpired + alertsExpired > 0)
                 {
@@ -1317,6 +1323,107 @@ namespace Quesadilla
                 }
             }
         }
+        private void logFile_ProcessMining(object sender, ProcessMiningEventArgs e)
+        {
+            //Log.Information("COMBAT:" + e.CombatEvent);
+            if (e.Entry != null)
+            {
+                if (!Program.Mining.ContainsKey(e.Entry.CharacterName))
+                {
+                    Program.Mining.Add(e.Entry.CharacterName, new List<MiningLine>());
+                }
+
+
+                // is this actual mining data
+                Match match = _MiningRegexAmounts.Match(e.Entry.LineContent);
+                if (match.Success)
+                {
+                    var minedAmount = match.Groups["miningAmount"].ToString();
+                    int mined = Int32.Parse(minedAmount.Trim());
+
+                    var minedWasted = match.Groups["miningResidue"].ToString();
+                    int wasted = Int32.Parse(minedWasted.Trim());
+
+                    Program.Mining[e.Entry.CharacterName].Add(new MiningLine()
+                    {
+                        TimeAdded = e.Entry.TimeAdded,
+                        MiningItem = match.Groups["miningContext"].ToString(),
+                        MiningAmount = mined,
+                        WastageAmount = wasted,
+                    });
+                }
+
+                // is event that roid popped
+                match = _MiningRegexRoidExploded.Match(e.Entry.LineContent);
+                if (match.Success)
+                {
+
+                    foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
+                    {
+                        if (!tempTrigger.Enabled)
+                            return false;
+                        return tempTrigger.AlertType == AlertConfigType.MiningEndedRoidPopped;
+                    })))
+                    {
+
+                        Log.Information("Mining: Rock expired");
+                        var alertText = generateAlertText(e.Entry, null, alert, match.Groups["miningDevice"].ToString(), 0, match.Groups["miningHowItEnded"].ToString());
+                        PathInfo path = null;
+
+                        Program.EnqueueNewAlert(
+                            new AlertQueueItem()
+                            {
+                                AlertText = alertText,
+                                MenuText = e.Entry.CharacterName + alertText,
+                                Entry = e.Entry,
+                                Path = path,
+                                Context = alertText,
+                                SoundFile = alert.SoundFile,
+                                FriendlyName = alert.FriendlyName,
+                                isMiningOver = true,
+                                ShowAlert = true,
+                            }
+                            );
+                    }
+                }
+
+                // is event cargo full ?
+                match = _MiningRegexCargoFull.Match(e.Entry.LineContent);
+                if (match.Success)
+                {
+
+                    foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
+                    {
+                        if (!tempTrigger.Enabled)
+                            return false;
+                        return tempTrigger.AlertType == AlertConfigType.MiningEndedFull;
+                    })))
+                    {
+
+                        Log.Information("Mining: cargo full");
+                        var alertText = generateAlertText(e.Entry, null, alert, match.Groups["miningDevice"].ToString(), 0, "Cargo full");
+                        PathInfo path = null;
+
+                        Program.EnqueueNewAlert(
+                            new AlertQueueItem()
+                            {
+                                AlertText = alertText,
+                                MenuText = e.Entry.CharacterName + alertText,
+                                Entry = e.Entry,
+                                Path = path,
+                                Context = alertText,
+                                SoundFile = alert.SoundFile,
+                                FriendlyName = alert.FriendlyName,
+                                isMiningOver = true,
+                                ShowAlert = true,
+                            }
+                            );
+                    }
+                }
+
+            }
+        }
+
         private void logFile_ProcessDecloak(object sender, ProcessDecloakEventArgs e)
         {
             //Log.Information("COMBAT:" + e.CombatEvent);
@@ -1868,6 +1975,7 @@ namespace Quesadilla
                 {
                     watcher.ProcessCombat += new EventHandler<ProcessCombatEventArgs>(this.logFile_ProcessCombat);
                     watcher.ProcessISK += new EventHandler<ProcessISKEventArgs>(this.logFile_ProcessISK);
+                    watcher.ProcessMining += new EventHandler<ProcessMiningEventArgs>(this.logFile_ProcessMining);
                     watcher.ProcessDecloak += new EventHandler<ProcessDecloakEventArgs>(this.logFile_ProcessDecloak);
                 }
                 else

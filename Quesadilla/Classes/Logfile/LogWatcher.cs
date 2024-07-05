@@ -32,8 +32,11 @@ namespace Quesadilla.Classes
         private readonly Regex _gameLogRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s(?<time>\\d{2}\\:\\d{2}\\:\\d{2})\\s\\]\\s\\(\\w.*\\)\\s(?<content>.*)", RegexOptions.Compiled);
         private readonly Regex _gameLogCombatRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(combat\\)", RegexOptions.Compiled);
         private readonly Regex _gameLogISKRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(bounty\\)", RegexOptions.Compiled);
-
+        private readonly Regex _gameLogMiningRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(mining\\)", RegexOptions.Compiled);
         private readonly Regex _gameLogCloakRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(notify\\)\\s*.*cloak deactivates", RegexOptions.Compiled);
+
+        private readonly Regex _gameLogMiningEndedFullRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(notify\\)\\s*.*completed operations. Ship's cargo hold is full", RegexOptions.Compiled);
+        private readonly Regex _gameLogMiningEndedRoidPoppedRegex = new Regex("\\[\\s\\d{4}\\.\\d{2}\\.\\d{2}\\s\\d{2}\\:\\d{2}\\:\\d{2}\\s\\]\\s\\(notify\\)\\s*.*deactivates as it finds the resource it was harvesting\\s", RegexOptions.Compiled);
 
         private readonly Regex _localSystemChange = new Regex("EVE\\sSystem\\s>\\sChannel\\schanged\\sto\\sLocal\\s:\\s(?<systemname>.*)", RegexOptions.Compiled);
         private readonly Regex _localListener = new Regex("Listener\\:\\s*(?<name>.*)", RegexOptions.Compiled);
@@ -45,6 +48,7 @@ namespace Quesadilla.Classes
         public event EventHandler<ProcessNewDataEventArgs> ProcessNewData;
         public event EventHandler<ProcessCombatEventArgs> ProcessCombat;
         public event EventHandler<ProcessISKEventArgs> ProcessISK;
+        public event EventHandler<ProcessMiningEventArgs> ProcessMining;
 
         public event EventHandler<ProcessDecloakEventArgs> ProcessDecloak;
         public event EventHandler<ProcessSystemChangeEventArgs> SystemChange;
@@ -232,6 +236,14 @@ namespace Quesadilla.Classes
                                         else if (this._gameLogISKRegex.IsMatch(input))
                                         {
                                             this.OnISK(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
+                                        }
+                                        else if (
+                                            this._gameLogMiningRegex.IsMatch(input) ||
+                                            this._gameLogMiningEndedFullRegex.IsMatch(input) ||
+                                            this._gameLogMiningEndedRoidPoppedRegex.IsMatch(input) 
+                                            )
+                                        {
+                                            this.OnMining(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
                                         }
                                         else if (this._gameLogCloakRegex.IsMatch(input))
                                         {
@@ -533,6 +545,13 @@ namespace Quesadilla.Classes
             if (this.ProcessISK == null)
                 return;
             this.ProcessISK((object)this, new ProcessISKEventArgs(logFileName, characterName, entry));
+        }
+        private void OnMining(string logFileName, string characterName, LogEntry entry)
+        {
+            logger.Debug((entry != null ? entry.LineContent : ""));
+            if (this.ProcessISK == null)
+                return;
+            this.ProcessMining((object)this, new ProcessMiningEventArgs(logFileName, characterName, entry));
         }
         private void OnDecloak(string logFileName, string characterName, LogEntry entry)
         {

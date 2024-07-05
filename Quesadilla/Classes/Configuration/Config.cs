@@ -226,6 +226,24 @@ namespace Quesadilla.Classes
                     MenuDisplay = "Decloak by {context}",
                     SoundFile = "tuba",
                 });
+                c.AlertConfiguration.Add(new AlertConfig()
+                {
+                    FriendlyName = "Out of rock",
+                    Enabled = true,
+                    AlertType = AlertConfigType.MiningEndedRoidPopped,
+                    TextDisplay = "{character} rock depleated",
+                    MenuDisplay = "{character} rock depleated",
+                    SoundFile = "pop1",
+                });
+                c.AlertConfiguration.Add(new AlertConfig()
+                {
+                    FriendlyName = "Miner full",
+                    Enabled = true,
+                    AlertType = AlertConfigType.MiningEndedFull,
+                    TextDisplay = "{character} cargo full",
+                    MenuDisplay = "{character} cargo full",
+                    SoundFile = "full",
+                });
             }
 
             if (c.Logfiles == null)
@@ -1020,6 +1038,13 @@ img.rounded-corners {
         [DefaultValue(typeof(int), "5400")]
         [ReadOnly(true)]
         public int ExpireISKSeconds { get; set; }
+
+        [Category("General")]
+        [DisplayName("Amount mined expiry seconds")]
+        [Description("How many seconds to consider Mining events as old and no longer need to track")]
+        [DefaultValue(typeof(int), "5400")]
+        [ReadOnly(true)]
+        public int ExpireMiningSeconds { get; set; }
 
         [Category("General")]
         [DisplayName("ZKill expiry seconds")]

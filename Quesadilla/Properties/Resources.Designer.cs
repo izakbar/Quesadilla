@@ -247,6 +247,15 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
+        internal static System.IO.UnmanagedMemoryStream full {
+            get {
+                return ResourceManager.GetStream("full", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
         internal static System.IO.UnmanagedMemoryStream harpsichord {
             get {
                 return ResourceManager.GetStream("harpsichord", resourceCulture);
@@ -297,6 +306,33 @@ namespace Quesadilla.Properties {
             get {
                 object obj = ResourceManager.GetObject("Paulmart_small", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream pop1 {
+            get {
+                return ResourceManager.GetStream("pop1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream pop2 {
+            get {
+                return ResourceManager.GetStream("pop2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream pop3 {
+            get {
+                return ResourceManager.GetStream("pop3", resourceCulture);
             }
         }
         
