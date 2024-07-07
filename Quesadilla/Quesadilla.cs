@@ -1367,7 +1367,7 @@ namespace Quesadilla
                     {
 
                         Log.Information("Mining: Rock expired");
-                        var alertText = generateAlertText(e.Entry, null, alert, match.Groups["miningDevice"].ToString(), 0, match.Groups["miningHowItEnded"].ToString());
+                        var alertText = generateAlertText(e.Entry, null, alert, e.Entry.CharacterName, 0, match.Groups["miningHowItEnded"].ToString());
                         PathInfo path = null;
 
                         Program.EnqueueNewAlert(
@@ -1379,7 +1379,7 @@ namespace Quesadilla
                                 Path = path,
                                 Context = alertText,
                                 SoundFile = alert.SoundFile,
-                                FriendlyName = alert.FriendlyName,
+                                FriendlyName = alert.FriendlyName + " - " + e.Entry.CharacterName,
                                 isMiningOver = true,
                                 ShowAlert = true,
                             }
@@ -1401,7 +1401,7 @@ namespace Quesadilla
                     {
 
                         Log.Information("Mining: cargo full");
-                        var alertText = generateAlertText(e.Entry, null, alert, match.Groups["miningDevice"].ToString(), 0, "Cargo full");
+                        var alertText = generateAlertText(e.Entry, null, alert, e.Entry.CharacterName, 0, match.Groups["miningDevice"].ToString() + " stopped - Cargo full");
                         PathInfo path = null;
 
                         Program.EnqueueNewAlert(
@@ -1413,7 +1413,7 @@ namespace Quesadilla
                                 Path = path,
                                 Context = alertText,
                                 SoundFile = alert.SoundFile,
-                                FriendlyName = alert.FriendlyName,
+                                FriendlyName = alert.FriendlyName + " - " + e.Entry.CharacterName,
                                 isMiningOver = true,
                                 ShowAlert = true,
                             }
@@ -1478,13 +1478,12 @@ namespace Quesadilla
         {
             Height = intelLog.Height + _windowExtraHeight + (Program.MainConfiguration.ShowMinimap ? pMinimapImage.Height : 20);
 
-            lblISK.Top = lblAlertsOutstanding.Top;
-            lblISK.Left = Left - lblISK.Width + 20;
+            lblISK.Top = 5; ;
+            lblISK.Left = Right - lblISK.Width + 20;
             if (Program.MainConfiguration.ShowMinimap)
             {
                 //lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
                 //lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
-                lblSystemName.Top = lblISK.Top;
 
                 lblEtxraInformation.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
                 lblEtxraInformation.Height = pMinimapImage.Height - (lblEtxraInformation.Top - pMinimapImage.Top - lblISK.Height - 5);
@@ -1494,9 +1493,11 @@ namespace Quesadilla
             {
                 //lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
                 //lblISK.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
-                lblSystemName.Top = lblISK.Top;
+                lblSystemName.Top = lblEtxraInformation.Top + lblEtxraInformation.Height - lblSystemName.Height - 5;
             }
 
+            lblStatus.Top = intelLog.Top - lblStatus.Height - 5;
+            lblSystemName.Top = lblStatus.Top;
             buttonIntelSize.Top = intelLog.Top + 2;
             buttonIntelSize.Left = intelLog.Width - buttonIntelSize.Width - 2;
         }
@@ -1857,6 +1858,7 @@ namespace Quesadilla
             if (c == null || c.LocationId == 0) return;
 
             var ClosestThera = EveScoutProcessor.FindClosest(Program.Universe, c.LocationId, "Thera");
+                                                                         
             var ClosestTurnur = EveScoutProcessor.FindClosest(Program.Universe, c.LocationId, "Turnur");
             PathInfo closePath;
 
