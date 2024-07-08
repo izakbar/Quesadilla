@@ -1478,8 +1478,9 @@ namespace Quesadilla
         {
             Height = intelLog.Height + _windowExtraHeight + (Program.MainConfiguration.ShowMinimap ? pMinimapImage.Height : 20);
 
-            lblISK.Top = 5; ;
-            lblISK.Left = Right - lblISK.Width + 20;
+            lblISK.Top = lblAlertsOutstanding.Top; ;
+            lblISK.Left = Width - lblISK.Width + 20;
+
             if (Program.MainConfiguration.ShowMinimap)
             {
                 //lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;

@@ -275,12 +275,12 @@ namespace Quesadilla
             // expire ISK ?
             foreach (var k in Mining.Keys)
             {
-                if (Mining[k].Count > 0)
+                bool removedEntry = true;
+                while (removedEntry && Mining[k].Count > 0)
                 {
-                    bool removedEntry = true;
-                    while (removedEntry)
+                    removedEntry = false;
+                    lock (Mining[k])
                     {
-                        removedEntry = false;
                         TimeSpan ts = DateTime.Now - Mining[k].First().TimeAdded;
                         if (ts.TotalSeconds > MainConfiguration.ExpireMiningSeconds)
                         {
@@ -296,12 +296,12 @@ namespace Quesadilla
             // expire ISK ?
             foreach (var k in ISK.Keys)
             {
-                if (ISK[k].Count > 0)
+                bool removedEntry = true;
+                while (removedEntry && ISK[k].Count > 0)
                 {
-                    bool removedEntry = true;
-                    while (removedEntry)
+                    removedEntry = false;
+                    lock (ISK[k])
                     {
-                        removedEntry = false;
                         TimeSpan ts = DateTime.Now - ISK[k].First().TimeAdded;
                         if (ts.TotalSeconds > MainConfiguration.ExpireISKSeconds)
                         {
@@ -319,10 +319,10 @@ namespace Quesadilla
             {
 
                 bool removedEntry = true;
-                while (removedEntry)
+                while (removedEntry && Combat[k].Count > 0)
                 {
                     removedEntry = false;
-                    if (Combat[k].Count > 0)
+                    lock (Combat[k])
                     {
                         TimeSpan ts = DateTime.Now - Combat[k].First().TimeAdded;
                         if (ts.TotalSeconds > MainConfiguration.ExpireCombatSeconds)
