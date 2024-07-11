@@ -1936,9 +1936,9 @@ namespace Quesadilla
             }
 
             // if update is delta data 
-            Dictionary<string, string> killdDeltadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(e.DeltaContent);
-            if (killdDeltadata != null)
+            if (! e.DeltaContent.IsNullOrEmpty())
             {
+                Dictionary<string, string> killdDeltadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(e.DeltaContent);
                 foreach (var kvp in killdDeltadata)
                 {
                     int systemId = int.Parse(kvp.Key);
