@@ -1090,5 +1090,65 @@ img.rounded-corners {
 
         public List<Regex> ignoreStrings { get; set; }
         public List<int> ignoreSystems { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Size of Planet on main window")]
+        [Description("When showing planet information on main window - how BIG should they be")]
+        [DefaultValue(typeof(int), "6")]
+        public int PlanetViewSize { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Show planet information")]
+        [Description("Should quesadilla show planet infomation")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool ShowPlanetInformation { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Temperate colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "LightSkyBlue")]
+        public Color PlanetInfoTemperateColour { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Ice colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "RoyalBlue")]
+        public Color PlanetInfoIceColour { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Gas colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "Yellow")]
+        public Color PlanetInfoGasColour { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Oceanic colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "DodgerBlue")]
+        public Color PlanetInfoOceanicColour { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Lava colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "Red")]
+        public Color PlanetInfoLavaColour { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Barren colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "Orange")]
+        public Color PlanetInfoBarrenColour { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Storm colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "MediumBlue")]
+        public Color PlanetInfoStormColour { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Plasma colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "Cyan")]
+        public Color PlanetInfoPlasmaColour { get; set; }
     }
 }

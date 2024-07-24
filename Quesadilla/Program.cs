@@ -10,10 +10,13 @@ using System.Reflection;
 using System.Resources;
 using System.Web.WebPages;
 using System.Windows.Forms;
+using EVEStandard.Enumerations;
+using EVEStandard;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
+using Quesadilla.Classes.ESIData;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Processes;
@@ -35,10 +38,13 @@ namespace Quesadilla
 
         public static Quesadilla q = null;
 
+        private static EVEStandardAPI esiClient;
+
         public static ZKill ZKillHandler = new ZKill();
         public static Config MainConfiguration = new Config();
+        public static ESIWorker ESIHandler;
 
-        public static UniverseManager Universe = new UniverseManager();
+        public static UniverseManager Universe;
 
         public static List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
         public static List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
@@ -67,10 +73,17 @@ namespace Quesadilla
 
             MainConfiguration = Config.Load(configuration_filename);
 
+            esiClient = new EVEStandardAPI(
+                    "Quesadilla",                  // User agent
+                    DataSource.Tranquility,         // Server [Tranquility/Singularity]
+                    TimeSpan.FromSeconds(30));       // Timeout
+
+            ESIHandler = new ESIWorker(esiClient, Log.Logger);
+            Universe = new UniverseManager(esiClient, Log.Logger);
+
             Universe.ReadSolarSystems("Quesadilla.Systems.Json");
             Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
             Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
-            Universe.SetupESI();
 
             CharacterList = new List<Character>();
 

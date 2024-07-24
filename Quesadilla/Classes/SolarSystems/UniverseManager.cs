@@ -16,15 +16,16 @@ using Quesadilla.Classes.Queues;
 using System.Windows.Forms;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
+using Serilog.Core;
 
 namespace Quesadilla.Classes.SolarSystems
 {
     public class UniverseManager
     {
-        public EVEStandardAPI esiClient;
+        private readonly EVEStandardAPI _esiClient;
+        private readonly ILogger _log;
 
         private const long LOWEST_WH_SYSTEM_ID = 31000000;
-        private ILogger logger = Log.ForContext<UniverseManager>();
 
         public Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
         public Dictionary<string, int> Names = new Dictionary<string, int>();
@@ -38,6 +39,12 @@ namespace Quesadilla.Classes.SolarSystems
         public DateTime DotlanDeltaRegions;
 
         public int HomeSolarSystemID { get; set; }
+
+        public UniverseManager(EVEStandardAPI esiClient, ILogger Log)
+        {
+            _esiClient = esiClient;
+            _log = Log;
+        }
 
         public void ReadSolarSystems(string jsonFile)
         {
@@ -67,25 +74,24 @@ namespace Quesadilla.Classes.SolarSystems
         }
         public void ReadESICharacters(string jsonFile)
         {
-            if (File.Exists(jsonFile))
+            try
             {
-                StreamReader reader = new StreamReader(jsonFile);
-                var json = reader.ReadToEnd();
-                ESICharacters = JsonConvert.DeserializeObject<Dictionary<int, ESICharacter>>(json);
+                if (File.Exists(jsonFile))
+                {
+                    StreamReader reader = new StreamReader(jsonFile);
+                    var json = reader.ReadToEnd();
+                    ESICharacters = JsonConvert.DeserializeObject<Dictionary<int, ESICharacter>>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Error reading character cache");
             }
         }
         public void WriteESICharacters(string jsonFile)
         {
             var json = JsonConvert.SerializeObject(ESICharacters);
             File.WriteAllText(jsonFile, json);
-        }
-
-        public void SetupESI()
-        {
-            esiClient = new EVEStandardAPI(
-                    "IzaWorks",                  // User agent
-                    DataSource.Tranquility,         // Server [Tranquility/Singularity]
-                    TimeSpan.FromSeconds(30));       // Timeout
         }
 
         public PathInfo FindAndCachePath(int fromSystemId, int toSystemId)
@@ -101,11 +107,11 @@ namespace Quesadilla.Classes.SolarSystems
             // don't do any work if path already exists.
             if (_pathfindingCache.ContainsKey(pathInfo.PathId))
             {
-                Log.Debug("Pathid " + pathInfo.PathId + " already exists");
+                _log.Debug("Pathid " + pathInfo.PathId + " already exists");
                 return (_pathfindingCache[pathInfo.PathId]);
             }
 
-            Log.Debug("Pathid " + pathInfo.PathId + " does not exist - building");
+            _log.Debug("Pathid " + pathInfo.PathId + " does not exist - building");
             if (fromSystemId == 0) return (null); 
             SolarSystem fromSystem = SolarSystems[fromSystemId];
             SolarSystem toSystem = SolarSystems[toSystemId];
@@ -184,11 +190,11 @@ namespace Quesadilla.Classes.SolarSystems
             }
             if (FoundPath == null)
             {
-                Log.Debug("Unable to find path");
+                _log.Debug("Unable to find path");
                 return null;
             }
 
-            Log.Debug("Found path");
+            _log.Debug("Found path");
             _pathfindingCache.Add(FoundPath.PathId, FoundPath);
             return (FoundPath);
         }
@@ -205,7 +211,7 @@ namespace Quesadilla.Classes.SolarSystems
             }
             try
             {
-                var characterInfo = esiClient.Character.GetCharacterPublicInfoV5Async(characterId).Result;
+                var characterInfo = _esiClient.Character.GetCharacterPublicInfoV5Async(characterId).Result;
                 ESICharacters.Add(characterId, new ESICharacter()
                 {
                     CharacterId = characterId,
@@ -214,10 +220,10 @@ namespace Quesadilla.Classes.SolarSystems
                 return characterInfo.Model.Name;
             }
             catch ( Exception ex) { 
-                Log.Error(ex.Message); 
+                _log.Error(ex.Message); 
                 if ( ex.InnerException != null )
                 {
-                    Log.Error(ex.InnerException.Message);
+                    _log.Error(ex.InnerException.Message);
                 }
                 return "**ESIERROR**";
             }

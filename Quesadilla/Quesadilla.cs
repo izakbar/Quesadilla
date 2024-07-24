@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Dotlan;
+using Quesadilla.Classes.ESIData;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.EveScout;
 using Quesadilla.Classes.Logfile;
@@ -223,6 +224,7 @@ namespace Quesadilla
             mainTimer.Enabled = true;
 
             Program.ZKillHandler.ZKillFeed.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
+            Program.ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(this.ESI_ProcessNewData);
         }
 
         private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
@@ -361,6 +363,8 @@ namespace Quesadilla
             splashScreen = null;
 
             this.Text = "Quesadilla v" + Program.version.ToString();
+
+            Program.ESIHandler.Resume();
         }
 
         private void mainTimer_Tick(object sender, EventArgs e)
@@ -925,6 +929,9 @@ namespace Quesadilla
                 }
 
                 CheckEveScoutConnection(c);
+
+                GetSystemInfo(foundSystemId);
+
                 // TODO                if (this._conf.CameraFollowCharacter && this.CentreOnCharacter.Text == key) this.ZoomTo(num1);
             }
 
@@ -933,7 +940,19 @@ namespace Quesadilla
             if (foundSystemId == -1)
                 return;
             Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
+
+
+
             shouldUpdateMinimap = true;
+        }
+
+        private void GetSystemInfo(int systemid)
+        {
+            // check if we need to pull data from ESI for system (planets/moons/belts)
+            if (Program.Universe.SolarSystems[systemid].Planets == null)
+            {
+                Program.ESIHandler.EnqueueRequestSystem(systemid);
+            }
         }
 
         private void _localWatcher_ChatServerChange(object sender, ProcessChatServerChangeEventArgs e)
@@ -1487,7 +1506,7 @@ namespace Quesadilla
                 //lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
 
                 lblEtxraInformation.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
-                lblEtxraInformation.Height = pMinimapImage.Height - (lblEtxraInformation.Top - pMinimapImage.Top - lblISK.Height - 5);
+                lblEtxraInformation.Height = pMinimapImage.Height - (lblEtxraInformation.Top - pMinimapImage.Top - lblISK.Height - 5 - (Program.MainConfiguration.PlanetViewSize*2));
                 lblEtxraInformation.Left = pMinimapImage.Left + pMinimapImage.Width + 2;
             }
             else
@@ -1631,6 +1650,14 @@ namespace Quesadilla
             }
         }
 
+        private void ESI_ProcessNewData(object sender, ESIEventArgs e)
+        {
+            if ( e.RequestType == ESIRequestType.System)
+            {
+                Invalidate();
+            }
+        }
+
         private void ZKill_ProcessNewData(object sender, ZKillEventArgs e)
         {
             string systemName = "---";
@@ -1647,6 +1674,8 @@ namespace Quesadilla
                 e.Kill.RegionName = regionName;
 
                 Program.ZKillHandler.EnqueueZKillAlert(e.Kill, Program.Universe.SolarSystems[(int)e.Kill.SolarSystemId]);
+
+                //GetSystemInfo((int)e.Kill.SolarSystemId);
             }
 
             Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {Program.Universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
@@ -2098,6 +2127,58 @@ namespace Quesadilla
 
                 Brush systemBrush = new SolidBrush(Color.Red);
                 e.Graphics.FillEllipse(systemBrush, combatLeft - CIRCLE_RADIUS, combatTop - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+            }
+
+            if (Program.MainConfiguration.ShowPlanetInformation && CurrentActiveToon != null && CurrentActiveToon != "")
+            {
+                var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
+                if (c != null)
+                {
+                    try
+                    {
+                        if (Program.Universe.SolarSystems[c.LocationId].Planets != null)
+                        {
+                            var planetInfo = Program.Universe.SolarSystems[c.LocationId].Planets
+                                .GroupBy(o => o.PlanetTypeName.Replace("Planet ",""))
+                                .Select(group => new
+                                {
+                                    type = group.Key,
+                                    Count = group.Count()
+                                })
+                                .OrderBy(x => x.type);
+
+                            int currentX = lblEtxraInformation.Left;
+                            int currentY = lblStatus.Top - (Program.MainConfiguration.PlanetViewSize*2);
+                            foreach (var p in planetInfo)
+                            {
+                                Brush systemBrush;
+                                Color dotColour = Color.Red;
+                                switch ( p.type)
+                                {
+                                    case "(Storm)": dotColour = Program.MainConfiguration.PlanetInfoStormColour; break;
+                                    case "(Barren)": dotColour = Program.MainConfiguration.PlanetInfoBarrenColour; break;
+                                    case "(Temperate)": dotColour = Program.MainConfiguration.PlanetInfoTemperateColour; break;
+                                    case "(Lava)": dotColour = Program.MainConfiguration.PlanetInfoLavaColour; break;
+                                    case "(Plasma)": dotColour = Program.MainConfiguration.PlanetInfoPlasmaColour; break;
+                                    case "(Gas)": dotColour = Program.MainConfiguration.PlanetInfoGasColour; break;
+                                    case "(Ice)": dotColour = Program.MainConfiguration.PlanetInfoIceColour; break;
+                                    case "(Oceanic)": dotColour = Program.MainConfiguration.PlanetInfoOceanicColour; break;
+                                    default: dotColour = Color.Red; break;
+                                }
+                                systemBrush = new SolidBrush(dotColour);
+                                e.Graphics.FillEllipse(systemBrush, currentX - Program.MainConfiguration.PlanetViewSize, currentY - Program.MainConfiguration.PlanetViewSize, Program.MainConfiguration.PlanetViewSize * 2, Program.MainConfiguration.PlanetViewSize * 2);
+                                currentX += (Program.MainConfiguration.PlanetViewSize);
+                                Font font = new Font("Verdana", 8, FontStyle.Regular);
+                                Size size = ImageGenerator.PaintDrawText(e, p.Count.ToString(), currentX, currentY- (Program.MainConfiguration.PlanetViewSize), dotColour, font);
+                                currentX += size.Width +(Program.MainConfiguration.PlanetViewSize);
+                            }
+                        }
+
+
+                    }
+                    catch (Exception ex) {
+                    }
+                }
 
             }
         }
@@ -2127,6 +2208,10 @@ namespace Quesadilla
             mouseOverMinimapSystems = Program.Universe.MouseOverSystem(e.X, e.Y, MinimapSystems);
             if (mouseOverMinimapSystems.Count() > 0 )
             {
+                foreach(var s in mouseOverMinimapSystems)
+                {
+                    GetSystemInfo((int)s.solarSystem.Id);
+                }
                 this.Invalidate();
             }
         }

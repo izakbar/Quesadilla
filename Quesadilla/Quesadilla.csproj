@@ -562,6 +562,10 @@
   <ItemGroup>
     <Compile Include="Classes\Attributes\IsColourAttribute.cs" />
     <Compile Include="Classes\CombatGraphData.cs" />
+    <Compile Include="Classes\ESIData\ESIRequest.cs" />
+    <Compile Include="Classes\ESIData\ESIRequestType.cs" />
+    <Compile Include="Classes\Events\ESIEventArgs.cs" />
+    <Compile Include="Classes\ESIData\ESIWorker.cs" />
     <Compile Include="Classes\Logfile\CombatLine.cs" />
     <Compile Include="Classes\Configuration\CSSData.cs" />
     <Compile Include="Classes\Configuration\LogfileConfig.cs" />
@@ -588,6 +592,9 @@
     <Compile Include="Classes\ItemType.cs" />
     <Compile Include="Classes\SolarSystems\MinimapConnection.cs" />
     <Compile Include="Classes\SolarSystems\MinimapSystem.cs" />
+    <Compile Include="Classes\SolarSystems\SolarSystemBelt.cs" />
+    <Compile Include="Classes\SolarSystems\SolarSystemMoon.cs" />
+    <Compile Include="Classes\SolarSystems\PlanetInfo.cs" />
     <Compile Include="Classes\ZKill\ZKill.cs" />
     <Compile Include="Classes\ZKill\ZKillKill.cs" />
     <Compile Include="Classes\ZKill\ZKillRedisQ.cs" />

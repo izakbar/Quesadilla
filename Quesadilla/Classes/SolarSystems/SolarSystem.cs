@@ -36,6 +36,7 @@ namespace Quesadilla.Classes.SolarSystems
         public Regex NameRegex => this._nameRegex;
         public bool MatchNameRegex(string logLine) => this._nameRegex.IsMatch(logLine);
         public List<SolarSystemConnectionData> ConnectedTo { get; set; }
+        public List<PlanetInfo> Planets { get; set; }
         [JsonIgnore]
         public int? NPCKillsDeltaLastHour { get; set; }
         public void SetNameRegex()

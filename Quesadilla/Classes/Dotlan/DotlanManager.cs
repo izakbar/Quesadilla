@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Quesadilla.Classes.Events;
 using Quesadilla.Classes.EveScout;
 using Quesadilla.Classes.SolarSystems;
 using Quesadilla.Classes.ZKill;
