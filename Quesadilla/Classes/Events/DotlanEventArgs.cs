@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Quesadilla.Classes.EveScout
+namespace Quesadilla.Classes.Events
 {
     public class DotlanEventArgs : EventArgs
     {

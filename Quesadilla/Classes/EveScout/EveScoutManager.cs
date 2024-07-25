@@ -81,6 +81,7 @@ namespace Quesadilla.Classes.EveScout
         private void DoWork(object sender, DoWorkEventArgs e)
         {
             GetEveScoutData("Thera");
+            Thread.Sleep(5);
             GetEveScoutData("Turnur");
             if (EveScoutEventHandler != null)
             {

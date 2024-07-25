@@ -10,10 +10,13 @@ using System.Reflection;
 using System.Resources;
 using System.Web.WebPages;
 using System.Windows.Forms;
+using EVEStandard.Enumerations;
+using EVEStandard;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
+using Quesadilla.Classes.ESIData;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Processes;
@@ -35,10 +38,13 @@ namespace Quesadilla
 
         public static Quesadilla q = null;
 
+        private static EVEStandardAPI esiClient;
+
         public static ZKill ZKillHandler = new ZKill();
         public static Config MainConfiguration = new Config();
+        public static ESIWorker ESIHandler;
 
-        public static UniverseManager Universe = new UniverseManager();
+        public static UniverseManager Universe;
 
         public static List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
         public static List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
@@ -53,6 +59,7 @@ namespace Quesadilla
 
         public static Dictionary<string, List<CombatLine>> Combat = new Dictionary<string, List<CombatLine>>();
         public static Dictionary<string, List<IskLine>> ISK = new Dictionary<string, List<IskLine>>();
+        public static Dictionary<string, List<MiningLine>> Mining = new Dictionary<string, List<MiningLine>>();
 
         public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
@@ -66,10 +73,17 @@ namespace Quesadilla
 
             MainConfiguration = Config.Load(configuration_filename);
 
+            esiClient = new EVEStandardAPI(
+                    "Quesadilla",                  // User agent
+                    DataSource.Tranquility,         // Server [Tranquility/Singularity]
+                    TimeSpan.FromSeconds(30));       // Timeout
+
+            ESIHandler = new ESIWorker(esiClient, Log.Logger);
+            Universe = new UniverseManager(esiClient, Log.Logger);
+
             Universe.ReadSolarSystems("Quesadilla.Systems.Json");
             Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
             Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
-            Universe.SetupESI();
 
             CharacterList = new List<Character>();
 
@@ -212,26 +226,29 @@ namespace Quesadilla
         public static void EnqueueNewAlert(AlertQueueItem alert)
         {
             // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
-            var f = NewAlerts.Where(o =>
-            (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
-            || (o.AlertText == alert.AlertText)
-            ).ToList();
-            if (f.Count == 0 || NewAlerts.Count == 0)
+            lock (NewAlerts)
             {
-                alert.RouteText = Program.Universe.PathToString(alert.Path);
-                NewAlerts.Enqueue(alert);
-            }
-            if (f.Count != 0)
-            {
-                if (f.First().Path != null && alert.Path != null && alert.Path.TotalJumps < f.First().Path.TotalJumps)
+                var f = NewAlerts.Where(o =>
+                (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
+                || (o.AlertText == alert.AlertText)
+                ).ToList();
+                if (f.Count == 0 || NewAlerts.Count == 0)
                 {
-                    f.First().Path = alert.Path;
-                    f.First().AlertText = alert.AlertText;
-                    f.First().Entry = alert.Entry;
-                    f.First().Context = alert.Context;
-                    f.First().RouteText = alert.RouteText;
-                    f.First().SoundFile = alert.SoundFile;
-                    f.First().ShowAlert = alert.ShowAlert;
+                    alert.RouteText = Program.Universe.PathToString(alert.Path);
+                    NewAlerts.Enqueue(alert);
+                }
+                if (f.Count != 0)
+                {
+                    if (f.First().Path != null && alert.Path != null && alert.Path.TotalJumps < f.First().Path.TotalJumps)
+                    {
+                        f.First().Path = alert.Path;
+                        f.First().AlertText = alert.AlertText;
+                        f.First().Entry = alert.Entry;
+                        f.First().Context = alert.Context;
+                        f.First().RouteText = alert.RouteText;
+                        f.First().SoundFile = alert.SoundFile;
+                        f.First().ShowAlert = alert.ShowAlert;
+                    }
                 }
             }
         }
@@ -269,18 +286,44 @@ namespace Quesadilla
 
             return ret;
         }
-
+        public static void ExpireMining()
+        {
+            // expire ISK ?
+            foreach (var k in Mining.Keys)
+            {
+                bool removedEntry = true;
+                while (removedEntry && Mining[k].Count > 0)
+                {
+                    removedEntry = false;
+                    lock (Mining[k])
+                    {
+                        TimeSpan ts = DateTime.Now - Mining[k].First().TimeAdded;
+                        if (ts.TotalSeconds > MainConfiguration.ExpireMiningSeconds)
+                        {
+                            Mining[k].Remove(Mining[k].First());
+                            removedEntry = true;
+                        }
+                    }
+                }
+            }
+        }
         public static void ExpireISK()
         {
             // expire ISK ?
             foreach (var k in ISK.Keys)
             {
-                if (ISK[k].Count > 0)
+                bool removedEntry = true;
+                while (removedEntry && ISK[k].Count > 0)
                 {
-                    TimeSpan ts = DateTime.Now - ISK[k].First().TimeAdded;
-                    if (ts.TotalSeconds > MainConfiguration.ExpireISKSeconds)
+                    removedEntry = false;
+                    lock (ISK[k])
                     {
-                        ISK[k].Remove(ISK[k].First());
+                        TimeSpan ts = DateTime.Now - ISK[k].First().TimeAdded;
+                        if (ts.TotalSeconds > MainConfiguration.ExpireISKSeconds)
+                        {
+                            ISK[k].Remove(ISK[k].First());
+                            removedEntry = true;
+                        }
                     }
                 }
             }
@@ -290,12 +333,19 @@ namespace Quesadilla
             // expire combats ?
             foreach (var k in Combat.Keys)
             {
-                if (Combat[k].Count > 0)
+
+                bool removedEntry = true;
+                while (removedEntry && Combat[k].Count > 0)
                 {
-                    TimeSpan ts = DateTime.Now - Combat[k].First().TimeAdded;
-                    if (ts.TotalSeconds > MainConfiguration.ExpireCombatSeconds)
+                    removedEntry = false;
+                    lock (Combat[k])
                     {
-                        Combat[k].Remove(Combat[k].First());
+                        TimeSpan ts = DateTime.Now - Combat[k].First().TimeAdded;
+                        if (ts.TotalSeconds > MainConfiguration.ExpireCombatSeconds)
+                        {
+                            Combat[k].Remove(Combat[k].First());
+                            removedEntry = true;
+                        }
                     }
                 }
             }

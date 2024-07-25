@@ -414,5 +414,16 @@ namespace Quesadilla.Classes
             TextRenderer.DrawText(e.Graphics, l.Text, l.Font, new Rectangle(l.Left, l.Top, l.Width, l.Height), l.ForeColor, flags);
         }
 
+        public static Size PaintDrawText(PaintEventArgs e, string s, int x, int y, Color c, Font f)
+        {
+            var flags = TextFormatFlags.Left;
+            // if (l.TextAlign == ContentAlignment.TopLeft || l.TextAlign == ContentAlignment.BottomLeft || l.TextAlign == ContentAlignment.MiddleLeft) flags = TextFormatFlags.Left;
+            flags = flags | TextFormatFlags.WordBreak;
+            e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+            Size size = TextRenderer.MeasureText(s, f);
+            TextRenderer.DrawText(e.Graphics, s, f, new Point(x, y), c, flags);
+            return size;
+        }
+
     }
 }

@@ -11,6 +11,8 @@ namespace Quesadilla.Classes.Configuration
         Range,
         FactionSpawn,
         Decloak,
+        MiningEndedRoidPopped,
+        MiningEndedFull,
         Text
     }
 }

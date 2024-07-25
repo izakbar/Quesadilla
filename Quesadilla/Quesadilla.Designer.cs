@@ -60,7 +60,7 @@
             this.intelLog.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.intelLog.Name = "intelLog";
             this.intelLog.ReadOnly = true;
-            this.intelLog.Size = new System.Drawing.Size(614, 187);
+            this.intelLog.Size = new System.Drawing.Size(638, 187);
             this.intelLog.TabIndex = 0;
             this.intelLog.Text = "";
             this.intelLog.TextChanged += new System.EventHandler(this.intelLog_TextChanged);
@@ -69,7 +69,7 @@
             // 
             this.ChatServerDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ChatServerDown.ForeColor = System.Drawing.Color.Red;
-            this.ChatServerDown.Location = new System.Drawing.Point(463, 4);
+            this.ChatServerDown.Location = new System.Drawing.Point(489, 4);
             this.ChatServerDown.Name = "ChatServerDown";
             this.ChatServerDown.Size = new System.Drawing.Size(149, 20);
             this.ChatServerDown.TabIndex = 3;
@@ -148,10 +148,10 @@
             // lblEtxraInformation
             // 
             this.lblEtxraInformation.ForeColor = System.Drawing.Color.ForestGreen;
-            this.lblEtxraInformation.Location = new System.Drawing.Point(295, 36);
+            this.lblEtxraInformation.Location = new System.Drawing.Point(295, 43);
             this.lblEtxraInformation.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblEtxraInformation.Name = "lblEtxraInformation";
-            this.lblEtxraInformation.Size = new System.Drawing.Size(317, 80);
+            this.lblEtxraInformation.Size = new System.Drawing.Size(332, 129);
             this.lblEtxraInformation.TabIndex = 13;
             this.lblEtxraInformation.Text = "999999";
             this.lblEtxraInformation.Visible = false;
@@ -160,7 +160,7 @@
             // lblSystemName
             // 
             this.lblSystemName.ForeColor = System.Drawing.Color.ForestGreen;
-            this.lblSystemName.Location = new System.Drawing.Point(413, 203);
+            this.lblSystemName.Location = new System.Drawing.Point(445, 203);
             this.lblSystemName.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblSystemName.Name = "lblSystemName";
             this.lblSystemName.Size = new System.Drawing.Size(193, 11);
@@ -174,7 +174,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(614, 417);
+            this.ClientSize = new System.Drawing.Size(638, 417);
             this.Controls.Add(this.lblSystemName);
             this.Controls.Add(this.lblEtxraInformation);
             this.Controls.Add(this.buttonIntelSize);

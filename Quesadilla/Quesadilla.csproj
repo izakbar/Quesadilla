@@ -562,7 +562,11 @@
   <ItemGroup>
     <Compile Include="Classes\Attributes\IsColourAttribute.cs" />
     <Compile Include="Classes\CombatGraphData.cs" />
-    <Compile Include="Classes\CombatLine.cs" />
+    <Compile Include="Classes\ESIData\ESIRequest.cs" />
+    <Compile Include="Classes\ESIData\ESIRequestType.cs" />
+    <Compile Include="Classes\Events\ESIEventArgs.cs" />
+    <Compile Include="Classes\ESIData\ESIWorker.cs" />
+    <Compile Include="Classes\Logfile\CombatLine.cs" />
     <Compile Include="Classes\Configuration\CSSData.cs" />
     <Compile Include="Classes\Configuration\LogfileConfig.cs" />
     <Compile Include="Classes\Configuration\PopupLocationType.cs" />
@@ -570,6 +574,7 @@
     <Compile Include="Classes\Dotlan\DotlanManager.cs" />
     <Compile Include="Classes\ESIData\ESICharacter.cs" />
     <Compile Include="Classes\Events\DotlanEventArgs.cs" />
+    <Compile Include="Classes\Events\ProcessMiningEventArgs.cs" />
     <Compile Include="Classes\Events\ProcessDecloakEventArgs.cs" />
     <Compile Include="Classes\Events\ProcessISKEventArgs.cs" />
     <Compile Include="Classes\Events\ZKillEventArgs.cs" />
@@ -578,7 +583,8 @@
     <Compile Include="Classes\EveScout\EveScoutWH.cs" />
     <Compile Include="Classes\Extensions\PropertyGridExtensions.cs" />
     <Compile Include="Classes\ImageGenerator.cs" />
-    <Compile Include="Classes\IskLine.cs" />
+    <Compile Include="Classes\Logfile\IskLine.cs" />
+    <Compile Include="Classes\Logfile\MiningLine.cs" />
     <Compile Include="Classes\Processes\ProcessInfo.cs" />
     <Compile Include="Classes\Processes\ProcessMonitor.cs" />
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
@@ -586,6 +592,9 @@
     <Compile Include="Classes\ItemType.cs" />
     <Compile Include="Classes\SolarSystems\MinimapConnection.cs" />
     <Compile Include="Classes\SolarSystems\MinimapSystem.cs" />
+    <Compile Include="Classes\SolarSystems\SolarSystemBelt.cs" />
+    <Compile Include="Classes\SolarSystems\SolarSystemMoon.cs" />
+    <Compile Include="Classes\SolarSystems\PlanetInfo.cs" />
     <Compile Include="Classes\ZKill\ZKill.cs" />
     <Compile Include="Classes\ZKill\ZKillKill.cs" />
     <Compile Include="Classes\ZKill\ZKillRedisQ.cs" />
@@ -845,6 +854,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Sounds\full.wav" />
+    <None Include="Resources\Sounds\pop1.wav" />
+    <None Include="Resources\Sounds\pop3.wav" />
+    <None Include="Resources\Sounds\pop2.wav" />
     <None Include="images\red-dot.png" />
     <None Include="images\bg_vagabond_Lloyd_George.png" />
     <None Include="images\bg_zirnitra.png" />
