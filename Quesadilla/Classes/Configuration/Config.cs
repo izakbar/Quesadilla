@@ -1095,7 +1095,7 @@ img.rounded-corners {
         [DisplayName("Size of Planet on main window")]
         [Description("When showing planet information on main window - how BIG should they be")]
         [DefaultValue(typeof(int), "6")]
-        public int PlanetViewSize { get; set; }
+        public int PlanetInfoViewSize { get; set; }
 
         [Category("Planet Info")]
         [DisplayName("Show planet information")]
@@ -1150,5 +1150,11 @@ img.rounded-corners {
         [Description("")]
         [DefaultValue(typeof(Color), "Cyan")]
         public Color PlanetInfoPlasmaColour { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Planet info font size")]
+        [Description("")]
+        [DefaultValue(typeof(int), "8")]
+        public int PlanetInfoFontSize { get; set; }
     }
 }

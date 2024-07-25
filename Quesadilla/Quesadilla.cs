@@ -92,6 +92,7 @@ namespace Quesadilla
         private int _windowExtraHeight = 60;
 
         private bool shouldUpdateMinimap = false;
+        private bool shouldUpdatePlanetInfo = false;
 
         private MenuItem menuConfiguredAlerts = new MenuItem("Configured Alerts");
         private MenuItem menuBackgrounds = new MenuItem("Popup Background");
@@ -122,6 +123,8 @@ namespace Quesadilla
         private string combatNeutOut = "ff7fffff";
 
         private bool ConfigurationWindowOpen = false;
+
+        private List<PlanetInfoDisplay> CurrentPlanetInfos = new List<PlanetInfoDisplay>();
 
         public Dictionary<string, int> TickCounts = new Dictionary<string, int>();
 
@@ -381,7 +384,10 @@ namespace Quesadilla
             {
                 UpdateMinimap();
             }
-
+            if (shouldUpdatePlanetInfo)
+            {
+                UpdatePlanetInfo();
+            }
 
             // dequeue Alerts
             if (++TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert && Program.NewAlerts.Count >0 )
@@ -394,6 +400,7 @@ namespace Quesadilla
                 {
                     Log.Error(NewAlert.AlertText);
                     shouldUpdateMinimap = true;
+                    shouldUpdatePlanetInfo = true;
                     // try to prevent new alert stealing focus
                     var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
                     var ptr = Program.ProcessMonitorHandler.GetForegroundWindowHandle();
@@ -942,7 +949,7 @@ namespace Quesadilla
             Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
 
 
-
+            shouldUpdatePlanetInfo = true;
             shouldUpdateMinimap = true;
         }
 
@@ -1506,7 +1513,7 @@ namespace Quesadilla
                 //lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
 
                 lblEtxraInformation.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
-                lblEtxraInformation.Height = pMinimapImage.Height - (lblEtxraInformation.Top - pMinimapImage.Top - lblISK.Height - 5 - (Program.MainConfiguration.PlanetViewSize*2));
+                lblEtxraInformation.Height = pMinimapImage.Height - (lblEtxraInformation.Top - pMinimapImage.Top - lblISK.Height - 5 - (Program.MainConfiguration.PlanetInfoViewSize*2));
                 lblEtxraInformation.Left = pMinimapImage.Left + pMinimapImage.Width + 2;
             }
             else
@@ -1612,6 +1619,7 @@ namespace Quesadilla
                         }
                         UpdateISK();
                         shouldUpdateMinimap = true;
+                        shouldUpdatePlanetInfo = true;
                     }
 
                     if (DPSGraphWindow != null &&
@@ -1655,6 +1663,7 @@ namespace Quesadilla
             if ( e.RequestType == ESIRequestType.System)
             {
                 Invalidate();
+                shouldUpdatePlanetInfo = true;
             }
         }
 
@@ -2016,6 +2025,46 @@ namespace Quesadilla
                 }
             }
         }
+        private void UpdatePlanetInfo()
+        {
+            shouldUpdatePlanetInfo = false;
+
+            var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
+            if (c != null)
+            {
+                try
+                {
+                    if (Program.Universe.SolarSystems[c.LocationId].Planets != null)
+                    {
+                        var planetInfo = Program.Universe.SolarSystems[c.LocationId].Planets
+                            .GroupBy(o => o.PlanetTypeName.Replace("Planet ", ""))
+                            .Select(group => new
+                            {
+                                type = group.Key,
+                                Count = group.Count()
+                            })
+                            .OrderBy(x => x.type);
+                        CurrentPlanetInfos.Clear();
+                        foreach (var p in planetInfo)
+                        {
+                            CurrentPlanetInfos.Add(new PlanetInfoDisplay()
+                            {
+                                PlanetType = p.type,
+                                CurrentMouseOver = false,
+                                Planets = string.Join(",",
+                                    Program.Universe.SolarSystems[c.LocationId].Planets
+                                    .Where( o => o.PlanetTypeName == $"Planet {p.type}")
+                                    .Select( o => o.PlanetName.Substring(o.PlanetName.LastIndexOf(' ') + 1))
+                                    .ToList()),
+                            });
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+        }
 
         private void UpdateMinimap()
         {
@@ -2138,8 +2187,13 @@ namespace Quesadilla
                     {
                         if (Program.Universe.SolarSystems[c.LocationId].Planets != null)
                         {
+                            if ( CurrentPlanetInfos.Count() == 0 )
+                            {
+                                UpdatePlanetInfo();
+                            }
+
                             var planetInfo = Program.Universe.SolarSystems[c.LocationId].Planets
-                                .GroupBy(o => o.PlanetTypeName.Replace("Planet ",""))
+                                .GroupBy(o => o.PlanetTypeName.Replace("Planet ", ""))
                                 .Select(group => new
                                 {
                                     type = group.Key,
@@ -2148,7 +2202,7 @@ namespace Quesadilla
                                 .OrderBy(x => x.type);
 
                             int currentX = lblEtxraInformation.Left;
-                            int currentY = lblStatus.Top - (Program.MainConfiguration.PlanetViewSize*2);
+                            int currentY = lblStatus.Top - (Program.MainConfiguration.PlanetInfoViewSize*2);
                             foreach (var p in planetInfo)
                             {
                                 Brush systemBrush;
@@ -2166,15 +2220,40 @@ namespace Quesadilla
                                     default: dotColour = Color.Red; break;
                                 }
                                 systemBrush = new SolidBrush(dotColour);
-                                e.Graphics.FillEllipse(systemBrush, currentX - Program.MainConfiguration.PlanetViewSize, currentY - Program.MainConfiguration.PlanetViewSize, Program.MainConfiguration.PlanetViewSize * 2, Program.MainConfiguration.PlanetViewSize * 2);
-                                currentX += (Program.MainConfiguration.PlanetViewSize);
-                                Font font = new Font("Verdana", 8, FontStyle.Regular);
-                                Size size = ImageGenerator.PaintDrawText(e, p.Count.ToString(), currentX, currentY- (Program.MainConfiguration.PlanetViewSize), dotColour, font);
-                                currentX += size.Width +(Program.MainConfiguration.PlanetViewSize);
+                                e.Graphics.FillEllipse(systemBrush, currentX - Program.MainConfiguration.PlanetInfoViewSize, currentY - Program.MainConfiguration.PlanetInfoViewSize, Program.MainConfiguration.PlanetInfoViewSize * 2, Program.MainConfiguration.PlanetInfoViewSize * 2);
+
+                                // set x/y
+                                var cpi = CurrentPlanetInfos.Where(o => o.PlanetType == p.type).First();
+                                cpi.X = currentX; cpi.Y = currentY;
+
+                                currentX += (Program.MainConfiguration.PlanetInfoViewSize);
+                                Font font = new Font("Verdana", Program.MainConfiguration.PlanetInfoFontSize, FontStyle.Regular);
+                                Size size = ImageGenerator.PaintDrawText(e, p.Count.ToString(), currentX, currentY- (Program.MainConfiguration.PlanetInfoViewSize), dotColour, font);
+                                currentX += size.Width +(Program.MainConfiguration.PlanetInfoViewSize);
+
                             }
+
+                            foreach(var mouseOverPlanet in CurrentPlanetInfos.Where(o => o.CurrentMouseOver)) {
+                                Color fontColour = Color.Red;
+                                switch (mouseOverPlanet.PlanetType)
+                                {
+                                    case "(Storm)": fontColour = Program.MainConfiguration.PlanetInfoStormColour; break;
+                                    case "(Barren)": fontColour = Program.MainConfiguration.PlanetInfoBarrenColour; break;
+                                    case "(Temperate)": fontColour = Program.MainConfiguration.PlanetInfoTemperateColour; break;
+                                    case "(Lava)": fontColour = Program.MainConfiguration.PlanetInfoLavaColour; break;
+                                    case "(Plasma)": fontColour = Program.MainConfiguration.PlanetInfoPlasmaColour; break;
+                                    case "(Gas)": fontColour = Program.MainConfiguration.PlanetInfoGasColour; break;
+                                    case "(Ice)": fontColour = Program.MainConfiguration.PlanetInfoIceColour; break;
+                                    case "(Oceanic)": fontColour = Program.MainConfiguration.PlanetInfoOceanicColour; break;
+                                    default: fontColour = Color.Red; break;
+                                }
+                                Font font = new Font("Verdana", Program.MainConfiguration.PlanetInfoFontSize, FontStyle.Regular);
+                                Size size = ImageGenerator.PaintDrawText(e, mouseOverPlanet.PlanetType + " " + mouseOverPlanet.Planets, 
+                                    mouseOverPlanet.X - (Program.MainConfiguration.PlanetInfoViewSize) , 
+                                    mouseOverPlanet.Y - ((Program.MainConfiguration.PlanetInfoViewSize*2) + Program.MainConfiguration.PlanetInfoFontSize),
+                                    fontColour, font);
+                            };
                         }
-
-
                     }
                     catch (Exception ex) {
                     }
@@ -2219,6 +2298,29 @@ namespace Quesadilla
         private void pMinimapImage_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void Quesadilla_MouseMove(object sender, MouseEventArgs e)
+        {
+            var WasMouseOver = CurrentPlanetInfos.Where(o => o.CurrentMouseOver == true).Count() > 0 ? true : false;
+            foreach (var p in CurrentPlanetInfos)
+            {
+                if (
+                    (p.X >= e.X - Program.MainConfiguration.PlanetInfoViewSize && p.X <= e.X + Program.MainConfiguration.PlanetInfoViewSize) &&
+                    (p.Y >= e.Y - Program.MainConfiguration.PlanetInfoViewSize && p.Y <= e.Y + Program.MainConfiguration.PlanetInfoViewSize))
+                {
+                    p.CurrentMouseOver = true;
+                } 
+                else
+                {
+                    p.CurrentMouseOver = false;
+                }
+            }
+            var IsMouseOver = CurrentPlanetInfos.Where(o => o.CurrentMouseOver == true).Count() > 0 ? true : false;
+            if (WasMouseOver || IsMouseOver)
+            {
+                this.Invalidate();
+            }
         }
     }
 }

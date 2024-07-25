@@ -590,6 +590,7 @@
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
     <Compile Include="Classes\Resources\QuesadillaSound.cs" />
     <Compile Include="Classes\ItemType.cs" />
+    <Compile Include="Classes\SolarSystems\PlanetInfoDisplay.cs" />
     <Compile Include="Classes\SolarSystems\MinimapConnection.cs" />
     <Compile Include="Classes\SolarSystems\MinimapSystem.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemBelt.cs" />
