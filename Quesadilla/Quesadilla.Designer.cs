@@ -127,7 +127,7 @@
             // pMinimapImage
             // 
             this.pMinimapImage.BackColor = System.Drawing.Color.Transparent;
-            this.pMinimapImage.Location = new System.Drawing.Point(6, 6);
+            this.pMinimapImage.Location = new System.Drawing.Point(5, 5);
             this.pMinimapImage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.pMinimapImage.Name = "pMinimapImage";
             this.pMinimapImage.Size = new System.Drawing.Size(429, 323);
@@ -152,7 +152,7 @@
             this.lblEtxraInformation.ForeColor = System.Drawing.Color.ForestGreen;
             this.lblEtxraInformation.Location = new System.Drawing.Point(442, 66);
             this.lblEtxraInformation.Name = "lblEtxraInformation";
-            this.lblEtxraInformation.Size = new System.Drawing.Size(498, 198);
+            this.lblEtxraInformation.Size = new System.Drawing.Size(464, 198);
             this.lblEtxraInformation.TabIndex = 13;
             this.lblEtxraInformation.Text = "999999";
             this.lblEtxraInformation.Visible = false;

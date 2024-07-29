@@ -1156,5 +1156,23 @@ img.rounded-corners {
         [Description("")]
         [DefaultValue(typeof(int), "8")]
         public int PlanetInfoFontSize { get; set; }
+
+        [Category("HeartBeat")]
+        [DisplayName("Heartbeat indicator Colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "Red")]
+        public Color HeartBeatIndicatorColour { get; set; }
+
+        [Category("HeartBeat")]
+        [DisplayName("Heartbeat indicator Divisions")]
+        [Description("")]
+        [DefaultValue(typeof(int), "20")]
+        public int HeartBeatIndicatorDivisions { get; set; }
+
+        [Category("HeartBeat")]
+        [DisplayName("Show Heartbeat indicator")]
+        [Description("")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool HeartBeatIndicator { get; set; }
     }
 }

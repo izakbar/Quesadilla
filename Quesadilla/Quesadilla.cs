@@ -152,6 +152,10 @@ namespace Quesadilla
         private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
         private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
 
+        private int activityLine = 0;
+        private int ActivityLineInc = 0;
+        private int ActivityLineMax = 0;
+
         public Quesadilla()
         {
             splashScreenThread = new Thread(new ThreadStart(ShowSplashScreen));
@@ -228,6 +232,9 @@ namespace Quesadilla
 
             Program.ZKillHandler.ZKillFeed.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
             Program.ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(this.ESI_ProcessNewData);
+
+            ActivityLineInc = (Width) / Program.MainConfiguration.HeartBeatIndicatorDivisions;
+            ActivityLineMax = (Width);
         }
 
         private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
@@ -372,6 +379,15 @@ namespace Quesadilla
 
         private void mainTimer_Tick(object sender, EventArgs e)
         {
+            activityLine += ActivityLineInc;
+            if ( activityLine > ActivityLineMax )
+            {
+                activityLine = 0;
+                Invalidate();
+            } else
+            {
+                Refresh();
+            }
 
             if (++TickCounts["LogfileCheck"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
             {
@@ -1527,6 +1543,9 @@ namespace Quesadilla
             lblSystemName.Top = lblStatus.Top;
             buttonIntelSize.Top = intelLog.Top + 2;
             buttonIntelSize.Left = intelLog.Width - buttonIntelSize.Width - 2;
+
+            ActivityLineInc = (Width) / Program.MainConfiguration.HeartBeatIndicatorDivisions;
+            ActivityLineMax = (Width);
         }
         private void buttonIntelSize_Click(object sender, EventArgs e)
         {
@@ -2135,6 +2154,7 @@ namespace Quesadilla
 
         private void Quesadilla_Paint(object sender, PaintEventArgs e)
         {
+
             ImageGenerator.PaintDrawText(e, lblCurrentClient);
             ImageGenerator.PaintDrawText(e, lblISK);
             ImageGenerator.PaintDrawText(e, lblAlertsOutstanding);
@@ -2258,7 +2278,14 @@ namespace Quesadilla
                     catch (Exception ex) {
                     }
                 }
+            }
 
+            if (Program.MainConfiguration.HeartBeatIndicator)
+            {
+                Brush lineBrush = new SolidBrush(Program.MainConfiguration.HeartBeatIndicatorColour);
+                Pen linePen = new Pen(lineBrush);
+
+                e.Graphics.DrawLine(linePen, new Point(0, 0), new Point(0, activityLine));
             }
         }
 

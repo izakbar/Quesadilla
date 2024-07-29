@@ -228,29 +228,39 @@ namespace Quesadilla
             // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
             lock (NewAlerts)
             {
-                var f = NewAlerts.Where(o =>
-                (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
-                || (o.AlertText == alert.AlertText)
-                ).ToList();
-                if (f.Count == 0 || NewAlerts.Count == 0)
-                {
-                    alert.RouteText = Program.Universe.PathToString(alert.Path);
-                    NewAlerts.Enqueue(alert);
-                }
-                if (f.Count != 0)
-                {
-                    if (f.First().Path != null && alert.Path != null && alert.Path.TotalJumps < f.First().Path.TotalJumps)
+                try {
+                    var f = NewAlerts.Where(o =>
+                    (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
+                    || (o.AlertText == alert.AlertText)
+                    ).ToList();
+                    if (f.Count == 0 || NewAlerts.Count == 0)
                     {
-                        f.First().Path = alert.Path;
-                        f.First().AlertText = alert.AlertText;
-                        f.First().Entry = alert.Entry;
-                        f.First().Context = alert.Context;
-                        f.First().RouteText = alert.RouteText;
-                        f.First().SoundFile = alert.SoundFile;
-                        f.First().ShowAlert = alert.ShowAlert;
+                        alert.RouteText = Program.Universe.PathToString(alert.Path);
+                        NewAlerts.Enqueue(alert);
+                    }
+                    if (f.Count != 0)
+                    {
+                        if (f.First().Path != null && alert.Path != null && alert.Path.TotalJumps < f.First().Path.TotalJumps)
+                        {
+                            f.First().Path = alert.Path;
+                            f.First().AlertText = alert.AlertText;
+                            f.First().Entry = alert.Entry;
+                            f.First().Context = alert.Context;
+                            f.First().RouteText = alert.RouteText;
+                            f.First().SoundFile = alert.SoundFile;
+                            f.First().ShowAlert = alert.ShowAlert;
+                        }
                     }
                 }
-            }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex.Message);
+                    if ( ex.InnerException != null)
+                    {
+                        Log.Debug(ex.InnerException.Message);
+                    }
+                }
+                }
         }
 
         public static void EnqueueActiveAlert(AlertQueueItem alert)

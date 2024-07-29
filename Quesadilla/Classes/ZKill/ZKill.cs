@@ -24,8 +24,8 @@ namespace Quesadilla.Classes.ZKill
             var f = q.Where(o => o.ID == kill.ID).ToList();
             if (f.Count == 0 )
             {
-                lock (q)
-                {
+                //lock (q)
+                //{
                     kill.VictimCharacterName = Program.Universe.GetCharacterName((int)kill.VictimCharacterId);
                     q.Enqueue(kill);
 
@@ -34,7 +34,7 @@ namespace Quesadilla.Classes.ZKill
                         system.Kills = new List<ZKillKill>();
                     }
                     system.Kills.Add(kill);
-                }
+                //}
             }
         }
 
@@ -46,8 +46,8 @@ namespace Quesadilla.Classes.ZKill
         private int ExpireZkillQueue(Queue<ZKillKill> zq)
         {
             int Expired = 0;
-            lock (zq)
-            {
+            //lock (zq)
+            //{
                 bool removedOBSZkill = true;
                 while (zq.Count > 0 && removedOBSZkill)
                 {
@@ -69,7 +69,7 @@ namespace Quesadilla.Classes.ZKill
                         removedOBSZkill = false;
                     }
                 }
-            }
+            //}
             return Expired;
         }
 
