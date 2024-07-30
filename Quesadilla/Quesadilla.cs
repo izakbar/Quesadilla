@@ -153,8 +153,8 @@ namespace Quesadilla
         private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
 
         private int activityLine = 0;
-        private int ActivityLineInc = 0;
-        private int ActivityLineMax = 0;
+        private int ActivityLineInc = 1;
+        private int ActivityLineMax = 1;
 
         public Quesadilla()
         {
@@ -233,8 +233,8 @@ namespace Quesadilla
             Program.ZKillHandler.ZKillFeed.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
             Program.ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(this.ESI_ProcessNewData);
 
-            ActivityLineInc = (Width) / Program.MainConfiguration.HeartBeatIndicatorDivisions;
-            ActivityLineMax = (Width);
+            ActivityLineInc = 1;
+            ActivityLineMax = Program.MainConfiguration.HeartBeatIndicatorWorkingText.Length-1;
         }
 
         private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
@@ -321,6 +321,9 @@ namespace Quesadilla
             pMinimapImage.Height = Program.MainConfiguration.MinimapHeight;
             pMinimapImage.Width = (int)((double)Program.MainConfiguration.MinimapHeight*1.3);
 
+            working.Visible = Program.MainConfiguration.HeartBeatIndicatorVisible;
+            working.ForeColor = Program.MainConfiguration.HeartBeatIndicatorColour;
+
             RebuildAlertsMenu();
             RebuildBackgroundsMenu();
             RebuildLatestAlertsMenu();
@@ -383,11 +386,8 @@ namespace Quesadilla
             if ( activityLine > ActivityLineMax )
             {
                 activityLine = 0;
-                Invalidate();
-            } else
-            {
-                Refresh();
             }
+            working.Text = Program.MainConfiguration.HeartBeatIndicatorWorkingText[activityLine].ToString();
 
             if (++TickCounts["LogfileCheck"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
             {
@@ -1529,7 +1529,7 @@ namespace Quesadilla
                 //lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
 
                 lblEtxraInformation.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
-                lblEtxraInformation.Height = pMinimapImage.Height - (lblEtxraInformation.Top - pMinimapImage.Top - lblISK.Height - 5 - (Program.MainConfiguration.PlanetInfoViewSize*2));
+                lblEtxraInformation.Height = pMinimapImage.Height - lblISK.Height - 5 - (Program.MainConfiguration.PlanetInfoViewSize * 2);
                 lblEtxraInformation.Left = pMinimapImage.Left + pMinimapImage.Width + 2;
             }
             else
@@ -1544,8 +1544,8 @@ namespace Quesadilla
             buttonIntelSize.Top = intelLog.Top + 2;
             buttonIntelSize.Left = intelLog.Width - buttonIntelSize.Width - 2;
 
-            ActivityLineInc = (Width) / Program.MainConfiguration.HeartBeatIndicatorDivisions;
-            ActivityLineMax = (Width);
+            //ActivityLineInc = (Width) / Program.MainConfiguration.HeartBeatIndicatorDivisions;
+            //ActivityLineMax = (Width);
         }
         private void buttonIntelSize_Click(object sender, EventArgs e)
         {
@@ -1681,7 +1681,13 @@ namespace Quesadilla
         {
             if ( e.RequestType == ESIRequestType.System)
             {
-                Invalidate();
+                try
+                {
+                    Invalidate();
+                }
+                catch (Exception ex)
+                {
+                }
                 shouldUpdatePlanetInfo = true;
             }
         }
@@ -2222,7 +2228,7 @@ namespace Quesadilla
                                 .OrderBy(x => x.type);
 
                             int currentX = lblEtxraInformation.Left;
-                            int currentY = lblStatus.Top - (Program.MainConfiguration.PlanetInfoViewSize*2);
+                            int currentY = lblStatus.Top - (Program.MainConfiguration.PlanetInfoViewSize);
                             foreach (var p in planetInfo)
                             {
                                 Brush systemBrush;
@@ -2280,6 +2286,7 @@ namespace Quesadilla
                 }
             }
 
+            /*
             if (Program.MainConfiguration.HeartBeatIndicator)
             {
                 Brush lineBrush = new SolidBrush(Program.MainConfiguration.HeartBeatIndicatorColour);
@@ -2287,6 +2294,7 @@ namespace Quesadilla
 
                 e.Graphics.DrawLine(linePen, new Point(0, 0), new Point(0, activityLine));
             }
+            */
         }
 
         private void UpdateISK()

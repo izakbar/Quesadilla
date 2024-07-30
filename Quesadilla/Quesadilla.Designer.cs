@@ -41,6 +41,7 @@
             this.lblAlertsOutstanding = new System.Windows.Forms.Label();
             this.lblEtxraInformation = new System.Windows.Forms.Label();
             this.lblSystemName = new System.Windows.Forms.Label();
+            this.working = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pMinimapImage)).BeginInit();
             this.SuspendLayout();
             // 
@@ -69,10 +70,10 @@
             // 
             this.ChatServerDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ChatServerDown.ForeColor = System.Drawing.Color.Red;
-            this.ChatServerDown.Location = new System.Drawing.Point(734, 6);
+            this.ChatServerDown.Location = new System.Drawing.Point(707, 6);
             this.ChatServerDown.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.ChatServerDown.Name = "ChatServerDown";
-            this.ChatServerDown.Size = new System.Drawing.Size(224, 31);
+            this.ChatServerDown.Size = new System.Drawing.Size(228, 31);
             this.ChatServerDown.TabIndex = 3;
             this.ChatServerDown.Text = "Chat Server Down";
             this.ChatServerDown.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -169,12 +170,25 @@
             this.lblSystemName.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.lblSystemName.Visible = false;
             // 
+            // working
+            // 
+            this.working.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.working.ForeColor = System.Drawing.Color.SaddleBrown;
+            this.working.Location = new System.Drawing.Point(937, -2);
+            this.working.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.working.Name = "working";
+            this.working.Size = new System.Drawing.Size(20, 23);
+            this.working.TabIndex = 15;
+            this.working.Text = "*";
+            this.working.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // Quesadilla
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(957, 642);
+            this.Controls.Add(this.working);
             this.Controls.Add(this.lblSystemName);
             this.Controls.Add(this.lblEtxraInformation);
             this.Controls.Add(this.buttonIntelSize);
@@ -214,6 +228,7 @@
         private System.Windows.Forms.Label lblAlertsOutstanding;
         private System.Windows.Forms.Label lblEtxraInformation;
         private System.Windows.Forms.Label lblSystemName;
+        private System.Windows.Forms.Label working;
     }
 }
 

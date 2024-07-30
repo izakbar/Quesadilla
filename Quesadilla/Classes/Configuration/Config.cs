@@ -1164,15 +1164,18 @@ img.rounded-corners {
         public Color HeartBeatIndicatorColour { get; set; }
 
         [Category("HeartBeat")]
-        [DisplayName("Heartbeat indicator Divisions")]
-        [Description("")]
-        [DefaultValue(typeof(int), "20")]
-        public int HeartBeatIndicatorDivisions { get; set; }
-
+        [DisplayName("Heartbeat indicator text")]
+        [Description("Check homepage for some examples")]
+        //        [DefaultValue(typeof(string), " ▁▂▃▄▅▆▇█▇▆▅▄▃▁")]
+        //        [DefaultValue(typeof(string)," ▏▎▍▌▋▊▉▊▋▌▍")] 
+        //        [DefaultValue(typeof(string), "▖▘▝▗")]
+        //        [DefaultValue(typeof(string), "⠁⠁⠉⠙⠚⠒⠂⠂⠒⠲⠴⠤⠄⠄⠤⠠⠠⠤⠦⠖⠒⠐⠐⠒⠓⠋⠉⠈⠈")]
+        [DefaultValue(typeof(string), "⠈⠉⠋⠓⠒⠐⠐⠒⠖⠦⠤⠠⠠⠤⠦⠖⠒⠐⠐⠒⠓⠋⠉⠈")]
+        public string HeartBeatIndicatorWorkingText { get; set; }
         [Category("HeartBeat")]
         [DisplayName("Show Heartbeat indicator")]
         [Description("")]
         [DefaultValue(typeof(bool), "true")]
-        public bool HeartBeatIndicator { get; set; }
+        public bool HeartBeatIndicatorVisible { get; set; }
     }
 }
