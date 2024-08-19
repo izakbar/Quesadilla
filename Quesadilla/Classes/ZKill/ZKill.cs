@@ -31,7 +31,7 @@ namespace Quesadilla.Classes.ZKill
 
             q.Enqueue(kill);
             // ensure only distinct values
-            q = new Queue<ZKillKill>(q.Distinct());
+            q = new ConcurrentQueue<ZKillKill>(q.Distinct());
         }
 
         public void EnqueueZKillAlert(ZKillKill kill, SolarSystem system)
