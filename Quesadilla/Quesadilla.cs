@@ -408,7 +408,9 @@ namespace Quesadilla
             // dequeue Alerts
             if (++TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert && Program.NewAlerts.Count >0 )
             {
-                var NewAlert = Program.NewAlerts.Dequeue();
+
+                AlertQueueItem NewAlert = null;
+                Program.NewAlerts.TryDequeue(out NewAlert);
 
                 Program.EnqueueActiveAlert(NewAlert);
 
