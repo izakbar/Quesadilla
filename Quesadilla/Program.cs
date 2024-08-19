@@ -27,6 +27,7 @@ using Quesadilla.Classes.ZKill;
 using Serilog;
 using Serilog.Formatting.Display;
 using Serilog.Sinks.WinForms.Base;
+using System.Collections.Concurrent;
 
 namespace Quesadilla
 {
@@ -49,8 +50,8 @@ namespace Quesadilla
         public static List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
         public static List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
 
-        public static Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
-        public static Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
+        public static ConcurrentQueue<AlertQueueItem> NewAlerts = new ConcurrentQueue<AlertQueueItem>();
+        public static ConcurrentQueue<AlertQueueItem> ActiveAlerts = new ConcurrentQueue<AlertQueueItem>();
 
         public static  List<LogWatcher> logfileWatchers = new List<LogWatcher>();
         public static List<Character> CharacterList { get; set; }
@@ -199,7 +200,7 @@ namespace Quesadilla
                     if (diffInSeconds > Program.MainConfiguration.ExpireAlertSeconds)
                     {
 
-                        alert = Program.ActiveAlerts.Dequeue();
+                        Program.ActiveAlerts.TryDequeue(out alert);
                         Expired++;
 
                         // expired so dequeue
