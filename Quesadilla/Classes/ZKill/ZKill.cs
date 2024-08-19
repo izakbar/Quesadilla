@@ -22,21 +22,16 @@ namespace Quesadilla.Classes.ZKill
         public void EnqueueZKillAlert(ConcurrentQueue<ZKillKill> q, ZKillKill kill, SolarSystem system)
         {
             // only add to new zkill list if not already in list. This should prevent multiple entries for same thing
-            var f = q.Where(o => o.ID == kill.ID).ToList();
-            if (f.Count == 0 )
+            kill.VictimCharacterName = Program.Universe.GetCharacterName((int)kill.VictimCharacterId);
+            if (system.Kills == null)
             {
-                //lock (q)
-                //{
-                    kill.VictimCharacterName = Program.Universe.GetCharacterName((int)kill.VictimCharacterId);
-                    q.Enqueue(kill);
-
-                    if (system.Kills == null)
-                    {
-                        system.Kills = new List<ZKillKill>();
-                    }
-                    system.Kills.Add(kill);
-                //}
+                system.Kills = new List<ZKillKill>();
             }
+            system.Kills.Add(kill);
+
+            q.Enqueue(kill);
+            // ensure only distinct values
+            q = new Queue<ZKillKill>(q.Distinct());
         }
 
         public void EnqueueZKillAlert(ZKillKill kill, SolarSystem system)
