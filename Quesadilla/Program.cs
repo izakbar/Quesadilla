@@ -233,6 +233,7 @@ namespace Quesadilla
                     var f = NewAlerts.Where(o =>
                     (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
                     || (o.AlertText == alert.AlertText)
+                    || (o.Kill != null && alert.Kill != null && o.Kill.ID == alert.Kill.ID)
                     ).ToList();
                     if (f.Count == 0 || NewAlerts.Count == 0)
                     {
