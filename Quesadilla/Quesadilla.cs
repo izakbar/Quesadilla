@@ -262,7 +262,7 @@ namespace Quesadilla
             bool first = true;
             DateTime now = DateTime.Now;
 
-            foreach (var alert in Program.ActiveAlerts.Distinct().Reverse().Where(o => o.ShowAlert).Take(Program.MainConfiguration.ShowLastUnexpiredAlerts).ToList())
+            foreach (var alert in Program.ActiveAlerts.Reverse().Where(o => o.ShowAlert).Take(Program.MainConfiguration.ShowLastUnexpiredAlerts).ToList())
             {
                 DateTime timeAdded = alert.Entry != null ? alert.Entry.TimeAdded : alert.Kill.TimeAdded;
                 TimeSpan timeAgo = now - timeAdded;
@@ -1418,7 +1418,7 @@ namespace Quesadilla
                             new AlertQueueItem()
                             {
                                 AlertText = alertText,
-                                MenuText = e.Entry.CharacterName + alertText,
+                                MenuText = alertText,
                                 Entry = e.Entry,
                                 Path = path,
                                 Context = alertText,

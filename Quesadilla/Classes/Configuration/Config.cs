@@ -232,7 +232,7 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.MiningEndedRoidPopped,
                     TextDisplay = "{character} rock depleated",
-                    MenuDisplay = "{character} rock depleated",
+                    MenuDisplay = "rock depleated",
                     SoundFile = "pop1",
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
@@ -241,7 +241,7 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.MiningEndedFull,
                     TextDisplay = "{character} cargo full",
-                    MenuDisplay = "{character} cargo full",
+                    MenuDisplay = "cargo full",
                     SoundFile = "full",
                 });
             }
