@@ -2389,7 +2389,7 @@ namespace Quesadilla
                 shipUrl = "https://quesadilla.prioryofthelemon.co.uk/wp/wp-content/uploads/2024/07/Quesadilla-1.png";
 
                 Uri img = new Uri(shipUrl);
-                // t.AddAppLogoOverride(new Uri(shipUrl), ToastGenericAppLogoCrop.Circle);
+                t.AddAppLogoOverride(new Uri(shipUrl), ToastGenericAppLogoCrop.Circle);
                 t.AddInlineImage(img, alert.Kill.VictimShipName);
             }
 

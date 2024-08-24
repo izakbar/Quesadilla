@@ -1181,7 +1181,7 @@ img.rounded-corners {
         [Category("Alert")]
         [DisplayName("Show alerts as windows notifications")]
         [Description("")]
-        [DefaultValue(typeof(bool), "true")]
+        [DefaultValue(typeof(bool), "false")]
         public bool ShowAlertWindowsNotification { get; set; }
 
         [Category("Alert")]
