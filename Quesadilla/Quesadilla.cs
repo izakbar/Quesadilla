@@ -1,5 +1,6 @@
 ﻿using EVEStandard.Models;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
@@ -28,6 +29,9 @@ using System.Media;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.Security.Cryptography.Pkcs;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -36,6 +40,7 @@ using System.Web.WebPages;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Xml;
+using Windows.ApplicationModel.VoiceCommands;
 using static Quesadilla.Classes.Processes.ProcessMonitor;
 using static Quesadilla.Extensions.StringExtensions;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -419,11 +424,9 @@ namespace Quesadilla
                     Log.Error(NewAlert.AlertText);
                     shouldUpdateMinimap = true;
                     shouldUpdatePlanetInfo = true;
-                    // try to prevent new alert stealing focus
-                    var NewAlertWindow = new QuesadillaAlertPopup(NewAlert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
-                    var ptr = Program.ProcessMonitorHandler.GetForegroundWindowHandle();
-                    NewAlertWindow.Show(this);
-                    var ptr2 = Program.ProcessMonitorHandler.SetForegroundWindowHandle(ptr);
+
+                    ShowAlert(NewAlert);
+
                     SoundPlayer sound = Program.LoadSoundFromFile(NewAlert.SoundFile);
                     if (sound != null) sound.Play();
                     RebuildLatestAlertsMenu();
@@ -1110,8 +1113,9 @@ namespace Quesadilla
             if (Program.ActiveAlerts.Where(o => o.ShowAlert).Count() > 0)
             {
                 var alert = Program.ActiveAlerts.Where(o => o.ShowAlert).Reverse().Take(1).ToList().First();
-                var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
-                NewAlertWindow.Show(this);
+                //var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
+                //NewAlertWindow.Show(this);
+                ShowAlert(alert);
             }
         }
 
@@ -2024,8 +2028,9 @@ namespace Quesadilla
         private void trayIconMenuShowHistoricAlert(object sender, EventArgs e)
         {
             AlertQueueItem alert = (AlertQueueItem)((MenuItem)sender).Tag;
-            var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
-            NewAlertWindow.Show(this);
+            //var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
+            //NewAlertWindow.Show(this);
+            ShowAlert(alert);
         }
 
         private void SetupLogfileEvents()
@@ -2334,6 +2339,106 @@ namespace Quesadilla
 
         private void pMinimapImage_Click(object sender, EventArgs e)
         {
+
+        }
+        private void ShowAlert(AlertQueueItem alert)
+        {
+            if ( Program.MainConfiguration.ShowAlertFancyNotification) ShowAlertWindow(alert);
+            if (Program.MainConfiguration.ShowAlertWindowsNotification) ShowAlertToast(alert);
+        }
+        private void ShowAlertWindow(AlertQueueItem alert)
+        {
+            // try to prevent new alert stealing focus
+            var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
+            var ptr = Program.ProcessMonitorHandler.GetForegroundWindowHandle();
+            NewAlertWindow.Show(this);
+            var ptr2 = Program.ProcessMonitorHandler.SetForegroundWindowHandle(ptr);
+        }
+
+        private void ShowAlertToast(AlertQueueItem alert)
+        {
+
+            ToastNotificationManagerCompat.OnActivated += toastArgs =>
+            {
+                // Obtain the arguments from the notification
+                ToastArguments args = ToastArguments.Parse(toastArgs.Argument);
+                // https://stackoverflow.com/questions/4580263/how-to-open-in-default-browser-in-c-sharp
+                System.Diagnostics.Process.Start(args["url"]);
+            };
+
+            var t = new ToastContentBuilder();
+
+            if (alert.Path != null)
+            {
+                t.AddButton(new ToastButton()
+                    .SetContent($"View {alert.Path.ToSystemName}")
+                    .AddArgument("action", "viewURL")
+                    .AddArgument("url", "https://evemaps.dotlan.net/map/" + alert.Path.ToSystemRegionName.Replace(" ", "_") + "/" + alert.Path.ToSystemName));
+
+                t.AddText($"System: {alert.Path.ToSystemName} ({alert.Path.ToSystemRegionName})");
+            }
+
+            if ( alert.Kill != null )
+            {
+                t.AddButton(new ToastButton()
+                    .SetContent($"View Zkill")
+                    .AddArgument("action", "viewURL")
+                    .AddArgument("url", "https://zkillboard.com/kill/" + alert.Kill.ID));
+
+                var shipUrl = $"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render?size=128";
+                shipUrl = "https://quesadilla.prioryofthelemon.co.uk/wp/wp-content/uploads/2024/07/Quesadilla-1.png";
+
+                Uri img = new Uri(shipUrl);
+                // t.AddAppLogoOverride(new Uri(shipUrl), ToastGenericAppLogoCrop.Circle);
+                t.AddInlineImage(img, alert.Kill.VictimShipName);
+            }
+
+            string contextInfo = "";
+            if (alert.Path != null && !(alert.isFaction || alert.isDecloak))
+            {
+                contextInfo = alert.Path.TotalJumps.ToString() + " jump" + (alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + alert.Context;
+            }
+            else
+            {
+                if (alert.isFaction)
+                {
+                    contextInfo = alert.Context;
+                }
+                else if (alert.isDecloak)
+                {
+                    contextInfo = alert.Context;
+                }
+                else
+
+                {
+                    contextInfo = alert.FriendlyName;
+                }
+            }
+
+            t.AddText(contextInfo);
+
+            string intelLine = "";
+            if (alert.isFaction)
+            {
+                intelLine = "Faction Spawn";
+                t.AddHeader("faction", "Faction spawn", "");
+            }
+            else if (alert.Kill != null)
+            {
+                t.AddHeader("zkill", "Zkill alert", "");
+                intelLine = alert.Kill.Context.Replace("\n"," - ");
+            }
+            else
+            {
+                t.AddHeader("intel", "Intel alert", "");
+                intelLine = alert.Entry.LineContent;
+            }
+            t.AddText(intelLine);
+
+            t.Show(toast =>
+            {
+                toast.ExpirationTime = DateTime.Now.AddSeconds(Program.MainConfiguration.AlertPopupSeconds);
+            });
 
         }
 

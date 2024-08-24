@@ -1177,5 +1177,17 @@ img.rounded-corners {
         [Description("")]
         [DefaultValue(typeof(bool), "true")]
         public bool HeartBeatIndicatorVisible { get; set; }
+
+        [Category("Alert")]
+        [DisplayName("Show alerts as windows notifications")]
+        [Description("")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool ShowAlertWindowsNotification { get; set; }
+
+        [Category("Alert")]
+        [DisplayName("Show alerts as Quesadilla notifications")]
+        [Description("")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool ShowAlertFancyNotification { get; set; }
     }
 }
