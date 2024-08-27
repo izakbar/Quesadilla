@@ -435,36 +435,43 @@ img.rounded-corners {
         [DisplayName("Milliseconds for main tick")]
         [ReadOnly(true)]
         [Description("How many milliseconds the main tick is - smaller means more occur")]
-        [DefaultValue(typeof(int), "166")]
+        [DefaultValue(typeof(int), "150")]
         public int TickMiliseconds { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeCleardown")]
         [Description("How many ticks will occur between event cleardown checks")]
-        [DefaultValue(typeof(int), "32")]
+        [DefaultValue(typeof(int), "40")]
         public int HowManyTicksBeforeCleardown { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeAlert")]
         [Description("After an alert is put into the new alert queue - how many ticks before display")]
-        [DefaultValue(typeof(int), "1")]
+        [DefaultValue(typeof(int), "2")]
         public int HowManyTicksBeforeAlert { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeDPSGraphUpdate")]
         [Description("How many ticks between DPS graph update")]
-        [DefaultValue(typeof(int), "12")]
+        [DefaultValue(typeof(int), "15")]
         public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeLogfileCheck")]
         [Description("How many ticks between logfile checks")]
-        [DefaultValue(typeof(int), "6")]
+        [DefaultValue(typeof(int), "4")]
         public int HowManyTicksBeforeLogfileCheck { get; set; }
+
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        [DisplayName("HowManyTicksRefreshProcesses")]
+        [Description("How many ticks before refreshing process list")]
+        [DefaultValue(typeof(int), "20")]
+        public int HowManyTicksRefreshProcesses { get; set; }
 
         [Category("Main window")]
         public Point InitialPosition { get; set; }

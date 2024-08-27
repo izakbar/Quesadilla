@@ -198,6 +198,7 @@ namespace Quesadilla
             TickCounts["SinceLastAlert"] = 0;
             TickCounts["SinceLastDPSGraphUpdate"] = 0;
             TickCounts["LogfileCheck"] = 0;
+            TickCounts["RefreshProcesses"] = 0;
 
             menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
@@ -241,6 +242,10 @@ namespace Quesadilla
 
             ActivityLineInc = 1;
             ActivityLineMax = Program.MainConfiguration.HeartBeatIndicatorWorkingText.Length-1;
+
+            // get processes
+            UpdateEveProcesses(true);
+
         }
 
         private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
@@ -478,7 +483,13 @@ namespace Quesadilla
                 TickCounts["SinceLastCleardown"] = 0;
             }
 
-            UpdateEveProcesses();
+            bool refreshProcessList = false;
+            if (++TickCounts["RefreshProcesses"] > Program.MainConfiguration.HowManyTicksRefreshProcesses && CombatAdded)
+            {
+                refreshProcessList = true;
+                TickCounts["RefreshProcesses"] = 0;
+            }            
+            UpdateEveProcesses(refreshProcessList);
 
 //            pCombat.Visible = InCombat;
 
@@ -1600,9 +1611,13 @@ namespace Quesadilla
 
         }
 
-        private void UpdateEveProcesses()
+        private void UpdateEveProcesses(bool refreshProcesses)
         {
-            Program.ProcessMonitorHandler.GetUpdatedProcesses(out List<ProcessInfo> addedProcesses, out List<ProcessInfo> updatedProcesses, out List<ProcessInfo> removedProcesses);
+            if (refreshProcesses)
+            {
+                Program.ProcessMonitorHandler.GetUpdatedProcesses();
+            }
+
             string previousToon = CurrentActiveToon;
 
             string foregroundWindowTitle = null;
