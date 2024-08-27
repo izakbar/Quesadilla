@@ -435,14 +435,14 @@ img.rounded-corners {
         [DisplayName("Milliseconds for main tick")]
         [ReadOnly(true)]
         [Description("How many milliseconds the main tick is - smaller means more occur")]
-        [DefaultValue(typeof(int), "120")]
+        [DefaultValue(typeof(int), "166")]
         public int TickMiliseconds { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeCleardown")]
         [Description("How many ticks will occur between event cleardown checks")]
-        [DefaultValue(typeof(int), "30")]
+        [DefaultValue(typeof(int), "32")]
         public int HowManyTicksBeforeCleardown { get; set; }
 
         [Category("Tick Timing")]
@@ -456,14 +456,14 @@ img.rounded-corners {
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeDPSGraphUpdate")]
         [Description("How many ticks between DPS graph update")]
-        [DefaultValue(typeof(int), "6")]
+        [DefaultValue(typeof(int), "12")]
         public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeLogfileCheck")]
         [Description("How many ticks between logfile checks")]
-        [DefaultValue(typeof(int), "2")]
+        [DefaultValue(typeof(int), "6")]
         public int HowManyTicksBeforeLogfileCheck { get; set; }
 
         [Category("Main window")]
@@ -1181,7 +1181,7 @@ img.rounded-corners {
         [Category("Alert")]
         [DisplayName("Show alerts as windows notifications")]
         [Description("")]
-        [DefaultValue(typeof(bool), "true")]
+        [DefaultValue(typeof(bool), "false")]
         public bool ShowAlertWindowsNotification { get; set; }
 
         [Category("Alert")]

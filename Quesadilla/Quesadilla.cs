@@ -387,6 +387,7 @@ namespace Quesadilla
 
         private void mainTimer_Tick(object sender, EventArgs e)
         {
+
             activityLine += ActivityLineInc;
             if ( activityLine > ActivityLineMax )
             {
@@ -394,11 +395,10 @@ namespace Quesadilla
             }
             working.Text = Program.MainConfiguration.HeartBeatIndicatorWorkingText[activityLine].ToString();
 
-            if (++TickCounts["LogfileCheck"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
+            if (++TickCounts["LogfileCheck"] > Program.MainConfiguration.HowManyTicksBeforeLogfileCheck)
             {
                 Program.LogfileWatchersProcessing();
                 TickCounts["LogfileCheck"] = 0;
-                UpdateISK();
             }
 
             if (shouldUpdateMinimap)
@@ -471,6 +471,8 @@ namespace Quesadilla
                 {
                     UpdateMinimap();
                 }
+
+                UpdateISK();
 
                 TickCounts["SinceLastCleardown"] = 0;
             }
