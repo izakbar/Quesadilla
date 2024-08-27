@@ -224,19 +224,20 @@ namespace Quesadilla
             return Expired;
         }
 
-        public static void EnqueueNewAlert(AlertQueueItem alert)
+        public static void EnqueueNewAlert(AlertQueueItem alert, ConcurrentQueue<AlertQueueItem> q)
         {
             // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
-            lock (NewAlerts)
+            lock (q)
             {
-                try {
+                try
+                {
                     var checkZkillAlerts = 0;
                     // check if zkill already exists
                     if (alert.Kill != null)
                     {
                         checkZkillAlerts =
                             ActiveAlerts.Where(o => (o.Kill != null && o.Kill.ID == alert.Kill.ID)).ToList().Count() +
-                            NewAlerts.Where(o => (o.Kill != null && o.Kill.ID == alert.Kill.ID)).ToList().Count();
+                            q.Where(o => (o.Kill != null && o.Kill.ID == alert.Kill.ID)).ToList().Count();
                     }
                     var foundAlerts = NewAlerts.Where(
                         o => (
@@ -244,10 +245,10 @@ namespace Quesadilla
                         || (o.Kill != null && alert.Kill != null && o.Kill.ID == alert.Kill.ID)
                         )).ToList();
 
-                    if (foundAlerts.Count == 0 || NewAlerts.Count == 0 && checkZkillAlerts == 0 )
+                    if ( (foundAlerts.Count == 0 || q.Count == 0) && checkZkillAlerts == 0)
                     {
                         alert.RouteText = Program.Universe.PathToString(alert.Path);
-                        NewAlerts.Enqueue(alert);
+                        q.Enqueue(alert);
                     }
                     if (foundAlerts.Count != 0)
                     {
@@ -266,12 +267,12 @@ namespace Quesadilla
                 catch (Exception ex)
                 {
                     Log.Debug(ex.Message);
-                    if ( ex.InnerException != null)
+                    if (ex.InnerException != null)
                     {
                         Log.Debug(ex.InnerException.Message);
                     }
                 }
-                }
+            }
         }
 
         public static void EnqueueActiveAlert(AlertQueueItem alert)

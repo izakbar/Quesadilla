@@ -17,6 +17,7 @@ using Quesadilla.Classes.ZKill;
 using Serilog;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -700,7 +701,7 @@ namespace Quesadilla
                                             FriendlyName = alert.FriendlyName,
                                             ShowAlert = true,
                                         };
-                                        Program.EnqueueNewAlert(insertedAlert);
+                                        Program.EnqueueNewAlert(insertedAlert, Program.NewAlerts);
                                         alertCount++;
                                     }
                                     break;
@@ -724,7 +725,7 @@ namespace Quesadilla
                                                 FriendlyName = alert.FriendlyName,
                                                 ShowAlert = true,
                                             };
-                                        Program.EnqueueNewAlert(insertedAlert);
+                                        Program.EnqueueNewAlert(insertedAlert, Program.NewAlerts);
                                         alertCount++;
                                     }
                                     break;
@@ -757,7 +758,7 @@ namespace Quesadilla
                                                         FriendlyName = alert.FriendlyName,
                                                         ShowAlert = true,
                                                     };
-                                                    Program.EnqueueNewAlert(insertedAlert);
+                                                    Program.EnqueueNewAlert(insertedAlert, Program.NewAlerts);
 
                                                     alertCount++;
                                                 }
@@ -794,7 +795,7 @@ namespace Quesadilla
                                                         FriendlyName = alert.FriendlyName,
                                                         ShowAlert = true,
                                                     };
-                                                    Program.EnqueueNewAlert(insertedAlert);
+                                                    Program.EnqueueNewAlert(insertedAlert, Program.NewAlerts);
 
                                                     alertCount++;
                                                 }
@@ -823,7 +824,7 @@ namespace Quesadilla
                                                     FriendlyName = alert.FriendlyName,
                                                     ShowAlert = true,
                                                 };
-                                            Program.EnqueueNewAlert(insertedAlert);
+                                            Program.EnqueueNewAlert(insertedAlert, Program.NewAlerts);
 
                                             alertCount++;
                                         }
@@ -850,7 +851,7 @@ namespace Quesadilla
                                 FriendlyName = "",
                                 ShowAlert = false,
                             };
-                            Program.EnqueueNewAlert(insertedAlert);
+                            Program.EnqueueNewAlert(insertedAlert, Program.NewAlerts);
                         }
 
                         //Program.Universe.AddAlert(systemId2, insertedAlert);
@@ -885,7 +886,7 @@ namespace Quesadilla
                                     SoundFile = alert.SoundFile,
                                     FriendlyName = alert.FriendlyName,
                                     ShowAlert = true,
-                                }
+                                }, Program.NewAlerts
                                 );
                             alertCount++;
                         }
@@ -1327,7 +1328,7 @@ namespace Quesadilla
                                         FriendlyName = alert.FriendlyName,
                                         isFaction = true,
                                         ShowAlert = true,
-                                    }
+                                    }, Program.NewAlerts
                                     );
                             }
                         }
@@ -1432,7 +1433,7 @@ namespace Quesadilla
                                 FriendlyName = alert.FriendlyName + " - " + e.Entry.CharacterName,
                                 isMiningOver = true,
                                 ShowAlert = true,
-                            }
+                            }, Program.NewAlerts
                             );
                     }
                 }
@@ -1466,7 +1467,7 @@ namespace Quesadilla
                                 FriendlyName = alert.FriendlyName + " - " + e.Entry.CharacterName,
                                 isMiningOver = true,
                                 ShowAlert = true,
-                            }
+                            }, Program.NewAlerts
                             );
                     }
                 }
@@ -1518,7 +1519,7 @@ namespace Quesadilla
                         FriendlyName = alert.FriendlyName,
                         isDecloak = true,
                         ShowAlert = true,
-                    }
+                    }, Program.NewAlerts
                     );
                 }
             }
@@ -1705,7 +1706,9 @@ namespace Quesadilla
             string systemName = "---";
             string regionName = "---";
 
-            var victimShipName = Program.Universe.ItemTypes.ContainsKey((int)e.Kill.VictimShipTypeId) ? Program.Universe.ItemTypes[(int)e.Kill.VictimShipTypeId].Name : "Unknown:" + e.Kill.VictimShipTypeId.ToString();
+        ConcurrentQueue<AlertQueueItem> ZKillAlerts = new ConcurrentQueue<AlertQueueItem>();
+
+        var victimShipName = Program.Universe.ItemTypes.ContainsKey((int)e.Kill.VictimShipTypeId) ? Program.Universe.ItemTypes[(int)e.Kill.VictimShipTypeId].Name : "Unknown:" + e.Kill.VictimShipTypeId.ToString();
             e.Kill.VictimShipName = victimShipName;
 
             if (Program.Universe.SolarSystems.ContainsKey((int)e.Kill.SolarSystemId))
@@ -1777,7 +1780,7 @@ namespace Quesadilla
                                     SoundFile = Program.MainConfiguration.ZKillSound,
                                     FriendlyName = "zkill",
                                     ShowAlert = true,
-                                }
+                                }, ZKillAlerts
                                 );
                         }
                         break;
@@ -1802,7 +1805,7 @@ namespace Quesadilla
                                     SoundFile = Program.MainConfiguration.ZKillSound,
                                     FriendlyName = "zkill",
                                     ShowAlert = true,
-                                }
+                                }, ZKillAlerts
                                 );
                         }
                         break;
@@ -1836,7 +1839,7 @@ namespace Quesadilla
                                             SoundFile = Program.MainConfiguration.ZKillSound,
                                             FriendlyName = alert.FriendlyName,
                                             ShowAlert = true,
-                                        }
+                                        }, ZKillAlerts
                                         );
                                     }
                                 }
@@ -1873,7 +1876,7 @@ namespace Quesadilla
                                             SoundFile = Program.MainConfiguration.ZKillSound,
                                             FriendlyName = "zkill",
                                             ShowAlert = true,
-                                        }
+                                        }, ZKillAlerts
                                         );
                                     }
                                 }
@@ -1884,6 +1887,19 @@ namespace Quesadilla
                         break;
                 }
 
+                if ( ZKillAlerts.Count > 0 )
+                {
+                    // Add new alert(s) to NewAlerts
+                    while (ZKillAlerts.Count > 0 )
+                    {
+                        AlertQueueItem item = null;
+                        ZKillAlerts.TryDequeue(out item);
+                        if ( item != null )
+                        {
+                            Program.EnqueueNewAlert(item, Program.NewAlerts);
+                        }
+                    }
+                }
                 shouldUpdateMinimap = sendAlert;
             }
         }
