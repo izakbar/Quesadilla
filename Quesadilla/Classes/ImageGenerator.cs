@@ -54,7 +54,8 @@ namespace Quesadilla.Classes
             Color SystemColourText,
             Color ZKillColour,
             Color IntelColour,
-            Color AltColour
+            Color AltColour,
+            int animationCycle
             )
         {
 
@@ -280,7 +281,9 @@ namespace Quesadilla.Classes
                     if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
                     {
                         var zkillPen = new Pen(ZKillColour);
-                        g.DrawEllipse(zkillPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2);
+                        int zkillPulse = animationCycle;
+                        g.DrawEllipse(zkillPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_KILL_GAP + zkillPulse), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_KILL_GAP + zkillPulse),
+                            (CIRCLE_RADIUS + CIRCLE_KILL_GAP + zkillPulse) * 2, (CIRCLE_RADIUS + CIRCLE_KILL_GAP+ zkillPulse) * 2);
                         foreach (var k in currentSystem.solarSystem.Kills)
                         {
                             sbExtraInformation.AppendLine($"ZKILL {k.Timestamp.ToString("HH:mm:ss")} {k.SolarSystemName} {k.VictimShipName} {k.VictimCharacterName}");
@@ -289,7 +292,9 @@ namespace Quesadilla.Classes
                     if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null).Count() > 0)
                     {
                         var intelPen = new Pen(IntelColour);
-                        g.DrawEllipse(intelPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2);
+                        int intelPulse = animationCycle;
+                        g.DrawEllipse(intelPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP) + intelPulse), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP) + intelPulse), 
+                            (CIRCLE_RADIUS + CIRCLE_ALERT_GAP + intelPulse) * 2, (CIRCLE_RADIUS + CIRCLE_ALERT_GAP + intelPulse) * 2);
                         foreach (var a in currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null))
                         {
                             sbExtraInformation.AppendLine($"{a.Entry.LogTime} {a.Entry.LineContent}");
@@ -300,7 +305,9 @@ namespace Quesadilla.Classes
                     if (Program.CharacterList.Where(o => o.IsClientActive && o.IsCurrentlActiveClient == false && o.LocationId == currentSystem.solarSystem.Id).Count() > 0)
                     {
                         var altPen = new Pen(AltColour);
-                        g.DrawEllipse(altPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP)), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP)), (CIRCLE_RADIUS + CIRCLE_ALT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALT_GAP) * 2);
+                        int altPulse = animationCycle;
+                        g.DrawEllipse(altPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP) + altPulse), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP) + altPulse),
+                            (CIRCLE_RADIUS + CIRCLE_ALT_GAP + altPulse) * 2, (CIRCLE_RADIUS + CIRCLE_ALT_GAP + altPulse) * 2);
                     }
                 }
 

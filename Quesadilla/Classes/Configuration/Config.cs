@@ -473,6 +473,13 @@ img.rounded-corners {
         [DefaultValue(typeof(int), "20")]
         public int HowManyTicksRefreshProcesses { get; set; }
 
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        [DisplayName("HowManyTicksMapAnimation")]
+        [Description("How many ticks between animation of map")]
+        [DefaultValue(typeof(int), "3")]
+        public int HowManyTicksMapAnimation { get; set; }
+
         [Category("Main window")]
         public Point InitialPosition { get; set; }
 

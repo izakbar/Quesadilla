@@ -162,6 +162,10 @@ namespace Quesadilla
         private int ActivityLineInc = 1;
         private int ActivityLineMax = 1;
 
+        private int minimapAnimationflag = 0;
+        private int minimapAnimationDirection = 1;
+        private int maxMinimapAnimationValue = 4;
+
         public Quesadilla()
         {
             splashScreenThread = new Thread(new ThreadStart(ShowSplashScreen));
@@ -199,6 +203,7 @@ namespace Quesadilla
             TickCounts["SinceLastDPSGraphUpdate"] = 0;
             TickCounts["LogfileCheck"] = 0;
             TickCounts["RefreshProcesses"] = 0;
+            TickCounts["AnimationRefresh"] = 0;
 
             menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
@@ -395,7 +400,7 @@ namespace Quesadilla
         {
 
             activityLine += ActivityLineInc;
-            if ( activityLine > ActivityLineMax )
+            if (activityLine > ActivityLineMax)
             {
                 activityLine = 0;
             }
@@ -417,7 +422,7 @@ namespace Quesadilla
             }
 
             // dequeue Alerts
-            if (++TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert && Program.NewAlerts.Count >0 )
+            if (++TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert && Program.NewAlerts.Count > 0)
             {
 
                 AlertQueueItem NewAlert = null;
@@ -442,7 +447,7 @@ namespace Quesadilla
             }
 
             // do cleardown/rebuild of alerts menu - if number of ticks passed
-            if ( ++TickCounts["SinceLastCleardown"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
+            if (++TickCounts["SinceLastCleardown"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
             {
 
                 int alertsExpired = 0;
@@ -463,7 +468,7 @@ namespace Quesadilla
                     lblAlertsOutstanding.Text = "";
                 }
 
-                if (Program.ZKillHandler.ZKillKills.Count > 0 )
+                if (Program.ZKillHandler.ZKillKills.Count > 0)
                 {
                     lblAlertsOutstanding.Text += "/" + Program.ZKillHandler.ZKillKills.Count.ToString();
                 }
@@ -488,10 +493,10 @@ namespace Quesadilla
             {
                 refreshProcessList = true;
                 TickCounts["RefreshProcesses"] = 0;
-            }            
+            }
             UpdateEveProcesses(refreshProcessList);
 
-//            pCombat.Visible = InCombat;
+            //            pCombat.Visible = InCombat;
 
             if (++TickCounts["SinceLastDPSGraphUpdate"] > Program.MainConfiguration.HowManyTicksBeforeDPSGraphUpdate && CombatAdded)
             {
@@ -509,10 +514,27 @@ namespace Quesadilla
                 TickCounts["SinceLastDPSGraphUpdate"] = 0;
             }
 
+            if (++TickCounts["AnimationRefresh"] > Program.MainConfiguration.HowManyTicksMapAnimation)
+            {
+                minimapAnimationflag += minimapAnimationDirection;
 
+                if (minimapAnimationDirection > 0 && (minimapAnimationflag > maxMinimapAnimationValue) )
+                {
+                    minimapAnimationflag = maxMinimapAnimationValue-1;
+                    minimapAnimationDirection = -1;
+                }
+                if (minimapAnimationDirection < 0 && (minimapAnimationflag < 0))
+                {
+                    minimapAnimationflag = 1;
+                    minimapAnimationDirection = 1;
+                }
+
+                UpdateMinimap();
+                TickCounts["AnimationRefresh"] = 0;
+            }
         }
 
-        private bool checkJumpsRange(AlertConfig alert, PathInfo path)
+            private bool checkJumpsRange(AlertConfig alert, PathInfo path)
         {
             bool checkJumpsRangeComparison(int jumps, AlertConfigJumpsComparison comparison, int? comparisonNumber)
             {
@@ -2175,7 +2197,8 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapSystemColourText,
                     Program.MainConfiguration.MinimapZKillColour,
                     Program.MainConfiguration.MinimapIntelColour,
-                    Program.MainConfiguration.MinimapAltPositionColour
+                    Program.MainConfiguration.MinimapAltPositionColour,
+                    minimapAnimationflag
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
