@@ -230,27 +230,36 @@ namespace Quesadilla
             lock (NewAlerts)
             {
                 try {
-                    var f = NewAlerts.Where(o =>
-                    (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
-                    || (o.AlertText == alert.AlertText)
-                    || (o.Kill != null && alert.Kill != null && o.Kill.ID == alert.Kill.ID)
-                    ).ToList();
-                    if (f.Count == 0 || NewAlerts.Count == 0)
+                    var checkZkillAlerts = 0;
+                    // check if zkill already exists
+                    if (alert.Kill != null)
+                    {
+                        checkZkillAlerts =
+                            ActiveAlerts.Where(o => (o.Kill != null && o.Kill.ID == alert.Kill.ID)).ToList().Count() +
+                            NewAlerts.Where(o => (o.Kill != null && o.Kill.ID == alert.Kill.ID)).ToList().Count();
+                    }
+                    var foundAlerts = NewAlerts.Where(
+                        o => (
+                        (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId) || (o.AlertText == alert.AlertText)
+                        || (o.Kill != null && alert.Kill != null && o.Kill.ID == alert.Kill.ID)
+                        )).ToList();
+
+                    if (foundAlerts.Count == 0 || NewAlerts.Count == 0 && checkZkillAlerts == 0 )
                     {
                         alert.RouteText = Program.Universe.PathToString(alert.Path);
                         NewAlerts.Enqueue(alert);
                     }
-                    if (f.Count != 0)
+                    if (foundAlerts.Count != 0)
                     {
-                        if (f.First().Path != null && alert.Path != null && alert.Path.TotalJumps < f.First().Path.TotalJumps)
+                        if (foundAlerts.First().Path != null && alert.Path != null && alert.Path.TotalJumps < foundAlerts.First().Path.TotalJumps)
                         {
-                            f.First().Path = alert.Path;
-                            f.First().AlertText = alert.AlertText;
-                            f.First().Entry = alert.Entry;
-                            f.First().Context = alert.Context;
-                            f.First().RouteText = alert.RouteText;
-                            f.First().SoundFile = alert.SoundFile;
-                            f.First().ShowAlert = alert.ShowAlert;
+                            foundAlerts.First().Path = alert.Path;
+                            foundAlerts.First().AlertText = alert.AlertText;
+                            foundAlerts.First().Entry = alert.Entry;
+                            foundAlerts.First().Context = alert.Context;
+                            foundAlerts.First().RouteText = alert.RouteText;
+                            foundAlerts.First().SoundFile = alert.SoundFile;
+                            foundAlerts.First().ShowAlert = alert.ShowAlert;
                         }
                     }
                 }
