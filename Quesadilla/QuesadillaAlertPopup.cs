@@ -176,7 +176,7 @@ namespace Quesadilla
                     configuration.AlertPopupMinimapAltPositionColour,
                     configuration.AlertPopupMinimapIncursionColour,
                     configuration.AlertPopupMinimapIceColour,
-                    0,0,0,
+                    null, null, null,
                     true
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
