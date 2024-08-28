@@ -27,6 +27,8 @@ namespace Quesadilla.Classes
         private const double LY_SCALING = 9460000000000;
 
         private const int CIRCLE_RADIUS = 3;
+        private const int INCURSION_CLOUD_SIZE = 60;
+        private const int SYSTEM_CIRCLE_SIZE = 6;
 
         public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c)
         {
@@ -55,12 +57,12 @@ namespace Quesadilla.Classes
             Color ZKillColour,
             Color IntelColour,
             Color AltColour,
+            Color IncursionColour,
             int animationCycle
             )
         {
 
             double GUI_SCALING = 30;
-
 
             Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
 
@@ -258,7 +260,17 @@ namespace Quesadilla.Classes
                 // adjust origin
                 Point originPoint = new Point(ox, oy);
 
-                // draw connections
+                // draw incursion base if required
+                foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Incursion))
+                {
+                    Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+                    Color TransparentIncursionColour = Color.FromArgb(255, IncursionColour);
+                    Brush incursionBrush = new SolidBrush(TransparentIncursionColour);
+                    float incursionBlobSize = (INCURSION_CLOUD_SIZE / (float)GUI_SCALING);
+                    g.FillEllipse(incursionBrush, currentPoint.X - incursionBlobSize, currentPoint.Y - incursionBlobSize, incursionBlobSize * 2, incursionBlobSize * 2);
+                }
+
+                    // draw connections
                 foreach (var connection in minimapConnectingSystems)
                 {
                     Point P1 = new Point(originPoint.X + connection.P1.X, originPoint.Y + connection.P1.Y);
@@ -271,12 +283,15 @@ namespace Quesadilla.Classes
                 foreach (var currentSystem in minimapSystems)
                 {
                     Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+                    float blobSize = (SYSTEM_CIRCLE_SIZE / (float)GUI_SCALING);
+
                     Color systemBrushColour = SystemColourNormal;
                     if (currentSystem.route) systemBrushColour = SystemColourRoute;
                     if (currentSystem.fromSystem) systemBrushColour = SystemColourFrom;
                     if (currentSystem.toSystem) systemBrushColour = SystemColourTo;
                     Brush systemBrush = new SolidBrush(systemBrushColour);
-                    g.FillEllipse(systemBrush, currentPoint.X - CIRCLE_RADIUS, currentPoint.Y - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+                    // g.FillEllipse(systemBrush, currentPoint.X - CIRCLE_RADIUS, currentPoint.Y - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+                    g.FillEllipse(systemBrush, currentPoint.X - blobSize, currentPoint.Y - blobSize, blobSize * 2, blobSize * 2);
 
                     if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
                     {
@@ -306,8 +321,12 @@ namespace Quesadilla.Classes
                     {
                         var altPen = new Pen(AltColour);
                         int altPulse = animationCycle;
+/*
                         g.DrawEllipse(altPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP) + altPulse), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP) + altPulse),
                             (CIRCLE_RADIUS + CIRCLE_ALT_GAP + altPulse) * 2, (CIRCLE_RADIUS + CIRCLE_ALT_GAP + altPulse) * 2);
+*/
+                        g.DrawEllipse(altPen, currentPoint.X - (blobSize + (CIRCLE_ALT_GAP) + altPulse), currentPoint.Y - (blobSize + (CIRCLE_ALT_GAP) + altPulse),
+                            (blobSize + CIRCLE_ALT_GAP + altPulse) * 2, (blobSize+ CIRCLE_ALT_GAP + altPulse) * 2);
                     }
                 }
 

@@ -626,6 +626,12 @@ img.rounded-corners {
         public Color MinimapAltPositionColour { get; set; }
 
         [Category("Main window")]
+        [DisplayName("Minimap incursion Indicator colour")]
+        [Description("Colour to use for incursion indicators on the minimap")]
+        [DefaultValue(typeof(Color), "DarkGreen")]
+        public Color MinimapIncursionColour { get; set; }
+
+        [Category("Main window")]
         [DisplayName("Minimap Height")]
         [Description("Height of the minimap")]
         [DefaultValue(typeof(int), "200")]
@@ -972,6 +978,12 @@ img.rounded-corners {
         public Color AlertPopupMinimapAltPositionColour { get; set; }
 
         [Category("Alert")]
+        [DisplayName("Minimap incursion Indicator colour")]
+        [Description("Colour to use for incursion indicators on the alert popup")]
+        [DefaultValue(typeof(Color), "DarkGreen")]
+        public Color AlertPopupMinimapIncursionColour { get; set; }
+
+        [Category("Alert")]
         [DisplayName("Use SDE X/Y")]
         [Description("Selecting true will show minimap using the SDE values for X/Y. Selecting False will use Dotlan layout")]
         [DefaultValue(typeof(bool), "false")]
@@ -1088,7 +1100,7 @@ img.rounded-corners {
         [Category("General")]
         [DisplayName("Pull dotlan map layout svg")]
         [Description("Should dotlan svg be pulled and parsed regularly")]
-        [DefaultValue(typeof(bool), "false")]
+        [DefaultValue(typeof(bool), "true")]
         [ReadOnly(true)]
         public bool DotlanMapPull { get; set; }
 

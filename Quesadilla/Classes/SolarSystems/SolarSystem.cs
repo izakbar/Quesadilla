@@ -39,6 +39,8 @@ namespace Quesadilla.Classes.SolarSystems
         public List<PlanetInfo> Planets { get; set; }
         [JsonIgnore]
         public int? NPCKillsDeltaLastHour { get; set; }
+        public bool Incursion { get; set; }
+        public bool IceField { get; set; }
         public void SetNameRegex()
         {
             string str = "";

@@ -489,7 +489,7 @@ namespace Quesadilla
             }
 
             bool refreshProcessList = false;
-            if (++TickCounts["RefreshProcesses"] > Program.MainConfiguration.HowManyTicksRefreshProcesses && CombatAdded)
+            if (++TickCounts["RefreshProcesses"] > Program.MainConfiguration.HowManyTicksRefreshProcesses)
             {
                 refreshProcessList = true;
                 TickCounts["RefreshProcesses"] = 0;
@@ -990,6 +990,7 @@ namespace Quesadilla
                 if (!DotlanProcessor.RegionsToCheck.Contains(region))
                 {
                     DotlanProcessor.RegionsToCheck.Add(region);
+                    DotlanProcessor.RunWorkerIfPossible();
                 }
 
                 CheckEveScoutConnection(c);
@@ -2032,14 +2033,16 @@ namespace Quesadilla
             // if update is map data
             if (!e.MapContent.IsNullOrEmpty())
             {
+                Log.Information($"Processing dotlan map data for {e.RegionName}");
                 XmlDocument xmldoc = new XmlDocument
                 {
                     XmlResolver = null
                 };
                 XmlNodeList dotlanXYNodes = null;
-                XmlNodeList dotlanDEFNodes = null;
+                XmlNodeList dotlanIncursionNodes = null;
                 xmldoc.LoadXml(e.MapContent);
                 dotlanXYNodes = xmldoc.SelectNodes(@"//*[@id='sysuse']/*");
+                dotlanIncursionNodes = xmldoc.SelectNodes(@"//*[@id='glow']/*");
 
                 double dotlanX = 0;
                 double dotlanY = 0;
@@ -2051,17 +2054,33 @@ namespace Quesadilla
                     float y = float.Parse(xn.Attributes["y"].Value);
 
                     string link = xn.Attributes["xlink:href"].Value.Replace("#", "");
-                    dotlanDEFNodes = xmldoc.SelectNodes($@"//*[@id='{link}']/*");
+                    XmlNode dotlanDEFNodes = xmldoc.SelectSingleNode($@"//*[@id='{link}']/*");
 
                     var s = Program.Universe.SolarSystems[(int)systemID];
                     s.DotlanX = x;
                     s.DotlanY = y;
+
+                    s.IceField = false;
+                    XmlNodeList iceFieldNode = xmldoc.SelectNodes($@"//*[@id='{link}']/*[@id='{link.Replace("def","ice")}']");
+                    if ( iceFieldNode  != null )
+                    {
+                        s.IceField = true;
+                    }
+
+                    // default to no incursion
+                    s.Incursion = false;
+                    XmlNode incursionNode = xmldoc.SelectSingleNode($@"//*[@id='glow']/*[@id='{link.Replace("def","inc")}']");
+                    if (incursionNode != null)
+                    {
+                        s.Incursion = true;
+                    }
                 }
             }
 
             // if update is delta data 
             if (! e.DeltaContent.IsNullOrEmpty())
             {
+                Log.Information($"Processing dotlan delta data for {e.RegionName}");
                 Dictionary<string, string> killdDeltadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(e.DeltaContent);
                 foreach (var kvp in killdDeltadata)
                 {
@@ -2198,6 +2217,7 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapZKillColour,
                     Program.MainConfiguration.MinimapIntelColour,
                     Program.MainConfiguration.MinimapAltPositionColour,
+                    Program.MainConfiguration.MinimapIncursionColour,
                     minimapAnimationflag
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
