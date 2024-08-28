@@ -64,7 +64,9 @@ namespace Quesadilla.Classes
             Color AltColour,
             Color IncursionColour,
             Color IceColour,
-            int animationCycle,
+            int animationCycleIntel,
+            int animationCycleKills,
+            int animationCycleAlts,
             bool defaultTextSize = false
             )
         {
@@ -312,7 +314,7 @@ namespace Quesadilla.Classes
                     if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
                     {
                         var zkillPen = new Pen(ZKillColour);
-                        int zkillPulse = animationCycle;
+                        int zkillPulse = animationCycleKills;
                         g.DrawEllipse(zkillPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_KILL_GAP + zkillPulse), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_KILL_GAP + zkillPulse),
                             (CIRCLE_RADIUS + CIRCLE_KILL_GAP + zkillPulse) * 2, (CIRCLE_RADIUS + CIRCLE_KILL_GAP+ zkillPulse) * 2);
                         foreach (var k in currentSystem.solarSystem.Kills)
@@ -323,7 +325,7 @@ namespace Quesadilla.Classes
                     if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null).Count() > 0)
                     {
                         var intelPen = new Pen(IntelColour);
-                        int intelPulse = animationCycle;
+                        int intelPulse = animationCycleIntel;
                         g.DrawEllipse(intelPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP) + intelPulse), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP) + intelPulse), 
                             (CIRCLE_RADIUS + CIRCLE_ALERT_GAP + intelPulse) * 2, (CIRCLE_RADIUS + CIRCLE_ALERT_GAP + intelPulse) * 2);
                         foreach (var a in currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null))
@@ -336,7 +338,7 @@ namespace Quesadilla.Classes
                     if (Program.CharacterList.Where(o => o.IsClientActive && o.IsCurrentlActiveClient == false && o.LocationId == currentSystem.solarSystem.Id).Count() > 0)
                     {
                         var altPen = new Pen(AltColour);
-                        int altPulse = animationCycle;
+                        int altPulse = animationCycleAlts;
 /*
                         g.DrawEllipse(altPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP) + altPulse), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP) + altPulse),
                             (CIRCLE_RADIUS + CIRCLE_ALT_GAP + altPulse) * 2, (CIRCLE_RADIUS + CIRCLE_ALT_GAP + altPulse) * 2);

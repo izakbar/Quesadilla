@@ -477,7 +477,7 @@ img.rounded-corners {
         [ReadOnly(true)]
         [DisplayName("HowManyTicksMapAnimation")]
         [Description("How many ticks between animation of map")]
-        [DefaultValue(typeof(int), "3")]
+        [DefaultValue(typeof(int), "2")]
         public int HowManyTicksMapAnimation { get; set; }
 
         [Category("Main window")]

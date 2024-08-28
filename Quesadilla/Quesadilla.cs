@@ -44,6 +44,7 @@ using System.Xml;
 using Windows.ApplicationModel.VoiceCommands;
 using static Quesadilla.Classes.Processes.ProcessMonitor;
 using static Quesadilla.Extensions.StringExtensions;
+using static System.Windows.Forms.AxHost;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Quesadilla
@@ -162,9 +163,9 @@ namespace Quesadilla
         private int ActivityLineInc = 1;
         private int ActivityLineMax = 1;
 
-        private int minimapAnimationflag = 0;
-        private int minimapAnimationDirection = 1;
-        private int maxMinimapAnimationValue = 4;
+        AnimationState AnimationStateKills;
+        AnimationState AnimationStateIntel;
+        AnimationState AnimationStateAlts;
 
         public Quesadilla()
         {
@@ -204,6 +205,11 @@ namespace Quesadilla
             TickCounts["LogfileCheck"] = 0;
             TickCounts["RefreshProcesses"] = 0;
             TickCounts["AnimationRefresh"] = 0;
+
+            AnimationStateKills = new AnimationState(state:0, direction:1, maximum:5);
+            AnimationStateIntel = new AnimationState(state:0, direction:1, maximum:4); 
+            AnimationStateAlts = new AnimationState(state:0, direction:1, maximum:3);
+
 
             menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
@@ -519,18 +525,9 @@ namespace Quesadilla
 
             if (++TickCounts["AnimationRefresh"] > Program.MainConfiguration.HowManyTicksMapAnimation)
             {
-                minimapAnimationflag += minimapAnimationDirection;
-
-                if (minimapAnimationDirection > 0 && (minimapAnimationflag > maxMinimapAnimationValue))
-                {
-                    minimapAnimationflag = maxMinimapAnimationValue - 1;
-                    minimapAnimationDirection = -1;
-                }
-                if (minimapAnimationDirection < 0 && (minimapAnimationflag < 0))
-                {
-                    minimapAnimationflag = 1;
-                    minimapAnimationDirection = 1;
-                }
+                AnimationStateKills.Advance();
+                AnimationStateIntel.Advance();
+                AnimationStateAlts.Advance();
 
                 UpdateMinimap();
                 TickCounts["AnimationRefresh"] = 0;
@@ -2224,7 +2221,9 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapAltPositionColour,
                     Program.MainConfiguration.MinimapIncursionColour,
                     Program.MainConfiguration.MinimapIceColour,
-                    minimapAnimationflag,
+                    AnimationStateIntel.Value(),
+                    AnimationStateKills.Value(),
+                    AnimationStateAlts.Value(),
                     false
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);

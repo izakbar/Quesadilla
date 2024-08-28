@@ -89,6 +89,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\AnimationState.cs" />
     <Compile Include="Classes\Attributes\IsColourAttribute.cs" />
     <Compile Include="Classes\CombatGraphData.cs" />
     <Compile Include="Classes\ESIData\ESIRequest.cs" />
