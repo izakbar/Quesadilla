@@ -246,7 +246,7 @@ namespace Quesadilla
             Program.ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(this.ESI_ProcessNewData);
 
             ActivityLineInc = 1;
-            ActivityLineMax = Program.MainConfiguration.HeartBeatIndicatorWorkingText.Length-1;
+            ActivityLineMax = Program.MainConfiguration.HeartBeatIndicatorWorkingText.Length - 1;
 
             // get processes
             UpdateEveProcesses(true);
@@ -295,7 +295,7 @@ namespace Quesadilla
                     first = !first;
                     trayIcon.Text = TrayString;
                 }
-                MenuItem menuAlert = new MenuItem(menuText, trayIconMenuShowHistoricAlert){ Tag = alert};
+                MenuItem menuAlert = new MenuItem(menuText, trayIconMenuShowHistoricAlert) { Tag = alert };
                 menuLatestAlerts.MenuItems.Add(menuAlert);
             }
         }
@@ -335,7 +335,7 @@ namespace Quesadilla
             lblSystemName.ForeColor = Program.MainConfiguration.MainWindowMouseoverSystemColour;
 
             pMinimapImage.Height = Program.MainConfiguration.MinimapHeight;
-            pMinimapImage.Width = (int)((double)Program.MainConfiguration.MinimapHeight*1.3);
+            pMinimapImage.Width = (int)((double)Program.MainConfiguration.MinimapHeight * 1.3);
 
             working.Visible = Program.MainConfiguration.HeartBeatIndicatorVisible;
             working.ForeColor = Program.MainConfiguration.HeartBeatIndicatorColour;
@@ -374,6 +374,9 @@ namespace Quesadilla
         }
         private void Quesadilla_Load(object sender, EventArgs e)
         {
+            DoubleBuffered = true;
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+
             lblCurrentClient.Text = "";
             lblISK.Text = "";
             lblAlertsOutstanding.Text = "";
@@ -518,9 +521,9 @@ namespace Quesadilla
             {
                 minimapAnimationflag += minimapAnimationDirection;
 
-                if (minimapAnimationDirection > 0 && (minimapAnimationflag > maxMinimapAnimationValue) )
+                if (minimapAnimationDirection > 0 && (minimapAnimationflag > maxMinimapAnimationValue))
                 {
-                    minimapAnimationflag = maxMinimapAnimationValue-1;
+                    minimapAnimationflag = maxMinimapAnimationValue - 1;
                     minimapAnimationDirection = -1;
                 }
                 if (minimapAnimationDirection < 0 && (minimapAnimationflag < 0))
@@ -534,7 +537,7 @@ namespace Quesadilla
             }
         }
 
-            private bool checkJumpsRange(AlertConfig alert, PathInfo path)
+        private bool checkJumpsRange(AlertConfig alert, PathInfo path)
         {
             bool checkJumpsRangeComparison(int jumps, AlertConfigJumpsComparison comparison, int? comparisonNumber)
             {
@@ -748,16 +751,16 @@ namespace Quesadilla
                                         alertText = generateAlertText(entry, path, alert, "", 0, "");
                                         Log.Debug("ALERT - " + alertText);
                                         insertedAlert = new AlertQueueItem()
-                                            {
-                                                AlertText = alertText,
-                                                MenuText = generateAlertText(entry, path, alert, "", 1, ""),
-                                                Entry = entry,
-                                                Path = path,
-                                                Context = path.FromSystemName,
-                                                SoundFile = alert.SoundFile,
-                                                FriendlyName = alert.FriendlyName,
-                                                ShowAlert = true,
-                                            };
+                                        {
+                                            AlertText = alertText,
+                                            MenuText = generateAlertText(entry, path, alert, "", 1, ""),
+                                            Entry = entry,
+                                            Path = path,
+                                            Context = path.FromSystemName,
+                                            SoundFile = alert.SoundFile,
+                                            FriendlyName = alert.FriendlyName,
+                                            ShowAlert = true,
+                                        };
                                         Program.EnqueueNewAlert(insertedAlert, Program.NewAlerts);
                                         alertCount++;
                                     }
@@ -847,16 +850,16 @@ namespace Quesadilla
                                             alertText = generateAlertText(entry, path, alert, alert.TriggerText, 0, alert.TriggerText);
                                             Log.Debug("ALERT - " + alertText);
                                             insertedAlert = new AlertQueueItem()
-                                                {
-                                                    AlertText = alertText,
-                                                    MenuText = generateAlertText(entry, path, alert, alert.TriggerText, 1, alert.TriggerText),
-                                                    Entry = entry,
-                                                    Path = path,
-                                                    Context = alert.TriggerText,
-                                                    SoundFile = alert.SoundFile,
-                                                    FriendlyName = alert.FriendlyName,
-                                                    ShowAlert = true,
-                                                };
+                                            {
+                                                AlertText = alertText,
+                                                MenuText = generateAlertText(entry, path, alert, alert.TriggerText, 1, alert.TriggerText),
+                                                Entry = entry,
+                                                Path = path,
+                                                Context = alert.TriggerText,
+                                                SoundFile = alert.SoundFile,
+                                                FriendlyName = alert.FriendlyName,
+                                                ShowAlert = true,
+                                            };
                                             Program.EnqueueNewAlert(insertedAlert, Program.NewAlerts);
 
                                             alertCount++;
@@ -871,7 +874,7 @@ namespace Quesadilla
                     int systemId1 = -1;
                     foreach (int systemId2 in intSet)
                     {
-                        if ( insertedAlert == null)
+                        if (insertedAlert == null)
                         {
                             insertedAlert = new AlertQueueItem()
                             {
@@ -1726,7 +1729,7 @@ namespace Quesadilla
 
         private void ESI_ProcessNewData(object sender, ESIEventArgs e)
         {
-            if ( e.RequestType == ESIRequestType.System)
+            if (e.RequestType == ESIRequestType.System)
             {
                 try
                 {
@@ -1744,9 +1747,9 @@ namespace Quesadilla
             string systemName = "---";
             string regionName = "---";
 
-        ConcurrentQueue<AlertQueueItem> ZKillAlerts = new ConcurrentQueue<AlertQueueItem>();
+            ConcurrentQueue<AlertQueueItem> ZKillAlerts = new ConcurrentQueue<AlertQueueItem>();
 
-        var victimShipName = Program.Universe.ItemTypes.ContainsKey((int)e.Kill.VictimShipTypeId) ? Program.Universe.ItemTypes[(int)e.Kill.VictimShipTypeId].Name : "Unknown:" + e.Kill.VictimShipTypeId.ToString();
+            var victimShipName = Program.Universe.ItemTypes.ContainsKey((int)e.Kill.VictimShipTypeId) ? Program.Universe.ItemTypes[(int)e.Kill.VictimShipTypeId].Name : "Unknown:" + e.Kill.VictimShipTypeId.ToString();
             e.Kill.VictimShipName = victimShipName;
 
             if (Program.Universe.SolarSystems.ContainsKey((int)e.Kill.SolarSystemId))
@@ -1804,7 +1807,7 @@ namespace Quesadilla
                         sendAlert = checkJumpsRange(alert, path);
                         if (sendAlert)
                         {
-                            alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText,"");
+                            alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText, "");
                             Log.Information("ALERT - " + alertText);
                             e.Kill.Alert = true;
                             Program.EnqueueNewAlert(
@@ -1870,7 +1873,7 @@ namespace Quesadilla
                                         new AlertQueueItem()
                                         {
                                             AlertText = alertText,
-                                            MenuText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillMenuText, x.CharacterName), 
+                                            MenuText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillMenuText, x.CharacterName),
                                             Kill = e.Kill,
                                             Path = path,
                                             Context = x.CharacterName,
@@ -1925,14 +1928,14 @@ namespace Quesadilla
                         break;
                 }
 
-                if ( ZKillAlerts.Count > 0 )
+                if (ZKillAlerts.Count > 0)
                 {
                     // Add new alert(s) to NewAlerts
-                    while (ZKillAlerts.Count > 0 )
+                    while (ZKillAlerts.Count > 0)
                     {
                         AlertQueueItem item = null;
                         ZKillAlerts.TryDequeue(out item);
-                        if ( item != null )
+                        if (item != null)
                         {
                             Program.EnqueueNewAlert(item, Program.NewAlerts);
                         }
@@ -1957,7 +1960,7 @@ namespace Quesadilla
                         status.Append(" (");
                         status.Append(c.ClosestTheraPath.TotalJumps);
                         status.Append(") - Sig:");
-                        status.Append((c.ClosestThera.FromSystemId == c.ClosestTheraPath.ToSystemId) ? c.ClosestThera.FromSignature : c.ClosestThera.ToSignature );
+                        status.Append((c.ClosestThera.FromSystemId == c.ClosestTheraPath.ToSystemId) ? c.ClosestThera.FromSignature : c.ClosestThera.ToSignature);
                     }
 
                     if (c.ClosestTurnur != null)
@@ -1970,7 +1973,8 @@ namespace Quesadilla
                         status.Append((c.ClosestTurnur.FromSystemId == c.ClosestTurnurPath.ToSystemId) ? c.ClosestTurnur.FromSignature : c.ClosestTurnur.ToSignature);
                     }
                 }
-            } else
+            }
+            else
             {
                 status.Append("No active Character");
             }
@@ -1984,7 +1988,7 @@ namespace Quesadilla
             if (c == null || c.LocationId == 0) return;
 
             var ClosestThera = EveScoutProcessor.FindClosest(Program.Universe, c.LocationId, "Thera");
-                                                                         
+
             var ClosestTurnur = EveScoutProcessor.FindClosest(Program.Universe, c.LocationId, "Turnur");
             PathInfo closePath;
 
@@ -2061,15 +2065,15 @@ namespace Quesadilla
                     s.DotlanY = y;
 
                     s.IceField = false;
-                    XmlNodeList iceFieldNode = xmldoc.SelectNodes($@"//*[@id='{link}']/*[@id='{link.Replace("def","ice")}']");
-                    if ( iceFieldNode  != null )
+                    XmlNodeList iceFieldNode = xmldoc.SelectNodes($@"//*[@id='{link}']/*[@id='{link.Replace("def", "ice")}']");
+                    if (iceFieldNode != null)
                     {
                         s.IceField = true;
                     }
 
                     // default to no incursion
                     s.Incursion = false;
-                    XmlNode incursionNode = xmldoc.SelectSingleNode($@"//*[@id='glow']/*[@id='{link.Replace("def","inc")}']");
+                    XmlNode incursionNode = xmldoc.SelectSingleNode($@"//*[@id='glow']/*[@id='{link.Replace("def", "inc")}']");
                     if (incursionNode != null)
                     {
                         s.Incursion = true;
@@ -2078,7 +2082,7 @@ namespace Quesadilla
             }
 
             // if update is delta data 
-            if (! e.DeltaContent.IsNullOrEmpty())
+            if (!e.DeltaContent.IsNullOrEmpty())
             {
                 Log.Information($"Processing dotlan delta data for {e.RegionName}");
                 Dictionary<string, string> killdDeltadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(e.DeltaContent);
@@ -2159,8 +2163,8 @@ namespace Quesadilla
                                 CurrentMouseOver = false,
                                 Planets = string.Join(",",
                                     Program.Universe.SolarSystems[c.LocationId].Planets
-                                    .Where( o => o.PlanetTypeName == $"Planet {p.type}")
-                                    .Select( o => o.PlanetName.Substring(o.PlanetName.LastIndexOf(' ') + 1))
+                                    .Where(o => o.PlanetTypeName == $"Planet {p.type}")
+                                    .Select(o => o.PlanetName.Substring(o.PlanetName.LastIndexOf(' ') + 1))
                                     .ToList()),
                             });
                         }
@@ -2176,10 +2180,11 @@ namespace Quesadilla
         {
             shouldUpdateMinimap = false;
 
-            if (CurrentActiveToon.IsNullOrEmpty() ) {
+            if (CurrentActiveToon.IsNullOrEmpty())
+            {
                 pMinimapImage.Visible = false;
                 this.Invalidate();
-                return; 
+                return;
             }
 
             UpdateISK();
@@ -2218,7 +2223,8 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapIntelColour,
                     Program.MainConfiguration.MinimapAltPositionColour,
                     Program.MainConfiguration.MinimapIncursionColour,
-                    minimapAnimationflag
+                    minimapAnimationflag,
+                    false
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
@@ -2248,24 +2254,23 @@ namespace Quesadilla
             ImageGenerator.PaintDrawText(e, lblISK);
             ImageGenerator.PaintDrawText(e, lblAlertsOutstanding);
 
-            if (pMinimapImage.Visible) {
-                if ( Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, lblEtxraInformation);
+            if (pMinimapImage.Visible)
+            {
+                if (Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, lblEtxraInformation);
                 if (mouseOverMinimapSystems.Count() > 0)
                 {
                     lblSystemName.Text = "";
-                    foreach(var m in mouseOverMinimapSystems)
+                    foreach (var m in mouseOverMinimapSystems)
                     {
-                        ImageGenerator.DrawSystemName(e.Graphics, m.X+pMinimapImage.Left, m.Y+pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.MinimapMouseoverSystemColour);
                         if (!lblSystemName.Text.IsNullOrEmpty()) lblSystemName.Text += ",";
-                        lblSystemName.Text += m.solarSystem.Name + ( m.solarSystem.NPCKillsDeltaLastHour == null ? "" : $"  {m.solarSystem.NPCKillsDeltaLastHour}");
+                        lblSystemName.Text += m.solarSystem.Name + (m.solarSystem.NPCKillsDeltaLastHour == null ? "" : $"  {m.solarSystem.NPCKillsDeltaLastHour}");
                     }
-
                     ImageGenerator.PaintDrawText(e, lblSystemName);
                 }
             }
 
             // draw red dot
-            if ( InCombat )
+            if (InCombat)
             {
                 int combatTop = 0;
                 int combatLeft = 0;
@@ -2296,7 +2301,7 @@ namespace Quesadilla
                     {
                         if (Program.Universe.SolarSystems[c.LocationId].Planets != null)
                         {
-                            if ( CurrentPlanetInfos.Count() == 0 )
+                            if (CurrentPlanetInfos.Count() == 0)
                             {
                                 UpdatePlanetInfo();
                             }
@@ -2316,7 +2321,7 @@ namespace Quesadilla
                             {
                                 Brush systemBrush;
                                 Color dotColour = Color.Red;
-                                switch ( p.type)
+                                switch (p.type)
                                 {
                                     case "(Storm)": dotColour = Program.MainConfiguration.PlanetInfoStormColour; break;
                                     case "(Barren)": dotColour = Program.MainConfiguration.PlanetInfoBarrenColour; break;
@@ -2337,12 +2342,13 @@ namespace Quesadilla
 
                                 currentX += (Program.MainConfiguration.PlanetInfoViewSize);
                                 Font font = new Font("Verdana", Program.MainConfiguration.PlanetInfoFontSize, FontStyle.Regular);
-                                Size size = ImageGenerator.PaintDrawText(e, p.Count.ToString(), currentX, currentY- (Program.MainConfiguration.PlanetInfoViewSize), dotColour, font);
-                                currentX += size.Width +(Program.MainConfiguration.PlanetInfoViewSize);
+                                Size size = ImageGenerator.PaintDrawText(e, p.Count.ToString(), currentX, currentY - (Program.MainConfiguration.PlanetInfoViewSize), dotColour, font);
+                                currentX += size.Width + (Program.MainConfiguration.PlanetInfoViewSize);
 
                             }
 
-                            foreach(var mouseOverPlanet in CurrentPlanetInfos.Where(o => o.CurrentMouseOver)) {
+                            foreach (var mouseOverPlanet in CurrentPlanetInfos.Where(o => o.CurrentMouseOver))
+                            {
                                 Color fontColour = Color.Red;
                                 switch (mouseOverPlanet.PlanetType)
                                 {
@@ -2357,14 +2363,15 @@ namespace Quesadilla
                                     default: fontColour = Color.Red; break;
                                 }
                                 Font font = new Font("Verdana", Program.MainConfiguration.PlanetInfoFontSize, FontStyle.Regular);
-                                Size size = ImageGenerator.PaintDrawText(e, mouseOverPlanet.PlanetType + " " + mouseOverPlanet.Planets, 
-                                    mouseOverPlanet.X - (Program.MainConfiguration.PlanetInfoViewSize) , 
-                                    mouseOverPlanet.Y - ((Program.MainConfiguration.PlanetInfoViewSize*2) + Program.MainConfiguration.PlanetInfoFontSize),
+                                Size size = ImageGenerator.PaintDrawText(e, mouseOverPlanet.PlanetType + " " + mouseOverPlanet.Planets,
+                                    mouseOverPlanet.X - (Program.MainConfiguration.PlanetInfoViewSize),
+                                    mouseOverPlanet.Y - ((Program.MainConfiguration.PlanetInfoViewSize * 2) + Program.MainConfiguration.PlanetInfoFontSize),
                                     fontColour, font);
                             };
                         }
                     }
-                    catch (Exception ex) {
+                    catch (Exception ex)
+                    {
                     }
                 }
             }
@@ -2403,9 +2410,9 @@ namespace Quesadilla
         private void pMinimapImage_MouseMove(object sender, MouseEventArgs e)
         {
             mouseOverMinimapSystems = Program.Universe.MouseOverSystem(e.X, e.Y, MinimapSystems);
-            if (mouseOverMinimapSystems.Count() > 0 )
+            if (mouseOverMinimapSystems.Count() > 0)
             {
-                foreach(var s in mouseOverMinimapSystems)
+                foreach (var s in mouseOverMinimapSystems)
                 {
                     GetSystemInfo((int)s.solarSystem.Id);
                 }
@@ -2419,14 +2426,14 @@ namespace Quesadilla
         }
         private void ShowAlert(AlertQueueItem alert)
         {
-            if ( Program.MainConfiguration.ShowAlertFancyNotification) ShowAlertWindow(alert);
+            if (Program.MainConfiguration.ShowAlertFancyNotification) ShowAlertWindow(alert);
             if (Program.MainConfiguration.ShowAlertWindowsNotification) ShowAlertToast(alert);
         }
         private void ShowAlertWindow(AlertQueueItem alert)
         {
             // try to prevent new alert stealing focus
-            var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
             var ptr = Program.ProcessMonitorHandler.GetForegroundWindowHandle();
+            var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
             NewAlertWindow.Show(this);
             var ptr2 = Program.ProcessMonitorHandler.SetForegroundWindowHandle(ptr);
         }
@@ -2454,7 +2461,7 @@ namespace Quesadilla
                 t.AddText($"System: {alert.Path.ToSystemName} ({alert.Path.ToSystemRegionName})");
             }
 
-            if ( alert.Kill != null )
+            if (alert.Kill != null)
             {
                 t.AddButton(new ToastButton()
                     .SetContent($"View Zkill")
@@ -2502,7 +2509,7 @@ namespace Quesadilla
             else if (alert.Kill != null)
             {
                 t.AddHeader("zkill", "Zkill alert", "");
-                intelLine = alert.Kill.Context.Replace("\n"," - ");
+                intelLine = alert.Kill.Context.Replace("\n", " - ");
             }
             else
             {
@@ -2528,7 +2535,7 @@ namespace Quesadilla
                     (p.Y >= e.Y - Program.MainConfiguration.PlanetInfoViewSize && p.Y <= e.Y + Program.MainConfiguration.PlanetInfoViewSize))
                 {
                     p.CurrentMouseOver = true;
-                } 
+                }
                 else
                 {
                     p.CurrentMouseOver = false;
@@ -2538,6 +2545,21 @@ namespace Quesadilla
             if (WasMouseOver || IsMouseOver)
             {
                 this.Invalidate();
+            }
+        }
+
+        private void pMinimapImage_Paint(object sender, PaintEventArgs e)
+        {
+            if (pMinimapImage.Visible)
+            {
+                if (Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, lblEtxraInformation);
+                if (mouseOverMinimapSystems.Count() > 0)
+                {
+                    foreach (var m in mouseOverMinimapSystems)
+                    {
+                        ImageGenerator.DrawSystemName(e.Graphics, m.X + pMinimapImage.Left, m.Y + pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.MinimapMouseoverSystemColour, 10);
+                    }
+                }
             }
         }
     }

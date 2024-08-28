@@ -135,6 +135,7 @@
             this.pMinimapImage.TabIndex = 10;
             this.pMinimapImage.TabStop = false;
             this.pMinimapImage.Click += new System.EventHandler(this.pMinimapImage_Click);
+            this.pMinimapImage.Paint += new System.Windows.Forms.PaintEventHandler(this.pMinimapImage_Paint);
             this.pMinimapImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pMinimapImage_MouseMove);
             // 
             // lblAlertsOutstanding

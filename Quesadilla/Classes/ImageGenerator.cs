@@ -33,6 +33,9 @@ namespace Quesadilla.Classes
 
         public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c, float textSize = DEFAULT_TEXT_SIZE )
         {
+            // ensure we do not go too small
+            if (textSize < DEFAULT_TEXT_SIZE || float.IsInfinity(textSize) ) textSize = DEFAULT_TEXT_SIZE;
+
             using (Font myfont = new Font("Verdana", textSize, FontStyle.Regular))
             {
                 g.TextRenderingHint = TextRenderingHint.AntiAlias;
@@ -59,7 +62,8 @@ namespace Quesadilla.Classes
             Color IntelColour,
             Color AltColour,
             Color IncursionColour,
-            int animationCycle
+            int animationCycle,
+            bool defaultTextSize = false
             )
         {
 
@@ -338,7 +342,8 @@ namespace Quesadilla.Classes
                     {
                         if (!currentSystem.textDisplay) continue;
                         Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-                        float textSize = (TEXT_SIZE / (float)GUI_SCALING);
+                        float textSize = defaultTextSize == false ? (TEXT_SIZE / (float)GUI_SCALING) : DEFAULT_TEXT_SIZE;
+                        if ( textSize < DEFAULT_TEXT_SIZE ) textSize = DEFAULT_TEXT_SIZE;
 
                         DrawSystemName(g, currentPoint.X, currentPoint.Y, currentSystem.solarSystem.Name, SystemColourText, textSize);
                     }

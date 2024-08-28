@@ -65,6 +65,15 @@ namespace QuesadillaExport
                     }
                 }
 
+                bool IceField = false;
+
+                XmlNodeList iceFieldNode = xmldoc.SelectNodes($@"//*[@id='def{solarSystem.solarSystemId}']/*[@id='ice{solarSystem.solarSystemId}']");
+                if (iceFieldNode != null)
+                {
+                    IceField = true;
+                }
+
+
                 SolarSystems.Add(solarSystem.solarSystemId,
                 new SolarSystem()
                 {
@@ -76,6 +85,7 @@ namespace QuesadillaExport
                     DotlanX = dotlanX,
                     DotlanY = dotlanY,
                     Id = solarSystem.solarSystemId,
+                    Incursion = false,
                     ConnectedTo = new List<SolarSystemConnectionData>(),
                 }
             );
