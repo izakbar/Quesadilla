@@ -19,7 +19,8 @@ namespace Quesadilla.Classes
     {
         private const int TRANSPARENT_BORDER_WIDTH = 1;
         private const int BORDER_WIDTH = 1;
-        private const int TEXT_SIZE = 8;
+        private const int TEXT_SIZE = 20;
+        private const float DEFAULT_TEXT_SIZE = 8;
         private const int CIRCLE_KILL_GAP = 4;
         private const int CIRCLE_ALERT_GAP = 6;
         private const int CIRCLE_ALT_GAP = 2;
@@ -30,9 +31,9 @@ namespace Quesadilla.Classes
         private const int INCURSION_CLOUD_SIZE = 60;
         private const int SYSTEM_CIRCLE_SIZE = 6;
 
-        public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c)
+        public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c, float textSize = DEFAULT_TEXT_SIZE )
         {
-            using (Font myfont = new Font("Verdana", TEXT_SIZE, FontStyle.Regular))
+            using (Font myfont = new Font("Verdana", textSize, FontStyle.Regular))
             {
                 g.TextRenderingHint = TextRenderingHint.AntiAlias;
 
@@ -336,10 +337,10 @@ namespace Quesadilla.Classes
                     foreach (var currentSystem in minimapSystems)
                     {
                         if (!currentSystem.textDisplay) continue;
-
                         Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+                        float textSize = (TEXT_SIZE / (float)GUI_SCALING);
 
-                        DrawSystemName(g, currentPoint.X, currentPoint.Y, currentSystem.solarSystem.Name, SystemColourText);
+                        DrawSystemName(g, currentPoint.X, currentPoint.Y, currentSystem.solarSystem.Name, SystemColourText, textSize);
                     }
                 }
 
