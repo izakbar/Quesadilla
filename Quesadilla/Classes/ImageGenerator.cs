@@ -12,6 +12,7 @@ using System.Diagnostics.Metrics;
 using System.ComponentModel;
 using System.Data;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Quesadilla.Classes
 {
@@ -62,6 +63,7 @@ namespace Quesadilla.Classes
             Color IntelColour,
             Color AltColour,
             Color IncursionColour,
+            Color IceColour,
             int animationCycle,
             bool defaultTextSize = false
             )
@@ -265,6 +267,9 @@ namespace Quesadilla.Classes
                 // adjust origin
                 Point originPoint = new Point(ox, oy);
 
+                float textSize = defaultTextSize == false ? (TEXT_SIZE / (float)GUI_SCALING) : DEFAULT_TEXT_SIZE;
+                if (textSize < DEFAULT_TEXT_SIZE) textSize = DEFAULT_TEXT_SIZE;
+
                 // draw incursion base if required
                 foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Incursion))
                 {
@@ -297,6 +302,12 @@ namespace Quesadilla.Classes
                     Brush systemBrush = new SolidBrush(systemBrushColour);
                     // g.FillEllipse(systemBrush, currentPoint.X - CIRCLE_RADIUS, currentPoint.Y - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
                     g.FillEllipse(systemBrush, currentPoint.X - blobSize, currentPoint.Y - blobSize, blobSize * 2, blobSize * 2);
+
+                    // do we have ice !
+                    if ( currentSystem.solarSystem.IceField == true )
+                    {
+                        DrawSystemName(g, currentPoint.X, currentPoint.Y, "*", IceColour, textSize);
+                    }
 
                     if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
                     {
@@ -342,9 +353,6 @@ namespace Quesadilla.Classes
                     {
                         if (!currentSystem.textDisplay) continue;
                         Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-                        float textSize = defaultTextSize == false ? (TEXT_SIZE / (float)GUI_SCALING) : DEFAULT_TEXT_SIZE;
-                        if ( textSize < DEFAULT_TEXT_SIZE ) textSize = DEFAULT_TEXT_SIZE;
-
                         DrawSystemName(g, currentPoint.X, currentPoint.Y, currentSystem.solarSystem.Name, SystemColourText, textSize);
                     }
                 }

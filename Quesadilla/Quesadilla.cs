@@ -2065,8 +2065,8 @@ namespace Quesadilla
                     s.DotlanY = y;
 
                     s.IceField = false;
-                    XmlNodeList iceFieldNode = xmldoc.SelectNodes($@"//*[@id='{link}']/*[@id='{link.Replace("def", "ice")}']");
-                    if (iceFieldNode != null)
+                    XmlNodeList iceFieldNode = xmldoc.SelectNodes($@"//*[@id='{link}']/*/*[@id='{link.Replace("def", "ice")}']");
+                    if (iceFieldNode != null && iceFieldNode.Count > 0)
                     {
                         s.IceField = true;
                     }
@@ -2223,6 +2223,7 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapIntelColour,
                     Program.MainConfiguration.MinimapAltPositionColour,
                     Program.MainConfiguration.MinimapIncursionColour,
+                    Program.MainConfiguration.MinimapIceColour,
                     minimapAnimationflag,
                     false
                     );
@@ -2291,6 +2292,7 @@ namespace Quesadilla
                 Brush systemBrush = new SolidBrush(Color.Red);
                 e.Graphics.FillEllipse(systemBrush, combatLeft - CIRCLE_RADIUS, combatTop - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
             }
+
 
             if (Program.MainConfiguration.ShowPlanetInformation && CurrentActiveToon != null && CurrentActiveToon != "")
             {

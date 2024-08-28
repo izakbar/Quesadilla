@@ -175,6 +175,7 @@ namespace Quesadilla
                     configuration.AlertPopupMinimapIntelColour,
                     configuration.AlertPopupMinimapAltPositionColour,
                     configuration.AlertPopupMinimapIncursionColour,
+                    configuration.AlertPopupMinimapIceColour,
                     0,
                     true
                     );
