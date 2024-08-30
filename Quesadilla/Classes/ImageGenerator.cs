@@ -22,8 +22,8 @@ namespace Quesadilla.Classes
         private const int TRANSPARENT_BORDER_WIDTH = 1;
         private const int BORDER_WIDTH = 1;
         private const int TEXT_SIZE = 20;
-        private const int CIRCLE_KILL_GAP = 9;
-        private const int CIRCLE_ALERT_GAP = 6;
+        private const int CIRCLE_KILL_GAP = 22;
+        private const int CIRCLE_ALERT_GAP = 12;
         private const int CIRCLE_ALT_GAP = 2;
 
         private const double LY_SCALING = 9460000000000;

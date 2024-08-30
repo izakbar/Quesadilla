@@ -208,7 +208,7 @@ namespace Quesadilla
 
             AnimationStateKills = new AnimationState(state:0, direction:-1, maximum:12, pulse:false);
             AnimationStateIntel = new AnimationState(state:1, direction:1, maximum:18, pulse:false); 
-            AnimationStateAlts = new AnimationState(state:2, direction:1, maximum:36, pulse:false);
+            AnimationStateAlts = new AnimationState(state:2, direction:-1, maximum:36, pulse:false);
 
             menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
