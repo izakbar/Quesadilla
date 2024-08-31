@@ -22,9 +22,9 @@ namespace Quesadilla.Classes
         private const int TRANSPARENT_BORDER_WIDTH = 1;
         private const int BORDER_WIDTH = 1;
         private const int TEXT_SIZE = 20;
-        private const int CIRCLE_KILL_GAP = 22;
-        private const int CIRCLE_ALERT_GAP = 12;
-        private const int CIRCLE_ALT_GAP = 2;
+ 
+        private const int CIRCLE_INITIAL_GAP = 3;
+        private const int CIRCLE_INCREASE_GAP = 7;
 
         private const double LY_SCALING = 9460000000000;
 
@@ -34,7 +34,7 @@ namespace Quesadilla.Classes
 
         private const float MINIMUM_TEXT_SIZE = 10;
         private const int MINIMUM_BLOB_SIZE = 3;
-        private const int MINIMUM_CIRCLE_SIZE = 4;
+        private const int MINIMUM_CIRCLE_SIZE = 3;
         private const int MINIMUM_CIRCLE_MULTIPLER = 3;
 
         public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c, float textSize = MINIMUM_TEXT_SIZE )
@@ -235,7 +235,7 @@ namespace Quesadilla.Classes
                     minY = Math.Min(minY, currentSystem.Y);
                 }
                 int maxSize = Math.Max((int)(maxX - minX), (int)(maxY - minY));
-                int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (CIRCLE_ALERT_GAP * 4);
+                int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (8);
                 GUI_SCALING = (int)Math.Round((double)(maxSize) / ((pictureSize * (rawXY ? .8 : .8))));
                 GUI_SCALING = GUI_SCALING * (((double)mapScale / 100));
                 // Apply scale
@@ -299,6 +299,8 @@ namespace Quesadilla.Classes
                 // draw system blobs
                 foreach (var currentSystem in minimapSystems)
                 {
+                    int circlesUsed = -1;
+
                     Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
                     float blobSize = (SYSTEM_CIRCLE_SIZE / (float)GUI_SCALING);
                     if ( blobSize < MINIMUM_BLOB_SIZE || float.IsInfinity(blobSize) )
@@ -322,7 +324,8 @@ namespace Quesadilla.Classes
                     if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
                     {
                         var circlePen = new Pen(ZKillColour,2);
-                        float circleSize = (CIRCLE_KILL_GAP / (float)GUI_SCALING);
+                        circlesUsed++;
+                        float circleSize = CIRCLE_INITIAL_GAP + (CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING;
                         if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize))
                         {
                             circleSize = MINIMUM_CIRCLE_SIZE + (MINIMUM_CIRCLE_MULTIPLER * 2);
@@ -357,7 +360,8 @@ namespace Quesadilla.Classes
                     if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null).Count() > 0)
                     {
                         var circlePen = new Pen(IntelColour,2);
-                        float circleSize = (CIRCLE_ALERT_GAP / (float)GUI_SCALING);
+                        circlesUsed++;
+                        float circleSize = CIRCLE_INITIAL_GAP + (CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING;
                         if ( circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize))
                         {
                             circleSize = MINIMUM_CIRCLE_SIZE + (MINIMUM_CIRCLE_MULTIPLER);
@@ -393,7 +397,8 @@ namespace Quesadilla.Classes
                     if (Program.CharacterList.Where(o => o.IsClientActive && o.IsCurrentlActiveClient == false && o.LocationId == currentSystem.solarSystem.Id).Count() > 0)
                     {
                         var circlePen = new Pen(AltColour,2);
-                        float circleSize = (CIRCLE_ALT_GAP / (float)GUI_SCALING);
+                        circlesUsed++;
+                        float circleSize = CIRCLE_INITIAL_GAP + (CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING;
                         if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize))
                         {
                             circleSize = MINIMUM_CIRCLE_SIZE; // MINIMUM_CIRCLE_MULTIPLER
