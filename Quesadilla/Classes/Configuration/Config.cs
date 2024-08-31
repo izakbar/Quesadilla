@@ -480,6 +480,13 @@ img.rounded-corners {
         [DefaultValue(typeof(int), "2")]
         public int HowManyTicksMapAnimation { get; set; }
 
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        [DisplayName("HowManyTicksBeforeSwitchISKPerHour")]
+        [Description("How many ticks between ISH/Hr and Total ISK/Hr")]
+        [DefaultValue(typeof(int), "20")]
+        public int HowManyTicksBeforeSwitchISKPerHour { get; set; }
+        
         [Category("Main window")]
         public Point InitialPosition { get; set; }
 
@@ -668,6 +675,12 @@ img.rounded-corners {
         public Color ISKColour { get; set; }
 
         [Category("Main window")]
+        [DisplayName("ISK/hr Total Colour")]
+        [Description("The colour to use for the total ISK/HR show on the main window")]
+        [DefaultValue(typeof(Color), "Orange")]
+        public Color ISKTotalColour { get; set; }
+
+        [Category("Main window")]
         [DisplayName("non-expired Alerts/Kills Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "LightPink")]
@@ -683,6 +696,12 @@ img.rounded-corners {
         [Description("The extra information display shows zkill and alert activity recently in systems on the current minimap view")]
         [DefaultValue(typeof(bool), "true")]
         public bool MainWindowShowExtraInformation { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Show total ISK per Hour")]
+        [Description("Show the total ISK per hour earned as well as per toon")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool ShowISKTotal { get; set; }
 
         [Category("Main window")]
         [DisplayName("Extra Information Colour")]

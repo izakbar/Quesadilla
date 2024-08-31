@@ -167,6 +167,8 @@ namespace Quesadilla
         AnimationState AnimationStateIntel;
         AnimationState AnimationStateAlts;
 
+        private bool ISKPerHourTotal = false;
+
         public Quesadilla()
         {
             splashScreenThread = new Thread(new ThreadStart(ShowSplashScreen));
@@ -205,6 +207,7 @@ namespace Quesadilla
             TickCounts["LogfileCheck"] = 0;
             TickCounts["RefreshProcesses"] = 0;
             TickCounts["AnimationRefresh"] = 0;
+            TickCounts["ISKPerHour"] = 0;
 
             AnimationStateKills = new AnimationState(state:0, direction:-1, maximum:36, pulse:false);
             AnimationStateIntel = new AnimationState(state:1, direction:1, maximum:18, pulse:false); 
@@ -331,7 +334,15 @@ namespace Quesadilla
             intelLog.ForeColor = Program.MainConfiguration.MainWindowLogTextColour;
             intelLog.BackColor = Program.MainConfiguration.MainWindowLogBackgroundColour;
 
-            lblISK.ForeColor = Program.MainConfiguration.ISKColour;
+            if (ISKPerHourTotal == true )
+            {
+                lblISK.ForeColor = Program.MainConfiguration.ISKTotalColour;
+            }
+            else
+            {
+                lblISK.ForeColor = Program.MainConfiguration.ISKColour;
+            }
+                
             lblAlertsOutstanding.ForeColor = Program.MainConfiguration.AlertsOutstandingColour;
             lblCurrentClient.ForeColor = Program.MainConfiguration.CurrentCharacterColour;
             lblStatus.ForeColor = Program.MainConfiguration.EvescoutColour;
@@ -453,6 +464,22 @@ namespace Quesadilla
 
                 TickCounts["SinceLastAlert"] = 0;
             }
+
+            if ( ++TickCounts["ISKPerHour"] > Program.MainConfiguration.HowManyTicksBeforeSwitchISKPerHour )
+            {
+                ISKPerHourTotal = !ISKPerHourTotal;
+                TickCounts["ISKPerHour"] = 0;
+
+                // if not configured - then reset to false;
+                if ( Program.MainConfiguration.ShowISKTotal == false )
+                {
+                    ISKPerHourTotal = false;
+                } else
+                {
+                    UpdateISK();
+                }
+            }
+
 
             // do cleardown/rebuild of alerts menu - if number of ticks passed
             if (++TickCounts["SinceLastCleardown"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
@@ -2389,16 +2416,25 @@ namespace Quesadilla
 
         private void UpdateISK()
         {
-            if (CurrentActiveToon != null && Program.ISK.ContainsKey(CurrentActiveToon))
+
+            if (ISKPerHourTotal == false)
             {
-                lblISK.Text = Program.GetIskLastHour(CurrentActiveToon);
-                this.Invalidate();
-                //lblISK.Visible = true;
-            }
-            else
+                if (CurrentActiveToon != null && Program.ISK.ContainsKey(CurrentActiveToon))
+                {
+                    lblISK.Text = Program.GetIskLastHour(CurrentActiveToon);
+                    lblISK.ForeColor = Program.MainConfiguration.ISKColour;
+                    this.Invalidate();
+                    //lblISK.Visible = true;
+                }
+                else
+                {
+                    //lblISK.Visible = false;
+                    lblISK.Text = "";
+                }
+            } else
             {
-                //lblISK.Visible = false;
-                lblISK.Text = "";
+                lblISK.Text = Program.GetIskLastHour("");
+                lblISK.ForeColor = Program.MainConfiguration.ISKTotalColour;
             }
         }
 
