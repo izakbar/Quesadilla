@@ -2508,6 +2508,24 @@ namespace Quesadilla
         private void UpdateMiningCSV()
         {
             var miningDetail = Program.GetMiningLastHourDetail("");
+            try
+            {
+                using (var writer = new StreamWriter("miningdata.csv"))
+                {
+                    writer.WriteLine("Character,MinedItem,Amount,Wastage");
+                    foreach (var m in miningDetail)
+                    {
+                        foreach (var md in m.Value)
+                        {
+                            writer.WriteLine($"{m.Key},{md.MiningItem},{md.MiningAmount},{md.WastageAmount}");
+                        }
+                    }
+                }
+            } 
+            catch (Exception ex)
+            {
+
+            }
 
         }
 
