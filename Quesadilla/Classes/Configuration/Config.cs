@@ -319,6 +319,83 @@ namespace Quesadilla.Classes
                 c.CSSData = new List<CSSData> { };
                 c.CSSData.Add(new CSSData()
                 {
+                    Name = "OBS.MiningTable",
+                    FriendlyName = "OBS Mining Table",
+                    CSS = @"
+.miningcontainer {
+  width: 100%;
+  position: relative;
+}
+.miningperhour {
+  border: 3px solid transparent;
+  border-radius: 15px;
+  outline: 2px solid Gold;
+
+  display: inline-block;
+  position: absolute;
+
+  color: green;
+  font-size: 24px;
+
+  margin: auto;
+}
+.miningTable {
+        display:  table;
+        width:auto;
+        background-color:#eee;
+        border:1px solid  #666666;
+        border-spacing:5px;/*cellspacing:poor IE support for  this*/
+       /* border-collapse:separate;*/
+}
+.miningRow {
+       display:table-row;
+       width:auto;
+ }
+
+.miningItem {
+        float:left;
+        display:table-column;
+        width:200px;
+ }
+.miningAmount {
+        float:left;
+        display:table-column;
+        width:100px;
+ }
+.miningWastage {
+        float:left;
+        display:table-column;
+        width:100px;
+        color: Red;
+ }
+",
+                });
+                c.CSSData.Add(new CSSData()
+                {
+                    Name = "OBS.Mining",
+                    FriendlyName = "OBS Mining Info",
+                    CSS = @"
+.miningcontainer {
+  width: 100%;
+  position: relative;
+}
+.miningperhour {
+  border: 3px solid transparent;
+  border-radius: 15px;
+  outline: 2px solid Gold;
+
+  display: inline-block;
+  position: absolute;
+
+  color: green;
+  font-size: 24px;
+
+  margin: auto;
+}
+",
+                });
+                c.CSSData.Add(new CSSData()
+                {
                     Name = "OBS.ISK",
                     FriendlyName = "OBS ISK Value",
                     CSS = @"
