@@ -42,6 +42,7 @@
             this.lblEtxraInformation = new System.Windows.Forms.Label();
             this.lblSystemName = new System.Windows.Forms.Label();
             this.working = new System.Windows.Forms.Label();
+            this.lblMining = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pMinimapImage)).BeginInit();
             this.SuspendLayout();
             // 
@@ -106,6 +107,7 @@
             // 
             // lblISK
             // 
+            this.lblISK.BackColor = System.Drawing.Color.Sienna;
             this.lblISK.ForeColor = System.Drawing.Color.ForestGreen;
             this.lblISK.Location = new System.Drawing.Point(442, 312);
             this.lblISK.Name = "lblISK";
@@ -183,12 +185,24 @@
             this.working.Text = "*";
             this.working.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // lblMining
+            // 
+            this.lblMining.BackColor = System.Drawing.Color.IndianRed;
+            this.lblMining.ForeColor = System.Drawing.Color.ForestGreen;
+            this.lblMining.Location = new System.Drawing.Point(442, 295);
+            this.lblMining.Name = "lblMining";
+            this.lblMining.Size = new System.Drawing.Size(268, 17);
+            this.lblMining.TabIndex = 16;
+            this.lblMining.Text = "999999";
+            this.lblMining.Visible = false;
+            // 
             // Quesadilla
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(957, 642);
+            this.Controls.Add(this.lblMining);
             this.Controls.Add(this.working);
             this.Controls.Add(this.lblSystemName);
             this.Controls.Add(this.lblEtxraInformation);
@@ -231,6 +245,7 @@
         private System.Windows.Forms.Label lblEtxraInformation;
         private System.Windows.Forms.Label lblSystemName;
         private System.Windows.Forms.Label working;
+        private System.Windows.Forms.Label lblMining;
     }
 }
 

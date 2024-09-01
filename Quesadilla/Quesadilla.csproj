@@ -115,6 +115,7 @@
     <Compile Include="Classes\ImageGenerator.cs" />
     <Compile Include="Classes\Logfile\IskLine.cs" />
     <Compile Include="Classes\Logfile\MiningLine.cs" />
+    <Compile Include="Classes\MiningDetails.cs" />
     <Compile Include="Classes\Processes\ProcessInfo.cs" />
     <Compile Include="Classes\Processes\ProcessMonitor.cs" />
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />

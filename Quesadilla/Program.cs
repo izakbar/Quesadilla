@@ -308,6 +308,69 @@ namespace Quesadilla
 
             return ret;
         }
+        public static string GetMiningLastHour(string toon)
+        {
+            var ret = "";
+            double m3 = 0;
+            double m3Wasted = 0;
+
+            //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
+            var expireTime = DateTime.Now.AddSeconds(-3600);
+
+            foreach (var t in CharacterList)
+            {
+                if (!toon.IsEmpty() && t.CharacterName != toon || !Mining.ContainsKey(t.CharacterName)) continue;
+                foreach (var m in Mining[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
+                {
+                    m3 += m.MiningAmount;
+                    m3Wasted += m.WastageAmount;
+                }
+            }
+
+            if (m3 > 0)
+            {
+                ret = ((int)Math.Truncate(m3)).ToString("N0")+" m3 (" + ((int)Math.Truncate(m3Wasted)).ToString("N0")+" m3) ";
+            }
+
+            return ret;
+        }
+        public static Dictionary<string, List<MiningDetails>> GetMiningLastHourDetail(string toon)
+        {
+        Dictionary<string, List<MiningDetails>> miningDetails = new Dictionary<string, List<MiningDetails>>();
+
+        //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
+        var expireTime = DateTime.Now.AddSeconds(-3600);
+
+            foreach (var t in CharacterList)
+            {
+                if (!toon.IsEmpty() && t.CharacterName != toon || !Mining.ContainsKey(t.CharacterName)) continue;
+                if (!miningDetails.ContainsKey(t.CharacterName))
+                {
+                    miningDetails[t.CharacterName] = new List<MiningDetails>();
+                }
+
+                foreach (var m in Mining[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
+                {
+                    MiningDetails md = miningDetails[t.CharacterName].Find(o => o.MiningItem == m.MiningItem);
+                    if (md == null)
+                    {
+                        md = new MiningDetails()
+                        {
+                            MiningItem = m.MiningItem,
+                            MiningAmount = m.MiningAmount,
+                            WastageAmount = m.WastageAmount,
+                        };
+                        miningDetails[t.CharacterName].Add(md);
+                    } else
+                    {
+                        md.MiningAmount += m.MiningAmount;
+                        md.WastageAmount += m.WastageAmount;
+                    }
+                }
+            }
+            return miningDetails;
+        }
+
         public static void ExpireMining()
         {
             // expire ISK ?

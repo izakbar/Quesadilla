@@ -168,6 +168,7 @@ namespace Quesadilla
         AnimationState AnimationStateAlts;
 
         private bool ISKPerHourTotal = false;
+        private bool MiningPerHourTotal = false;
 
         public Quesadilla()
         {
@@ -208,6 +209,8 @@ namespace Quesadilla
             TickCounts["RefreshProcesses"] = 0;
             TickCounts["AnimationRefresh"] = 0;
             TickCounts["ISKPerHour"] = 0;
+            TickCounts["MiningPerHour"] = 0;
+            TickCounts["MiningDetail"] = 0;
 
             AnimationStateKills = new AnimationState(state:0, direction:-1, maximum:36, pulse:false);
             AnimationStateIntel = new AnimationState(state:1, direction:1, maximum:18, pulse:false); 
@@ -342,7 +345,16 @@ namespace Quesadilla
             {
                 lblISK.ForeColor = Program.MainConfiguration.ISKColour;
             }
-                
+
+            if (MiningPerHourTotal == true)
+            {
+                lblMining.ForeColor = Program.MainConfiguration.MiningTotalColour;
+            }
+            else
+            {
+                lblMining.ForeColor = Program.MainConfiguration.MiningColour;
+            }
+
             lblAlertsOutstanding.ForeColor = Program.MainConfiguration.AlertsOutstandingColour;
             lblCurrentClient.ForeColor = Program.MainConfiguration.CurrentCharacterColour;
             lblStatus.ForeColor = Program.MainConfiguration.EvescoutColour;
@@ -398,6 +410,7 @@ namespace Quesadilla
 
             lblCurrentClient.Text = "";
             lblISK.Text = "";
+            lblMining.Text = "";
             lblAlertsOutstanding.Text = "";
             lblEtxraInformation.Text = "";
             lblSystemName.Text = "";
@@ -468,21 +481,43 @@ namespace Quesadilla
                 TickCounts["SinceLastAlert"] = 0;
             }
 
-            if ( ++TickCounts["ISKPerHour"] > Program.MainConfiguration.HowManyTicksBeforeSwitchISKPerHour )
+            if (++TickCounts["ISKPerHour"] > Program.MainConfiguration.HowManyTicksBeforeSwitchISKPerHour)
             {
                 ISKPerHourTotal = !ISKPerHourTotal;
                 TickCounts["ISKPerHour"] = 0;
 
                 // if not configured - then reset to false;
-                if ( Program.MainConfiguration.ShowISKTotal == false )
+                if (Program.MainConfiguration.ShowISKTotal == false)
                 {
                     ISKPerHourTotal = false;
-                } else
+                }
+                else
                 {
                     UpdateISK();
                 }
             }
 
+            if (++TickCounts["MiningDetail"] > Program.MainConfiguration.HowManyTicksMiningCSVOutput)
+            {
+                TickCounts["MiningDetail"] = 0;
+                UpdateMiningCSV();
+            }
+
+            if (++TickCounts["MiningPerHour"] > Program.MainConfiguration.HowManyTicksBeforeSwitchMiningPerHour)
+            {
+                MiningPerHourTotal = !MiningPerHourTotal;
+                TickCounts["MiningPerHour"] = 0;
+
+                // if not configured - then reset to false;
+                if (Program.MainConfiguration.ShowMiningTotal == false)
+                {
+                    MiningPerHourTotal = false;
+                }
+                else
+                {
+                    UpdateMining();
+                }
+            }
 
             // do cleardown/rebuild of alerts menu - if number of ticks passed
             if (++TickCounts["SinceLastCleardown"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
@@ -522,6 +557,7 @@ namespace Quesadilla
                 }
 
                 UpdateISK();
+                UpdateMining();
 
                 TickCounts["SinceLastCleardown"] = 0;
             }
@@ -1595,6 +1631,9 @@ namespace Quesadilla
             lblISK.Top = lblAlertsOutstanding.Top; ;
             lblISK.Left = Width - (lblISK.Width + 15);
 
+            lblMining.Top = lblAlertsOutstanding.Top; ;
+            lblMining.Left = Width - (lblISK.Width + lblMining.Width + 20);
+
             if (Program.MainConfiguration.ShowMinimap)
             {
                 //lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
@@ -2281,6 +2320,7 @@ namespace Quesadilla
 
             ImageGenerator.PaintDrawText(e, lblCurrentClient);
             ImageGenerator.PaintDrawText(e, lblISK);
+            ImageGenerator.PaintDrawText(e, lblMining);
             ImageGenerator.PaintDrawText(e, lblAlertsOutstanding);
 
             if (pMinimapImage.Visible)
@@ -2439,6 +2479,36 @@ namespace Quesadilla
                 lblISK.Text = Program.GetIskLastHour("");
                 lblISK.ForeColor = Program.MainConfiguration.ISKTotalColour;
             }
+        }
+        private void UpdateMining()
+        {
+
+            if (MiningPerHourTotal == false)
+            {
+                if (CurrentActiveToon != null && Program.Mining.ContainsKey(CurrentActiveToon))
+                {
+                    lblMining.Text = Program.GetMiningLastHour(CurrentActiveToon);
+                    lblMining.ForeColor = Program.MainConfiguration.MiningColour;
+                    this.Invalidate();
+                    //lblISK.Visible = true;
+                }
+                else
+                {
+                    //lblISK.Visible = false;
+                    lblMining.Text = "";
+                }
+            }
+            else
+            {
+                lblMining.Text = Program.GetMiningLastHour("");
+                lblMining.ForeColor = Program.MainConfiguration.MiningTotalColour;
+            }
+        }
+
+        private void UpdateMiningCSV()
+        {
+            var miningDetail = Program.GetMiningLastHourDetail("");
+
         }
 
         private void lblEtxraInformation_Click(object sender, EventArgs e)
