@@ -613,6 +613,19 @@ img.rounded-corners {
         [DefaultValue(typeof(Color), "Orchid")]
         public Color MainWindowMouseoverSystemColour { get; set; }
 
+        [Category("Main window")]
+        [DisplayName("Minimap zoom delta")]
+        [Description("How much to adjust zoom on mouse scroll")]
+        [DefaultValue(typeof(int), "5")]
+        public int MainWindowMouseScrollAmount { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Minimap zoom initial map scale")]
+        [Description("How to scale main window minimap - default 100")]
+        [DefaultValue(typeof(int), "70")]
+        public int MainWindowMapScale { get; set; }
+        
+
         [Category("Alert")]
         [DisplayName("Minimap system name colour for mouseover")]
         [Description("")]

@@ -387,6 +387,9 @@ namespace Quesadilla
             RecalculateWindowHeight();
 
             mainTimer.Interval = Program.MainConfiguration.TickMiliseconds;
+
+            mapScale = Program.MainConfiguration.MainWindowMapScale;
+            if (mapScale == 0) mapScale = 100;
         }
         private void Quesadilla_Load(object sender, EventArgs e)
         {
@@ -2268,8 +2271,8 @@ namespace Quesadilla
         }
         private void pMinimapImage_MouseWheel(object sender, MouseEventArgs e)
         {
-            if (e.Delta > 0) mapScale += 10;
-            if (e.Delta < 0) mapScale -= 10;
+            if (e.Delta > 0) mapScale += Program.MainConfiguration.MainWindowMouseScrollAmount;
+            if (e.Delta < 0) mapScale -= Program.MainConfiguration.MainWindowMouseScrollAmount;
             UpdateMinimap();
         }
 
