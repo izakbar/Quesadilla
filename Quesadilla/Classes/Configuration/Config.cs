@@ -173,7 +173,7 @@ namespace Quesadilla.Classes
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
                     FriendlyName = "Home system < 5 jumps",
-                    Enabled = true,
+                    Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.Home,
                     TextDisplay = "{jumps}->{fromsystem} : {route}",
@@ -359,18 +359,26 @@ namespace Quesadilla.Classes
         color: CornflowerBlue;
         padding-left:30px;
  }
+.miningCharacter {
+        float:left;
+        display:table-column;
+        width:100%;
+        padding-left:5px;
+ }
 .miningAmount {
         float:left;
         display:table-column;
-        width:80px;
+        width:70px;
         text-align: right;
+        padding-right:5px;
  }
 .miningWastage {
         float:left;
         display:table-column;
-        width:80px;
+        width:70px;
         color: Red;
         text-align: right;
+        padding-right:5px;
  }
 ",
                 });

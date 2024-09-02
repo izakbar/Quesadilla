@@ -168,11 +168,11 @@ namespace Quesadilla.Controllers
                     output += $"<div class=miningcontainer><div class=miningperhour>";
 
                     foreach (var m in mining) {
-                        output += $"<div class=MiningRow><div class=miningtoon>{m.Key}</div></div>";
+                        output += $"<div class=MiningRow><div class=miningCharacter>{m.Key}</div></div>";
                         foreach (var o in m.Value)
                         {
                             output += $"<div class=miningRow><div class=miningItem>{o.MiningItem}</div><div class=miningAmount>{o.MiningAmount}</div>";
-                            if ( hideWastage == false ) output += "<div class=miningWastage>{o.WastageAmount}</div>";
+                            if ( hideWastage == false ) output += $"<div class=miningWastage>{o.WastageAmount}</div>";
                             output += "</div>";
                         }
                         //< div class=miningperhour>{mining}</div>

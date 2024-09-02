@@ -329,7 +329,7 @@ namespace Quesadilla
 
             if (units > 0)
             {
-                ret = ((int)Math.Truncate(units)).ToString("N0")+" (" + ((int)Math.Truncate(units3Wasted)).ToString("N0")+") ";
+                ret = ((int)Math.Truncate(units)).ToString("N0")+" - " + ((int)Math.Truncate(units3Wasted)).ToString("N0")+") ";
             }
 
             return ret;
