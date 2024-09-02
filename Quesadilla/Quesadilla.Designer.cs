@@ -55,7 +55,7 @@
             // intelLog
             // 
             this.intelLog.BackColor = System.Drawing.SystemColors.Info;
-            this.intelLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.intelLog.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.intelLog.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.intelLog.ForContext = "";
             this.intelLog.Location = new System.Drawing.Point(0, 356);
@@ -111,9 +111,10 @@
             this.lblISK.ForeColor = System.Drawing.Color.ForestGreen;
             this.lblISK.Location = new System.Drawing.Point(442, 312);
             this.lblISK.Name = "lblISK";
-            this.lblISK.Size = new System.Drawing.Size(171, 17);
+            this.lblISK.Size = new System.Drawing.Size(177, 17);
             this.lblISK.TabIndex = 8;
             this.lblISK.Text = "999999";
+            this.lblISK.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.lblISK.Visible = false;
             // 
             // lblStatus
@@ -191,9 +192,10 @@
             this.lblMining.ForeColor = System.Drawing.Color.ForestGreen;
             this.lblMining.Location = new System.Drawing.Point(442, 295);
             this.lblMining.Name = "lblMining";
-            this.lblMining.Size = new System.Drawing.Size(268, 17);
+            this.lblMining.Size = new System.Drawing.Size(177, 17);
             this.lblMining.TabIndex = 16;
             this.lblMining.Text = "999999";
+            this.lblMining.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.lblMining.Visible = false;
             // 
             // Quesadilla
