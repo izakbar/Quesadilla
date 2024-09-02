@@ -355,18 +355,22 @@ namespace Quesadilla.Classes
 .miningItem {
         float:left;
         display:table-column;
-        width:200px;
+        width:350px;
+        color: CornflowerBlue;
+        padding-left:30px;
  }
 .miningAmount {
         float:left;
         display:table-column;
-        width:100px;
+        width:80px;
+        text-align: right;
  }
 .miningWastage {
         float:left;
         display:table-column;
-        width:100px;
+        width:80px;
         color: Red;
+        text-align: right;
  }
 ",
                 });
@@ -575,7 +579,7 @@ img.rounded-corners {
         [ReadOnly(true)]
         [DisplayName("HowManyTicksMiningCSVOutput")]
         [Description("How many ticks between Mining/Hr CSV output")]
-        [DefaultValue(typeof(int), "10")] // 400 - 5 mins
+        [DefaultValue(typeof(int), "400")] // 400 - 5 mins
         public int HowManyTicksMiningCSVOutput { get; set; }
         
         [Category("Main window")]

@@ -2507,13 +2507,26 @@ namespace Quesadilla
 
         private void UpdateMiningCSV()
         {
-            var miningDetail = Program.GetMiningLastHourDetail("");
+            var miningDetail = Program.GetMiningLastHourDetail("",false);
+            var miningSummary = Program.MiningItemSummary(miningDetail);
+
             try
             {
                 using (var writer = new StreamWriter("miningdata.csv"))
                 {
                     writer.WriteLine("Character,MinedItem,Amount,Wastage");
                     foreach (var m in miningDetail)
+                    {
+                        foreach (var md in m.Value)
+                        {
+                            writer.WriteLine($"{m.Key},{md.MiningItem},{md.MiningAmount},{md.WastageAmount}");
+                        }
+                    }
+
+                    writer.WriteLine();
+                    writer.WriteLine("-----------------------------------------------------------------------------------");
+                    writer.WriteLine();
+                    foreach (var m in miningSummary)
                     {
                         foreach (var md in m.Value)
                         {

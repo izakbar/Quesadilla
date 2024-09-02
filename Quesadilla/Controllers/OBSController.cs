@@ -157,12 +157,12 @@ namespace Quesadilla.Controllers
             };
         }
         [HttpGet("[controller]/miningPerHourTable")]
-        public IActionResult miningPerHourTable(string toon)
+        public IActionResult miningPerHourTable(string toon, bool totalsOnly, bool hideWastage = false)
         {
             string output = "<meta http-equiv=\"refresh\" content=\"10\">\r\n";
             if (Program.q != null)
             {
-                var mining = Program.GetMiningLastHourDetail(toon);
+                var mining = Program.GetMiningLastHourDetail(toon, totalsOnly);
                 if (!mining.IsNullOrEmpty())
                 {
                     output += $"<div class=miningcontainer><div class=miningperhour>";
@@ -171,7 +171,9 @@ namespace Quesadilla.Controllers
                         output += $"<div class=MiningRow><div class=miningtoon>{m.Key}</div></div>";
                         foreach (var o in m.Value)
                         {
-                            output += $"<div class=miningRow><div class=miningItem>{o.MiningItem}</div><div class=miningAmount>{o.MiningAmount}</div><div class=miningWastage>{o.WastageAmount}</div></div>";
+                            output += $"<div class=miningRow><div class=miningItem>{o.MiningItem}</div><div class=miningAmount>{o.MiningAmount}</div>";
+                            if ( hideWastage == false ) output += "<div class=miningWastage>{o.WastageAmount}</div>";
+                            output += "</div>";
                         }
                         //< div class=miningperhour>{mining}</div>
                     }

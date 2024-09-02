@@ -311,8 +311,8 @@ namespace Quesadilla
         public static string GetMiningLastHour(string toon)
         {
             var ret = "";
-            double m3 = 0;
-            double m3Wasted = 0;
+            double units = 0;
+            double units3Wasted = 0;
 
             //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
             var expireTime = DateTime.Now.AddSeconds(-3600);
@@ -322,19 +322,19 @@ namespace Quesadilla
                 if (!toon.IsEmpty() && t.CharacterName != toon || !Mining.ContainsKey(t.CharacterName)) continue;
                 foreach (var m in Mining[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
                 {
-                    m3 += m.MiningAmount;
-                    m3Wasted += m.WastageAmount;
+                    units += m.MiningAmount;
+                    units3Wasted += m.WastageAmount;
                 }
             }
 
-            if (m3 > 0)
+            if (units > 0)
             {
-                ret = ((int)Math.Truncate(m3)).ToString("N0")+" m3 (" + ((int)Math.Truncate(m3Wasted)).ToString("N0")+" m3) ";
+                ret = ((int)Math.Truncate(units)).ToString("N0")+" (" + ((int)Math.Truncate(units3Wasted)).ToString("N0")+") ";
             }
 
             return ret;
         }
-        public static Dictionary<string, List<MiningDetails>> GetMiningLastHourDetail(string toon)
+        public static Dictionary<string, List<MiningDetails>> GetMiningLastHourDetail(string toon, bool itemTotalsOnly)
         {
         Dictionary<string, List<MiningDetails>> miningDetails = new Dictionary<string, List<MiningDetails>>();
 
@@ -368,7 +368,47 @@ namespace Quesadilla
                     }
                 }
             }
-            return miningDetails;
+
+            if ( itemTotalsOnly)
+            {
+                return MiningItemSummary(miningDetails);
+            }
+            else
+            {
+                return miningDetails;
+            }
+        }
+
+        public static Dictionary<string, List<MiningDetails>> MiningItemSummary(Dictionary<string, List<MiningDetails>> miningDetail)
+        {
+            Dictionary<string, List<MiningDetails>> miningSummary = new Dictionary<string, List<MiningDetails>>();
+
+            if (miningDetail.Count == 0) return miningSummary;
+
+            miningSummary["Summary"] = new List<MiningDetails>();
+            foreach (var detail in miningDetail)
+            {
+                foreach (var detailItem in detail.Value)
+                {
+                    MiningDetails miningSummaryItem = miningSummary["Summary"].Find(o => o.MiningItem == detailItem.MiningItem);
+                    if (miningSummaryItem == null)
+                    {
+                        miningSummaryItem= new MiningDetails()
+                        {
+                            MiningItem = detailItem.MiningItem,
+                            MiningAmount = detailItem.MiningAmount,
+                            WastageAmount = detailItem.WastageAmount,
+                        };
+                        miningSummary["Summary"].Add(miningSummaryItem);
+                    }
+                    else
+                    {
+                        miningSummaryItem.MiningAmount += detailItem.MiningAmount;
+                        miningSummaryItem.WastageAmount += detailItem.WastageAmount;
+                    }
+                }
+            }
+            return miningSummary;
         }
 
         public static void ExpireMining()
