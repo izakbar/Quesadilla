@@ -98,11 +98,18 @@ namespace Quesadilla.Classes
 
         public static Config Load(string filename)
         {
-            var c = new Config();
+            Config c = null;
 
-            StreamReader reader = new StreamReader(filename);
-            var json = reader.ReadToEnd();
-            c = JsonConvert.DeserializeObject<Config>(json);
+            try
+            {
+                StreamReader reader = new StreamReader(filename);
+                var json = reader.ReadToEnd();
+                reader.Close();
+                c = JsonConvert.DeserializeObject<Config>(json);
+            }
+            catch (Exception ex)
+            {
+            }
 
             if (c is null)
             {
