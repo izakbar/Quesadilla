@@ -41,6 +41,8 @@
             this.lblAlertsOutstanding = new System.Windows.Forms.Label();
             this.lblEtxraInformation = new System.Windows.Forms.Label();
             this.lblSystemName = new System.Windows.Forms.Label();
+            this.working = new System.Windows.Forms.Label();
+            this.lblMining = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pMinimapImage)).BeginInit();
             this.SuspendLayout();
             // 
@@ -53,14 +55,14 @@
             // intelLog
             // 
             this.intelLog.BackColor = System.Drawing.SystemColors.Info;
-            this.intelLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.intelLog.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.intelLog.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.intelLog.ForContext = "";
-            this.intelLog.Location = new System.Drawing.Point(0, 230);
+            this.intelLog.Location = new System.Drawing.Point(0, 231);
             this.intelLog.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.intelLog.Name = "intelLog";
             this.intelLog.ReadOnly = true;
-            this.intelLog.Size = new System.Drawing.Size(638, 187);
+            this.intelLog.Size = new System.Drawing.Size(638, 186);
             this.intelLog.TabIndex = 0;
             this.intelLog.Text = "";
             this.intelLog.TextChanged += new System.EventHandler(this.intelLog_TextChanged);
@@ -69,9 +71,9 @@
             // 
             this.ChatServerDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ChatServerDown.ForeColor = System.Drawing.Color.Red;
-            this.ChatServerDown.Location = new System.Drawing.Point(489, 4);
+            this.ChatServerDown.Location = new System.Drawing.Point(471, 4);
             this.ChatServerDown.Name = "ChatServerDown";
-            this.ChatServerDown.Size = new System.Drawing.Size(149, 20);
+            this.ChatServerDown.Size = new System.Drawing.Size(152, 20);
             this.ChatServerDown.TabIndex = 3;
             this.ChatServerDown.Text = "Chat Server Down";
             this.ChatServerDown.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -103,20 +105,22 @@
             // 
             // lblISK
             // 
+            this.lblISK.BackColor = System.Drawing.Color.Sienna;
             this.lblISK.ForeColor = System.Drawing.Color.ForestGreen;
             this.lblISK.Location = new System.Drawing.Point(295, 203);
             this.lblISK.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblISK.Name = "lblISK";
-            this.lblISK.Size = new System.Drawing.Size(114, 11);
+            this.lblISK.Size = new System.Drawing.Size(118, 11);
             this.lblISK.TabIndex = 8;
             this.lblISK.Text = "999999";
+            this.lblISK.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.lblISK.Visible = false;
             // 
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
             this.lblStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lblStatus.Location = new System.Drawing.Point(0, 217);
+            this.lblStatus.Location = new System.Drawing.Point(0, 218);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(168, 13);
             this.lblStatus.TabIndex = 9;
@@ -125,12 +129,13 @@
             // pMinimapImage
             // 
             this.pMinimapImage.BackColor = System.Drawing.Color.Transparent;
-            this.pMinimapImage.Location = new System.Drawing.Point(4, 4);
+            this.pMinimapImage.Location = new System.Drawing.Point(3, 3);
             this.pMinimapImage.Name = "pMinimapImage";
             this.pMinimapImage.Size = new System.Drawing.Size(286, 210);
             this.pMinimapImage.TabIndex = 10;
             this.pMinimapImage.TabStop = false;
             this.pMinimapImage.Click += new System.EventHandler(this.pMinimapImage_Click);
+            this.pMinimapImage.Paint += new System.Windows.Forms.PaintEventHandler(this.pMinimapImage_Paint);
             this.pMinimapImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pMinimapImage_MouseMove);
             // 
             // lblAlertsOutstanding
@@ -151,7 +156,7 @@
             this.lblEtxraInformation.Location = new System.Drawing.Point(295, 43);
             this.lblEtxraInformation.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblEtxraInformation.Name = "lblEtxraInformation";
-            this.lblEtxraInformation.Size = new System.Drawing.Size(332, 129);
+            this.lblEtxraInformation.Size = new System.Drawing.Size(309, 129);
             this.lblEtxraInformation.TabIndex = 13;
             this.lblEtxraInformation.Text = "999999";
             this.lblEtxraInformation.Visible = false;
@@ -169,12 +174,38 @@
             this.lblSystemName.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.lblSystemName.Visible = false;
             // 
+            // working
+            // 
+            this.working.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.working.ForeColor = System.Drawing.Color.SaddleBrown;
+            this.working.Location = new System.Drawing.Point(625, -1);
+            this.working.Name = "working";
+            this.working.Size = new System.Drawing.Size(13, 15);
+            this.working.TabIndex = 15;
+            this.working.Text = "*";
+            this.working.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // lblMining
+            // 
+            this.lblMining.BackColor = System.Drawing.Color.IndianRed;
+            this.lblMining.ForeColor = System.Drawing.Color.ForestGreen;
+            this.lblMining.Location = new System.Drawing.Point(295, 192);
+            this.lblMining.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblMining.Name = "lblMining";
+            this.lblMining.Size = new System.Drawing.Size(118, 11);
+            this.lblMining.TabIndex = 16;
+            this.lblMining.Text = "999999";
+            this.lblMining.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.lblMining.Visible = false;
+            // 
             // Quesadilla
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(638, 417);
+            this.Controls.Add(this.lblMining);
+            this.Controls.Add(this.working);
             this.Controls.Add(this.lblSystemName);
             this.Controls.Add(this.lblEtxraInformation);
             this.Controls.Add(this.buttonIntelSize);
@@ -185,6 +216,7 @@
             this.Controls.Add(this.ChatServerDown);
             this.Controls.Add(this.intelLog);
             this.Controls.Add(this.pMinimapImage);
+            this.DoubleBuffered = true;
             this.ForeColor = System.Drawing.Color.Lime;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -194,6 +226,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Quesadilla_FormClosing);
             this.Load += new System.EventHandler(this.Quesadilla_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Quesadilla_Paint);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Quesadilla_MouseMove);
             ((System.ComponentModel.ISupportInitialize)(this.pMinimapImage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -213,6 +246,8 @@
         private System.Windows.Forms.Label lblAlertsOutstanding;
         private System.Windows.Forms.Label lblEtxraInformation;
         private System.Windows.Forms.Label lblSystemName;
+        private System.Windows.Forms.Label working;
+        private System.Windows.Forms.Label lblMining;
     }
 }
 

@@ -347,15 +347,15 @@ namespace Quesadilla.Classes
         public long GetFileLength(string fileName)
         {
             long fileLength = -1;
-            using (StreamReader streamReader = new StreamReader((Stream)new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), this._fileEncoding))
+            try
             {
-                try
+                using (StreamReader streamReader = new StreamReader((Stream)new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), this._fileEncoding))
                 {
                     fileLength = streamReader.BaseStream.Length;
                 }
-                catch (Exception ex)
-                {
-                }
+            }
+            catch (Exception ex)
+            {
             }
             return fileLength;
         }

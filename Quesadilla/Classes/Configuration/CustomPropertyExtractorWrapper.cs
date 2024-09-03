@@ -22,7 +22,8 @@ public class CustomPropertyExtractorWrapper : CustomTypeDescriptor
             .Where(o => o.PropertyType == typeof(Color) || 
             o.PropertyType == typeof(bool) || 
             o.PropertyType == typeof(int) || 
-            o.PropertyType == typeof(PopupLocationType)
+            o.PropertyType == typeof(PopupLocationType) ||
+            o.Category == "HeartBeat"
             )
             .ToArray();
         return new PropertyDescriptorCollection(properties);

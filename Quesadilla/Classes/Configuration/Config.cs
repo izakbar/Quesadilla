@@ -98,11 +98,18 @@ namespace Quesadilla.Classes
 
         public static Config Load(string filename)
         {
-            var c = new Config();
+            Config c = null;
 
-            StreamReader reader = new StreamReader(filename);
-            var json = reader.ReadToEnd();
-            c = JsonConvert.DeserializeObject<Config>(json);
+            try
+            {
+                StreamReader reader = new StreamReader(filename);
+                var json = reader.ReadToEnd();
+                reader.Close();
+                c = JsonConvert.DeserializeObject<Config>(json);
+            }
+            catch (Exception ex)
+            {
+            }
 
             if (c is null)
             {
@@ -173,7 +180,7 @@ namespace Quesadilla.Classes
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
                     FriendlyName = "Home system < 5 jumps",
-                    Enabled = true,
+                    Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.Home,
                     TextDisplay = "{jumps}->{fromsystem} : {route}",
@@ -209,6 +216,16 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
+                    FriendlyName = "Skyhook robbery",
+                    Enabled = false,
+                    AlertType = AlertConfigType.Text,
+                    TextDisplay = "Skyhook robbery {text} reported by {reporter}",
+                    MenuDisplay = "Skyhook robbery {text} reported by {reporter}",
+                    SoundFile = "Boo2",
+                    TriggerText = "skyhook",
+                });
+                c.AlertConfiguration.Add(new AlertConfig()
+                {
                     FriendlyName = "Faction Spawn",
                     Enabled = true,
                     AlertType = AlertConfigType.FactionSpawn,
@@ -232,7 +249,7 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.MiningEndedRoidPopped,
                     TextDisplay = "{character} rock depleated",
-                    MenuDisplay = "{character} rock depleated",
+                    MenuDisplay = "rock depleated",
                     SoundFile = "pop1",
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
@@ -241,7 +258,7 @@ namespace Quesadilla.Classes
                     Enabled = true,
                     AlertType = AlertConfigType.MiningEndedFull,
                     TextDisplay = "{character} cargo full",
-                    MenuDisplay = "{character} cargo full",
+                    MenuDisplay = "cargo full",
                     SoundFile = "full",
                 });
             }
@@ -317,6 +334,95 @@ namespace Quesadilla.Classes
             if (c.CSSData== null)
             {
                 c.CSSData = new List<CSSData> { };
+                c.CSSData.Add(new CSSData()
+                {
+                    Name = "OBS.MiningTable",
+                    FriendlyName = "OBS Mining Table",
+                    CSS = @"
+.miningcontainer {
+  width: 100%;
+  position: relative;
+}
+.miningperhour {
+  border: 3px solid transparent;
+  border-radius: 15px;
+  outline: 2px solid Gold;
+
+  display: inline-block;
+  position: absolute;
+
+  color: green;
+  font-size: 24px;
+
+  margin: auto;
+}
+.miningTable {
+        display:  table;
+        width:auto;
+        background-color:#eee;
+        border:1px solid  #666666;
+        border-spacing:5px;/*cellspacing:poor IE support for  this*/
+       /* border-collapse:separate;*/
+}
+.miningRow {
+       display:table-row;
+       width:auto;
+ }
+
+.miningItem {
+        float:left;
+        display:table-column;
+        width:350px;
+        color: CornflowerBlue;
+        padding-left:30px;
+ }
+.miningCharacter {
+        float:left;
+        display:table-column;
+        width:100%;
+        padding-left:5px;
+ }
+.miningAmount {
+        float:left;
+        display:table-column;
+        width:70px;
+        text-align: right;
+        padding-right:5px;
+ }
+.miningWastage {
+        float:left;
+        display:table-column;
+        width:70px;
+        color: Red;
+        text-align: right;
+        padding-right:5px;
+ }
+",
+                });
+                c.CSSData.Add(new CSSData()
+                {
+                    Name = "OBS.Mining",
+                    FriendlyName = "OBS Mining Info",
+                    CSS = @"
+.miningcontainer {
+  width: 100%;
+  position: relative;
+}
+.miningperhour {
+  border: 3px solid transparent;
+  border-radius: 15px;
+  outline: 2px solid Gold;
+
+  display: inline-block;
+  position: absolute;
+
+  color: green;
+  font-size: 24px;
+
+  margin: auto;
+}
+",
+                });
                 c.CSSData.Add(new CSSData()
                 {
                     Name = "OBS.ISK",
@@ -435,37 +541,72 @@ img.rounded-corners {
         [DisplayName("Milliseconds for main tick")]
         [ReadOnly(true)]
         [Description("How many milliseconds the main tick is - smaller means more occur")]
-        [DefaultValue(typeof(int), "120")]
+        [DefaultValue(typeof(int), "150")]
         public int TickMiliseconds { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeCleardown")]
         [Description("How many ticks will occur between event cleardown checks")]
-        [DefaultValue(typeof(int), "30")]
+        [DefaultValue(typeof(int), "40")]
         public int HowManyTicksBeforeCleardown { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeAlert")]
         [Description("After an alert is put into the new alert queue - how many ticks before display")]
-        [DefaultValue(typeof(int), "1")]
+        [DefaultValue(typeof(int), "2")]
         public int HowManyTicksBeforeAlert { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeDPSGraphUpdate")]
         [Description("How many ticks between DPS graph update")]
-        [DefaultValue(typeof(int), "6")]
+        [DefaultValue(typeof(int), "15")]
         public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeLogfileCheck")]
         [Description("How many ticks between logfile checks")]
-        [DefaultValue(typeof(int), "2")]
+        [DefaultValue(typeof(int), "4")]
         public int HowManyTicksBeforeLogfileCheck { get; set; }
 
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        [DisplayName("HowManyTicksRefreshProcesses")]
+        [Description("How many ticks before refreshing process list")]
+        [DefaultValue(typeof(int), "20")]
+        public int HowManyTicksRefreshProcesses { get; set; }
+
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        [DisplayName("HowManyTicksMapAnimation")]
+        [Description("How many ticks between animation of map")]
+        [DefaultValue(typeof(int), "2")]
+        public int HowManyTicksMapAnimation { get; set; }
+
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        [DisplayName("HowManyTicksBeforeSwitchISKPerHour")]
+        [Description("How many ticks between ISH/Hr and Total ISK/Hr")]
+        [DefaultValue(typeof(int), "20")]
+        public int HowManyTicksBeforeSwitchISKPerHour { get; set; }
+
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        [DisplayName("HowManyTicksBeforeSwitchMiningPerHour")]
+        [Description("How many ticks between Mining/Hr and Total Mining/Hr")]
+        [DefaultValue(typeof(int), "21")]
+        public int HowManyTicksBeforeSwitchMiningPerHour { get; set; }
+
+        [Category("Tick Timing")]
+        [ReadOnly(true)]
+        [DisplayName("HowManyTicksMiningCSVOutput")]
+        [Description("How many ticks between Mining/Hr CSV output")]
+        [DefaultValue(typeof(int), "400")] // 400 - 5 mins
+        public int HowManyTicksMiningCSVOutput { get; set; }
+        
         [Category("Main window")]
         public Point InitialPosition { get; set; }
 
@@ -533,6 +674,12 @@ img.rounded-corners {
         public Color MinimapLineColourNormal { get; set; }
 
         [Category("Main window")]
+        [DisplayName("Minimap Out of region connection colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "DimGray")]
+        public Color MinimapLineColourOutOfRegion { get; set; }
+
+        [Category("Main window")]
         [DisplayName("Minimap Route connection colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Tomato")]
@@ -592,6 +739,19 @@ img.rounded-corners {
         [DefaultValue(typeof(Color), "Orchid")]
         public Color MainWindowMouseoverSystemColour { get; set; }
 
+        [Category("Main window")]
+        [DisplayName("Minimap zoom delta")]
+        [Description("How much to adjust zoom on mouse scroll")]
+        [DefaultValue(typeof(int), "5")]
+        public int MainWindowMouseScrollAmount { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Minimap zoom initial map scale")]
+        [Description("How to scale main window minimap - default 100")]
+        [DefaultValue(typeof(int), "70")]
+        public int MainWindowMapScale { get; set; }
+        
+
         [Category("Alert")]
         [DisplayName("Minimap system name colour for mouseover")]
         [Description("")]
@@ -612,6 +772,18 @@ img.rounded-corners {
         public Color MinimapAltPositionColour { get; set; }
 
         [Category("Main window")]
+        [DisplayName("Minimap incursion Indicator colour")]
+        [Description("Colour to use for incursion indicators on the minimap")]
+        [DefaultValue(typeof(Color), "DarkGreen")]
+        public Color MinimapIncursionColour { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Minimap Ice Indicator colour")]
+        [Description("Colour to use for ice indicatos on the minimap")]
+        [DefaultValue(typeof(Color), "Cyan")]
+        public Color MinimapIceColour { get; set; }
+
+        [Category("Main window")]
         [DisplayName("Minimap Height")]
         [Description("Height of the minimap")]
         [DefaultValue(typeof(int), "200")]
@@ -630,6 +802,12 @@ img.rounded-corners {
         public int MinimapJumps { get; set; }
 
         [Category("Main window")]
+        [DisplayName("Minimap show out of region systems")]
+        [Description("Show systems outside current region if in configured jumps range {MinimapJumps}")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool MinimapShowOutOfRegion { get; set; }
+
+        [Category("Main window")]
         [DisplayName("Current character colour")]
         [Description("The colour to use for the currently active eveonline character on the main window")]
         [DefaultValue(typeof(Color), "MediumTurquoise")]
@@ -640,6 +818,24 @@ img.rounded-corners {
         [Description("The colour to use for the ISK/HR show on the main window")]
         [DefaultValue(typeof(Color), "Aqua")]
         public Color ISKColour { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("ISK/hr Total Colour")]
+        [Description("The colour to use for the total ISK/HR show on the main window")]
+        [DefaultValue(typeof(Color), "Orange")]
+        public Color ISKTotalColour { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Mining/hr Colour")]
+        [Description("The colour to use for the Mining/HR show on the main window")]
+        [DefaultValue(typeof(Color), "Aqua")]
+        public Color MiningColour { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Mining/hr Total Colour")]
+        [Description("The colour to use for the total Mining/HR show on the main window")]
+        [DefaultValue(typeof(Color), "Orange")]
+        public Color MiningTotalColour { get; set; }
 
         [Category("Main window")]
         [DisplayName("non-expired Alerts/Kills Colour")]
@@ -657,6 +853,18 @@ img.rounded-corners {
         [Description("The extra information display shows zkill and alert activity recently in systems on the current minimap view")]
         [DefaultValue(typeof(bool), "true")]
         public bool MainWindowShowExtraInformation { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Show total ISK per Hour")]
+        [Description("Show the total ISK per hour earned as well as per toon")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool ShowISKTotal { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Show total Mining per Hour")]
+        [Description("Show the total Mining per hour as well as per toon")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool ShowMiningTotal { get; set; }
 
         [Category("Main window")]
         [DisplayName("Extra Information Colour")]
@@ -903,6 +1111,12 @@ img.rounded-corners {
         [DefaultValue(typeof(Color), "Gainsboro")]
         public Color AlertPopupMinimapLineColourNormal { get; set; }
 
+        [Category("Main window")]
+        [DisplayName("Minimap Out of region connection colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "DimGray")]
+        public Color AlertPopupMinimapLineColourOutOfRegion { get; set; }
+
         [Category("Alert")]
         [DisplayName("Minimap route connection colour")]
         [Description("")]
@@ -956,6 +1170,18 @@ img.rounded-corners {
         [Description("")]
         [DefaultValue(typeof(Color), "Aqua")]
         public Color AlertPopupMinimapAltPositionColour { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Minimap Ice Indicator colour")]
+        [Description("Colour to use for ice indicatos on the alert popup")]
+        [DefaultValue(typeof(Color), "Cyan")]
+        public Color AlertPopupMinimapIceColour { get; set; }
+
+        [Category("Alert")]
+        [DisplayName("Minimap incursion Indicator colour")]
+        [Description("Colour to use for incursion indicators on the alert popup")]
+        [DefaultValue(typeof(Color), "DarkGreen")]
+        public Color AlertPopupMinimapIncursionColour { get; set; }
 
         [Category("Alert")]
         [DisplayName("Use SDE X/Y")]
@@ -1074,7 +1300,7 @@ img.rounded-corners {
         [Category("General")]
         [DisplayName("Pull dotlan map layout svg")]
         [Description("Should dotlan svg be pulled and parsed regularly")]
-        [DefaultValue(typeof(bool), "false")]
+        [DefaultValue(typeof(bool), "true")]
         [ReadOnly(true)]
         public bool DotlanMapPull { get; set; }
 
@@ -1095,7 +1321,7 @@ img.rounded-corners {
         [DisplayName("Size of Planet on main window")]
         [Description("When showing planet information on main window - how BIG should they be")]
         [DefaultValue(typeof(int), "6")]
-        public int PlanetViewSize { get; set; }
+        public int PlanetInfoViewSize { get; set; }
 
         [Category("Planet Info")]
         [DisplayName("Show planet information")]
@@ -1150,5 +1376,44 @@ img.rounded-corners {
         [Description("")]
         [DefaultValue(typeof(Color), "Cyan")]
         public Color PlanetInfoPlasmaColour { get; set; }
+
+        [Category("Planet Info")]
+        [DisplayName("Planet info font size")]
+        [Description("")]
+        [DefaultValue(typeof(int), "8")]
+        public int PlanetInfoFontSize { get; set; }
+
+        [Category("HeartBeat")]
+        [DisplayName("Heartbeat indicator Colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "Red")]
+        public Color HeartBeatIndicatorColour { get; set; }
+
+        [Category("HeartBeat")]
+        [DisplayName("Heartbeat indicator text")]
+        [Description("Check homepage for some examples")]
+        //        [DefaultValue(typeof(string), " ▁▂▃▄▅▆▇█▇▆▅▄▃▁")]
+        //        [DefaultValue(typeof(string)," ▏▎▍▌▋▊▉▊▋▌▍")] 
+        //        [DefaultValue(typeof(string), "▖▘▝▗")]
+        //        [DefaultValue(typeof(string), "⠁⠁⠉⠙⠚⠒⠂⠂⠒⠲⠴⠤⠄⠄⠤⠠⠠⠤⠦⠖⠒⠐⠐⠒⠓⠋⠉⠈⠈")]
+        [DefaultValue(typeof(string), "⠈⠉⠋⠓⠒⠐⠐⠒⠖⠦⠤⠠⠠⠤⠦⠖⠒⠐⠐⠒⠓⠋⠉⠈")]
+        public string HeartBeatIndicatorWorkingText { get; set; }
+        [Category("HeartBeat")]
+        [DisplayName("Show Heartbeat indicator")]
+        [Description("")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool HeartBeatIndicatorVisible { get; set; }
+
+        [Category("Alert")]
+        [DisplayName("Show alerts as windows notifications")]
+        [Description("")]
+        [DefaultValue(typeof(bool), "false")]
+        public bool ShowAlertWindowsNotification { get; set; }
+
+        [Category("Alert")]
+        [DisplayName("Show alerts as Quesadilla notifications")]
+        [Description("")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool ShowAlertFancyNotification { get; set; }
     }
 }

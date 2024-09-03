@@ -81,6 +81,7 @@ namespace Quesadilla.Classes.SolarSystems
                     StreamReader reader = new StreamReader(jsonFile);
                     var json = reader.ReadToEnd();
                     ESICharacters = JsonConvert.DeserializeObject<Dictionary<int, ESICharacter>>(json);
+                    reader.Close() ;
                 }
             }
             catch (Exception ex)

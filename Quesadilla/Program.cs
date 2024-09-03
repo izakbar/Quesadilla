@@ -27,6 +27,7 @@ using Quesadilla.Classes.ZKill;
 using Serilog;
 using Serilog.Formatting.Display;
 using Serilog.Sinks.WinForms.Base;
+using System.Collections.Concurrent;
 
 namespace Quesadilla
 {
@@ -49,8 +50,8 @@ namespace Quesadilla
         public static List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
         public static List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
 
-        public static Queue<AlertQueueItem> NewAlerts = new Queue<AlertQueueItem>();
-        public static Queue<AlertQueueItem> ActiveAlerts = new Queue<AlertQueueItem>();
+        public static ConcurrentQueue<AlertQueueItem> NewAlerts = new ConcurrentQueue<AlertQueueItem>();
+        public static ConcurrentQueue<AlertQueueItem> ActiveAlerts = new ConcurrentQueue<AlertQueueItem>();
 
         public static  List<LogWatcher> logfileWatchers = new List<LogWatcher>();
         public static List<Character> CharacterList { get; set; }
@@ -199,7 +200,7 @@ namespace Quesadilla
                     if (diffInSeconds > Program.MainConfiguration.ExpireAlertSeconds)
                     {
 
-                        alert = Program.ActiveAlerts.Dequeue();
+                        Program.ActiveAlerts.TryDequeue(out alert);
                         Expired++;
 
                         // expired so dequeue
@@ -223,31 +224,52 @@ namespace Quesadilla
             return Expired;
         }
 
-        public static void EnqueueNewAlert(AlertQueueItem alert)
+        public static void EnqueueNewAlert(AlertQueueItem alert, ConcurrentQueue<AlertQueueItem> q)
         {
             // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
-            lock (NewAlerts)
+            lock (q)
             {
-                var f = NewAlerts.Where(o =>
-                (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId)
-                || (o.AlertText == alert.AlertText)
-                ).ToList();
-                if (f.Count == 0 || NewAlerts.Count == 0)
+                try
                 {
-                    alert.RouteText = Program.Universe.PathToString(alert.Path);
-                    NewAlerts.Enqueue(alert);
-                }
-                if (f.Count != 0)
-                {
-                    if (f.First().Path != null && alert.Path != null && alert.Path.TotalJumps < f.First().Path.TotalJumps)
+                    var checkZkillAlerts = 0;
+                    // check if zkill already exists
+                    if (alert.Kill != null)
                     {
-                        f.First().Path = alert.Path;
-                        f.First().AlertText = alert.AlertText;
-                        f.First().Entry = alert.Entry;
-                        f.First().Context = alert.Context;
-                        f.First().RouteText = alert.RouteText;
-                        f.First().SoundFile = alert.SoundFile;
-                        f.First().ShowAlert = alert.ShowAlert;
+                        checkZkillAlerts =
+                            ActiveAlerts.Where(o => (o.Kill != null && o.Kill.ID == alert.Kill.ID)).ToList().Count() +
+                            q.Where(o => (o.Kill != null && o.Kill.ID == alert.Kill.ID)).ToList().Count();
+                    }
+                    var foundAlerts = NewAlerts.Where(
+                        o => (
+                        (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId) || (o.AlertText == alert.AlertText)
+                        || (o.Kill != null && alert.Kill != null && o.Kill.ID == alert.Kill.ID)
+                        )).ToList();
+
+                    if ( (foundAlerts.Count == 0 || q.Count == 0) && checkZkillAlerts == 0)
+                    {
+                        alert.RouteText = Program.Universe.PathToString(alert.Path);
+                        q.Enqueue(alert);
+                    }
+                    if (foundAlerts.Count != 0)
+                    {
+                        if (foundAlerts.First().Path != null && alert.Path != null && alert.Path.TotalJumps < foundAlerts.First().Path.TotalJumps)
+                        {
+                            foundAlerts.First().Path = alert.Path;
+                            foundAlerts.First().AlertText = alert.AlertText;
+                            foundAlerts.First().Entry = alert.Entry;
+                            foundAlerts.First().Context = alert.Context;
+                            foundAlerts.First().RouteText = alert.RouteText;
+                            foundAlerts.First().SoundFile = alert.SoundFile;
+                            foundAlerts.First().ShowAlert = alert.ShowAlert;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex.Message);
+                    if (ex.InnerException != null)
+                    {
+                        Log.Debug(ex.InnerException.Message);
                     }
                 }
             }
@@ -286,6 +308,109 @@ namespace Quesadilla
 
             return ret;
         }
+        public static string GetMiningLastHour(string toon)
+        {
+            var ret = "";
+            double units = 0;
+            double units3Wasted = 0;
+
+            //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
+            var expireTime = DateTime.Now.AddSeconds(-3600);
+
+            foreach (var t in CharacterList)
+            {
+                if (!toon.IsEmpty() && t.CharacterName != toon || !Mining.ContainsKey(t.CharacterName)) continue;
+                foreach (var m in Mining[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
+                {
+                    units += m.MiningAmount;
+                    units3Wasted += m.WastageAmount;
+                }
+            }
+
+            if (units > 0)
+            {
+                ret = ((int)Math.Truncate(units)).ToString("N0")+" - " + ((int)Math.Truncate(units3Wasted)).ToString("N0")+" ";
+            }
+
+            return ret;
+        }
+        public static Dictionary<string, List<MiningDetails>> GetMiningLastHourDetail(string toon, bool itemTotalsOnly)
+        {
+        Dictionary<string, List<MiningDetails>> miningDetails = new Dictionary<string, List<MiningDetails>>();
+
+        //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
+        var expireTime = DateTime.Now.AddSeconds(-3600);
+
+            foreach (var t in CharacterList)
+            {
+                if (!toon.IsEmpty() && t.CharacterName != toon || !Mining.ContainsKey(t.CharacterName)) continue;
+                if (!miningDetails.ContainsKey(t.CharacterName))
+                {
+                    miningDetails[t.CharacterName] = new List<MiningDetails>();
+                }
+
+                foreach (var m in Mining[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
+                {
+                    MiningDetails md = miningDetails[t.CharacterName].Find(o => o.MiningItem == m.MiningItem);
+                    if (md == null)
+                    {
+                        md = new MiningDetails()
+                        {
+                            MiningItem = m.MiningItem,
+                            MiningAmount = m.MiningAmount,
+                            WastageAmount = m.WastageAmount,
+                        };
+                        miningDetails[t.CharacterName].Add(md);
+                    } else
+                    {
+                        md.MiningAmount += m.MiningAmount;
+                        md.WastageAmount += m.WastageAmount;
+                    }
+                }
+            }
+
+            if ( itemTotalsOnly)
+            {
+                return MiningItemSummary(miningDetails);
+            }
+            else
+            {
+                return miningDetails;
+            }
+        }
+
+        public static Dictionary<string, List<MiningDetails>> MiningItemSummary(Dictionary<string, List<MiningDetails>> miningDetail)
+        {
+            Dictionary<string, List<MiningDetails>> miningSummary = new Dictionary<string, List<MiningDetails>>();
+
+            if (miningDetail.Count == 0) return miningSummary;
+
+            miningSummary["Summary"] = new List<MiningDetails>();
+            foreach (var detail in miningDetail)
+            {
+                foreach (var detailItem in detail.Value)
+                {
+                    MiningDetails miningSummaryItem = miningSummary["Summary"].Find(o => o.MiningItem == detailItem.MiningItem);
+                    if (miningSummaryItem == null)
+                    {
+                        miningSummaryItem= new MiningDetails()
+                        {
+                            MiningItem = detailItem.MiningItem,
+                            MiningAmount = detailItem.MiningAmount,
+                            WastageAmount = detailItem.WastageAmount,
+                        };
+                        miningSummary["Summary"].Add(miningSummaryItem);
+                    }
+                    else
+                    {
+                        miningSummaryItem.MiningAmount += detailItem.MiningAmount;
+                        miningSummaryItem.WastageAmount += detailItem.WastageAmount;
+                    }
+                }
+            }
+            return miningSummary;
+        }
+
         public static void ExpireMining()
         {
             // expire ISK ?

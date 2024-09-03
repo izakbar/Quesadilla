@@ -135,6 +135,62 @@ namespace Quesadilla.Controllers
                 Content = output,
             };
         }
+        [HttpGet("[controller]/miningPerHour")]
+        public IActionResult miningPerHour(string toon)
+        {
+            string output = "<meta http-equiv=\"refresh\" content=\"10\">\r\n";
+            if (Program.q != null)
+            {
+                string mining = Program.GetMiningLastHour(toon);
+                if (!mining.IsNullOrEmpty())
+                {
+                    output += $"<div class=miningcontainer><div class=miningperhour>{mining}</div></div>";
+
+                    var css = Program.MainConfiguration.CSSData.Where(o => o.Name == "OBS.Mining").First().CSS;
+                    output += $"<style>{css}</style>";
+                }
+            }
+            return new ContentResult
+            {
+                ContentType = "text/html",
+                Content = output,
+            };
+        }
+        [HttpGet("[controller]/miningPerHourTable")]
+        public IActionResult miningPerHourTable(string toon, bool totalsOnly, bool hideWastage = false)
+        {
+            string output = "<meta http-equiv=\"refresh\" content=\"10\">\r\n";
+            if (Program.q != null)
+            {
+                var mining = Program.GetMiningLastHourDetail(toon, totalsOnly);
+                if (!mining.IsNullOrEmpty())
+                {
+                    output += $"<div class=miningcontainer><div class=miningperhour>";
+
+                    foreach (var m in mining) {
+                        output += $"<div class=MiningRow><div class=miningCharacter>{m.Key}</div></div>";
+                        foreach (var o in m.Value)
+                        {
+                            output += $"<div class=miningRow><div class=miningItem>{o.MiningItem}</div><div class=miningAmount>{o.MiningAmount}</div>";
+                            if ( hideWastage == false ) output += $"<div class=miningWastage>{o.WastageAmount}</div>";
+                            output += "</div>";
+                        }
+                        //< div class=miningperhour>{mining}</div>
+                    }
+                    
+                    output += "</div></div>";
+
+                    var css = Program.MainConfiguration.CSSData.Where(o => o.Name == "OBS.MiningTable").First().CSS;
+                    output += $"<style>{css}</style>";
+                }
+            }
+            return new ContentResult
+            {
+                ContentType = "text/html",
+                Content = output,
+            };
+        }
+
         public byte[] ImageToByteArray(System.Drawing.Image imageIn)
         {
             MemoryStream ms = new MemoryStream();

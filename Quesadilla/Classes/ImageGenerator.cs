@@ -12,6 +12,9 @@ using System.Diagnostics.Metrics;
 using System.ComponentModel;
 using System.Data;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
+using EVEStandard.Models;
+using System.Collections.Immutable;
 
 namespace Quesadilla.Classes
 {
@@ -19,18 +22,28 @@ namespace Quesadilla.Classes
     {
         private const int TRANSPARENT_BORDER_WIDTH = 1;
         private const int BORDER_WIDTH = 1;
-        private const int TEXT_SIZE = 8;
-        private const int CIRCLE_KILL_GAP = 4;
-        private const int CIRCLE_ALERT_GAP = 6;
-        private const int CIRCLE_ALT_GAP = 2;
+        private const int TEXT_SIZE = 20;
+ 
+        private const int CIRCLE_INITIAL_GAP = 3;
+        private const int CIRCLE_INCREASE_GAP = 7;
 
         private const double LY_SCALING = 9460000000000;
 
         private const int CIRCLE_RADIUS = 3;
+        private const int INCURSION_CLOUD_SIZE = 60;
+        private const int SYSTEM_CIRCLE_SIZE = 6;
 
-        public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c)
+        private const float MINIMUM_TEXT_SIZE = 10;
+        private const int MINIMUM_BLOB_SIZE = 3;
+        private const int MINIMUM_CIRCLE_SIZE = 3;
+        private const int MINIMUM_CIRCLE_MULTIPLER = 3;
+
+        public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c, float textSize = MINIMUM_TEXT_SIZE )
         {
-            using (Font myfont = new Font("Verdana", TEXT_SIZE, FontStyle.Regular))
+            // ensure we do not go too small
+            if (textSize < MINIMUM_TEXT_SIZE || float.IsInfinity(textSize) ) textSize = MINIMUM_TEXT_SIZE;
+
+            using (Font myfont = new Font("Verdana", textSize, FontStyle.Regular))
             {
                 g.TextRenderingHint = TextRenderingHint.AntiAlias;
 
@@ -46,6 +59,7 @@ namespace Quesadilla.Classes
             bool showSystemText,
             bool Border, Color BorderColor,
             Color LineColourNormal,
+            Color LineColourOutOfRegion,
             Color LineColourRoute,
             Color SystemColourNormal,
             Color SystemColourRoute,
@@ -54,12 +68,18 @@ namespace Quesadilla.Classes
             Color SystemColourText,
             Color ZKillColour,
             Color IntelColour,
-            Color AltColour
+            Color AltColour,
+            Color IncursionColour,
+            Color IceColour,
+            int? animationCycleIntel,
+            int? animationCycleKills,
+            int? animationCycleAlts,
+            bool defaultTextSize = false,
+            bool showOutOfRegion = false
             )
         {
 
             double GUI_SCALING = 30;
-
 
             Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
 
@@ -159,7 +179,10 @@ namespace Quesadilla.Classes
                             foreach (var connection in mapSystem.solarSystem.ConnectedTo)
                             {
                                 var linkedSolarSystem = Program.Universe.SolarSystems[connection.ToSystemId];
-                                var linkedMinimapSystem = minimapSystems.Where(o => o.solarSystem.Id == linkedSolarSystem.Id).FirstOrDefault();
+
+                                if (showOutOfRegion == false && linkedSolarSystem.RegionName != FromSystem.RegionName) continue; // do not add to systems
+
+                                    var linkedMinimapSystem = minimapSystems.Where(o => o.solarSystem.Id == linkedSolarSystem.Id).FirstOrDefault();
                                 if (minimapSystems.Where(o => o.solarSystem.Name == linkedSolarSystem.Name).Count() == 0 &&
                                     minimapSystemsAdditional.Where(o => o.solarSystem.Name == linkedSolarSystem.Name).Count() == 0)
                                 {
@@ -218,7 +241,7 @@ namespace Quesadilla.Classes
                     minY = Math.Min(minY, currentSystem.Y);
                 }
                 int maxSize = Math.Max((int)(maxX - minX), (int)(maxY - minY));
-                int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (CIRCLE_ALERT_GAP * 4);
+                int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (8);
                 GUI_SCALING = (int)Math.Round((double)(maxSize) / ((pictureSize * (rawXY ? .8 : .8))));
                 GUI_SCALING = GUI_SCALING * (((double)mapScale / 100));
                 // Apply scale
@@ -257,30 +280,84 @@ namespace Quesadilla.Classes
                 // adjust origin
                 Point originPoint = new Point(ox, oy);
 
-                // draw connections
+                float textSize = defaultTextSize == false ? (TEXT_SIZE / (float)GUI_SCALING) : MINIMUM_TEXT_SIZE;
+                if (textSize < MINIMUM_TEXT_SIZE) textSize = MINIMUM_TEXT_SIZE;
+
+                // draw incursion base if required
+                foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Incursion))
+                {
+                    Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+                    Color TransparentIncursionColour = Color.FromArgb(255, IncursionColour);
+                    Brush incursionBrush = new SolidBrush(TransparentIncursionColour);
+                    float incursionBlobSize = (INCURSION_CLOUD_SIZE / (float)GUI_SCALING);
+                    g.FillEllipse(incursionBrush, currentPoint.X - incursionBlobSize, currentPoint.Y - incursionBlobSize, incursionBlobSize * 2, incursionBlobSize * 2);
+                }
+
+                    // draw connections
                 foreach (var connection in minimapConnectingSystems)
                 {
                     Point P1 = new Point(originPoint.X + connection.P1.X, originPoint.Y + connection.P1.Y);
                     Point P2 = new Point(originPoint.X + connection.P2.X, originPoint.Y + connection.P2.Y);
-                    Pen linePen = new Pen(connection.route ? LineColourRoute : LineColourNormal, 1);
+                    Pen linePen = new Pen(connection.route ? LineColourRoute : ((FromSystem.RegionName == connection.ToSystem.RegionName) ? LineColourNormal : LineColourOutOfRegion), 1);
                     g.DrawLine(linePen, P1, P2);
                 }
 
                 // draw system blobs
                 foreach (var currentSystem in minimapSystems)
                 {
+                    int circlesUsed = -1;
+
                     Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+                    float blobSize = (SYSTEM_CIRCLE_SIZE / (float)GUI_SCALING);
+                    if ( blobSize < MINIMUM_BLOB_SIZE || float.IsInfinity(blobSize) )
+                    {
+                        blobSize = MINIMUM_BLOB_SIZE;
+                    }
+
                     Color systemBrushColour = SystemColourNormal;
                     if (currentSystem.route) systemBrushColour = SystemColourRoute;
                     if (currentSystem.fromSystem) systemBrushColour = SystemColourFrom;
                     if (currentSystem.toSystem) systemBrushColour = SystemColourTo;
                     Brush systemBrush = new SolidBrush(systemBrushColour);
-                    g.FillEllipse(systemBrush, currentPoint.X - CIRCLE_RADIUS, currentPoint.Y - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+                    g.FillEllipse(systemBrush, currentPoint.X - blobSize, currentPoint.Y - blobSize, blobSize * 2, blobSize * 2);
+
+                    // do we have ice !
+                    if ( currentSystem.solarSystem.IceField == true )
+                    {
+                        DrawSystemName(g, currentPoint.X, currentPoint.Y, "*", IceColour, textSize);
+                    }
 
                     if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
                     {
-                        var zkillPen = new Pen(ZKillColour);
-                        g.DrawEllipse(zkillPen, currentPoint.X - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), currentPoint.Y - (CIRCLE_RADIUS + CIRCLE_KILL_GAP), (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_KILL_GAP) * 2);
+                        var circlePen = new Pen(ZKillColour,2);
+                        circlesUsed++;
+                        float circleSize = CIRCLE_INITIAL_GAP + (CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING;
+                        if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize))
+                        {
+                            circleSize = MINIMUM_CIRCLE_SIZE + (MINIMUM_CIRCLE_MULTIPLER * 2);
+                        }
+
+                        if (animationCycleKills is null)
+                        {
+                            g.DrawEllipse(circlePen,
+                                currentPoint.X - (blobSize + circleSize),
+                                currentPoint.Y - (blobSize + circleSize),
+                                (blobSize + circleSize) * 2,
+                                (blobSize + circleSize) * 2);
+                        }
+                        else
+                        {
+                            float[] dashSet = { 1, 1, 2, 2, 4, 4 };
+                            //circlePen.DashStyle = DashStyle.DashDot;
+                            circlePen.DashPattern = dashSet;
+                            g.DrawArc(circlePen,
+                                //currentPoint.X - (blobSize + (circleSize) + (float)animationCycleAlts), currentPoint.Y - (blobSize + (circleSize) + (float)animationCycleAlts),
+                                currentPoint.X - (blobSize + circleSize), currentPoint.Y - (blobSize + circleSize),
+                                //(blobSize + circleSize + (float)animationCycleAlts) * 2, (blobSize + circleSize + (float)animationCycleAlts) * 2,
+                                (blobSize + circleSize) * 2, (blobSize + circleSize) * 2,
+                                30 * (float)animationCycleIntel, 360);
+                        }
+
                         foreach (var k in currentSystem.solarSystem.Kills)
                         {
                             sbExtraInformation.AppendLine($"ZKILL {k.Timestamp.ToString("HH:mm:ss")} {k.SolarSystemName} {k.VictimShipName} {k.VictimCharacterName}");
@@ -288,8 +365,34 @@ namespace Quesadilla.Classes
                     }
                     if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null).Count() > 0)
                     {
-                        var intelPen = new Pen(IntelColour);
-                        g.DrawEllipse(intelPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALERT_GAP)), (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALERT_GAP) * 2);
+                        var circlePen = new Pen(IntelColour,2);
+                        circlesUsed++;
+                        float circleSize = CIRCLE_INITIAL_GAP + (CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING;
+                        if ( circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize))
+                        {
+                            circleSize = MINIMUM_CIRCLE_SIZE + (MINIMUM_CIRCLE_MULTIPLER);
+                        }
+                        if (animationCycleIntel is null)
+                        {
+                            g.DrawEllipse(circlePen,
+                                currentPoint.X - (blobSize + circleSize),
+                                currentPoint.Y - (blobSize + circleSize),
+                                (blobSize + circleSize) * 2,
+                                (blobSize + circleSize) * 2);
+                        }
+                        else
+                        {
+                            float[] dashSet = { 4, 4, 2, 2, 1, 1 };
+                            //circlePen.DashStyle = DashStyle.DashDot;
+                            circlePen.DashPattern = dashSet;
+                            g.DrawArc(circlePen,
+                                //currentPoint.X - (blobSize + (circleSize) + (float)animationCycleAlts), currentPoint.Y - (blobSize + (circleSize) + (float)animationCycleAlts),
+                                currentPoint.X - (blobSize + circleSize), currentPoint.Y - (blobSize + circleSize),
+                                //(blobSize + circleSize + (float)animationCycleAlts) * 2, (blobSize + circleSize + (float)animationCycleAlts) * 2,
+                                (blobSize + circleSize) * 2, (blobSize + circleSize) * 2,
+                                20 * (float)animationCycleIntel, 360);
+                        }
+
                         foreach (var a in currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null))
                         {
                             sbExtraInformation.AppendLine($"{a.Entry.LogTime} {a.Entry.LineContent}");
@@ -299,8 +402,34 @@ namespace Quesadilla.Classes
                     // active alt in sytstem ?
                     if (Program.CharacterList.Where(o => o.IsClientActive && o.IsCurrentlActiveClient == false && o.LocationId == currentSystem.solarSystem.Id).Count() > 0)
                     {
-                        var altPen = new Pen(AltColour);
-                        g.DrawEllipse(altPen, currentPoint.X - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP)), currentPoint.Y - (CIRCLE_RADIUS + (CIRCLE_ALT_GAP)), (CIRCLE_RADIUS + CIRCLE_ALT_GAP) * 2, (CIRCLE_RADIUS + CIRCLE_ALT_GAP) * 2);
+                        var circlePen = new Pen(AltColour,2);
+                        circlesUsed++;
+                        float circleSize = CIRCLE_INITIAL_GAP + (CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING;
+                        if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize))
+                        {
+                            circleSize = MINIMUM_CIRCLE_SIZE; // MINIMUM_CIRCLE_MULTIPLER
+                        }
+
+                        if (animationCycleAlts is null)
+                        {
+                            g.DrawEllipse(circlePen, 
+                                currentPoint.X - (blobSize + circleSize), 
+                                currentPoint.Y - (blobSize + circleSize),
+                                (blobSize + circleSize) * 2, 
+                                (blobSize + circleSize) * 2);
+                        }
+                        else
+                        {
+                            float[] dashSet = { 4,4,2,2,1,1 };
+                            //circlePen.DashStyle = DashStyle.DashDot;
+                            circlePen.DashPattern = dashSet;
+                            g.DrawArc(circlePen,
+                                //currentPoint.X - (blobSize + (circleSize) + (float)animationCycleAlts), currentPoint.Y - (blobSize + (circleSize) + (float)animationCycleAlts),
+                                currentPoint.X - (blobSize + circleSize) , currentPoint.Y - (blobSize + circleSize),
+                                //(blobSize + circleSize + (float)animationCycleAlts) * 2, (blobSize + circleSize + (float)animationCycleAlts) * 2,
+                                (blobSize + circleSize) * 2, (blobSize + circleSize) * 2, 
+                                10 * (float)animationCycleAlts, 360);
+                        }
                     }
                 }
 
@@ -310,10 +439,8 @@ namespace Quesadilla.Classes
                     foreach (var currentSystem in minimapSystems)
                     {
                         if (!currentSystem.textDisplay) continue;
-
                         Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-
-                        DrawSystemName(g, currentPoint.X, currentPoint.Y, currentSystem.solarSystem.Name, SystemColourText);
+                        DrawSystemName(g, currentPoint.X, currentPoint.Y, currentSystem.solarSystem.Name, SystemColourText, textSize);
                     }
                 }
 

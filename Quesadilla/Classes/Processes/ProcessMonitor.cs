@@ -61,11 +61,8 @@ namespace Quesadilla.Classes.Processes
             // This is a possible extension point
             return String.Equals(processName, ProcessMonitor.DEFAULT_PROCESS_NAME, StringComparison.OrdinalIgnoreCase);
         }
-        public void GetUpdatedProcesses(out List<ProcessInfo> addedProcesses, out List<ProcessInfo> updatedProcesses, out List<ProcessInfo> removedProcesses)
+        public void GetUpdatedProcesses()
         {
-            addedProcesses = new List<ProcessInfo>(16);
-            updatedProcesses = new List<ProcessInfo>(16);
-            removedProcesses = new List<ProcessInfo>(16);
 
             IList<IntPtr> knownProcesses = new List<IntPtr>(this._processCache.Keys);
             foreach (Process process in Process.GetProcesses())
@@ -90,7 +87,6 @@ namespace Quesadilla.Classes.Processes
                 {
                     // This is a new process in the list
                     this._processCache.Add(mainWindowHandle, mainWindowTitle);
-                    addedProcesses.Add(new ProcessInfo(mainWindowHandle, mainWindowTitle));
                 }
                 else
                 {
@@ -98,7 +94,6 @@ namespace Quesadilla.Classes.Processes
                     if (cachedTitle != mainWindowTitle)
                     {
                         this._processCache[mainWindowHandle] = mainWindowTitle;
-                        updatedProcesses.Add(new ProcessInfo(mainWindowHandle, mainWindowTitle));
                     }
 
                     knownProcesses.Remove(mainWindowHandle);
@@ -108,7 +103,6 @@ namespace Quesadilla.Classes.Processes
             foreach (IntPtr index in knownProcesses)
             {
                 string title = this._processCache[index];
-                removedProcesses.Add(new ProcessInfo(index, title));
                 this._processCache.Remove(index);
             }
         }

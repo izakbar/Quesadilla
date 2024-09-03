@@ -55,12 +55,16 @@ namespace Quesadilla.Classes.Dotlan
 
         private void Tick(object sender, EventArgs e)
         {
+            RunWorkerIfPossible();
+        }
+
+        public void RunWorkerIfPossible()
+        {
             if (!Worker.IsBusy && !FeedPaused)
             {
                 Worker.RunWorkerAsync();
             }
         }
-
 
         public void Pause()
         {

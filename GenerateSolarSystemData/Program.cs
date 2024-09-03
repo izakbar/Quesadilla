@@ -49,6 +49,7 @@ namespace QuesadillaExport
 
                 double dotlanX = 0;
                 double dotlanY = 0;
+                string link = "";
 
                 if (dotlanRegionDataLoaded)
                 {
@@ -61,9 +62,19 @@ namespace QuesadillaExport
                         {
                             dotlanX = x;
                             dotlanY = y;
+                            link = xn.Attributes["xlink:href"].Value.Replace("#", "");
                         }
                     }
                 }
+
+                bool IceField = false;
+
+                XmlNodeList iceFieldNode = xmldoc.SelectNodes($@"//*[@id='{link}']/*/*[@id='{link.Replace("def", "ice")}']");
+                if (iceFieldNode != null && iceFieldNode.Count > 0 )
+                {
+                    IceField = true;
+                }
+
 
                 SolarSystems.Add(solarSystem.solarSystemId,
                 new SolarSystem()
@@ -76,6 +87,8 @@ namespace QuesadillaExport
                     DotlanX = dotlanX,
                     DotlanY = dotlanY,
                     Id = solarSystem.solarSystemId,
+                    Incursion = false,
+                    IceField = IceField,
                     ConnectedTo = new List<SolarSystemConnectionData>(),
                 }
             );

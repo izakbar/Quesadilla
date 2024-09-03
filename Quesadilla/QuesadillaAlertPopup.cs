@@ -165,6 +165,7 @@ namespace Quesadilla
                     configuration.AlertPopupMinimapShowSystemText,
                     configuration.AlertPopupShowMinimapBorder, configuration.AlertPopupMinimapBorderColour,
                     configuration.AlertPopupMinimapLineColourNormal,
+                    configuration.AlertPopupMinimapLineColourOutOfRegion,
                     configuration.AlertPopupMinimapLineColourRoute,
                     configuration.AlertPopupMinimapSystemColourNormal,
                     configuration.AlertPopupMinimapSystemColourRoute,
@@ -173,7 +174,12 @@ namespace Quesadilla
                     configuration.AlertPopupMinimapSystemColourText,
                     configuration.AlertPopupMinimapZKillColour,
                     configuration.AlertPopupMinimapIntelColour,
-                    configuration.AlertPopupMinimapAltPositionColour
+                    configuration.AlertPopupMinimapAltPositionColour,
+                    configuration.AlertPopupMinimapIncursionColour,
+                    configuration.AlertPopupMinimapIceColour,
+                    null, null, null,
+                    true,
+                    true // show out of region 
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
