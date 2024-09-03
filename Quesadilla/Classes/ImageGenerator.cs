@@ -74,7 +74,8 @@ namespace Quesadilla.Classes
             int? animationCycleIntel,
             int? animationCycleKills,
             int? animationCycleAlts,
-            bool defaultTextSize = false
+            bool defaultTextSize = false,
+            bool showOutOfRegion = false
             )
         {
 
@@ -178,7 +179,10 @@ namespace Quesadilla.Classes
                             foreach (var connection in mapSystem.solarSystem.ConnectedTo)
                             {
                                 var linkedSolarSystem = Program.Universe.SolarSystems[connection.ToSystemId];
-                                var linkedMinimapSystem = minimapSystems.Where(o => o.solarSystem.Id == linkedSolarSystem.Id).FirstOrDefault();
+
+                                if (showOutOfRegion == false && linkedSolarSystem.RegionName != FromSystem.RegionName) continue; // do not add to systems
+
+                                    var linkedMinimapSystem = minimapSystems.Where(o => o.solarSystem.Id == linkedSolarSystem.Id).FirstOrDefault();
                                 if (minimapSystems.Where(o => o.solarSystem.Name == linkedSolarSystem.Name).Count() == 0 &&
                                     minimapSystemsAdditional.Where(o => o.solarSystem.Name == linkedSolarSystem.Name).Count() == 0)
                                 {

@@ -2293,7 +2293,8 @@ namespace Quesadilla
                     AnimationStateIntel.Value(),
                     AnimationStateKills.Value(),
                     AnimationStateAlts.Value(),
-                    false
+                    false,
+                    Program.MainConfiguration.MinimapShowOutOfRegion
                     );
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));

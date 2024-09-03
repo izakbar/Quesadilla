@@ -785,6 +785,12 @@ img.rounded-corners {
         public int MinimapJumps { get; set; }
 
         [Category("Main window")]
+        [DisplayName("Minimap show out of region systems")]
+        [Description("Show systems outside current region if in configured jumps range {MinimapJumps}")]
+        [DefaultValue(typeof(bool), "true")]
+        public bool MinimapShowOutOfRegion { get; set; }
+
+        [Category("Main window")]
         [DisplayName("Current character colour")]
         [Description("The colour to use for the currently active eveonline character on the main window")]
         [DefaultValue(typeof(Color), "MediumTurquoise")]
