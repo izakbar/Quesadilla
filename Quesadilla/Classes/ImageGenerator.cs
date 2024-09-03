@@ -14,6 +14,7 @@ using System.Data;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using EVEStandard.Models;
+using System.Collections.Immutable;
 
 namespace Quesadilla.Classes
 {
@@ -58,6 +59,7 @@ namespace Quesadilla.Classes
             bool showSystemText,
             bool Border, Color BorderColor,
             Color LineColourNormal,
+            Color LineColourOutOfRegion,
             Color LineColourRoute,
             Color SystemColourNormal,
             Color SystemColourRoute,
@@ -292,7 +294,7 @@ namespace Quesadilla.Classes
                 {
                     Point P1 = new Point(originPoint.X + connection.P1.X, originPoint.Y + connection.P1.Y);
                     Point P2 = new Point(originPoint.X + connection.P2.X, originPoint.Y + connection.P2.Y);
-                    Pen linePen = new Pen(connection.route ? LineColourRoute : LineColourNormal, 1);
+                    Pen linePen = new Pen(connection.route ? LineColourRoute : ((FromSystem.RegionName == connection.ToSystem.RegionName) ? LineColourNormal : LineColourOutOfRegion), 1);
                     g.DrawLine(linePen, P1, P2);
                 }
 

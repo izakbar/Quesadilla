@@ -1629,14 +1629,14 @@ namespace Quesadilla
             Height = intelLog.Height + _windowExtraHeight + (Program.MainConfiguration.ShowMinimap ? pMinimapImage.Height : 20);
 
             lblISK.Top = lblAlertsOutstanding.Top; ;
-            lblISK.Left = Width - (lblISK.Width + 15);
+            lblISK.Left = Width - (lblISK.Width + working.Width + 15);
 
             lblMining.Top = lblAlertsOutstanding.Top; ;
-            lblMining.Left = Width - (lblISK.Width + lblMining.Width + 25);
+            lblMining.Left = Width - (lblISK.Width + lblMining.Width + working.Width + 25);
 
             if (Program.MainConfiguration.ShowMinimap)
             {
-                //lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
+                //lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;|
                 //lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
 
                 lblEtxraInformation.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
@@ -2278,6 +2278,7 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapShowSystemText,
                     Program.MainConfiguration.ShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
                     Program.MainConfiguration.MinimapLineColourNormal,
+                    Program.MainConfiguration.MinimapLineColourOutOfRegion,
                     Program.MainConfiguration.MinimapLineColourRoute,
                     Program.MainConfiguration.MinimapSystemColourNormal,
                     Program.MainConfiguration.MinimapSystemColourRoute,

@@ -165,6 +165,7 @@ namespace Quesadilla
                     configuration.AlertPopupMinimapShowSystemText,
                     configuration.AlertPopupShowMinimapBorder, configuration.AlertPopupMinimapBorderColour,
                     configuration.AlertPopupMinimapLineColourNormal,
+                    configuration.AlertPopupMinimapLineColourOutOfRegion,
                     configuration.AlertPopupMinimapLineColourRoute,
                     configuration.AlertPopupMinimapSystemColourNormal,
                     configuration.AlertPopupMinimapSystemColourRoute,

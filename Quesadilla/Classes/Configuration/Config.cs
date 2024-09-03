@@ -657,6 +657,12 @@ img.rounded-corners {
         public Color MinimapLineColourNormal { get; set; }
 
         [Category("Main window")]
+        [DisplayName("Minimap Out of region connection colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "DimGray")]
+        public Color MinimapLineColourOutOfRegion { get; set; }
+
+        [Category("Main window")]
         [DisplayName("Minimap Route connection colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Tomato")]
@@ -1081,6 +1087,12 @@ img.rounded-corners {
         [Description("")]
         [DefaultValue(typeof(Color), "Gainsboro")]
         public Color AlertPopupMinimapLineColourNormal { get; set; }
+
+        [Category("Main window")]
+        [DisplayName("Minimap Out of region connection colour")]
+        [Description("")]
+        [DefaultValue(typeof(Color), "DimGray")]
+        public Color AlertPopupMinimapLineColourOutOfRegion { get; set; }
 
         [Category("Alert")]
         [DisplayName("Minimap route connection colour")]
