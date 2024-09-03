@@ -216,6 +216,16 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
+                    FriendlyName = "Skyhook robbery",
+                    Enabled = false,
+                    AlertType = AlertConfigType.Text,
+                    TextDisplay = "Skyhook robbery {text} reported by {reporter}",
+                    MenuDisplay = "Skyhook robbery {text} reported by {reporter}",
+                    SoundFile = "Boo2",
+                    TriggerText = "skyhook",
+                });
+                c.AlertConfiguration.Add(new AlertConfig()
+                {
                     FriendlyName = "Faction Spawn",
                     Enabled = true,
                     AlertType = AlertConfigType.FactionSpawn,
