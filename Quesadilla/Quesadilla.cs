@@ -2126,22 +2126,26 @@ namespace Quesadilla
                     XmlNode dotlanDEFNodes = xmldoc.SelectSingleNode($@"//*[@id='{link}']/*");
 
                     var s = Program.Universe.SolarSystems[(int)systemID];
-                    s.DotlanX = x;
-                    s.DotlanY = y;
 
-                    s.IceField = false;
-                    XmlNodeList iceFieldNode = xmldoc.SelectNodes($@"//*[@id='{link}']/*/*[@id='{link.Replace("def", "ice")}']");
-                    if (iceFieldNode != null && iceFieldNode.Count > 0)
+                    if (s.RegionName == e.RegionName)
                     {
-                        s.IceField = true;
-                    }
+                        s.DotlanX = x;
+                        s.DotlanY = y;
 
-                    // default to no incursion
-                    s.Incursion = false;
-                    XmlNode incursionNode = xmldoc.SelectSingleNode($@"//*[@id='glow']/*[@id='{link.Replace("def", "inc")}']");
-                    if (incursionNode != null)
-                    {
-                        s.Incursion = true;
+                        s.IceField = false;
+                        XmlNodeList iceFieldNode = xmldoc.SelectNodes($@"//*[@id='{link}']/*/*[@id='{link.Replace("def", "ice")}']");
+                        if (iceFieldNode != null && iceFieldNode.Count > 0)
+                        {
+                            s.IceField = true;
+                        }
+
+                        // default to no incursion
+                        s.Incursion = false;
+                        XmlNode incursionNode = xmldoc.SelectSingleNode($@"//*[@id='glow']/*[@id='{link.Replace("def", "inc")}']");
+                        if (incursionNode != null)
+                        {
+                            s.Incursion = true;
+                        }
                     }
                 }
             }
