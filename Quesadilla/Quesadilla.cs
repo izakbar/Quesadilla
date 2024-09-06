@@ -2578,8 +2578,8 @@ namespace Quesadilla
         private void ShowAlertWindow(AlertQueueItem alert)
         {
             // try to prevent new alert stealing focus
-            var ptr = Program.ProcessMonitorHandler.GetForegroundWindowHandle();
             var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
+            var ptr = Program.ProcessMonitorHandler.GetForegroundWindowHandle();
             NewAlertWindow.Show(this);
             var ptr2 = Program.ProcessMonitorHandler.SetForegroundWindowHandle(ptr);
         }
