@@ -329,6 +329,13 @@ namespace Quesadilla.Classes
                     Logfile = "izakbar.debug",
                     LogType = Logfile.LogFileType.ChatIntel,
                 });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "Tenerifis Intel",
+                    Logfile = "tenerifis.imperium ",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
             }
 
             if (c.CSSData== null)
