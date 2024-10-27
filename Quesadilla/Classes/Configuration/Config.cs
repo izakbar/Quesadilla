@@ -269,8 +269,43 @@ namespace Quesadilla.Classes
                 c.Logfiles.Add(new LogfileConfig()
                 {
                     Enabled = true,
-                    FriendlyName = "Catch Intel",
-                    Logfile = "catch.imperium",
+                    FriendlyName = "Tenerifis/Immensea/Catch/Impass (CONDI Sov)",
+                    Logfile = "east.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "Delve/Querious/Period Basis",
+                    Logfile = "west.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "Paragon Soul, Esoteria, Feythabolis",
+                    Logfile = "southeast.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "LS Aridia Intel",
+                    Logfile = "aridia.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "LS Khanid Intel",
+                    Logfile = "khanid.imperium",
+                    LogType = Logfile.LogFileType.ChatIntel,
+                });
+                c.Logfiles.Add(new LogfileConfig()
+                {
+                    Enabled = true,
+                    FriendlyName = "Pochven Intel",
+                    Logfile = "triangle.imperium",
                     LogType = Logfile.LogFileType.ChatIntel,
                 });
                 c.Logfiles.Add(new LogfileConfig()
@@ -283,36 +318,8 @@ namespace Quesadilla.Classes
                 c.Logfiles.Add(new LogfileConfig()
                 {
                     Enabled = true,
-                    FriendlyName = "Period Basis Intel",
-                    Logfile = "period.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "Querious Intel",
-                    Logfile = "querious.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "Delve Intel",
-                    Logfile = "delve.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = false,
-                    FriendlyName = "Cloud Ring Intel",
-                    Logfile = "cr.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "Paragon Soul Intel",
-                    Logfile = "paragon.imperium",
+                    FriendlyName = "Curse Intel",
+                    Logfile = "curse.imperium ",
                     LogType = Logfile.LogFileType.ChatIntel,
                 });
                 c.Logfiles.Add(new LogfileConfig()
