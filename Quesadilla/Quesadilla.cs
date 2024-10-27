@@ -1068,9 +1068,19 @@ namespace Quesadilla
             SetupStatusBar();
 
             if (foundSystemId == -1)
-                return;
-            Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
+            {
 
+                if (e.SystemName.StartsWith("J"))
+                {
+                    // wormhole ? - get info from http://anoik.is/
+
+                }
+                else
+                {
+                    return;
+                }
+            }
+            Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
 
             shouldUpdatePlanetInfo = true;
             shouldUpdateMinimap = true;

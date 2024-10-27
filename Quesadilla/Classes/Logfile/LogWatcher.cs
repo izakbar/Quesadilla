@@ -466,7 +466,10 @@ namespace Quesadilla.Classes
                         }
                         Match match1 = this._localSystemChange.Match(str ?? string.Empty);
                         if (match1.Success)
+                        {
                             localInfo.CurrentSystem = match1.Groups["systemname"].ToString();
+                            //OnSystemChange(match1.Groups["systemname"].ToString(), localInfo.CharName);
+                        }
                     }
                 }
                 catch (Exception ex)
