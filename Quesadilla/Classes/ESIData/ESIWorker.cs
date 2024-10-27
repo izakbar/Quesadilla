@@ -133,9 +133,12 @@ namespace Quesadilla.Classes.ESIData
         {
             try
             {
+
+                _log.Debug($"Getting planet information for {systemId}");
                 var systemInfo = _esiClient.Universe.GetSolarSystemInfoV4Async(systemId).Result.Model;
                 if (systemInfo != null)
                 {
+                    _log.Debug($"{systemInfo.Name} {systemInfo.Planets.Count}");
                     List<PlanetInfo> planets = new List<PlanetInfo>();
                     foreach (var p in systemInfo.Planets)
                     {
