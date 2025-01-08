@@ -179,8 +179,9 @@ namespace Quesadilla
                     configuration.AlertPopupMinimapIceColour,
                     null, null, null,
                     true,
-                    true // show out of region 
-                    );
+                    true, // show out of region 
+					Program.MainConfiguration.AlertPopupMinimapIncursionAlpha
+					);
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
                 pMinimapImage.Image = minimapBitmap;

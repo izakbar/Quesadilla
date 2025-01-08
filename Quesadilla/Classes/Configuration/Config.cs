@@ -778,13 +778,20 @@ img.rounded-corners {
         [DefaultValue(typeof(Color), "Aqua")]
         public Color MinimapAltPositionColour { get; set; }
 
-        [Category("Main window")]
-        [DisplayName("Minimap incursion Indicator colour")]
-        [Description("Colour to use for incursion indicators on the minimap")]
-        [DefaultValue(typeof(Color), "DarkGreen")]
-        public Color MinimapIncursionColour { get; set; }
+		[Category("Main window")]
+		[DisplayName("Minimap incursion Indicator colour")]
+		[Description("Colour to use for incursion indicators on the minimap")]
+		[DefaultValue(typeof(Color), "DarkGreen")]
+		public Color MinimapIncursionColour { get; set; }
 
-        [Category("Main window")]
+		[Category("Main window")]
+		[DisplayName("Minimap incursion Indicator alpha")]
+		[Description("Alpha to use for incursion indicators on the minimap")]
+		[DefaultValue(typeof(int), "95")]
+        [Range(0, 100)]
+		public int MinimapIncursionAlpha { get; set; }
+
+		[Category("Main window")]
         [DisplayName("Minimap Ice Indicator colour")]
         [Description("Colour to use for ice indicatos on the minimap")]
         [DefaultValue(typeof(Color), "Cyan")]
@@ -1188,7 +1195,14 @@ img.rounded-corners {
         [DisplayName("Minimap incursion Indicator colour")]
         [Description("Colour to use for incursion indicators on the alert popup")]
         [DefaultValue(typeof(Color), "DarkGreen")]
-        public Color AlertPopupMinimapIncursionColour { get; set; }
+		public Color AlertPopupMinimapIncursionColour { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap incursion Indicator alpha")]
+		[Description("Alpha to use for incursion indicators on the alert popup")]
+		[DefaultValue(typeof(int), "95")]
+		[Range(0, 100)]
+        public int AlertPopupMinimapIncursionAlpha { get; set; }
 
         [Category("Alert")]
         [DisplayName("Use SDE X/Y")]

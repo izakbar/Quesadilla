@@ -15,6 +15,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using EVEStandard.Models;
 using System.Collections.Immutable;
+using EVEStandard.API;
+using System.Drawing.Imaging;
+using System.Windows.Media;
 
 namespace Quesadilla.Classes
 {
@@ -75,13 +78,14 @@ namespace Quesadilla.Classes
             int? animationCycleKills,
             int? animationCycleAlts,
             bool defaultTextSize = false,
-            bool showOutOfRegion = false
+            bool showOutOfRegion = false,
+            int incursionAlphaAmount = 50
             )
         {
 
             double GUI_SCALING = 30;
 
-            Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
+            Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
 
             int combinedBorder = TRANSPARENT_BORDER_WIDTH + BORDER_WIDTH;
 
@@ -283,18 +287,52 @@ namespace Quesadilla.Classes
                 float textSize = defaultTextSize == false ? (TEXT_SIZE / (float)GUI_SCALING) : MINIMUM_TEXT_SIZE;
                 if (textSize < MINIMUM_TEXT_SIZE) textSize = MINIMUM_TEXT_SIZE;
 
-                // draw incursion base if required
-                foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Incursion))
-                {
-                    Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-                    Color TransparentIncursionColour = Color.FromArgb(255, IncursionColour);
-                    Brush incursionBrush = new SolidBrush(TransparentIncursionColour);
-                    float incursionBlobSize = (INCURSION_CLOUD_SIZE / (float)GUI_SCALING);
-                    g.FillEllipse(incursionBrush, currentPoint.X - incursionBlobSize, currentPoint.Y - incursionBlobSize, incursionBlobSize * 2, incursionBlobSize * 2);
-                }
+				// draw incursion base if required
+				if (minimapSystems.Where(o => o.solarSystem.Incursion).Count() > 0)
+				{
+					g.CompositingMode = CompositingMode.SourceOver;
+					g.CompositingQuality = CompositingQuality.GammaCorrected;
 
-                    // draw connections
-                foreach (var connection in minimapConnectingSystems)
+					Brush incursionBrush = new SolidBrush(IncursionColour);
+					Brush incursionOutlineBrush = new SolidBrush(Color.Red);
+                    Pen incursionOutlinePen = new Pen(incursionOutlineBrush, 3);
+					float incursionBlobSize = (INCURSION_CLOUD_SIZE / (float)GUI_SCALING);
+
+					Image incursionImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
+
+                    ColorMatrix incursionColourMatrix = new ColorMatrix();
+					incursionColourMatrix.Matrix33 = (float)((float)incursionAlphaAmount / (float)100);  // alpha !
+					ImageAttributes incursionImageAttr = new ImageAttributes();
+                    incursionImageAttr.SetColorMatrix(incursionColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+					using (Graphics gIncursion = Graphics.FromImage(incursionImage))
+					{
+						foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Incursion))
+						{
+							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+							gIncursion.DrawEllipse(incursionOutlinePen, currentPoint.X - incursionBlobSize, currentPoint.Y - incursionBlobSize, incursionBlobSize * 2, incursionBlobSize * 2);
+						}
+
+						foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Incursion))
+						{
+							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+							gIncursion.FillEllipse(incursionBrush, currentPoint.X - incursionBlobSize, currentPoint.Y - incursionBlobSize, incursionBlobSize * 2, incursionBlobSize * 2);
+						}
+
+						g.DrawImage(
+							incursionImage,
+							// target
+							new Rectangle(0, 0, incursionImage.Width, incursionImage.Height),
+							// source
+							0, 0, incursionImage.Width, incursionImage.Height,
+							GraphicsUnit.Pixel,
+							incursionImageAttr
+							);
+					}
+				}
+
+				// draw connections
+				foreach (var connection in minimapConnectingSystems)
                 {
                     Point P1 = new Point(originPoint.X + connection.P1.X, originPoint.Y + connection.P1.Y);
                     Point P2 = new Point(originPoint.X + connection.P2.X, originPoint.Y + connection.P2.Y);
