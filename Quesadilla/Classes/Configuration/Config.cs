@@ -785,11 +785,24 @@ img.rounded-corners {
 		public Color MinimapIncursionColour { get; set; }
 
 		[Category("Main window")]
+		[DisplayName("Minimap incursion Indicator outline colour")]
+		[Description("Colour to use for outline for incursion indicators on the minimap")]
+		[DefaultValue(typeof(Color), "Red")]
+		public Color MinimapIncursionOutlineColour { get; set; }
+
+		[Category("Main window")]
 		[DisplayName("Minimap incursion Indicator alpha")]
 		[Description("Alpha to use for incursion indicators on the minimap")]
 		[DefaultValue(typeof(int), "95")]
         [Range(0, 100)]
 		public int MinimapIncursionAlpha { get; set; }
+
+		[Category("Main window")]
+		[DisplayName("Minimap incursion cloud size")]
+		[Description("Size to use for incursion indicators on the minimap")]
+		[DefaultValue(typeof(int), "60")]
+		[Range(0, 100)]
+		public int MinimapIncursionCloudSize { get; set; }
 
 		[Category("Main window")]
         [DisplayName("Minimap Ice Indicator colour")]
@@ -1191,11 +1204,17 @@ img.rounded-corners {
         [DefaultValue(typeof(Color), "Cyan")]
         public Color AlertPopupMinimapIceColour { get; set; }
 
-        [Category("Alert")]
-        [DisplayName("Minimap incursion Indicator colour")]
-        [Description("Colour to use for incursion indicators on the alert popup")]
-        [DefaultValue(typeof(Color), "DarkGreen")]
+		[Category("Alert")]
+		[DisplayName("Minimap incursion Indicator colour")]
+		[Description("Colour to use for incursion indicators on the alert popup")]
+		[DefaultValue(typeof(Color), "DarkGreen")]
 		public Color AlertPopupMinimapIncursionColour { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap incursion Indicator outline colour")]
+		[Description("Colour to use for outline to incursion indicators on the alert popup")]
+		[DefaultValue(typeof(Color), "Red")]
+		public Color AlertPopupMinimapIncursionOutlineColour { get; set; }
 
 		[Category("Alert")]
 		[DisplayName("Minimap incursion Indicator alpha")]
@@ -1204,6 +1223,13 @@ img.rounded-corners {
 		[Range(0, 100)]
         public int AlertPopupMinimapIncursionAlpha { get; set; }
 
+		[Category("Alert")]
+		[DisplayName("Minimap incursion Indicator size")]
+		[Description("Size of each incursion indicator on the alert popup")]
+		[DefaultValue(typeof(int), "30")]
+		[Range(0, 100)]
+		public int AlertPopupMinimapIncursionCloudSize { get; set; }
+		
         [Category("Alert")]
         [DisplayName("Use SDE X/Y")]
         [Description("Selecting true will show minimap using the SDE values for X/Y. Selecting False will use Dotlan layout")]

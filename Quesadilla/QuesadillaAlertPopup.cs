@@ -176,11 +176,13 @@ namespace Quesadilla
                     configuration.AlertPopupMinimapIntelColour,
                     configuration.AlertPopupMinimapAltPositionColour,
                     configuration.AlertPopupMinimapIncursionColour,
-                    configuration.AlertPopupMinimapIceColour,
+					configuration.AlertPopupMinimapIncursionOutlineColour,
+					configuration.AlertPopupMinimapIceColour,
                     null, null, null,
                     true,
                     true, // show out of region 
-					Program.MainConfiguration.AlertPopupMinimapIncursionAlpha
+					Program.MainConfiguration.AlertPopupMinimapIncursionAlpha,
+					Program.MainConfiguration.AlertPopupMinimapIncursionCloudSize
 					);
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));

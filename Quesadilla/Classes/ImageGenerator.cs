@@ -18,6 +18,7 @@ using System.Collections.Immutable;
 using EVEStandard.API;
 using System.Drawing.Imaging;
 using System.Windows.Media;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
 
 namespace Quesadilla.Classes
 {
@@ -33,7 +34,6 @@ namespace Quesadilla.Classes
         private const double LY_SCALING = 9460000000000;
 
         private const int CIRCLE_RADIUS = 3;
-        private const int INCURSION_CLOUD_SIZE = 60;
         private const int SYSTEM_CIRCLE_SIZE = 6;
 
         private const float MINIMUM_TEXT_SIZE = 10;
@@ -72,14 +72,16 @@ namespace Quesadilla.Classes
             Color ZKillColour,
             Color IntelColour,
             Color AltColour,
-            Color IncursionColour,
+			Color IncursionColour,
+		    Color IncursionOutlineColour,
             Color IceColour,
             int? animationCycleIntel,
             int? animationCycleKills,
             int? animationCycleAlts,
             bool defaultTextSize = false,
             bool showOutOfRegion = false,
-            int incursionAlphaAmount = 50
+            int incursionAlphaAmount = 50,
+            int incursionCloudSize = 60
             )
         {
 
@@ -98,30 +100,23 @@ namespace Quesadilla.Classes
 
             using (Graphics g = Graphics.FromImage(dstImage))
             {
-                // main background
-                using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.PaleGoldenrod)))
-                {
-                    g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
-                }
 
-                // Border ?
-                if (Border)
+                Brush backgroundBrush = new SolidBrush(Color.FromArgb(0, Color.PaleGoldenrod));
+				// main background
+				//g.FillRectangle(backgroundBrush, 0, 0, dstImage.Width, dstImage.Height);
+
+				// Border ?
+				if (Border)
                 {
                     using (Brush br = new SolidBrush(BorderColor))
                     {
                         g.FillRectangle(br, TRANSPARENT_BORDER_WIDTH, TRANSPARENT_BORDER_WIDTH, dstImage.Width - (TRANSPARENT_BORDER_WIDTH * 2), dstImage.Height - (TRANSPARENT_BORDER_WIDTH * 2));
                     }
-                    using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.PaleGoldenrod)))
-                    {
-                        g.FillRectangle(br, combinedBorder, combinedBorder, dstImage.Width - (combinedBorder * 2), dstImage.Height - (combinedBorder * 2));
-                    }
+                    g.FillRectangle(backgroundBrush, combinedBorder, combinedBorder, dstImage.Width - (combinedBorder * 2), dstImage.Height - (combinedBorder * 2));
                 }
                 else
                 {
-                    using (Brush br = new SolidBrush(Color.FromKnownColor(KnownColor.PaleGoldenrod)))
-                    {
-                        g.FillRectangle(br, TRANSPARENT_BORDER_WIDTH, TRANSPARENT_BORDER_WIDTH, dstImage.Width - (TRANSPARENT_BORDER_WIDTH * 2), dstImage.Height - (TRANSPARENT_BORDER_WIDTH * 2));
-                    }
+                    g.FillRectangle(backgroundBrush, TRANSPARENT_BORDER_WIDTH, TRANSPARENT_BORDER_WIDTH, dstImage.Width - (TRANSPARENT_BORDER_WIDTH * 2), dstImage.Height - (TRANSPARENT_BORDER_WIDTH * 2));
                 }
 
                 if (path is null || path.FromSystemId == 0) return dstImage;
@@ -290,13 +285,14 @@ namespace Quesadilla.Classes
 				// draw incursion base if required
 				if (minimapSystems.Where(o => o.solarSystem.Incursion).Count() > 0)
 				{
-					g.CompositingMode = CompositingMode.SourceOver;
-					g.CompositingQuality = CompositingQuality.GammaCorrected;
+					//g.CompositingMode = CompositingMode.SourceOver;
+					//g.CompositingQuality = CompositingQuality.GammaCorrected;
+					g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
 					Brush incursionBrush = new SolidBrush(IncursionColour);
-					Brush incursionOutlineBrush = new SolidBrush(Color.Red);
+					Brush incursionOutlineBrush = new SolidBrush(IncursionOutlineColour);
                     Pen incursionOutlinePen = new Pen(incursionOutlineBrush, 3);
-					float incursionBlobSize = (INCURSION_CLOUD_SIZE / (float)GUI_SCALING);
+					float incursionBlobSize = ((float) incursionCloudSize / (float)GUI_SCALING);
 
 					Image incursionImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
 

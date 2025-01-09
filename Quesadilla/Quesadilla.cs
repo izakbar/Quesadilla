@@ -2302,18 +2302,20 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapZKillColour,
                     Program.MainConfiguration.MinimapIntelColour,
                     Program.MainConfiguration.MinimapAltPositionColour,
-                    Program.MainConfiguration.MinimapIncursionColour,
+					Program.MainConfiguration.MinimapIncursionColour,
+					Program.MainConfiguration.MinimapIncursionOutlineColour,
                     Program.MainConfiguration.MinimapIceColour,
                     AnimationStateIntel.Value(),
                     AnimationStateKills.Value(),
                     AnimationStateAlts.Value(),
                     false,
                     Program.MainConfiguration.MinimapShowOutOfRegion,
-                    Program.MainConfiguration.MinimapIncursionAlpha
+					Program.MainConfiguration.MinimapIncursionAlpha,
+                    Program.MainConfiguration.MinimapIncursionCloudSize
                     );
-                Bitmap minimapBitmap = new Bitmap(minimapImage);
-                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
-                pMinimapImage.Image = minimapBitmap;
+//                Bitmap minimapBitmap = new Bitmap(minimapImage);
+//                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
+                pMinimapImage.Image = minimapImage;
                 lblEtxraInformation.Text = extraInformation;
                 pMinimapImage.Visible = true;
                 this.Invalidate();
