@@ -2165,14 +2165,22 @@ namespace Quesadilla
             {
                 Log.Information($"Processing dotlan delta data for {e.RegionName}");
                 Dictionary<string, string> killdDeltadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(e.DeltaContent);
+
                 foreach (var kvp in killdDeltadata)
                 {
-                    int systemId = int.Parse(kvp.Key);
-                    int killDelta = int.Parse(kvp.Value);
-
-                    if (Program.Universe.SolarSystems.ContainsKey(systemId))
+                    if (kvp.Key.Equals("error"))
                     {
-                        Program.Universe.SolarSystems[systemId].NPCKillsDeltaLastHour = killDelta;
+						Log.Error($"{kvp.Value} Processing dotlan delta data for {e.RegionName}");
+					}
+					else
+                    {
+                        int systemId = int.Parse(kvp.Key);
+                        int killDelta = int.Parse(kvp.Value);
+
+                        if (Program.Universe.SolarSystems.ContainsKey(systemId))
+                        {
+                            Program.Universe.SolarSystems[systemId].NPCKillsDeltaLastHour = killDelta;
+                        }
                     }
                 }
             }
