@@ -805,12 +805,18 @@ img.rounded-corners {
 		public int MinimapIncursionCloudSize { get; set; }
 
 		[Category("Main window")]
-        [DisplayName("Minimap Ice Indicator colour")]
-        [Description("Colour to use for ice indicatos on the minimap")]
-        [DefaultValue(typeof(Color), "Cyan")]
-        public Color MinimapIceColour { get; set; }
+		[DisplayName("Minimap Ice Indicator colour")]
+		[Description("Colour to use for ice indicatos on the minimap")]
+		[DefaultValue(typeof(Color), "Cyan")]
+		public Color MinimapIceColour { get; set; }
 
-        [Category("Main window")]
+		[Category("Main window")]
+		[DisplayName("Minimap Mercoxit Indicator colour")]
+		[Description("Colour to use for Mercoxit indicatos on the minimap")]
+		[DefaultValue(typeof(Color), "IndianRed")]
+		public Color MinimapMercoxitColour { get; set; }
+
+		[Category("Main window")]
         [DisplayName("Minimap Height")]
         [Description("Height of the minimap")]
         [DefaultValue(typeof(int), "200")]
@@ -1198,11 +1204,17 @@ img.rounded-corners {
         [DefaultValue(typeof(Color), "Aqua")]
         public Color AlertPopupMinimapAltPositionColour { get; set; }
 
-        [Category("Main window")]
+        [Category("Alert")]
         [DisplayName("Minimap Ice Indicator colour")]
         [Description("Colour to use for ice indicatos on the alert popup")]
         [DefaultValue(typeof(Color), "Cyan")]
         public Color AlertPopupMinimapIceColour { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap Mercoxit Indicator colour")]
+		[Description("Colour to use for Mercoxit indicatos on the alert popup")]
+		[DefaultValue(typeof(Color), "IndianRed")]
+		public Color AlertPopupMinimapMercoxitColour { get; set; }
 
 		[Category("Alert")]
 		[DisplayName("Minimap incursion Indicator colour")]

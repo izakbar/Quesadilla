@@ -82,7 +82,7 @@ namespace Quesadilla.Controllers
             if (Program.q != null && Program.q.latestAlertBitmap != null)
             {
                 TimeSpan timeAgo = DateTime.Now - Program.q.latestAlertTimestamp;
-                if (timeAgo.Seconds > seconds)
+                if (timeAgo.TotalSeconds > seconds)
                 {
                     return new ContentResult
                     {

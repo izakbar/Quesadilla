@@ -178,6 +178,7 @@ namespace Quesadilla
                     configuration.AlertPopupMinimapIncursionColour,
 					configuration.AlertPopupMinimapIncursionOutlineColour,
 					configuration.AlertPopupMinimapIceColour,
+                    configuration.AlertPopupMinimapMercoxitColour,
                     null, null, null,
                     true,
                     true, // show out of region 

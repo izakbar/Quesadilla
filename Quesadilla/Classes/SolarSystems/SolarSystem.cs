@@ -41,7 +41,8 @@ namespace Quesadilla.Classes.SolarSystems
         public int? NPCKillsDeltaLastHour { get; set; }
         public bool Incursion { get; set; }
         public bool IceField { get; set; }
-        public void SetNameRegex()
+		public double Security { get; set; }
+		public void SetNameRegex()
         {
             string str = "";
             foreach (char c in Name)

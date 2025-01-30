@@ -89,6 +89,7 @@ namespace QuesadillaExport
                     Id = solarSystem.solarSystemId,
                     Incursion = false,
                     IceField = IceField,
+                    Security = solarSystem.Security,
                     ConnectedTo = new List<SolarSystemConnectionData>(),
                 }
             );

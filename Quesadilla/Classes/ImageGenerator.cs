@@ -75,6 +75,7 @@ namespace Quesadilla.Classes
 			Color IncursionColour,
 		    Color IncursionOutlineColour,
             Color IceColour,
+            Color MercoxitColour,
             int? animationCycleIntel,
             int? animationCycleKills,
             int? animationCycleAlts,
@@ -355,13 +356,21 @@ namespace Quesadilla.Classes
                     Brush systemBrush = new SolidBrush(systemBrushColour);
                     g.FillEllipse(systemBrush, currentPoint.X - blobSize, currentPoint.Y - blobSize, blobSize * 2, blobSize * 2);
 
+					// How about mercoxit ?
+					if (currentSystem.solarSystem.Security < -0.7)
+					{
+						DrawSystemName(g, currentPoint.X-10, currentPoint.Y-3, "✦", MercoxitColour, textSize);
+					}
+					
                     // do we have ice !
-                    if ( currentSystem.solarSystem.IceField == true )
+					if ( currentSystem.solarSystem.IceField == true )
                     {
-                        DrawSystemName(g, currentPoint.X, currentPoint.Y, "*", IceColour, textSize);
+                        DrawSystemName(g, currentPoint.X+10, currentPoint.Y-3, "❅", IceColour, textSize);
                     }
 
-                    if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
+					// DrawSystemName(g, currentPoint.X, currentPoint.Y, $"{currentSystem.solarSystem.NPCKillsDeltaLastHour}", Color.AliceBlue, textSize); 
+
+					if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
                     {
                         var circlePen = new Pen(ZKillColour,2);
                         circlesUsed++;
