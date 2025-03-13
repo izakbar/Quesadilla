@@ -266,70 +266,119 @@ namespace Quesadilla.Classes
             if (c.Logfiles == null)
             {
                 c.Logfiles = new List<LogfileConfig> { };
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "Tenerifis/Immensea/Catch/Impass (CONDI Sov)",
-                    Logfile = "east.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "Delve/Querious/Period Basis",
-                    Logfile = "west.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "Paragon Soul, Esoteria, Feythabolis",
-                    Logfile = "southeast.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "LS Aridia Intel",
-                    Logfile = "aridia.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "LS Khanid Intel",
-                    Logfile = "khanid.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "Pochven Intel",
-                    Logfile = "triangle.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "Fountain Intel",
-                    Logfile = "ftn.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "Curse Intel",
-                    Logfile = "curse.imperium ",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "Querious/Catch Intel",
-                    Logfile = "Quer_Catch.imperium",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
-                c.Logfiles.Add(new LogfileConfig()
+				/*
+								c.Logfiles.Add(new LogfileConfig()
+								{
+									Enabled = true,
+									FriendlyName = "Tenerifis/Immensea/Catch/Impass (CONDI Sov)",
+									Logfile = "east.imperium",
+									LogType = Logfile.LogFileType.ChatIntel,
+								});
+								c.Logfiles.Add(new LogfileConfig()
+								{
+									Enabled = true,
+									FriendlyName = "Delve/Querious/Period Basis",
+									Logfile = "west.imperium",
+									LogType = Logfile.LogFileType.ChatIntel,
+								});
+								c.Logfiles.Add(new LogfileConfig()
+								{
+									Enabled = true,
+									FriendlyName = "Paragon Soul, Esoteria, Feythabolis",
+									Logfile = "southeast.imperium",
+									LogType = Logfile.LogFileType.ChatIntel,
+								});
+								c.Logfiles.Add(new LogfileConfig()
+								{
+									Enabled = true,
+									FriendlyName = "LS Aridia Intel",
+									Logfile = "aridia.imperium",
+									LogType = Logfile.LogFileType.ChatIntel,
+								});
+								c.Logfiles.Add(new LogfileConfig()
+								{
+									Enabled = true,
+									FriendlyName = "LS Khanid Intel",
+									Logfile = "khanid.imperium",
+									LogType = Logfile.LogFileType.ChatIntel,
+								});
+								c.Logfiles.Add(new LogfileConfig()
+								{
+									Enabled = true,
+									FriendlyName = "Pochven Intel",
+									Logfile = "triangle.imperium",
+									LogType = Logfile.LogFileType.ChatIntel,
+								});
+								c.Logfiles.Add(new LogfileConfig()
+								{
+									Enabled = true,
+									FriendlyName = "Fountain Intel",
+									Logfile = "ftn.imperium",
+									LogType = Logfile.LogFileType.ChatIntel,
+								});
+								c.Logfiles.Add(new LogfileConfig()
+								{
+									Enabled = true,
+									FriendlyName = "Curse Intel",
+									Logfile = "curse.imperium ",
+									LogType = Logfile.LogFileType.ChatIntel,
+								});
+								c.Logfiles.Add(new LogfileConfig()
+								{
+									Enabled = true,
+									FriendlyName = "Querious/Catch Intel",
+									Logfile = "Quer_Catch.imperium",
+									LogType = Logfile.LogFileType.ChatIntel,
+								});
+				*/
+				c.Logfiles.Add(new LogfileConfig()
+				{
+					Enabled = true,
+					FriendlyName = "Fountain Intel",
+					Logfile = "I. Ftn Intel",
+					LogType = Logfile.LogFileType.ChatIntel,
+				});
+				c.Logfiles.Add(new LogfileConfig()
+				{
+					Enabled = true,
+					FriendlyName = "Cloud Ring Intel",
+					Logfile = "I. C Ring Intel",
+					LogType = Logfile.LogFileType.ChatIntel,
+				});
+				c.Logfiles.Add(new LogfileConfig()
+				{
+					Enabled = true,
+					FriendlyName = "Aridia Intel",
+					Logfile = "I. Aridia Intel",
+					LogType = Logfile.LogFileType.ChatIntel,
+				});
+
+
+
+				c.Logfiles.Add(new LogfileConfig()
+				{
+					Enabled = true,
+					FriendlyName = "Curse Intel",
+					Logfile = "I. Curse Intel",
+					LogType = Logfile.LogFileType.ChatIntel,
+				});
+				c.Logfiles.Add(new LogfileConfig()
+				{
+					Enabled = true,
+					FriendlyName = "OuterRing Intel",
+					Logfile = "I. OR Intel",
+					LogType = Logfile.LogFileType.ChatIntel,
+				});
+				c.Logfiles.Add(new LogfileConfig()
+				{
+					Enabled = true,
+					FriendlyName = "Pochven Intel",
+					Logfile = "I. Poch Intel",
+					LogType = Logfile.LogFileType.ChatIntel,
+				});
+
+
+				c.Logfiles.Add(new LogfileConfig()
                 {
                     Enabled = true,
                     FriendlyName = "Izakbar DEBUG",
@@ -1369,6 +1418,12 @@ img.rounded-corners {
         [DefaultValue(typeof(bool), "true")]
         public bool DotlanDeltaPull { get; set; }
 
+		[Category("General")]
+		[DisplayName("Keep current toon as last selected")]
+		[Description("If current process is not an eve process - treat last toon selected as current")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool KeepLastToonWhenNotEve { get; set; }
+		
         public List<AlertConfig> AlertConfiguration { get; set; }
         public List<LogfileConfig> Logfiles { get; set; }
         public List<CSSData> CSSData { get; set; }

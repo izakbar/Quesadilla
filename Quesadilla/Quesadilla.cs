@@ -40,6 +40,7 @@ using System.Threading.Tasks;
 using System.Web.WebPages;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Windows.Interop;
 using System.Xml;
 using Windows.ApplicationModel.VoiceCommands;
 using static Quesadilla.Classes.Processes.ProcessMonitor;
@@ -170,7 +171,28 @@ namespace Quesadilla
         private bool ISKPerHourTotal = false;
         private bool MiningPerHourTotal = false;
 
-        public Quesadilla()
+        private bool NoActiveEveProcess = false;
+
+		[DllImport("user32.dll")]
+		private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+		private readonly IntPtr HWND_BOTTOM = new IntPtr(1);
+		private readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+		
+		private const UInt32 SWP_NOSIZE = 0x0001;
+		private const UInt32 SWP_NOMOVE = 0x0002;
+
+		public void SendWindowBack(IntPtr w)
+		{
+			//var hWnd = new WindowInteropHelper(window).Handle;
+			SetWindowPos(w, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		}
+		public void SendWindowTop(IntPtr w)
+		{
+			//var hWnd = new WindowInteropHelper(window).Handle;
+			SetWindowPos(w, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		}
+
+		public Quesadilla()
         {
             splashScreenThread = new Thread(new ThreadStart(ShowSplashScreen));
             splashScreenThread.Start();
@@ -1746,7 +1768,7 @@ namespace Quesadilla
                     SetupStatusBar();
 
                     // sort out DPS Graph
-                    if (previousToon == null || previousToon == "" || previousToon != CurrentActiveToon)
+                    if (previousToon == null || previousToon == "" || previousToon != CurrentActiveToon || NoActiveEveProcess == true )
                     {
                         if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
                         {
@@ -1758,44 +1780,70 @@ namespace Quesadilla
                             {
                                 CombatAdded = true;
                                 DPSGraphWindow.UpdateDPSGraph();
-                                DPSGraphWindow.Show();
+								DPSGraphWindow.TopMost = Program.MainConfiguration.DPSGraphStayOnTop;
+                                if (NoActiveEveProcess)
+                                {
+                                    SendWindowTop(DPSGraphWindow.Handle);
+								}
+								DPSGraphWindow.Show();
                             }
                         }
                         UpdateISK();
                         shouldUpdateMinimap = true;
                         shouldUpdatePlanetInfo = true;
-                    }
+					} 
 
                     if (DPSGraphWindow != null &&
                         (
                         PrevRect.Top != currentEveWindowRect.Top || PrevRect.Bottom != currentEveWindowRect.Bottom ||
                         PrevRect.Left != currentEveWindowRect.Left || PrevRect.Right != currentEveWindowRect.Right
                         )
-                        )
+						)
                     {
-                        DPSGraphWindow.SetScreenPosition();
+						DPSGraphWindow.SetScreenPosition();
                     }
-                }
-                else
+					if ( NoActiveEveProcess) NoActiveEveProcess = false;
+
+				}
+				else
                 {
-                    if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
+                    // not eve window 
+
+					if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
                     {
-                        DPSGraphWindow.Hide();
-                    }
+                        if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
+                        {
+                            DPSGraphWindow.Hide();
+                        } else
+                        {
+                            if (DPSGraphWindow.TopMost != false)
+                            {
+                                currentEveWindowRect = PrevRect;
+                                DPSGraphWindow.TopMost = false;
+                                SendWindowBack(DPSGraphWindow.Handle);
+                            }
+						}
+					}
                 }
             }
 
             if (foregroundWindowTitle == null)
             {
-                //lblCurrentClient.Visible = false;
-                CurrentActiveToon = "";
-                lblCurrentClient.Text = CurrentActiveToon;
-                SetupStatusBar();
-                shouldUpdateMinimap = true;
+                if (! Program.MainConfiguration.KeepLastToonWhenNotEve)
+                {
+                    //lblCurrentClient.Visible = false;
+                    CurrentActiveToon = "";
+                    lblCurrentClient.Text = CurrentActiveToon;
+                    SetupStatusBar();
+                    shouldUpdateMinimap = true;
+                } else
+                {
+                    NoActiveEveProcess = true;
+                }
             }
 
-            // just double check thru charachter list active clients to make sure there is still an active client.
-            foreach (var c in Program.CharacterList)
+			// just double check thru charachter list active clients to make sure there is still an active client.
+			foreach (var c in Program.CharacterList)
             {
                 c.IsClientActive = Program.ProcessMonitorHandler.IsCharStillActive(c.CharacterName);
                 c.IsCurrentlActiveClient = (c.CharacterName == CurrentActiveToon ? true : false);
