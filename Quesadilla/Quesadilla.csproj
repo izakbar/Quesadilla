@@ -387,6 +387,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="images\INITlogo.png" />
     <None Include="Resources\Sounds\full.wav" />
     <None Include="Resources\Sounds\pop1.wav" />
     <None Include="Resources\Sounds\pop3.wav" />
