@@ -78,7 +78,7 @@ namespace Quesadilla.Classes.ZKill
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
-            string URL = $"https://redisq.zkillboard.com/listen.php?queueID={ZkillQueueId}";
+            string URL = $"https://zkillredisq.stream/listen.php?queueID={ZkillQueueId}";
             string strContent = string.Empty;
             try
             {
