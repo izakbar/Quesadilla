@@ -66,6 +66,7 @@
     <ApplicationIcon>q.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -226,6 +227,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="QuesadillaSplashScreen.resx">
       <DependentUpon>QuesadillaSplashScreen.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -385,6 +387,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="images\INITlogo.png" />
     <None Include="Resources\Sounds\full.wav" />
     <None Include="Resources\Sounds\pop1.wav" />
     <None Include="Resources\Sounds\pop3.wav" />

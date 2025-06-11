@@ -34,7 +34,7 @@ namespace Quesadilla
 
             if ( Program.MainConfiguration.DPSGraphTransparent )
             {
-                this.Text = "";
+                this.Text = "DPS";
                 this.ControlBox = false;
                 this.MinimizeBox = false;
                 this.FormBorderStyle = FormBorderStyle.None;

@@ -27,8 +27,11 @@ namespace Quesadilla.Classes
         private const int TRANSPARENT_BORDER_WIDTH = 1;
         private const int BORDER_WIDTH = 1;
         private const int TEXT_SIZE = 20;
- 
-        private const int CIRCLE_INITIAL_GAP = 3;
+
+        private const double MERCOXIT_SECURITY = -0.75;
+
+
+		private const int CIRCLE_INITIAL_GAP = 3;
         private const int CIRCLE_INCREASE_GAP = 7;
 
         private const double LY_SCALING = 9460000000000;
@@ -357,7 +360,7 @@ namespace Quesadilla.Classes
                     g.FillEllipse(systemBrush, currentPoint.X - blobSize, currentPoint.Y - blobSize, blobSize * 2, blobSize * 2);
 
 					// How about mercoxit ?
-					if (currentSystem.solarSystem.Security < -0.7)
+					if (currentSystem.solarSystem.Security < MERCOXIT_SECURITY)
 					{
 						DrawSystemName(g, currentPoint.X-10, currentPoint.Y-3, "✦", MercoxitColour, textSize);
 					}

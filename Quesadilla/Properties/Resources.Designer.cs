@@ -265,6 +265,16 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap INITlogo {
+            get {
+                object obj = ResourceManager.GetObject("INITlogo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap izakbar {
             get {
                 object obj = ResourceManager.GetObject("izakbar", resourceCulture);
