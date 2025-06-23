@@ -95,16 +95,6 @@ namespace Quesadilla
             lblDPSGraphLineSize.Text = _configuration.DPSGraphLineSize.ToString();
             lblShowLastUnexpiredAlerts.Text = _configuration.ShowLastUnexpiredAlerts.ToString();
 
-            trackAlertPopupMinimapSizeWidth.Minimum = 1;
-            trackAlertPopupMinimapSizeHeight.Minimum = 1;
-            trackAlertPopupMinimapPositionX.Minimum = 0;
-            trackAlertPopupMinimapPositionY.Minimum = 0;
-
-            trackAlertPopupMinimapSizeWidth.Value = _configuration.AlertPopupMinimapSize.X > trackAlertPopupMinimapSizeWidth.Maximum ? trackAlertPopupMinimapSizeWidth.Maximum : _configuration.AlertPopupMinimapSize.X;
-            trackAlertPopupMinimapSizeHeight.Value = _configuration.AlertPopupMinimapSize.Y > trackAlertPopupMinimapSizeHeight.Maximum ? trackAlertPopupMinimapSizeHeight.Maximum : _configuration.AlertPopupMinimapSize.Y; 
-            trackAlertPopupMinimapPositionX.Value = _configuration.AlertPopupMinimapPosition.X;
-            trackAlertPopupMinimapPositionY.Value = _configuration.AlertPopupMinimapPosition.Y;
-
             formLoaded = true;
             ShowAlertBitmap();
 
@@ -155,12 +145,6 @@ namespace Quesadilla
             _alertPopup.Show();
             _alertPopup.Hide();
             alertDemo.Image = GetFormImageWithoutBorders(_alertPopup);
-
-            trackAlertPopupMinimapSizeWidth.Maximum = _alertPopup.Width - _configuration.AlertPopupMinimapPosition.X - 1;
-            trackAlertPopupMinimapSizeHeight.Maximum = _alertPopup.Height - -_configuration.AlertPopupMinimapPosition.Y - 1;
-
-            trackAlertPopupMinimapPositionX.Maximum = _alertPopup.Width - _configuration.AlertPopupMinimapSize.X - 1;
-            trackAlertPopupMinimapPositionY.Maximum = _alertPopup.Height - -_configuration.AlertPopupMinimapSize.Y - 1;
         }
 
         private void QuesadillaConfiguration_FormClosing(object sender, FormClosingEventArgs e)
@@ -211,36 +195,6 @@ namespace Quesadilla
             return (c);
         }
 
-        private void buttonPickSystemColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupSystemNameColour = ChooseColour(_configuration.AlertPopupSystemNameColour);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickContextColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupContextInfoColour = ChooseColour(_configuration.AlertPopupContextInfoColour);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickRegionColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupRegionNameColour = ChooseColour(_configuration.AlertPopupRegionNameColour);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickIntelLineColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupIntelLineColour = ChooseColour(_configuration.AlertPopupIntelLineColour);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickAlertTextColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupAlertTextColour = ChooseColour(_configuration.AlertPopupAlertTextColour);
-            ShowAlertBitmap();
-        }
-
         private void cmbBackground_SelectedIndexChanged(object sender, EventArgs e)
         {
             _configuration.AlertPopupBackground = cmbBackground.Text;
@@ -277,30 +231,6 @@ namespace Quesadilla
             _configuration.HomeSystem = cmbHomeSystem.Text;
         }
 
-        private void trackAlertPopupMinimapSizeWidth_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapSize = (new Point(((TrackBar)sender).Value, _configuration.AlertPopupMinimapSize.Y));
-            ShowAlertBitmap();
-        }
-
-        private void trackAlertPopupMinimapSizeHeight_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapSize = (new Point(_configuration.AlertPopupMinimapSize.X ,((TrackBar)sender).Value));
-            ShowAlertBitmap();
-
-        }
-
-        private void trackAlertPopupMinimapPositionX_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapPosition = (new Point(((TrackBar)sender).Value, _configuration.AlertPopupMinimapPosition.Y));
-            ShowAlertBitmap();
-        }
-
-        private void trackAlertPopupMinimapPositionY_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapPosition = (new Point(_configuration.AlertPopupMinimapPosition.X, ((TrackBar)sender).Value));
-            ShowAlertBitmap();
-        }
 
         private void Properties_Click(object sender, EventArgs e)
         {

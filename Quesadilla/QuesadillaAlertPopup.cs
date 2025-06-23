@@ -21,6 +21,7 @@ using System.Reflection.Emit;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls.Primitives;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
@@ -54,7 +55,9 @@ namespace Quesadilla
         private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
         private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
 
-        public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background, Quesadilla mainForm)
+        private Config _config;
+
+		public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background, Quesadilla mainForm)
         {
             _main = mainForm;
             InitializeComponent();
@@ -65,9 +68,16 @@ namespace Quesadilla
             _seconds = configuration.AlertPopupSeconds;
             _opacity = configuration.AlertPopupOpacity;
             _opacitystep = configuration.AlertPopupOpacityStep;
+
+            _config = configuration;
+
             Opacity = 0;
 
-            AlertText.ForeColor = configuration.AlertPopupAlertTextColour;
+			configuration.ApplyConfiguration(this, configuration.AlertWindowItemLocations, 0, false,false,true);
+
+			Width = configuration.AlertWindowSize.Width;
+            Height = configuration.AlertWindowSize.Height;
+
             AlertText.Text = _alert.AlertText;
 
             if (alert.Kill != null)
@@ -76,7 +86,6 @@ namespace Quesadilla
                 IsAlert = false;
             }
 
-            SystemName.ForeColor = configuration.AlertPopupSystemNameColour;
             if (alert.Path != null)
             {
                 SystemName.Text = _alert.Path.ToSystemName;
@@ -97,7 +106,6 @@ namespace Quesadilla
                 }
             }
 
-            RegionName.ForeColor = configuration.AlertPopupRegionNameColour;
             if (alert.Path != null)
             {
                 RegionName.Text = _alert.Path.ToSystemRegionName;
@@ -111,7 +119,6 @@ namespace Quesadilla
                 }
             }
 
-            ContextInfo.ForeColor = configuration.AlertPopupContextInfoColour;
             if (alert.Path != null && ! (alert.isFaction|| alert.isDecloak))
             {
                 ContextInfo.Text = _alert.Path.TotalJumps.ToString() + " jump" + (_alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + _alert.Context;
@@ -133,7 +140,6 @@ namespace Quesadilla
                 }
             }
 
-            IntelLine.ForeColor = configuration.AlertPopupIntelLineColour;
             if (alert.isFaction)
             {
                 IntelLine.Text = FACTION_TEXT;
@@ -141,12 +147,12 @@ namespace Quesadilla
             {
                 IntelLine.Text = alert.Kill.Context;
 
-                pAlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
-                Image RoundedImage = ImageGenerator.ClipToCircle(pAlertImage.Image, new PointF(pAlertImage.Image.Width / 2, pAlertImage.Image.Height / 2), pAlertImage.Image.Width / 2, 
+                AlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
+                Image RoundedImage = ImageGenerator.ClipToCircle(AlertImage.Image, new PointF(AlertImage.Image.Width / 2, AlertImage.Image.Height / 2), AlertImage.Image.Width / 2, 
                     Color.Transparent , configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, configuration.ZKillIskColour, configuration.ZKillShowBar, configuration.ZKillBarColour);
                 Bitmap killBitmap = new Bitmap(RoundedImage);
                 killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
-                pAlertImage.Image = killBitmap;
+                AlertImage.Image = killBitmap;
 
                 ShipName.Text = alert.Kill.VictimShipName;
             }
@@ -159,8 +165,7 @@ namespace Quesadilla
             if (configuration.AlertPopupShowMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0) )
             {
                 string extraInformation = "";
-                pMinimapImage.Size = (Size)configuration.AlertPopupMinimapSize;
-                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path , 0,100, 
+                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MinimapImage.Width, MinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path , 0,100, 
                     configuration.AlertPopupMinimapRawXY, ref extraInformation, ref MinimapSystems,
                     configuration.AlertPopupMinimapShowSystemText,
                     configuration.AlertPopupShowMinimapBorder, configuration.AlertPopupMinimapBorderColour,
@@ -182,18 +187,18 @@ namespace Quesadilla
                     null, null, null,
                     true,
                     true, // show out of region 
-					Program.MainConfiguration.AlertPopupMinimapIncursionAlpha,
-					Program.MainConfiguration.AlertPopupMinimapIncursionCloudSize
+					configuration.AlertPopupMinimapIncursionAlpha,
+					configuration.AlertPopupMinimapIncursionCloudSize,
+					configuration.AlertPopupMinimapConnectionGap
 					);
                 Bitmap minimapBitmap = new Bitmap(minimapImage);
                 minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
-                pMinimapImage.Image = minimapBitmap;
-                pMinimapImage.Location = configuration.AlertPopupMinimapPosition;
-                pMinimapImage.Visible = true;
+                MinimapImage.Image = minimapBitmap;
+                MinimapImage.Visible = true;
             }
             else
             {
-                pMinimapImage.Visible = false;
+                MinimapImage.Visible = false;
             }
 
             BackgroundImage = background;
@@ -288,21 +293,21 @@ namespace Quesadilla
                         Location = new Point()
                         {
                             X = screen.WorkingArea.Left,
-                            Y = screen.WorkingArea.Bottom - Height,
+                            Y = screen.WorkingArea.Bottom - Height - 1,
                         };
                         break;
                     case PopupLocationType.BottomCenter:
                         Location = new Point()
                         {
                             X = (screen.WorkingArea.Right / 2) - (Width / 2),
-                            Y = screen.WorkingArea.Bottom - Height,
+                            Y = screen.WorkingArea.Bottom - Height - 1,
                         };
                         break;
                     case PopupLocationType.BottomRight:
                         Location = new Point()
                         {
                             X = screen.WorkingArea.Right - Width,
-                            Y = screen.WorkingArea.Bottom - Height,
+                            Y = screen.WorkingArea.Bottom - Height - 1,
                         };
                         break;
                     case PopupLocationType.Center:
@@ -467,21 +472,24 @@ namespace Quesadilla
 
         private void QuesadillaAlertPopup_Paint(object sender, PaintEventArgs e)
         {
-            ImageGenerator.PaintDrawText(e, AlertText);
-            ImageGenerator.PaintDrawText(e, SystemName);
-            ImageGenerator.PaintDrawText(e,RegionName);
-            ImageGenerator.PaintDrawText(e,ContextInfo);
-            if ( ShowShipname ) ImageGenerator.PaintDrawText(e, ShipName);
-            ImageGenerator.PaintDrawText(e, ContextInfo);
-            ImageGenerator.PaintDrawText(e, IntelLine);
+            if ( _config.GetConfiguration("AlertText" , _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e, AlertText);
+			if (_config.GetConfiguration("SystemName", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e, SystemName);
+			if (_config.GetConfiguration("RegionName", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e,RegionName);
+			if (_config.GetConfiguration("ContextInfo", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e,ContextInfo);
+            if (_config.GetConfiguration("ShipName", _config.AlertWindowItemLocations).IsVisible && ShowShipname)
+            {
+                ImageGenerator.PaintDrawText(e, ShipName);
+            }
+			if (_config.GetConfiguration("ContextInfo", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e, ContextInfo);
+			if (_config.GetConfiguration("IntelLine", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e, IntelLine);
 
-            if (pMinimapImage.Visible)
+            if (MinimapImage.Visible)
             {
                 if (mouseOverMinimapSystems.Count() > 0)
                 {
                     foreach (var m in mouseOverMinimapSystems)
                     {
-                        ImageGenerator.DrawSystemName(e.Graphics, m.X+ pMinimapImage.Left, m.Y+ pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.AlertPopupMinimapMouseoverSystemColour);
+                        ImageGenerator.DrawSystemName(e.Graphics, m.X+ MinimapImage.Left, m.Y+ MinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.AlertPopupMinimapMouseoverSystemColour);
                     }
                 }
             }
@@ -513,5 +521,10 @@ namespace Quesadilla
                 this.Invalidate();
             }
         }
-    }
+
+		private void RegionName_Click(object sender, EventArgs e)
+		{
+
+		}
+	}
 }

@@ -93,6 +93,7 @@
     <Compile Include="Classes\AnimationState.cs" />
     <Compile Include="Classes\Attributes\IsColourAttribute.cs" />
     <Compile Include="Classes\CombatGraphData.cs" />
+    <Compile Include="Classes\Configuration\ConfigurationItemLocationInformation.cs" />
     <Compile Include="Classes\ESIData\ESIRequest.cs" />
     <Compile Include="Classes\ESIData\ESIRequestType.cs" />
     <Compile Include="Classes\Events\ESIEventArgs.cs" />
@@ -387,6 +388,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="images\DefaultAlert.png" />
     <None Include="images\INITlogo.png" />
     <None Include="Resources\Sounds\full.wav" />
     <None Include="Resources\Sounds\pop1.wav" />

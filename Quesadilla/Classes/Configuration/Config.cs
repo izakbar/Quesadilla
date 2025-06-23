@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Controls.Primitives;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -23,8 +24,53 @@ namespace Quesadilla.Classes
 {
     public class Config
     {
+        public void ApplyConfiguration(Form form, List<ConfigurationItemLocationInformation> locations, int topAdjust, bool MiningPerHourTotal, bool ISKPerHourTotal, bool ignoreVisible)
+        {
+			foreach (ConfigurationItemLocationInformation item in locations)
+			{
+				var foundItem = form.Controls.Find(item.Name, true).FirstOrDefault();
+				if (foundItem != null)
+				{
+					if (!foundItem.Name.Equals("ChatServerDown") && !ignoreVisible) foundItem.Visible = item.IsVisible;
+					foundItem.Location = new Point(item.Location.X, item.Location.Y + topAdjust);
 
-        public Config Duplicate()
+					foundItem.ForeColor = item.Color;
+					foundItem.BackColor = item.BackColor;
+					foundItem.Size = item.Size;
+					foundItem.Font = item.Font;
+
+					// check for special flipflop cases
+					if (foundItem.Name.Equals("MiningData") && MiningPerHourTotal) foundItem.ForeColor = item.AlternateColor;
+					if (foundItem.Name.Equals("RattingData") && ISKPerHourTotal) foundItem.ForeColor = item.AlternateColor;
+				}
+			}
+		}
+
+        public ConfigurationItemLocationInformation GetConfiguration(string name, List<ConfigurationItemLocationInformation> locations)
+        {
+            ConfigurationItemLocationInformation foundItem = locations.Find(o => o.Name == name);
+            return foundItem;
+		}
+
+		private List<ConfigurationItemLocationInformation> DuplicateLocations(List<ConfigurationItemLocationInformation> locations)
+		{
+            List<ConfigurationItemLocationInformation> newItems = new List<ConfigurationItemLocationInformation>();
+			foreach (var item in locations)
+			{
+				newItems.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = item.Name,
+					Location = item.Location,
+					Color = item.Color,
+					IsVisible = item.IsVisible,
+					Size = item.Size,
+					Font = item.Font,
+				});
+			}
+            return newItems;
+		}
+
+		public Config Duplicate()
         {
             Config c = new Config()
             {
@@ -41,9 +87,6 @@ namespace Quesadilla.Classes
                 var value = propertyType.GetValue(this);
                 propertyType.SetValue(c, value);
             }
-
-            c.AlertPopupMinimapPosition = new Point(AlertPopupMinimapPosition.X, AlertPopupMinimapPosition.Y);
-            c.AlertPopupMinimapSize = new Point(AlertPopupMinimapSize.X, AlertPopupMinimapSize.Y);
 
             c.ignoreStrings = new List<Regex>();
             c.ignoreSystems = new List<int>();
@@ -87,9 +130,13 @@ namespace Quesadilla.Classes
                 c.CSSData.Add(css);
             }
 
-            c.InitialPosition = new Point(InitialPosition.X, InitialPosition.Y);
-            c.WindowSize = new Point(WindowSize.X, WindowSize.Y);
-            c.DPSGraphWindowSize = new Point(DPSGraphWindowSize.X, DPSGraphWindowSize.Y);
+            c.MainWindowItemLocations = DuplicateLocations(MainWindowItemLocations);
+			c.AlertWindowItemLocations = DuplicateLocations(AlertWindowItemLocations);
+
+			c.InitialPosition = new Point(InitialPosition.X, InitialPosition.Y);
+			c.MainWindowSize = new Size(MainWindowSize.Width, MainWindowSize.Height);
+			c.AlertWindowSize = new Size(AlertWindowSize.Width, AlertWindowSize.Height);
+			c.DPSGraphWindowSize = new Size(DPSGraphWindowSize.Width, DPSGraphWindowSize.Height);
             c.DPSGraphWindowSizeAdjust = new Point(DPSGraphWindowSizeAdjust.X, DPSGraphWindowSizeAdjust.Y);
 
             return (c);
@@ -127,12 +174,10 @@ namespace Quesadilla.Classes
                 }
 
                 c.InitialPosition = new Point(0, 0);
-                c.WindowSize = new Point(760, 404);
-                c.DPSGraphWindowSize = new Point(250, 100);
+				c.MainWindowSize = new Size(760, 404);
+				c.AlertWindowSize = new Size(400, 180);
+				c.DPSGraphWindowSize = new Size(250, 100);
                 c.DPSGraphWindowSizeAdjust = new Point(10, 15);
-
-                c.AlertPopupMinimapPosition = new Point(34, 3);
-                c.AlertPopupMinimapSize = new Point(193, 128);
 
                 c.AlertPopupLocation = PopupLocationType.BottomLeft;
                 c.DPSLocation = PopupLocationType.TopRight;
@@ -560,7 +605,224 @@ img.rounded-corners {
 ",
                 });
             }
-            return (c);
+
+
+            if (c.MainWindowItemLocations == null)
+            {
+                c.MainWindowItemLocations = new List<ConfigurationItemLocationInformation>();
+                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+                {
+                    Name = "WorkingIndicator",
+                    Color = Color.Red,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+                    Location = new Point(625, -1),
+                    Size = new Size(13, 15),
+                    Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold),
+                });
+                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+                {
+                    Name = "CurrentClient",
+                    Color = Color.MediumTurquoise,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+                    Location = new Point(2, 2),
+                    Size = new Size(265, 21),
+                    Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold),
+                });
+                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+                {
+                    Name = "EveScoutStatus",
+                    Color = Color.LimeGreen,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+                    Location = new Point(0, 218),
+                    Size = new Size(163, 13),
+                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                });
+
+                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+                {
+                    Name = "AlertsOutstanding",
+                    Color = Color.LightCoral,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+                    Location = new Point(240, 3),
+                    Size = new Size(114, 11),
+                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                });
+
+                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+                {
+                    Name = "MiningData",
+                    Color = Color.Aqua,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Orange,
+                    IsVisible = true,
+                    Location = new Point(200, 3),
+                    Size = new Size(118, 11),
+                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                });
+
+                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+                {
+                    Name = "RattingData",
+                    Color = Color.Aqua,
+                    AlternateColor = Color.Orange,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+                    Location = new Point(350, 3),
+                    Size = new Size(118, 11),
+                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                });
+
+                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+                {
+                    Name = "MainMinimap",
+                    Color = Color.White,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Red,
+                    IsVisible = true,
+                    Location = new Point(3, 3),
+                    Size = new Size(260, 200),
+                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                });
+
+				c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "MouseoverSystemName",
+					Color = Color.Orchid,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Red,
+					IsVisible = true,
+					Location = new Point(445, 203),
+					Size = new Size(193, 11),
+					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+				});
+
+				c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "ExtraInformation",
+					Color = Color.LimeGreen,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Brown,
+					IsVisible = true,
+					Location = new Point(270, 18),
+					Size = new Size(360, 170),
+					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+				});
+
+				c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "ChatServerDown",
+					Color = Color.Red,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Brown,
+					IsVisible = true,
+					Location = new Point(471, 3),
+					Size = new Size(152, 20),
+					Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold),
+				});
+
+                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+                {
+                    Name = "IntelLog",
+                    Color = Color.LightGoldenrodYellow,
+                    BackColor = System.Drawing.ColorTranslator.FromHtml("#0f0f11"),
+					AlternateColor = Color.Brown,		
+                    IsVisible = true,
+                    Location = new Point(471, 3),
+                    Size = new Size(152, 20),
+                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                });
+			}
+
+            if (c.AlertWindowItemLocations == null)
+            {
+                c.AlertWindowItemLocations = new List<ConfigurationItemLocationInformation>();
+				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "AlertText",
+					Color = Color.White,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+					Location = new Point(0, 165),
+					Size = new Size(400, 12),
+					Font = new Font("Tahoma", 8.25f, FontStyle.Regular),
+				});
+				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "SystemName",
+					Color = Color.Lime,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+					Location = new Point(115, 4),
+					Size = new Size(280, 31),
+					Font = new Font("Microsoft Sans Serif", 20.0f, FontStyle.Bold),
+				});
+				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "RegionName",
+					Color = Color.Cyan,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+					Location = new Point(275, 36),
+					Size = new Size(120, 13),
+					Font = new Font("Microsoft Sans Serif", 8.0f, FontStyle.Bold),
+				});
+				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "ContextInfo",
+					Color = Color.Yellow,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+					Location = new Point(2,47),
+					Size = new Size(396, 19),
+					Font = new Font("Verdana", 10.0f, FontStyle.Bold),
+				});
+				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "IntelLine",
+					Color = Color.White,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+					Location = new Point(155,64),
+					Size = new Size(240, 57),
+					Font = new Font("Tahoma", 9.0f, FontStyle.Regular),
+				});
+				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "ShipName",
+					Color = Color.Lime,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+					Location = new Point(180, 125),
+					Size = new Size(150, 13),
+					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
+				});
+				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "AlertImage",
+					Color = Color.White,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+					Location = new Point(335, 95),
+					Size = new Size(53, 57),
+					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
+				});
+				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "MinimapImage",
+					Color = Color.White,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+					Location = new Point(34, 3),
+					Size = new Size(193, 128),
+					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
+				});
+			}
+
+			return (c);
         }
 
         public void Save(string filename)
@@ -667,9 +929,12 @@ img.rounded-corners {
         public Point InitialPosition { get; set; }
 
         [Category("Main window")]
-        public Point WindowSize { get; set; }
+        public Size MainWindowSize { get; set; }
 
-        [Category("Main window")]
+		[Category("Alert window")]
+		public Size AlertWindowSize { get; set; }
+
+		[Category("Main window")]
         [DisplayName("Stay On Top")]
         [Description("Should the main window stay on top of other windows")]
         [DefaultValue(typeof(bool), "true")]
@@ -686,18 +951,6 @@ img.rounded-corners {
         [Description("Background Colour for the main window")]
         [DefaultValue(typeof(Color), "#0f0f11")]
         public Color MainWindowBackgroundColour { get; set; }
-
-        [Category("Main window")]
-        [DisplayName("Log Background Colour")]
-        [Description("Background colour for the main window log")]
-        [DefaultValue(typeof(Color), "#0f0f11")]
-        public Color MainWindowLogBackgroundColour { get; set; }
-        
-        [Category("Main window")]
-        [DisplayName("Log Text Colour")]
-        [Description("Text colour for the main window log")]
-        [DefaultValue(typeof(Color), "LightGoldenrodYellow")]
-        public Color MainWindowLogTextColour { get; set; }
 
         [Category("Main window")]
         [DisplayName("Show Minimap")]
@@ -790,12 +1043,6 @@ img.rounded-corners {
         public Color MinimapMouseoverSystemColour { get; set; }
 
         [Category("Main window")]
-        [DisplayName("Mouse over System Colour")]
-        [Description("Colour of text to use to display the systemname in the mainform when user mouseover a system in the minimap")]
-        [DefaultValue(typeof(Color), "Orchid")]
-        public Color MainWindowMouseoverSystemColour { get; set; }
-
-        [Category("Main window")]
         [DisplayName("Minimap zoom delta")]
         [Description("How much to adjust zoom on mouse scroll")]
         [DefaultValue(typeof(int), "5")]
@@ -854,6 +1101,13 @@ img.rounded-corners {
 		public int MinimapIncursionCloudSize { get; set; }
 
 		[Category("Main window")]
+		[DisplayName("Minimap connection line gap size")]
+		[Description("Size of gap at each side of connection on minimap")]
+		[DefaultValue(typeof(int), "10")]
+		[Range(0, 100)]
+		public int MinimapConnectionGap { get; set; }
+
+		[Category("Main window")]
 		[DisplayName("Minimap Ice Indicator colour")]
 		[Description("Colour to use for ice indicatos on the minimap")]
 		[DefaultValue(typeof(Color), "Cyan")]
@@ -864,12 +1118,6 @@ img.rounded-corners {
 		[Description("Colour to use for Mercoxit indicatos on the minimap")]
 		[DefaultValue(typeof(Color), "IndianRed")]
 		public Color MinimapMercoxitColour { get; set; }
-
-		[Category("Main window")]
-        [DisplayName("Minimap Height")]
-        [Description("Height of the minimap")]
-        [DefaultValue(typeof(int), "200")]
-        public int MinimapHeight { get; set; }
 
         [Category("Main window")]
         [DisplayName("Use SDE X/Y")]
@@ -890,47 +1138,6 @@ img.rounded-corners {
         public bool MinimapShowOutOfRegion { get; set; }
 
         [Category("Main window")]
-        [DisplayName("Current character colour")]
-        [Description("The colour to use for the currently active eveonline character on the main window")]
-        [DefaultValue(typeof(Color), "MediumTurquoise")]
-        public Color CurrentCharacterColour { get; set; }
-
-        [Category("Main window")]
-        [DisplayName("ISK/hr Colour")]
-        [Description("The colour to use for the ISK/HR show on the main window")]
-        [DefaultValue(typeof(Color), "Aqua")]
-        public Color ISKColour { get; set; }
-
-        [Category("Main window")]
-        [DisplayName("ISK/hr Total Colour")]
-        [Description("The colour to use for the total ISK/HR show on the main window")]
-        [DefaultValue(typeof(Color), "Orange")]
-        public Color ISKTotalColour { get; set; }
-
-        [Category("Main window")]
-        [DisplayName("Mining/hr Colour")]
-        [Description("The colour to use for the Mining/HR show on the main window")]
-        [DefaultValue(typeof(Color), "Aqua")]
-        public Color MiningColour { get; set; }
-
-        [Category("Main window")]
-        [DisplayName("Mining/hr Total Colour")]
-        [Description("The colour to use for the total Mining/HR show on the main window")]
-        [DefaultValue(typeof(Color), "Orange")]
-        public Color MiningTotalColour { get; set; }
-
-        [Category("Main window")]
-        [DisplayName("non-expired Alerts/Kills Colour")]
-        [Description("")]
-        [DefaultValue(typeof(Color), "LightPink")]
-        public Color AlertsOutstandingColour { get; set; }
-
-        [Category("Main window")]
-        [DisplayName("EveScout Information Colour")]
-        [DefaultValue(typeof(Color), "LimeGreen")]
-        public Color EvescoutColour { get; set; }
-
-        [Category("Main window")]
         [DisplayName("Show Extra Information")]
         [Description("The extra information display shows zkill and alert activity recently in systems on the current minimap view")]
         [DefaultValue(typeof(bool), "true")]
@@ -948,12 +1155,15 @@ img.rounded-corners {
         [DefaultValue(typeof(bool), "true")]
         public bool ShowMiningTotal { get; set; }
 
-        [Category("Main window")]
-        [DisplayName("Extra Information Colour")]
-        [DefaultValue(typeof(Color), "LimeGreen")]
-        public Color MainWindowExtraInformationColour { get; set; }
+		[Category("Main window")]
+		[DisplayName("Item Locations")]
+		public List<ConfigurationItemLocationInformation> MainWindowItemLocations { get; set; }
 
-        [Category("DPS")]
+		[Category("Alert")]
+		[DisplayName("Item Locations")]
+		public List<ConfigurationItemLocationInformation> AlertWindowItemLocations { get; set; }
+
+		[Category("DPS")]
         [DisplayName("DPS Graph location")]
         [Description("Location to display DPS graph when required")]
         public PopupLocationType DPSLocation { get; set; }
@@ -961,7 +1171,7 @@ img.rounded-corners {
         [Category("DPS")]
         [DisplayName("DPS Graph Window size")]
         [Description("Size of the DPS graph")]
-        public Point DPSGraphWindowSize { get; set; }
+        public Size DPSGraphWindowSize { get; set; }
 
         [Category("DPS")]
         [DisplayName("DPS Graph Window size adjustment")]
@@ -1129,39 +1339,9 @@ img.rounded-corners {
         [Category("Alert")]
         [DisplayName("Background")]
         [Description("")]
-        [DefaultValue(typeof(string), "bg_paulmart2")]
+        [DefaultValue(typeof(string), "bg_DefaultAlert")]
         [Browsable(false)]
         public string AlertPopupBackground { get; set; }
-
-        [Category("Alert")]
-        [DisplayName("System Name Colour")]
-        [Description("")]
-        [DefaultValue(typeof(Color), "Lime")]
-        public Color AlertPopupSystemNameColour { get; set; }
-
-        [Category("Alert")]
-        [DisplayName("Region Name Colour")]
-        [Description("")]
-        [DefaultValue(typeof(Color), "Cyan")]
-        public Color AlertPopupRegionNameColour { get; set; }
-
-        [Category("Alert")]
-        [DisplayName("Context Info Colour")]
-        [Description("")]
-        [DefaultValue(typeof(Color), "Yellow")]
-        public Color AlertPopupContextInfoColour { get; set; }
-
-        [Category("Alert")]
-        [DisplayName("Intel Line Colour")]
-        [Description("")]
-        [DefaultValue(typeof(Color), "White")]
-        public Color AlertPopupIntelLineColour { get; set; }
-
-        [Category("Alert")]
-        [DisplayName("Alert Text Colour")]
-        [Description("")]
-        [DefaultValue(typeof(Color), "White")]
-        public Color AlertPopupAlertTextColour { get; set; }
 
         [Category("Alert")]
         [DisplayName("Show Minimap")]
@@ -1290,18 +1470,19 @@ img.rounded-corners {
 		[DefaultValue(typeof(int), "30")]
 		[Range(0, 100)]
 		public int AlertPopupMinimapIncursionCloudSize { get; set; }
-		
-        [Category("Alert")]
+
+		[Category("Alert")]
+		[DisplayName("Minimap Connection line gap size")]
+		[Description("Size of gap and each end of connections on minimap")]
+		[DefaultValue(typeof(int), "10")]
+		[Range(0, 100)]
+		public int AlertPopupMinimapConnectionGap { get; set; }
+
+		[Category("Alert")]
         [DisplayName("Use SDE X/Y")]
         [Description("Selecting true will show minimap using the SDE values for X/Y. Selecting False will use Dotlan layout")]
         [DefaultValue(typeof(bool), "false")]
         public bool AlertPopupMinimapRawXY { get; set; }
-
-        [Category("Alert")]
-        public Point AlertPopupMinimapPosition { get; set; }
-
-        [Category("Alert")]
-        public Point AlertPopupMinimapSize { get; set; }
 
         [Category("Alert")]
         [DisplayName("ZKillAlertText")]

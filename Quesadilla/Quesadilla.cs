@@ -14,6 +14,7 @@ using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.Resources;
 using Quesadilla.Classes.SolarSystems;
 using Quesadilla.Classes.ZKill;
+using Quesadilla.Properties;
 using Serilog;
 using System;
 using System.Collections;
@@ -43,6 +44,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 using System.Windows.Interop;
 using System.Xml;
 using Windows.ApplicationModel.VoiceCommands;
+using Windows.Devices.Sms;
 using static Quesadilla.Classes.Processes.ProcessMonitor;
 using static Quesadilla.Extensions.StringExtensions;
 using static System.Windows.Forms.AxHost;
@@ -203,8 +205,9 @@ namespace Quesadilla
             InitializeComponent();
             Program.InitializeResources();
 
-            this.pMinimapImage.MouseWheel += pMinimapImage_MouseWheel;
+            this.TitleIcon.Image = Properties.Resources.q.ToBitmap();
 
+			this.MainMinimap.MouseWheel += pMinimapImage_MouseWheel;
 
             // Initialize tray
             trayIcon = new NotifyIcon()
@@ -281,8 +284,17 @@ namespace Quesadilla
             ActivityLineInc = 1;
             ActivityLineMax = Program.MainConfiguration.HeartBeatIndicatorWorkingText.Length - 1;
 
-            // get processes
-            UpdateEveProcesses(true);
+
+			foreach (Control c in this.TopbarPanel.Controls)
+			{
+				if (!(c is System.Windows.Forms.Button)) //Change here depending on the Library you use for your contols
+				{
+                    c.MouseDown += TopbarPanel_MouseDown;
+				}
+			}
+
+			// get processes
+			UpdateEveProcesses(true);
 
         }
 
@@ -356,33 +368,10 @@ namespace Quesadilla
         {
             BackColor = Program.MainConfiguration.MainWindowBackgroundColour;
             ForeColor = Program.MainConfiguration.MainWindowTextColour;
-            intelLog.ForeColor = Program.MainConfiguration.MainWindowLogTextColour;
-            intelLog.BackColor = Program.MainConfiguration.MainWindowLogBackgroundColour;
 
+            Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.MainWindowItemLocations, TopbarPanel.Height, MiningPerHourTotal, ISKPerHourTotal, false);
 
-            if (MiningPerHourTotal == true)
-            {
-                lblMining.ForeColor = Program.MainConfiguration.MiningTotalColour;
-            }
-            else
-            {
-                lblMining.ForeColor = Program.MainConfiguration.MiningColour;
-            }
-
-            lblAlertsOutstanding.ForeColor = Program.MainConfiguration.AlertsOutstandingColour;
-            lblCurrentClient.ForeColor = Program.MainConfiguration.CurrentCharacterColour;
-            lblStatus.ForeColor = Program.MainConfiguration.EvescoutColour;
-            lblEtxraInformation.ForeColor = Program.MainConfiguration.MainWindowExtraInformationColour;
-
-            lblSystemName.ForeColor = Program.MainConfiguration.MainWindowMouseoverSystemColour;
-
-            pMinimapImage.Height = Program.MainConfiguration.MinimapHeight;
-            pMinimapImage.Width = (int)((double)Program.MainConfiguration.MinimapHeight * 1.3);
-
-            working.Visible = Program.MainConfiguration.HeartBeatIndicatorVisible;
-            working.ForeColor = Program.MainConfiguration.HeartBeatIndicatorColour;
-
-            RebuildAlertsMenu();
+			RebuildAlertsMenu();
             RebuildBackgroundsMenu();
             RebuildLatestAlertsMenu();
 
@@ -422,12 +411,12 @@ namespace Quesadilla
             DoubleBuffered = true;
             this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
 
-            lblCurrentClient.Text = "";
-            lblISK.Text = "";
-            lblMining.Text = "";
-            lblAlertsOutstanding.Text = "";
-            lblEtxraInformation.Text = "";
-            lblSystemName.Text = "";
+            CurrentClient.Text = "";
+            RattingData.Text = "";
+            MiningData.Text = "";
+            AlertsOutstanding.Text = "";
+            ExtraInformation.Text = "";
+            MouseoverSystemName.Text = "";
 
             this.Invalidate();
 
@@ -440,9 +429,10 @@ namespace Quesadilla
             Thread.Sleep(500);
             splashScreen = null;
 
-            this.Text = "Quesadilla v" + Program.version.ToString();
+            //this.Text = "Quesadilla v" + Program.version.ToString();
+            this.Title.Text = "Quesadilla v" + Program.version.ToString();
 
-            Program.ESIHandler.Resume();
+			Program.ESIHandler.Resume();
         }
 
         private void mainTimer_Tick(object sender, EventArgs e)
@@ -453,7 +443,7 @@ namespace Quesadilla
             {
                 activityLine = 0;
             }
-            working.Text = Program.MainConfiguration.HeartBeatIndicatorWorkingText[activityLine].ToString();
+            WorkingIndicator.Text = Program.MainConfiguration.HeartBeatIndicatorWorkingText[activityLine].ToString();
 
             if (++TickCounts["LogfileCheck"] > Program.MainConfiguration.HowManyTicksBeforeLogfileCheck)
             {
@@ -548,16 +538,16 @@ namespace Quesadilla
                     {
                         RebuildLatestAlertsMenu();
                     }
-                    lblAlertsOutstanding.Text = Program.ActiveAlerts.Count.ToString();
+                    AlertsOutstanding.Text = Program.ActiveAlerts.Count.ToString();
                 }
                 else
                 {
-                    lblAlertsOutstanding.Text = "";
+                    AlertsOutstanding.Text = "";
                 }
 
                 if (Program.ZKillHandler.ZKillKills.Count > 0)
                 {
-                    lblAlertsOutstanding.Text += "/" + Program.ZKillHandler.ZKillKills.Count.ToString();
+                    AlertsOutstanding.Text += "/" + Program.ZKillHandler.ZKillKills.Count.ToString();
                 }
 
                 Program.ExpireCombat();
@@ -1119,7 +1109,7 @@ namespace Quesadilla
         private void Quesadilla_FormClosing(object sender, FormClosingEventArgs e)
         {
             Program.MainConfiguration.InitialPosition = Location;
-            Program.MainConfiguration.WindowSize = new System.Drawing.Point(Width, Height);
+            Program.MainConfiguration.MainWindowSize = new Size(Width, Height);
             Program.MainConfiguration.StayOnTop = TopMost;
             Program.Universe.WriteESICharacters(Program.CHARACTER_CACHE_FILE);
         }
@@ -1251,7 +1241,7 @@ namespace Quesadilla
             {
 
                 Program.MainConfiguration.InitialPosition = Location;
-                Program.MainConfiguration.WindowSize = new System.Drawing.Point(Width, Height);
+                Program.MainConfiguration.MainWindowSize = new Size(Width, Height);
                 Program.MainConfiguration.StayOnTop = TopMost;
 
                 var ConfigurationWindow = new QuesadillaConfiguration(Program.MainConfiguration, menuConfigurationWindow, this);
@@ -1650,56 +1640,38 @@ namespace Quesadilla
 
         private void RecalculateWindowHeight()
         {
-            Height = intelLog.Height + _windowExtraHeight + (Program.MainConfiguration.ShowMinimap ? pMinimapImage.Height : 20);
-
-            lblISK.Top = lblAlertsOutstanding.Top; ;
-            lblISK.Left = Width - (lblISK.Width + working.Width + 15);
-
-            lblMining.Top = lblAlertsOutstanding.Top; ;
-            lblMining.Left = Width - (lblISK.Width + lblMining.Width + working.Width + 25);
+            Height = IntelLog.Height + _windowExtraHeight + (Program.MainConfiguration.ShowMinimap ? MainMinimap.Height : 20);
 
             if (Program.MainConfiguration.ShowMinimap)
             {
                 //lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;|
                 //lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
-
-                lblEtxraInformation.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
-                lblEtxraInformation.Height = pMinimapImage.Height - lblISK.Height - 5 - (Program.MainConfiguration.PlanetInfoViewSize * 2);
-                lblEtxraInformation.Left = pMinimapImage.Left + pMinimapImage.Width + 2;
-            }
-            else
-            {
-                //lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;
-                //lblISK.Top = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 5;
-                lblSystemName.Top = lblEtxraInformation.Top + lblEtxraInformation.Height - lblSystemName.Height - 5;
             }
 
-            lblStatus.Top = intelLog.Top - lblStatus.Height - 5;
-            lblSystemName.Top = lblStatus.Top;
-            buttonIntelSize.Top = intelLog.Top + 2;
-            buttonIntelSize.Left = intelLog.Width - buttonIntelSize.Width - 2;
+            buttonIntelSize.Top = IntelLog.Top + 2;
+            buttonIntelSize.Left = IntelLog.Width - buttonIntelSize.Width - 2;
 
             //ActivityLineInc = (Width) / Program.MainConfiguration.HeartBeatIndicatorDivisions;
             //ActivityLineMax = (Width);
         }
         private void buttonIntelSize_Click(object sender, EventArgs e)
         {
-            if (intelLog.Height == _intelSizeMin)
+            if (IntelLog.Height == _intelSizeMin)
             {
                 // max it big
-                intelLog.Height = _intelSizeMax;
+                IntelLog.Height = _intelSizeMax;
                 buttonIntelSize.Text = "▼";
             }
             else
             {
                 // make it small
-                intelLog.Height = _intelSizeMin;
+                IntelLog.Height = _intelSizeMin;
                 buttonIntelSize.Text = "▲";
             }
 
             RecalculateWindowHeight();
 
-            intelLog.ScrollToCaret();
+            IntelLog.ScrollToCaret();
         }
 
         private void chartDPS_Click(object sender, EventArgs e)
@@ -1755,7 +1727,7 @@ namespace Quesadilla
                 {
                     //lblCurrentClient.Visible = true;
                     CurrentActiveToon = foregroundWindowTitle.Replace("EVE - ", "");
-                    lblCurrentClient.Text = CurrentActiveToon;
+                    CurrentClient.Text = CurrentActiveToon;
 
                     SetupStatusBar();
 
@@ -1825,7 +1797,7 @@ namespace Quesadilla
                 {
                     //lblCurrentClient.Visible = false;
                     CurrentActiveToon = "";
-                    lblCurrentClient.Text = CurrentActiveToon;
+                    CurrentClient.Text = CurrentActiveToon;
                     SetupStatusBar();
                     shouldUpdateMinimap = true;
                 } else
@@ -2094,7 +2066,7 @@ namespace Quesadilla
                 status.Append("No active Character");
             }
 
-            lblStatus.Text = status.ToString().Trim();
+            EveScoutStatus.Text = status.ToString().Trim();
         }
 
         private void CheckEveScoutConnection(Character c)
@@ -2309,7 +2281,7 @@ namespace Quesadilla
 
             if (CurrentActiveToon.IsNullOrEmpty())
             {
-                pMinimapImage.Visible = false;
+                MainMinimap.Visible = false;
                 this.Invalidate();
                 return;
             }
@@ -2335,7 +2307,7 @@ namespace Quesadilla
             if (Program.MainConfiguration.ShowMinimap)
             {
                 string extraInformation = "";
-                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(pMinimapImage.Width, pMinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
+                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MainMinimap.Width, MainMinimap.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
                     Program.MainConfiguration.MinimapJumps, mapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation, ref MinimapSystems,
                     Program.MainConfiguration.MinimapShowSystemText,
                     Program.MainConfiguration.ShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
@@ -2360,19 +2332,20 @@ namespace Quesadilla
                     false,
                     Program.MainConfiguration.MinimapShowOutOfRegion,
 					Program.MainConfiguration.MinimapIncursionAlpha,
-                    Program.MainConfiguration.MinimapIncursionCloudSize
-                    );
+                    Program.MainConfiguration.MinimapIncursionCloudSize,
+					Program.MainConfiguration.MinimapConnectionGap
+					);
 //                Bitmap minimapBitmap = new Bitmap(minimapImage);
 //                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
-                pMinimapImage.Image = minimapImage;
-                lblEtxraInformation.Text = extraInformation;
-                pMinimapImage.Visible = true;
+                MainMinimap.Image = minimapImage;
+                ExtraInformation.Text = extraInformation;
+                MainMinimap.Visible = true;
                 this.Invalidate();
             }
             else
             {
-                lblEtxraInformation.Text = "";
-                pMinimapImage.Visible = false;
+                ExtraInformation.Text = "";
+                MainMinimap.Visible = false;
                 this.Invalidate();
             }
         }
@@ -2386,23 +2359,23 @@ namespace Quesadilla
         private void Quesadilla_Paint(object sender, PaintEventArgs e)
         {
 
-            ImageGenerator.PaintDrawText(e, lblCurrentClient);
-            ImageGenerator.PaintDrawText(e, lblISK);
-            ImageGenerator.PaintDrawText(e, lblMining);
-            ImageGenerator.PaintDrawText(e, lblAlertsOutstanding);
+            ImageGenerator.PaintDrawText(e, CurrentClient);
+            ImageGenerator.PaintDrawText(e, RattingData);
+            ImageGenerator.PaintDrawText(e, MiningData);
+            ImageGenerator.PaintDrawText(e, AlertsOutstanding);
 
-            if (pMinimapImage.Visible)
+            if (MainMinimap.Visible)
             {
-                if (Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, lblEtxraInformation);
+                if (Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, ExtraInformation);
                 if (mouseOverMinimapSystems.Count() > 0)
                 {
-                    lblSystemName.Text = "";
+                    MouseoverSystemName.Text = "";
                     foreach (var m in mouseOverMinimapSystems)
                     {
-                        if (!lblSystemName.Text.IsNullOrEmpty()) lblSystemName.Text += ",";
-                        lblSystemName.Text += m.solarSystem.Name + (m.solarSystem.NPCKillsDeltaLastHour == null ? "" : $"  {m.solarSystem.NPCKillsDeltaLastHour}");
+                        if (!MouseoverSystemName.Text.IsNullOrEmpty()) MouseoverSystemName.Text += ",";
+                        MouseoverSystemName.Text += m.solarSystem.Name + (m.solarSystem.NPCKillsDeltaLastHour == null ? "" : $"  {m.solarSystem.NPCKillsDeltaLastHour}");
                     }
-                    ImageGenerator.PaintDrawText(e, lblSystemName);
+                    ImageGenerator.PaintDrawText(e, MouseoverSystemName);
                 }
             }
 
@@ -2416,13 +2389,13 @@ namespace Quesadilla
 
                 if (Program.MainConfiguration.ShowMinimap)
                 {
-                    combatLeft = pMinimapImage.Left + 10;
-                    combatTop = pMinimapImage.Top + pMinimapImage.Height - 3 - 10;
+                    combatLeft = MainMinimap.Left + 10;
+                    combatTop = MainMinimap.Top + MainMinimap.Height - 3 - 10;
                 }
                 else
                 {
-                    combatLeft = lblAlertsOutstanding.Left + lblAlertsOutstanding.Width - 10;
-                    combatTop = lblAlertsOutstanding.Top + lblAlertsOutstanding.Height + 8;
+                    combatLeft = AlertsOutstanding.Left + AlertsOutstanding.Width - 10;
+                    combatTop = AlertsOutstanding.Top + AlertsOutstanding.Height + 8;
                 }
 
                 Brush systemBrush = new SolidBrush(Color.Red);
@@ -2453,8 +2426,8 @@ namespace Quesadilla
                                 })
                                 .OrderBy(x => x.type);
 
-                            int currentX = lblEtxraInformation.Left;
-                            int currentY = lblStatus.Top - (Program.MainConfiguration.PlanetInfoViewSize);
+                            int currentX = ExtraInformation.Left;
+                            int currentY = EveScoutStatus.Top - (Program.MainConfiguration.PlanetInfoViewSize);
                             foreach (var p in planetInfo)
                             {
                                 Brush systemBrush;
@@ -2532,21 +2505,21 @@ namespace Quesadilla
             {
                 if (CurrentActiveToon != null && Program.ISK.ContainsKey(CurrentActiveToon))
                 {
-                    lblISK.Text = Program.GetIskLastHour(CurrentActiveToon);
-                    lblISK.ForeColor = Program.MainConfiguration.ISKColour;
+                    RattingData.Text = Program.GetIskLastHour(CurrentActiveToon);
+                    RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
                     this.Invalidate();
                     //lblISK.Visible = true;
                 }
                 else
                 {
                     //lblISK.Visible = false;
-                    lblISK.Text = "";
+                    RattingData.Text = "";
                 }
             } else
             {
-                lblISK.Text = Program.GetIskLastHour("");
-                lblISK.ForeColor = Program.MainConfiguration.ISKTotalColour;
-            }
+                RattingData.Text = Program.GetIskLastHour("");
+                RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).AlternateColor;
+			}
         }
         private void UpdateMining()
         {
@@ -2555,22 +2528,22 @@ namespace Quesadilla
             {
                 if (CurrentActiveToon != null && Program.Mining.ContainsKey(CurrentActiveToon))
                 {
-                    lblMining.Text = Program.GetMiningLastHour(CurrentActiveToon);
-                    lblMining.ForeColor = Program.MainConfiguration.MiningColour;
-                    this.Invalidate();
+                    MiningData.Text = Program.GetMiningLastHour(CurrentActiveToon);
+                    MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
+					this.Invalidate();
                     //lblISK.Visible = true;
                 }
                 else
                 {
                     //lblISK.Visible = false;
-                    lblMining.Text = "";
+                    MiningData.Text = "";
                 }
             }
             else
             {
-                lblMining.Text = Program.GetMiningLastHour("");
-                lblMining.ForeColor = Program.MainConfiguration.MiningTotalColour;
-            }
+                MiningData.Text = Program.GetMiningLastHour("");
+                MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
+			}
         }
 
         private void UpdateMiningCSV()
@@ -2758,17 +2731,43 @@ namespace Quesadilla
 
         private void pMinimapImage_Paint(object sender, PaintEventArgs e)
         {
-            if (pMinimapImage.Visible)
+            if (MainMinimap.Visible)
             {
-                if (Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, lblEtxraInformation);
+                if (Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, ExtraInformation);
                 if (mouseOverMinimapSystems.Count() > 0)
                 {
                     foreach (var m in mouseOverMinimapSystems)
                     {
-                        ImageGenerator.DrawSystemName(e.Graphics, m.X + pMinimapImage.Left, m.Y + pMinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.MinimapMouseoverSystemColour, 10);
+                        ImageGenerator.DrawSystemName(e.Graphics, m.X + MainMinimap.Left, m.Y + MainMinimap.Top, m.solarSystem.Name, Program.MainConfiguration.MinimapMouseoverSystemColour, 10);
                     }
                 }
             }
         }
-    }
+
+		private void buttonClose_Click(object sender, EventArgs e)
+		{
+            this.Close();
+		}
+
+		private void ButtonMinimize_Click(object sender, EventArgs e)
+		{
+            this.WindowState = FormWindowState.Minimized;
+		}
+
+        public const int WM_NCLBUTTONDOWN = 0xA1;
+        public const int HT_CAPTION = 0x2;
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern bool ReleaseCapture();
+
+		private void TopbarPanel_MouseDown(object sender, MouseEventArgs e)
+		{
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+            }
+		}
+	}
 }

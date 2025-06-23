@@ -85,7 +85,8 @@ namespace Quesadilla.Classes
             bool defaultTextSize = false,
             bool showOutOfRegion = false,
             int incursionAlphaAmount = 50,
-            int incursionCloudSize = 60
+            int incursionCloudSize = 60,
+            int connectingLineGap = 10
             )
         {
 
@@ -331,13 +332,18 @@ namespace Quesadilla.Classes
 					}
 				}
 
-				// draw connections
+                // draw connections
+                float lineGap = (float)(connectingLineGap / GUI_SCALING); 
+                if ( lineGap < 0) lineGap = 0.1f;
 				foreach (var connection in minimapConnectingSystems)
                 {
                     Point P1 = new Point(originPoint.X + connection.P1.X, originPoint.Y + connection.P1.Y);
                     Point P2 = new Point(originPoint.X + connection.P2.X, originPoint.Y + connection.P2.Y);
                     Pen linePen = new Pen(connection.route ? LineColourRoute : ((FromSystem.RegionName == connection.ToSystem.RegionName) ? LineColourNormal : LineColourOutOfRegion), 1);
-                    g.DrawLine(linePen, P1, P2);
+                    float distance = (float) Math.Sqrt(Math.Pow((P1.X - P2.X), 2) + Math.Pow((P1.Y - P2.Y), 2)) - (lineGap*2);
+                    if (distance < 0.1f) distance = 0.1f;
+					linePen.DashPattern = new float[] { 0.1f, lineGap, distance, lineGap };
+					g.DrawLine(linePen, P1, P2);
                 }
 
                 // draw system blobs

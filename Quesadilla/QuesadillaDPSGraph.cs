@@ -41,8 +41,8 @@ namespace Quesadilla
             }
 
 
-            Width = Program.MainConfiguration.DPSGraphWindowSize.X <= 100 ? 100 : Program.MainConfiguration.DPSGraphWindowSize.X;
-            Height = Program.MainConfiguration.DPSGraphWindowSize.Y <= 50 ? 50 : Program.MainConfiguration.DPSGraphWindowSize.Y;
+            Width = Program.MainConfiguration.DPSGraphWindowSize.Width <= 100 ? 100 : Program.MainConfiguration.DPSGraphWindowSize.Width;
+            Height = Program.MainConfiguration.DPSGraphWindowSize.Height <= 50 ? 50 : Program.MainConfiguration.DPSGraphWindowSize.Height;
 
             SetScreenPosition();
         }
