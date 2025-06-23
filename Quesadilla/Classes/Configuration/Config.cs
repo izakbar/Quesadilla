@@ -398,9 +398,15 @@ namespace Quesadilla.Classes
 					LogType = Logfile.LogFileType.ChatIntel,
 				});
 
-
-
 				c.Logfiles.Add(new LogfileConfig()
+				{
+					Enabled = true,
+					FriendlyName = "Delve and Querious Intel",
+					Logfile = "I. Delve & Q Intel",
+					LogType = Logfile.LogFileType.ChatIntel,
+				});
+
+                c.Logfiles.Add(new LogfileConfig()
 				{
 					Enabled = true,
 					FriendlyName = "Curse Intel",
