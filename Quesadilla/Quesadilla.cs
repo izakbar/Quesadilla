@@ -359,14 +359,6 @@ namespace Quesadilla
             intelLog.ForeColor = Program.MainConfiguration.MainWindowLogTextColour;
             intelLog.BackColor = Program.MainConfiguration.MainWindowLogBackgroundColour;
 
-            if (ISKPerHourTotal == true )
-            {
-                lblISK.ForeColor = Program.MainConfiguration.ISKTotalColour;
-            }
-            else
-            {
-                lblISK.ForeColor = Program.MainConfiguration.ISKColour;
-            }
 
             if (MiningPerHourTotal == true)
             {
