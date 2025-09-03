@@ -168,9 +168,10 @@ namespace Quesadilla
 
         AnimationState AnimationStateKills;
         AnimationState AnimationStateIntel;
-        AnimationState AnimationStateAlts;
+		AnimationState AnimationStateAlts;
+		AnimationState AnimationStateUniHoles;
 
-        private bool ISKPerHourTotal = false;
+		private bool ISKPerHourTotal = false;
         private bool MiningPerHourTotal = false;
 
         private bool NoActiveEveProcess = false;
@@ -238,10 +239,11 @@ namespace Quesadilla
             TickCounts["MiningDetail"] = 0;
 
             AnimationStateKills = new AnimationState(state:0, direction:-1, maximum:36, pulse:false);
-            AnimationStateIntel = new AnimationState(state:1, direction:1, maximum:18, pulse:false); 
-            AnimationStateAlts = new AnimationState(state:2, direction:-1, maximum:12, pulse:false);
+            AnimationStateIntel = new AnimationState(state:1, direction:1, maximum:18, pulse:false);
+			AnimationStateAlts = new AnimationState(state: 2, direction: -1, maximum: 12, pulse: false);
+			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
 
-            menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
+			menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
 
             menuConfiguration.MenuItems.Add(menuConfigurationAlwaysOnTop = new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = Program.MainConfiguration.StayOnTop, });
@@ -596,9 +598,10 @@ namespace Quesadilla
             {
                 AnimationStateKills.Advance();
                 AnimationStateIntel.Advance();
-                AnimationStateAlts.Advance();
+				AnimationStateAlts.Advance();
+				AnimationStateUniHoles.Advance();
 
-                UpdateMinimap();
+				UpdateMinimap();
                 TickCounts["AnimationRefresh"] = 0;
             }
         }
@@ -2321,14 +2324,16 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapSystemColourText,
                     Program.MainConfiguration.MinimapZKillColour,
                     Program.MainConfiguration.MinimapIntelColour,
-                    Program.MainConfiguration.MinimapAltPositionColour,
+					Program.MainConfiguration.MinimapAltPositionColour,
+					Program.MainConfiguration.MinimapUniHoleColour,
 					Program.MainConfiguration.MinimapIncursionColour,
 					Program.MainConfiguration.MinimapIncursionOutlineColour,
 					Program.MainConfiguration.MinimapIceColour,
 					Program.MainConfiguration.MinimapMercoxitColour,
                     AnimationStateIntel.Value(),
                     AnimationStateKills.Value(),
-                    AnimationStateAlts.Value(),
+					AnimationStateAlts.Value(),
+                    AnimationStateUniHoles.Value(),
                     false,
                     Program.MainConfiguration.MinimapShowOutOfRegion,
 					Program.MainConfiguration.MinimapIncursionAlpha,

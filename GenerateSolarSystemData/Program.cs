@@ -1,20 +1,74 @@
-﻿using Microsoft.Extensions.Configuration;
-using QuesadillaExport.DataAccess;
-using Quesadilla;
-using Serilog;
-using Quesadilla.Classes.SolarSystems;
-using Google.Protobuf.WellKnownTypes;
-using System.Text.Json.Serialization;
-using Quesadilla.Classes;
+﻿using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Quesadilla;
+using Quesadilla.Classes;
+using Quesadilla.Classes.SolarSystems;
+using QuesadillaExport.DataAccess;
+using Serilog;
+using System.IO;
+using System.Text;
+using System.Text.Json.Serialization;
 using System.Xml;
 
 namespace QuesadillaExport
 {
     internal class Program
     {
+        static void GenerateUniHoleData()
+        {
+			Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
+			StreamReader reader = new StreamReader("Quesadilla.Systems.json");
+			var json = reader.ReadToEnd();
+			SolarSystems = JsonConvert.DeserializeObject<Dictionary<int, SolarSystem>>(json);
+			reader.Close();
 
-        static void GenerateSolarSystemData()
+
+            StringBuilder UniHoles = new StringBuilder();
+			using (StreamReader drifterReader = new StreamReader("UniHoleData/RegionData.html"))
+			{
+				while (drifterReader.Peek() >= 0)
+				{
+					var drifterLine = drifterReader.ReadLine();
+                    if (drifterLine.StartsWith("<tr>") &&
+                        drifterLine.Contains("https://evemaps.dotlan.net/map/") )
+                    {
+
+						var dl = drifterLine.Split('"').
+							Where(o => o.Contains("https://evemaps.dotlan.net/map/")).ToList();
+						;
+
+                        if (dl.Count > 1)
+                        {
+
+                            var info = dl[1].Split('/');
+
+                            var region = info[4];
+                            var systems = info[5].Split("#")[0].Split(',');
+
+                            foreach (var system in systems)
+                            {
+                                var s = SolarSystems.FirstOrDefault(s => s.Value.Name == system.Replace("_", " "));
+                                s.Value.UniHole = true;
+
+                                UniHoles.AppendLine($"INSERT IGNORE INTO MapUpgrades(SystemId, UpgradeType, UpgradeText) VALUES('{s.Value.Id}','UniHole','');");
+
+                            }
+                        }
+
+					}
+				}
+			}
+			json = JsonConvert.SerializeObject(SolarSystems);
+			File.WriteAllText(@"Quesadilla.Systems.json", json);
+			using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"UniHoleData\UniHoles.txt"))
+			{
+				file.WriteLine(UniHoles.ToString());
+			}
+
+		}
+
+		static void GenerateSolarSystemData()
         {
             var solarSystems = DataAccess.mapSolarSystems.SelectAll();
             Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
@@ -146,6 +200,8 @@ namespace QuesadillaExport
 
             GenerateSolarSystemData();
             GenerateItemTypesData();
+
+            GenerateUniHoleData();
         }
     }
 }

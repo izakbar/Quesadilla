@@ -32,17 +32,16 @@ namespace Quesadilla.Classes
 
 
 		private const int CIRCLE_INITIAL_GAP = 3;
-        private const int CIRCLE_INCREASE_GAP = 7;
+		private const int CIRCLE_INCREASE_GAP = 7;
 
-        private const double LY_SCALING = 9460000000000;
+		private const double LY_SCALING = 9460000000000;
 
         private const int CIRCLE_RADIUS = 3;
         private const int SYSTEM_CIRCLE_SIZE = 6;
 
         private const float MINIMUM_TEXT_SIZE = 10;
         private const int MINIMUM_BLOB_SIZE = 3;
-        private const int MINIMUM_CIRCLE_SIZE = 3;
-        private const int MINIMUM_CIRCLE_MULTIPLER = 3;
+        private const float MINIMUM_CIRCLE_SIZE = 2.3f;
 
         public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c, float textSize = MINIMUM_TEXT_SIZE )
         {
@@ -74,14 +73,16 @@ namespace Quesadilla.Classes
             Color SystemColourText,
             Color ZKillColour,
             Color IntelColour,
-            Color AltColour,
+			Color AltColour,
+			Color UniHoleColour,
 			Color IncursionColour,
 		    Color IncursionOutlineColour,
             Color IceColour,
             Color MercoxitColour,
-            int? animationCycleIntel,
+			int? animationCycleIntel,
             int? animationCycleKills,
-            int? animationCycleAlts,
+			int? animationCycleAlts,
+            int? animationCycleUniHoles,
             bool defaultTextSize = false,
             bool showOutOfRegion = false,
             int incursionAlphaAmount = 50,
@@ -377,6 +378,35 @@ namespace Quesadilla.Classes
                         DrawSystemName(g, currentPoint.X+10, currentPoint.Y-3, "❅", IceColour, textSize);
                     }
 
+					// Unihole ?
+					if (currentSystem.solarSystem.UniHole == true)
+					{
+						var circlePen = new Pen(UniHoleColour, 2);
+						float circleSize = 0;
+
+						if (animationCycleUniHoles is null)
+						{
+							g.DrawEllipse(circlePen,
+								currentPoint.X - (blobSize + circleSize),
+								currentPoint.Y - (blobSize + circleSize),
+								(blobSize + circleSize) * 2,
+								(blobSize + circleSize) * 2);
+						}
+						else
+						{
+							float[] dashSet = { 10, 4, 4, 4};
+							//circlePen.DashStyle = DashStyle.DashDot;
+							circlePen.DashPattern = dashSet;
+							g.DrawArc(circlePen,
+								//currentPoint.X - (blobSize + (circleSize) + (float)animationCycleAlts), currentPoint.Y - (blobSize + (circleSize) + (float)animationCycleAlts),
+								currentPoint.X - (blobSize + circleSize), currentPoint.Y - (blobSize + circleSize),
+								//(blobSize + circleSize + (float)animationCycleAlts) * 2, (blobSize + circleSize + (float)animationCycleAlts) * 2,
+								(blobSize + circleSize) * 2, (blobSize + circleSize) * 2,
+								20 * (float)animationCycleUniHoles, 360);
+						}
+					}
+
+
 					// DrawSystemName(g, currentPoint.X, currentPoint.Y, $"{currentSystem.solarSystem.NPCKillsDeltaLastHour}", Color.AliceBlue, textSize); 
 
 					if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
@@ -386,7 +416,7 @@ namespace Quesadilla.Classes
                         float circleSize = CIRCLE_INITIAL_GAP + (CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING;
                         if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize))
                         {
-                            circleSize = MINIMUM_CIRCLE_SIZE + (MINIMUM_CIRCLE_MULTIPLER * 2);
+                            circleSize = MINIMUM_CIRCLE_SIZE;
                         }
 
                         if (animationCycleKills is null)
@@ -415,6 +445,7 @@ namespace Quesadilla.Classes
                             sbExtraInformation.AppendLine($"ZKILL {k.Timestamp.ToString("HH:mm:ss")} {k.SolarSystemName} {k.VictimShipName} {k.VictimCharacterName}");
                         }
                     }
+
                     if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null).Count() > 0)
                     {
                         var circlePen = new Pen(IntelColour,2);
@@ -422,7 +453,7 @@ namespace Quesadilla.Classes
                         float circleSize = CIRCLE_INITIAL_GAP + (CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING;
                         if ( circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize))
                         {
-                            circleSize = MINIMUM_CIRCLE_SIZE + (MINIMUM_CIRCLE_MULTIPLER);
+                            circleSize = MINIMUM_CIRCLE_SIZE;
                         }
                         if (animationCycleIntel is null)
                         {
@@ -459,7 +490,7 @@ namespace Quesadilla.Classes
                         float circleSize = CIRCLE_INITIAL_GAP + (CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING;
                         if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize))
                         {
-                            circleSize = MINIMUM_CIRCLE_SIZE; // MINIMUM_CIRCLE_MULTIPLER
+                            circleSize = MINIMUM_CIRCLE_SIZE;
                         }
 
                         if (animationCycleAlts is null)

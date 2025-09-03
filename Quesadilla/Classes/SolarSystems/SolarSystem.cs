@@ -42,6 +42,7 @@ namespace Quesadilla.Classes.SolarSystems
         public bool Incursion { get; set; }
         public bool IceField { get; set; }
 		public double Security { get; set; }
+        public Boolean UniHole {  get; set; }
 		public void SetNameRegex()
         {
             string str = "";

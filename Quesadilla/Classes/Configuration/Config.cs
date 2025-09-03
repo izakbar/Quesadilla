@@ -1074,11 +1074,17 @@ img.rounded-corners {
         [ReadOnly(true)]
         public bool AlertTransparent { get; set; }
 
-        [Category("Main window")]
-        [DisplayName("Minimap Alt Indicator colour")]
-        [Description("Colour to use for the logged in alt indicators on the minimap")]
-        [DefaultValue(typeof(Color), "Aqua")]
-        public Color MinimapAltPositionColour { get; set; }
+		[Category("Main window")]
+		[DisplayName("Minimap Alt Indicator colour")]
+		[Description("Colour to use for the logged in alt indicators on the minimap")]
+		[DefaultValue(typeof(Color), "Aqua")]
+		public Color MinimapAltPositionColour { get; set; }
+
+		[Category("Main window")]
+		[DisplayName("Minimap Unihole Indicator colour")]
+		[Description("Colour to use for Unihole indicators on the minimap")]
+		[DefaultValue(typeof(Color), "Fuchsia")]
+		public Color MinimapUniHoleColour { get; set; }
 
 		[Category("Main window")]
 		[DisplayName("Minimap incursion Indicator colour")]
@@ -1433,13 +1439,19 @@ img.rounded-corners {
         [DefaultValue(typeof(Color), "Orange")]
         public Color AlertPopupMinimapIntelColour { get; set; }
 
-        [Category("Alert")]
-        [DisplayName("Minimap logged in alt indicator colour")]
-        [Description("")]
-        [DefaultValue(typeof(Color), "Aqua")]
-        public Color AlertPopupMinimapAltPositionColour { get; set; }
+		[Category("Alert")]
+		[DisplayName("Minimap logged in alt indicator colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "Aqua")]
+		public Color AlertPopupMinimapAltPositionColour { get; set; }
 
-        [Category("Alert")]
+		[Category("Alert")]
+		[DisplayName("Minimap Unihole indicator colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "Fuchsia")]
+		public Color AlertPopupMinimapUniHoleColour { get; set; }
+
+		[Category("Alert")]
         [DisplayName("Minimap Ice Indicator colour")]
         [Description("Colour to use for ice indicatos on the alert popup")]
         [DefaultValue(typeof(Color), "Cyan")]
