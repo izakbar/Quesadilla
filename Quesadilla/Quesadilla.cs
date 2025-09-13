@@ -2547,7 +2547,7 @@ namespace Quesadilla
             else
             {
                 MiningData.Text = Program.GetMiningLastHour("");
-                MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
+                MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
 			}
         }
 

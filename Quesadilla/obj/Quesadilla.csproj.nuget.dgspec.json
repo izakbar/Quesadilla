@@ -20,6 +20,7 @@
         ],
         "configFilePaths": [
           "C:\\Users\\carls\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -53,7 +54,7 @@
             },
             "Microsoft.AspNetCore.Hosting": {
               "target": "Package",
-              "version": "[2.2.7, )"
+              "version": "[2.3.0, )"
             },
             "Microsoft.AspNetCore.Mvc": {
               "target": "Package",
