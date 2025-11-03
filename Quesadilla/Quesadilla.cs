@@ -1089,6 +1089,25 @@ namespace Quesadilla
             }
             Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
 
+            // Should we update system information in system log file ?
+            if (Program.MainConfiguration.OutputCharacterLocationsToFile)
+            {
+                try
+                {
+                    StringBuilder s = new StringBuilder();
+					foreach( var c in Program.CharacterList)
+                    {
+                        s.Append($"{c.CharacterName}:{c.Location}");
+						File.WriteAllText($"Quesadilla.Locations.{c.CharacterName}", c.Location);
+                    }
+					File.WriteAllText($"Quesadilla.Locations", s.ToString());
+				}
+				catch (Exception ex)
+                {
+                    //
+                }
+            }
+
             shouldUpdatePlanetInfo = true;
             shouldUpdateMinimap = true;
         }
