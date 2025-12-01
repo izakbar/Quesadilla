@@ -60,11 +60,13 @@ namespace Quesadilla.Classes
 				newItems.Add(new ConfigurationItemLocationInformation()
 				{
 					Name = item.Name,
-					Location = item.Location,
+					Location = new Point(item.Location.X, item.Location.Y),
 					Color = item.Color,
 					IsVisible = item.IsVisible,
-					Size = item.Size,
+					Size = new Size(item.Size.Width, item.Size.Height),
 					Font = item.Font,
+                    BackColor = item.BackColor,
+                    AlternateColor = item.AlternateColor,
 				});
 			}
             return newItems;
@@ -78,6 +80,8 @@ namespace Quesadilla.Classes
                 DPSLocation = DPSLocation,
                 InitialPosition = InitialPosition,
                 ZKillSound = ZKillSound,
+                AlertPopupMinimapRawXY = AlertPopupMinimapRawXY,
+                MinimapRawXY = MinimapRawXY,
             };
 
             // copy as many config items as possible
@@ -1138,10 +1142,10 @@ img.rounded-corners {
 		public Color MinimapMercoxitColour { get; set; }
 
         [Category("Main window")]
-        [DisplayName("Use SDE X/Y")]
-        [Description("Selecting true will show minimap using the SDE values for X/Y. Selecting False will use Dotlan layout")]
-        [DefaultValue(typeof(bool), "false")]
-        public bool MinimapRawXY { get; set; }
+        [DisplayName("Maptype to use")]
+        [Description("Which map layout to use for the Minimap")]
+        [DefaultValue(typeof(MapType), "Dotlan")]
+        public MapType MinimapRawXY { get; set; }
 
         [Category("Main window")]
         [DisplayName("Minimap Jumps")]
@@ -1503,10 +1507,10 @@ img.rounded-corners {
 		public int AlertPopupMinimapConnectionGap { get; set; }
 
 		[Category("Alert")]
-        [DisplayName("Use SDE X/Y")]
-        [Description("Selecting true will show minimap using the SDE values for X/Y. Selecting False will use Dotlan layout")]
-        [DefaultValue(typeof(bool), "false")]
-        public bool AlertPopupMinimapRawXY { get; set; }
+        [DisplayName("Which maptype to use for alert windows")]
+        [Description("Which minimap to use for Alert windows")]
+        [DefaultValue(typeof(MapType), "Dotlan")]
+        public MapType AlertPopupMinimapRawXY { get; set; }
 
         [Category("Alert")]
         [DisplayName("ZKillAlertText")]

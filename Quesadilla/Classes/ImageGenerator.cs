@@ -19,6 +19,7 @@ using EVEStandard.API;
 using System.Drawing.Imaging;
 using System.Windows.Media;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
+using Quesadilla.Classes.Configuration;
 
 namespace Quesadilla.Classes
 {
@@ -60,7 +61,7 @@ namespace Quesadilla.Classes
                     );
             }
         }
-        public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, bool rawXY, ref string extraInformation, ref List<MinimapSystem> returnMinimapSystems,
+        public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, MapType whichMap, ref string extraInformation, ref List<MinimapSystem> returnMinimapSystems,
             bool showSystemText,
             bool Border, Color BorderColor,
             Color LineColourNormal,
@@ -90,8 +91,7 @@ namespace Quesadilla.Classes
             int connectingLineGap = 10
             )
         {
-
-            double GUI_SCALING = 30;
+			double GUI_SCALING = 30;
 
             Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
 
@@ -146,9 +146,18 @@ namespace Quesadilla.Classes
                             toSystem = pathSystem == path.ToSystemId ? true : false,
                             route = true,
                             textDisplay = (pathSystem == path.FromSystemId || pathSystem == path.ToSystemId) ? true : false,
-                            X = (rawXY ? (int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING) : (int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX))),
-                            Y = (rawXY ? (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING) : (int)Math.Round((nextSolarSystem.DotlanY - FromSystem.DotlanY))),
-                        });
+
+							X = ( 
+                            whichMap == MapType.SDE ? (int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING) :
+                            ( whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.X2D - nextSolarSystem.X2D) / LY_SCALING) :
+							(int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX)))
+							),
+							Y = (
+							whichMap == MapType.SDE ? (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING) :
+							(whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.Y2D - nextSolarSystem.Y2D) / LY_SCALING) :
+							(int)Math.Round((nextSolarSystem.DotlanY - FromSystem.DotlanY)))
+							),
+						});
 
                         // add connection
                         if (nextSolarSystem != FromSystem)
@@ -158,14 +167,16 @@ namespace Quesadilla.Classes
                                 FromSystem = previousSystem,
                                 ToSystem = nextSolarSystem,
                                 route = true,
-                                P1 = (rawXY
-                                ? new Point((int)Math.Round((FromSystem.X - previousSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - previousSystem.Y) / LY_SCALING))
-                                : new Point((int)Math.Round((previousSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((previousSystem.DotlanY - FromSystem.DotlanY)))
-                                ),
-                                P2 = (rawXY
-                                ? new Point((int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING))
-                                : new Point((int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((nextSolarSystem.DotlanY - FromSystem.DotlanY)))
-                                ),
+								P1 = (
+							        whichMap == MapType.SDE ? new Point((int)Math.Round((FromSystem.X - previousSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - previousSystem.Y) / LY_SCALING)) :
+							        (whichMap == MapType.SDE2D ? new Point((int)Math.Round((FromSystem.X2D - previousSystem.X2D) / LY_SCALING), (int)Math.Round((FromSystem.Y2D - previousSystem.Y2D) / LY_SCALING)) :
+							        new Point((int)Math.Round((previousSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((previousSystem.DotlanY - FromSystem.DotlanY))))
+							    ),
+								P2 = (
+									whichMap == MapType.SDE ? new Point((int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING)) :
+									(whichMap == MapType.SDE2D ? new Point((int)Math.Round((FromSystem.X2D - previousSystem.X2D) / LY_SCALING), (int)Math.Round((FromSystem.Y2D - previousSystem.Y2D) / LY_SCALING)) :
+									new Point((int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((nextSolarSystem.DotlanY - FromSystem.DotlanY))))
+								),
                             });
                         }
                         previousSystem = nextSolarSystem;
@@ -198,9 +209,17 @@ namespace Quesadilla.Classes
                                         toSystem = false,
                                         route = false,
                                         textDisplay = false,
-                                        X = (rawXY ? (int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING) : (int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX))),
-                                        Y = (rawXY ? (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING) : (int)Math.Round((linkedSolarSystem.DotlanY - FromSystem.DotlanY))),
-                                    });
+										X = (
+							                whichMap == MapType.SDE ? (int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING) :
+							                (whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.X2D - linkedSolarSystem.X2D) / LY_SCALING) :
+							                (int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX)))
+							            ),
+										Y = (
+							                whichMap == MapType.SDE ? (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING) :
+							                (whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.Y2D - linkedSolarSystem.Y2D) / LY_SCALING) :
+											(int)Math.Round((linkedSolarSystem.DotlanY - FromSystem.DotlanY)))
+										),
+									});
                                 }
 
                                 // check if connection already saved
@@ -215,15 +234,20 @@ namespace Quesadilla.Classes
                                         FromSystem = mapSystem.solarSystem,
                                         ToSystem = linkedSolarSystem,
                                         route = (mapSystem.route == true & (linkedMinimapSystem != null && linkedMinimapSystem.route == true)),
-                                        P1 = (rawXY
-                                        ? new Point((int)Math.Round((FromSystem.X - mapSystem.solarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - mapSystem.solarSystem.Y) / LY_SCALING))
-                                        : new Point((int)Math.Round((mapSystem.solarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((mapSystem.solarSystem.DotlanY - FromSystem.DotlanY)))
-                                        ),
-                                        P2 = (rawXY
-                                        ? new Point((int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING))
-                                        : new Point((int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((linkedSolarSystem.DotlanY - FromSystem.DotlanY)))
-                                        ),
-                                    });
+
+										P1 = (
+									        whichMap == MapType.SDE ? new Point((int)Math.Round((FromSystem.X - mapSystem.solarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - mapSystem.solarSystem.Y) / LY_SCALING)) :
+									        (whichMap == MapType.SDE2D ? new Point((int)Math.Round((FromSystem.X2D - mapSystem.solarSystem.X2D) / LY_SCALING), (int)Math.Round((FromSystem.Y2D - mapSystem.solarSystem.Y2D) / LY_SCALING)) :
+											new Point((int)Math.Round((mapSystem.solarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((mapSystem.solarSystem.DotlanY - FromSystem.DotlanY))))
+										),
+
+										P2 = (
+									        whichMap == MapType.SDE ? new Point((int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING)) :
+									        (whichMap == MapType.SDE2D ? new Point((int)Math.Round((FromSystem.X2D - linkedSolarSystem.X2D) / LY_SCALING), (int)Math.Round((FromSystem.Y2D - linkedSolarSystem.Y2D) / LY_SCALING)) :
+											new Point((int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((linkedSolarSystem.DotlanY - FromSystem.DotlanY))))
+								        ),
+
+									});
                                 }
                             }
                         }
@@ -247,7 +271,7 @@ namespace Quesadilla.Classes
                 }
                 int maxSize = Math.Max((int)(maxX - minX), (int)(maxY - minY));
                 int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (8);
-                GUI_SCALING = (int)Math.Round((double)(maxSize) / ((pictureSize * (rawXY ? .8 : .8))));
+                GUI_SCALING = (int)Math.Round((double)(maxSize) / ((pictureSize * (whichMap == MapType.SDE ? .8 : (whichMap == MapType.SDE2D ? .8 : .8 )) )));
                 GUI_SCALING = GUI_SCALING * (((double)mapScale / 100));
                 // Apply scale
                 maxX = 0; maxY = 0; minX = 0; minY = 0;

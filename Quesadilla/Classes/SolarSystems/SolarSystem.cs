@@ -20,9 +20,11 @@ namespace Quesadilla.Classes.SolarSystems
         public double X { get; set; }
         public double Y { get; set; }
         public double Z { get; set; }
-        public double DotlanX { get; set; }
-        public double DotlanY { get; set; }
-        [JsonIgnore]
+		public double DotlanX { get; set; }
+		public double DotlanY { get; set; }
+		public double X2D { get; set; }
+		public double Y2D { get; set; }
+		[JsonIgnore]
         public Vector3 Xyz { get; set; }
         [JsonIgnore]
         public List<ZKillKill> Kills { get; set; }

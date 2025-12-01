@@ -24,8 +24,9 @@ public class CustomPropertyExtractorWrapper : CustomTypeDescriptor
 			o.PropertyType == typeof(int) ||
 			o.PropertyType == typeof(Size) ||
             o.PropertyType == typeof(Point) ||
-            o.PropertyType == typeof(PopupLocationType) ||
-            o.Category == "HeartBeat"
+			o.PropertyType == typeof(PopupLocationType) ||
+			o.PropertyType == typeof(MapType) ||
+			o.Category == "HeartBeat"
             )
             .ToArray();
         return new PropertyDescriptorCollection(properties);
