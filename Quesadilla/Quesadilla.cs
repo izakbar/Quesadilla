@@ -88,9 +88,18 @@ namespace Quesadilla
 
         private readonly Regex _MiningRegexRoidExploded = new Regex("(?<miningDevice>.*)\\sdeactivates as it finds the resource it was harvesting\\s(?<miningHowItEnded>.*)", RegexOptions.Compiled);
         private readonly Regex _MiningRegexCargoFull = new Regex("Your\\s*(?<miningDevice>.*)\\s*has completed operations. Ship.s cargo hold is full.*", RegexOptions.Compiled);
-        private readonly Regex _MiningRegexAmounts = new Regex("^<color=0x........>\\s*You mined\\s*<font size=..><color=0x........>(?<miningAmount>.*)<color=0x........><font size=..>\\s*units* of\\s*<color=0x........><font size=..>\\s*(?<miningContext>.*)\\s*<color=0x........><font size=..>\\swith a lost residue of\\s*<font size=..><color=0x........>(?<miningResidue>.*)<color=0x........><font size=..>\\s*units*", RegexOptions.Compiled);
 
-        private readonly Regex _DecloakRegexMobileObservatory = new Regex("cloak deactivates due to a pulse from a Mobile Observatory", RegexOptions.Compiled);
+		private readonly Regex _MiningRegexAmounts = new Regex("^<color=.*>\\s*You mined\\s*<font size=..><color=.*>(?<miningAmount>.*)<color=.*><font size=..>\\s*units* of\\s*<color=.*><font size=..>\\s*(?<miningContext>.*)", RegexOptions.Compiled);
+		private readonly Regex _MiningRegexAmountsCritical = new Regex("^^<color=.*>\\s*Critical mining success!\\s*<color=.*><font size=..>\\sYou mined an additional\\s<color=.*><font size=..>(?<miningAmount>.*)<color=.*><font size=..>\\s*units* of\\s*<color=.*><font size=..>\\s*(?<miningContext>.*)", RegexOptions.Compiled);
+		private readonly Regex _MiningRegexAmountsResidue = new Regex("^^<color=.*>\\s*Additional\\s*<font size=..><color=.*>(?<miningResidue>.*)<color=.*><font size=..>\\s*units depleted from asteroid as residue", RegexOptions.Compiled);
+		// normal: <color=0x77ffffff>You mined <font size=12><color=#ff8dc169>40<color=0x77ffffff><font size=10> units of <color=0xffffffff><font size=12>Arkonor
+		// bonus:  <color=#fff0ff45>Critical mining success!<color=0x77ffffff><font size=10> You mined an additional <color=#fff0ff45><font size=12>107<color=0x77ffffff><font size=10> units of <color=0xffffffff><font size=12>Otavite
+		// residue: <color=0x77ffffff>Additional <font size=12><color=#ffff454b>23<color=0x77ffffff><font size=10> units depleted from asteroid as residue
+
+
+
+
+		private readonly Regex _DecloakRegexMobileObservatory = new Regex("cloak deactivates due to a pulse from a Mobile Observatory", RegexOptions.Compiled);
         private readonly Regex _DecloakRegexProximity = new Regex("Your cloak deactivates due to proximity to (?<decloakProximity>.*)", RegexOptions.Compiled);
 
         private readonly Regex _ISKRegexISKData = new Regex("^<font size=12><b><color=0x........>\\s*(?<iskAmount>.*) ISK\\s*</b><color=0x........> added to next bounty payout", RegexOptions.Compiled);
@@ -1547,20 +1556,61 @@ namespace Quesadilla
                     var minedAmount = match.Groups["miningAmount"].ToString();
                     int mined = Int32.Parse(minedAmount.Trim());
 
-                    var minedWasted = match.Groups["miningResidue"].ToString();
-                    int wasted = Int32.Parse(minedWasted.Trim());
+                    //var minedWasted = match.Groups["miningResidue"].ToString();
+                    //int wasted = Int32.Parse(minedWasted.Trim());
 
                     Program.Mining[e.Entry.CharacterName].Add(new MiningLine()
                     {
                         TimeAdded = e.Entry.TimeAdded,
                         MiningItem = match.Groups["miningContext"].ToString(),
                         MiningAmount = mined,
-                        WastageAmount = wasted,
+                        Critical = false,
+                        //WastageAmount = wasted,
                     });
                 }
 
-                // is event that roid popped
-                match = _MiningRegexRoidExploded.Match(e.Entry.LineContent);
+				// is this critical mining data
+				match = _MiningRegexAmountsCritical.Match(e.Entry.LineContent);
+				if (match.Success)
+				{
+					var minedAmount = match.Groups["miningAmount"].ToString();
+					int mined = Int32.Parse(minedAmount.Trim());
+
+					//var minedWasted = match.Groups["miningResidue"].ToString();
+					//int wasted = Int32.Parse(minedWasted.Trim());
+
+					Program.Mining[e.Entry.CharacterName].Add(new MiningLine()
+					{
+						TimeAdded = e.Entry.TimeAdded,
+						MiningItem = match.Groups["miningContext"].ToString(),
+						MiningAmount = mined,
+                        Critical = true,
+						//WastageAmount = wasted,
+					});
+				}
+
+				// is this residue mining data
+				match = _MiningRegexAmountsResidue.Match(e.Entry.LineContent);
+				if (match.Success)
+				{
+					//var minedAmount = match.Groups["miningAmount"].ToString();
+					//int mined = Int32.Parse(minedAmount.Trim());
+
+					var minedWasted = match.Groups["miningResidue"].ToString();
+					int wasted = Int32.Parse(minedWasted.Trim());
+
+					Program.Mining[e.Entry.CharacterName].Add(new MiningLine()
+					{
+						TimeAdded = e.Entry.TimeAdded,
+						MiningItem = "WASTE",
+						//MiningAmount = mined,
+						WastageAmount = wasted,
+                        Critical = false,
+					});
+				}
+
+				// is event that roid popped
+				match = _MiningRegexRoidExploded.Match(e.Entry.LineContent);
                 if (match.Success)
                 {
 
