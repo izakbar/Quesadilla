@@ -65,11 +65,11 @@
 			this.IntelLog.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.IntelLog.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.IntelLog.ForContext = "";
-			this.IntelLog.Location = new System.Drawing.Point(0, 231);
-			this.IntelLog.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+			this.IntelLog.Location = new System.Drawing.Point(0, 356);
+			this.IntelLog.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.IntelLog.Name = "IntelLog";
 			this.IntelLog.ReadOnly = true;
-			this.IntelLog.Size = new System.Drawing.Size(638, 186);
+			this.IntelLog.Size = new System.Drawing.Size(957, 286);
 			this.IntelLog.TabIndex = 0;
 			this.IntelLog.Text = "";
 			this.IntelLog.TextChanged += new System.EventHandler(this.intelLog_TextChanged);
@@ -78,9 +78,10 @@
 			// 
 			this.ChatServerDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.ChatServerDown.ForeColor = System.Drawing.Color.Red;
-			this.ChatServerDown.Location = new System.Drawing.Point(474, 17);
+			this.ChatServerDown.Location = new System.Drawing.Point(711, 26);
+			this.ChatServerDown.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.ChatServerDown.Name = "ChatServerDown";
-			this.ChatServerDown.Size = new System.Drawing.Size(152, 20);
+			this.ChatServerDown.Size = new System.Drawing.Size(228, 31);
 			this.ChatServerDown.TabIndex = 3;
 			this.ChatServerDown.Text = "Chat Server Down";
 			this.ChatServerDown.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -90,10 +91,10 @@
 			// 
 			this.buttonIntelSize.BackColor = System.Drawing.SystemColors.Info;
 			this.buttonIntelSize.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.buttonIntelSize.Location = new System.Drawing.Point(597, 230);
-			this.buttonIntelSize.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+			this.buttonIntelSize.Location = new System.Drawing.Point(896, 354);
+			this.buttonIntelSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.buttonIntelSize.Name = "buttonIntelSize";
-			this.buttonIntelSize.Size = new System.Drawing.Size(17, 18);
+			this.buttonIntelSize.Size = new System.Drawing.Size(26, 28);
 			this.buttonIntelSize.TabIndex = 6;
 			this.buttonIntelSize.Text = "▼";
 			this.buttonIntelSize.UseVisualStyleBackColor = false;
@@ -103,9 +104,10 @@
 			// 
 			this.CurrentClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.CurrentClient.ForeColor = System.Drawing.Color.Blue;
-			this.CurrentClient.Location = new System.Drawing.Point(21, 43);
+			this.CurrentClient.Location = new System.Drawing.Point(32, 66);
+			this.CurrentClient.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.CurrentClient.Name = "CurrentClient";
-			this.CurrentClient.Size = new System.Drawing.Size(269, 21);
+			this.CurrentClient.Size = new System.Drawing.Size(404, 32);
 			this.CurrentClient.TabIndex = 7;
 			this.CurrentClient.Text = "Current Client";
 			this.CurrentClient.Visible = false;
@@ -114,10 +116,9 @@
 			// 
 			this.RattingData.BackColor = System.Drawing.Color.Transparent;
 			this.RattingData.ForeColor = System.Drawing.Color.ForestGreen;
-			this.RattingData.Location = new System.Drawing.Point(295, 203);
-			this.RattingData.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.RattingData.Location = new System.Drawing.Point(442, 312);
 			this.RattingData.Name = "RattingData";
-			this.RattingData.Size = new System.Drawing.Size(118, 11);
+			this.RattingData.Size = new System.Drawing.Size(177, 17);
 			this.RattingData.TabIndex = 8;
 			this.RattingData.Text = "999999";
 			this.RattingData.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -127,18 +128,20 @@
 			// 
 			this.EveScoutStatus.AutoSize = true;
 			this.EveScoutStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.EveScoutStatus.Location = new System.Drawing.Point(0, 218);
+			this.EveScoutStatus.Location = new System.Drawing.Point(0, 336);
+			this.EveScoutStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.EveScoutStatus.Name = "EveScoutStatus";
-			this.EveScoutStatus.Size = new System.Drawing.Size(168, 13);
+			this.EveScoutStatus.Size = new System.Drawing.Size(262, 20);
 			this.EveScoutStatus.TabIndex = 9;
 			this.EveScoutStatus.Text = "XXXXXXXXXXXXXXXXXXXXXXX";
 			// 
 			// MainMinimap
 			// 
 			this.MainMinimap.BackColor = System.Drawing.Color.Transparent;
-			this.MainMinimap.Location = new System.Drawing.Point(4, 20);
+			this.MainMinimap.Location = new System.Drawing.Point(6, 31);
+			this.MainMinimap.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.MainMinimap.Name = "MainMinimap";
-			this.MainMinimap.Size = new System.Drawing.Size(286, 156);
+			this.MainMinimap.Size = new System.Drawing.Size(429, 240);
 			this.MainMinimap.TabIndex = 10;
 			this.MainMinimap.TabStop = false;
 			this.MainMinimap.Click += new System.EventHandler(this.pMinimapImage_Click);
@@ -148,10 +151,9 @@
 			// AlertsOutstanding
 			// 
 			this.AlertsOutstanding.ForeColor = System.Drawing.Color.LightCoral;
-			this.AlertsOutstanding.Location = new System.Drawing.Point(295, 20);
-			this.AlertsOutstanding.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.AlertsOutstanding.Location = new System.Drawing.Point(442, 31);
 			this.AlertsOutstanding.Name = "AlertsOutstanding";
-			this.AlertsOutstanding.Size = new System.Drawing.Size(114, 11);
+			this.AlertsOutstanding.Size = new System.Drawing.Size(171, 17);
 			this.AlertsOutstanding.TabIndex = 12;
 			this.AlertsOutstanding.Text = "999999";
 			this.AlertsOutstanding.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -161,10 +163,9 @@
 			// 
 			this.ExtraInformation.BackColor = System.Drawing.Color.Transparent;
 			this.ExtraInformation.ForeColor = System.Drawing.Color.Fuchsia;
-			this.ExtraInformation.Location = new System.Drawing.Point(295, 43);
-			this.ExtraInformation.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.ExtraInformation.Location = new System.Drawing.Point(442, 66);
 			this.ExtraInformation.Name = "ExtraInformation";
-			this.ExtraInformation.Size = new System.Drawing.Size(309, 129);
+			this.ExtraInformation.Size = new System.Drawing.Size(464, 198);
 			this.ExtraInformation.TabIndex = 13;
 			this.ExtraInformation.Text = "999999";
 			this.ExtraInformation.Visible = false;
@@ -173,10 +174,9 @@
 			// MouseoverSystemName
 			// 
 			this.MouseoverSystemName.ForeColor = System.Drawing.Color.ForestGreen;
-			this.MouseoverSystemName.Location = new System.Drawing.Point(445, 203);
-			this.MouseoverSystemName.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.MouseoverSystemName.Location = new System.Drawing.Point(668, 312);
 			this.MouseoverSystemName.Name = "MouseoverSystemName";
-			this.MouseoverSystemName.Size = new System.Drawing.Size(193, 11);
+			this.MouseoverSystemName.Size = new System.Drawing.Size(290, 17);
 			this.MouseoverSystemName.TabIndex = 14;
 			this.MouseoverSystemName.Text = "systemName";
 			this.MouseoverSystemName.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -186,9 +186,10 @@
 			// 
 			this.WorkingIndicator.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.WorkingIndicator.ForeColor = System.Drawing.Color.SaddleBrown;
-			this.WorkingIndicator.Location = new System.Drawing.Point(625, 12);
+			this.WorkingIndicator.Location = new System.Drawing.Point(938, 18);
+			this.WorkingIndicator.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.WorkingIndicator.Name = "WorkingIndicator";
-			this.WorkingIndicator.Size = new System.Drawing.Size(13, 15);
+			this.WorkingIndicator.Size = new System.Drawing.Size(20, 23);
 			this.WorkingIndicator.TabIndex = 15;
 			this.WorkingIndicator.Text = "*";
 			this.WorkingIndicator.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -197,10 +198,9 @@
 			// 
 			this.MiningData.BackColor = System.Drawing.Color.Transparent;
 			this.MiningData.ForeColor = System.Drawing.Color.ForestGreen;
-			this.MiningData.Location = new System.Drawing.Point(295, 192);
-			this.MiningData.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.MiningData.Location = new System.Drawing.Point(442, 295);
 			this.MiningData.Name = "MiningData";
-			this.MiningData.Size = new System.Drawing.Size(118, 11);
+			this.MiningData.Size = new System.Drawing.Size(177, 17);
 			this.MiningData.TabIndex = 16;
 			this.MiningData.Text = "999999";
 			this.MiningData.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -210,9 +210,9 @@
 			// 
 			this.TitleIcon.Dock = System.Windows.Forms.DockStyle.Left;
 			this.TitleIcon.Location = new System.Drawing.Point(0, 0);
-			this.TitleIcon.Margin = new System.Windows.Forms.Padding(4);
+			this.TitleIcon.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
 			this.TitleIcon.Name = "TitleIcon";
-			this.TitleIcon.Size = new System.Drawing.Size(20, 18);
+			this.TitleIcon.Size = new System.Drawing.Size(30, 28);
 			this.TitleIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.TitleIcon.TabIndex = 2;
 			this.TitleIcon.TabStop = false;
@@ -226,8 +226,9 @@
 			this.TopbarPanel.Controls.Add(this.TitleIcon);
 			this.TopbarPanel.Dock = System.Windows.Forms.DockStyle.Top;
 			this.TopbarPanel.Location = new System.Drawing.Point(0, 0);
+			this.TopbarPanel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.TopbarPanel.Name = "TopbarPanel";
-			this.TopbarPanel.Size = new System.Drawing.Size(638, 18);
+			this.TopbarPanel.Size = new System.Drawing.Size(957, 28);
 			this.TopbarPanel.TabIndex = 17;
 			this.TopbarPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TopbarPanel_MouseDown);
 			// 
@@ -238,9 +239,10 @@
 			this.ButtonMinimize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.ButtonMinimize.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.ButtonMinimize.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.ButtonMinimize.Location = new System.Drawing.Point(588, 0);
+			this.ButtonMinimize.Location = new System.Drawing.Point(881, 0);
+			this.ButtonMinimize.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.ButtonMinimize.Name = "ButtonMinimize";
-			this.ButtonMinimize.Size = new System.Drawing.Size(25, 18);
+			this.ButtonMinimize.Size = new System.Drawing.Size(38, 28);
 			this.ButtonMinimize.TabIndex = 20;
 			this.ButtonMinimize.Text = "-";
 			this.ButtonMinimize.UseVisualStyleBackColor = true;
@@ -253,9 +255,10 @@
 			this.buttonClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.buttonClose.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.buttonClose.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.buttonClose.Location = new System.Drawing.Point(613, 0);
+			this.buttonClose.Location = new System.Drawing.Point(919, 0);
+			this.buttonClose.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.buttonClose.Name = "buttonClose";
-			this.buttonClose.Size = new System.Drawing.Size(25, 18);
+			this.buttonClose.Size = new System.Drawing.Size(38, 28);
 			this.buttonClose.TabIndex = 19;
 			this.buttonClose.Text = "X";
 			this.buttonClose.UseVisualStyleBackColor = true;
@@ -266,21 +269,21 @@
 			this.Title.AutoSize = true;
 			this.Title.Dock = System.Windows.Forms.DockStyle.Left;
 			this.Title.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-			this.Title.Location = new System.Drawing.Point(20, 0);
-			this.Title.Margin = new System.Windows.Forms.Padding(1);
+			this.Title.Location = new System.Drawing.Point(30, 0);
+			this.Title.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
 			this.Title.Name = "Title";
-			this.Title.Padding = new System.Windows.Forms.Padding(3);
-			this.Title.Size = new System.Drawing.Size(41, 19);
+			this.Title.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			this.Title.Size = new System.Drawing.Size(59, 30);
 			this.Title.TabIndex = 4;
 			this.Title.Text = "label1";
 			this.Title.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
 			// 
 			// Quesadilla
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Window;
-			this.ClientSize = new System.Drawing.Size(638, 417);
+			this.ClientSize = new System.Drawing.Size(957, 642);
 			this.Controls.Add(this.TopbarPanel);
 			this.Controls.Add(this.MiningData);
 			this.Controls.Add(this.WorkingIndicator);
@@ -298,7 +301,7 @@
 			this.ForeColor = System.Drawing.Color.Lime;
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+			this.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
 			this.MaximizeBox = false;
 			this.Name = "Quesadilla";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Quesadilla_FormClosing);

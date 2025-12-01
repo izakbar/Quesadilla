@@ -24,7 +24,11 @@ namespace Quesadilla.Classes.ZKill
             // only add to new zkill list if not already in list. This should prevent multiple entries for same thing
             if ( q.Where(o => o.ID == kill.ID).Count() == 0 )
             {
-            kill.VictimCharacterName = Program.Universe.GetCharacterName((int)kill.VictimCharacterId);
+                kill.VictimCharacterName = "**NO ONE**";
+                if (kill.VictimCharacterId != null)
+                {
+                    kill.VictimCharacterName = Program.Universe.GetCharacterName((int)kill.VictimCharacterId);
+                }
             if (system.Kills == null)
             {
                 system.Kills = new List<ZKillKill>();

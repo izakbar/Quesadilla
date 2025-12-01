@@ -125,7 +125,7 @@ namespace Quesadilla.Classes
                     g.FillRectangle(backgroundBrush, TRANSPARENT_BORDER_WIDTH, TRANSPARENT_BORDER_WIDTH, dstImage.Width - (TRANSPARENT_BORDER_WIDTH * 2), dstImage.Height - (TRANSPARENT_BORDER_WIDTH * 2));
                 }
 
-                if (path is null || path.FromSystemId == 0) return dstImage;
+                if (path is null || path.FromSystemId == 0 || path.FromSystemId == -1) return dstImage;
                 var FromSystem = Program.Universe.SolarSystems[path.FromSystemId];
 
                 // add route systems

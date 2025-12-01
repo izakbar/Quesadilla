@@ -694,7 +694,7 @@ namespace Quesadilla
             returnString = returnString.Replace("{value}", kill.TotalValue);
             returnString = returnString.Replace("{victim}", kill.VictimCharacterName);
             returnString = returnString.Replace("{system}", Program.Universe.SolarSystems.ContainsKey((int)kill.SolarSystemId) ? Program.Universe.SolarSystems[(int)kill.SolarSystemId].Name : kill.SolarSystemId.ToString());
-            returnString = returnString.Replace("{killer}", kill.KillerCharacterId == 0 ? "NPC" : Program.Universe.GetCharacterName((int)kill.KillerCharacterId));
+            returnString = returnString.Replace("{killer}", (kill.KillerCharacterId == null || kill.KillerCharacterId == 0) ? "NPC" : Program.Universe.GetCharacterName((int)kill.KillerCharacterId));
             returnString = returnString.Replace("{victimship}", Program.Universe.ItemTypes.ContainsKey((int)kill.VictimShipTypeId) ? Program.Universe.ItemTypes[(int)kill.VictimShipTypeId].Name : "Unknown:" + kill.VictimShipTypeId.ToString());
 
             returnString = returnString.Replace("{killership}", Program.Universe.ItemTypes.ContainsKey((int)kill.KillerShipTypeId) ? Program.Universe.ItemTypes[(int)kill.KillerShipTypeId].Name : kill.KillerShipTypeId.ToString());
@@ -1045,14 +1045,16 @@ namespace Quesadilla
                 {
                     c.LocationId = foundSystemId;
                     c.Location = foundSystemName;
+                    c.InAbyss = false;
                 }
-                else
+				else
                 {
                     c = new Character()
                     {
                         CharacterName = characterName,
                         LocationId = foundSystemId,
                         Location = foundSystemName,
+                        InAbyss = false,
                     };
                     Program.CharacterList.Add(c);
                 }
@@ -1070,9 +1072,27 @@ namespace Quesadilla
                 GetSystemInfo(foundSystemId);
 
                 // TODO                if (this._conf.CameraFollowCharacter && this.CentreOnCharacter.Text == key) this.ZoomTo(num1);
-            }
+            } else
+            {
+				var c = Program.CharacterList.Where(o => o.CharacterName == characterName).FirstOrDefault();
+				if (c != null)
+				{
+					c.InAbyss = true;
+				}
+				else
+				{
+					c = new Character()
+					{
+						CharacterName = characterName,
+						LocationId = foundSystemId,
+						Location = foundSystemName,
+						InAbyss = true,
+					};
+					Program.CharacterList.Add(c);
+				}
+			}
 
-            SetupStatusBar();
+			SetupStatusBar();
 
             if (foundSystemId == -1)
             {
@@ -1088,6 +1108,25 @@ namespace Quesadilla
                 }
             }
             Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
+
+            // Should we update system information in system log file ?
+            if (Program.MainConfiguration.OutputCharacterLocationsToFile)
+            {
+                try
+                {
+                    StringBuilder s = new StringBuilder();
+					foreach( var c in Program.CharacterList)
+                    {
+                        s.Append($"{c.CharacterName}:{c.Location}{(c.InAbyss ? " *IN-ABYSS*" : "")}");
+						File.WriteAllText($"Quesadilla.Locations.{c.CharacterName}", $"{c.Location} {(c.InAbyss ? " *IN-ABYSS*" : "")}");
+                    }
+					File.WriteAllText($"Quesadilla.Locations", s.ToString());
+				}
+				catch (Exception ex)
+                {
+                    //
+                }
+            }
 
             shouldUpdatePlanetInfo = true;
             shouldUpdateMinimap = true;
@@ -1854,7 +1893,7 @@ namespace Quesadilla
                 //GetSystemInfo((int)e.Kill.SolarSystemId);
             }
 
-            Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {Program.Universe.GetCharacterName((int)e.Kill.VictimCharacterId)}");
+            Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {Program.Universe.GetCharacterName((e.Kill.VictimCharacterId != null ? (int)e.Kill.VictimCharacterId : 0 ))}");
             e.Kill.Context = generateZKillAlertText(e.Kill, null, Program.MainConfiguration.ZKillContextText, "");
 
             // check if zkill system matches any range alerts

@@ -837,13 +837,19 @@ img.rounded-corners {
             File.WriteAllText(filename, json);
         }
 
-        [Category("General")]
-        [DisplayName("Staging system")]
-        [Description("When alerts are generated relative to your home/staging system - this is the value used")]
-        [DefaultValue(typeof(string), "K7D-II")]
-        public string HomeSystem { get; set; }
+		[Category("General")]
+		[DisplayName("Staging system")]
+		[Description("When alerts are generated relative to your home/staging system - this is the value used")]
+		[DefaultValue(typeof(string), "K7D-II")]
+		public string HomeSystem { get; set; }
 
-        [Category("General")]
+		[Category("General")]
+		[DisplayName("Output Character Locations")]
+		[Description("When character locations change - output to file")]
+		[DefaultValue(typeof(Boolean), "False")]
+		public Boolean OutputCharacterLocationsToFile { get; set; }
+
+		[Category("General")]
         [DisplayName("Show ZKill alerts")]
         [Description("Show ZKill events close to your alert setup")]
         [DefaultValue(typeof(bool), "true")]

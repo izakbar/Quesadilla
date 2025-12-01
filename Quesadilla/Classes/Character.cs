@@ -21,6 +21,7 @@ namespace Quesadilla.Classes
         public PathInfo ClosestTurnurPath { get; set; }
         public EveScoutWH ClosestThera { get; set; }
         public PathInfo ClosestTheraPath { get; set; }
+        public bool InAbyss {  get; set; }
 
         public Character()
         {

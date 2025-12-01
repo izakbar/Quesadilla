@@ -128,7 +128,9 @@ namespace Quesadilla.Classes.ZKill
                 if ( ZKillEventHandler != null )
                 {
 
-                    var mainAttacker = zkill.Package.Killmail.Attackers.Where(o => o.FinalBlow).First();
+                    var km = Program.ESIHandler.GetKillMail(zkill.Package.killID, zkill.Package.Zkb.Hash);
+
+                    var mainAttacker = km.Attackers.Where(o => o.FinalBlow).First();
 
                     string isk = "";
 
@@ -151,15 +153,15 @@ namespace Quesadilla.Classes.ZKill
 
                     ZKillKill z = new ZKillKill()
                     {
-                        ID = zkill.Package.ID,
-                        SolarSystemId = zkill.Package.Killmail.SolarSystemId,
-                        Timestamp = zkill.Package.Killmail.Timestamp,
+                        ID = zkill.Package.killID,
+                        SolarSystemId = km.SolarSystemId,
+                        Timestamp = km.KillmailTime,
                         TimeAdded = DateTime.Now,
 
-                        VictimAllianceId = zkill.Package.Killmail.Victim.AllianceId,
-                        VictimCharacterId = zkill.Package.Killmail.Victim.CharacterId,
-                        VictimCorporationId = zkill.Package.Killmail.Victim.CorporationId,
-                        VictimShipTypeId = zkill.Package.Killmail.Victim.ShipTypeId,
+                        VictimAllianceId = km.Victim.AllianceId,
+                        VictimCharacterId = km.Victim.CharacterId,
+                        VictimCorporationId = km.Victim.CorporationId,
+                        VictimShipTypeId = km.Victim.ShipTypeId,
 
                         KillerAllianceId = mainAttacker.AllianceId,
                         KillerCharacterId = mainAttacker.CharacterId,
