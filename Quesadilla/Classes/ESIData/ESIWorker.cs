@@ -223,5 +223,19 @@ namespace Quesadilla.Classes.ESIData
         {
             EnqueueRequest(ESIRequestType.Belt, beltid);
         }
+
+        public Killmail GetKillMail(long killId, string killHash)
+        {
+            try
+            {
+                var kill = _esiClient.Killmails.GetKillmailV1Async((int)killId, killHash);
+                return kill.Result.Model;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex?.InnerException.Message);
+                return null;
+            }
+		}
     }
 }

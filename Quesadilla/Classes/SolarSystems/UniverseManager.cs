@@ -98,7 +98,7 @@ namespace Quesadilla.Classes.SolarSystems
         public PathInfo FindAndCachePath(int fromSystemId, int toSystemId)
         {
 
-            if ( fromSystemId >= LOWEST_WH_SYSTEM_ID || toSystemId >= LOWEST_WH_SYSTEM_ID) return null;
+            if ( fromSystemId >= LOWEST_WH_SYSTEM_ID || toSystemId >= LOWEST_WH_SYSTEM_ID || fromSystemId == -1 || toSystemId == -1) return null;
 
             PathInfo pathInfo = new PathInfo()
             {

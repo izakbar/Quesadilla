@@ -19,18 +19,18 @@ namespace Quesadilla.Classes.ZKill
         public string SolarSystemName { get; set; }
         public string RegionName { get; set; }
 
-        public long VictimAllianceId { get; set; }
-        public long VictimCharacterId { get; set; }
+        public long? VictimAllianceId { get; set; }
+        public long? VictimCharacterId { get; set; }
         public string VictimCharacterName { get; set; }
-        public long VictimCorporationId { get; set; }
-        public long VictimShipTypeId { get; set; }
+        public long? VictimCorporationId { get; set; }
+        public long? VictimShipTypeId { get; set; }
         public string VictimShipName { get; set; }
         public bool NPC {  get; set; }
-        public long KillerCharacterId { get; set; }
-        public long KillerCorporationId { get; set; }
-        public long KillerAllianceId { get; set; }
-        public long KillerShipTypeId { get; set; }
-        public long KillerWeaponTypeId { get; set; }
+        public long? KillerCharacterId { get; set; }
+        public long? KillerCorporationId { get; set; }
+        public long? KillerAllianceId { get; set; }
+        public long? KillerShipTypeId { get; set; }
+        public long? KillerWeaponTypeId { get; set; }
 
         public string TotalValue { get; set; }
 
