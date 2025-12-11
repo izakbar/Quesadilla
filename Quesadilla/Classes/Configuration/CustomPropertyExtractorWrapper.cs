@@ -26,6 +26,8 @@ public class CustomPropertyExtractorWrapper : CustomTypeDescriptor
             o.PropertyType == typeof(Point) ||
 			o.PropertyType == typeof(PopupLocationType) ||
 			o.PropertyType == typeof(MapType) ||
+            o.PropertyType == typeof(ConfigurationItemLocationInformation) ||
+            o.PropertyType == typeof(List<ConfigurationItemLocationInformation>) ||
 			o.Category == "HeartBeat"
             )
             .ToArray();
