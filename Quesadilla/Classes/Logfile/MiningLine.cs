@@ -12,5 +12,6 @@ namespace Quesadilla.Classes.Logfile
         public int MiningAmount { get; set; }
         public int WastageAmount { get; set; }
         public string MiningItem { get; set; }
+        public bool Critical { get; set;  }
     }
 }

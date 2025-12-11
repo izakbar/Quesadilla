@@ -54,15 +54,19 @@
             },
             "Microsoft.AspNetCore.Hosting": {
               "target": "Package",
-              "version": "[2.2.7, )"
+              "version": "[2.3.0, )"
             },
             "Microsoft.AspNetCore.Mvc": {
               "target": "Package",
-              "version": "[2.2.0, )"
+              "version": "[2.3.0, )"
             },
             "Microsoft.AspNetCore.Server.Kestrel": {
               "target": "Package",
-              "version": "[2.2.0, )"
+              "version": "[2.3.0, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[9.0.11, )"
             },
             "Microsoft.Extensions.Configuration.EnvironmentVariables": {
               "target": "Package",
@@ -70,7 +74,7 @@
             },
             "Microsoft.Extensions.Configuration.Json": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[9.0.0, )"
             },
             "Microsoft.Toolkit.Uwp.Notifications": {
               "target": "Package",
@@ -82,7 +86,7 @@
             },
             "PointyHatGames.EVEStandard": {
               "target": "Package",
-              "version": "[3.1.3, )"
+              "version": "[3.1.7, )"
             },
             "Serilog": {
               "target": "Package",
