@@ -1081,8 +1081,10 @@ namespace Quesadilla
                 GetSystemInfo(foundSystemId);
 
                 // TODO                if (this._conf.CameraFollowCharacter && this.CentreOnCharacter.Text == key) this.ZoomTo(num1);
-            } else
-            {
+            }
+
+			if (!string.IsNullOrEmpty(characterName) && foundSystemId == -1 && !e.SystemName.StartsWith("J"))
+			{
 				var c = Program.CharacterList.Where(o => o.CharacterName == characterName).FirstOrDefault();
 				if (c != null)
 				{
@@ -1103,20 +1105,11 @@ namespace Quesadilla
 
 			SetupStatusBar();
 
-            if (foundSystemId == -1)
-            {
-
-                if (e.SystemName.StartsWith("J"))
-                {
-                    // wormhole ? - get info from http://anoik.is/
-
-                }
-                else
-                {
-                    return;
-                }
-            }
-            Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
+			if (foundSystemId == -1 && e.SystemName.StartsWith("J"))
+			{
+				// wormhole ? - get info from http://anoik.is/
+			}
+			Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
 
             // Should we update system information in system log file ?
             if (Program.MainConfiguration.OutputCharacterLocationsToFile)
@@ -2132,6 +2125,12 @@ namespace Quesadilla
                 var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
                 if (c != null)
                 {
+                    if ( c.InAbyss )
+                    {
+                        status.Append("*IN-ABYSS* ");
+                    }
+
+
                     if (c.ClosestThera != null)
                     {
                         status.Append("  Thera <- ");
