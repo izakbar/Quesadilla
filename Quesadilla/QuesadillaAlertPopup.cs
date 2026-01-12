@@ -140,25 +140,76 @@ namespace Quesadilla
                 }
             }
 
-            if (alert.isFaction)
+			if (alert.isFaction)
             {
                 IntelLine.Text = FACTION_TEXT;
-            } else if ( IsZkill )
+				AlertImage.Height = AlertImage.Width;
+			}
+			else if ( IsZkill )
             {
                 IntelLine.Text = alert.Kill.Context;
+                try
+                {
+                    AlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
 
-                AlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
-                Image RoundedImage = ImageGenerator.ClipToCircle(AlertImage.Image, new PointF(AlertImage.Image.Width / 2, AlertImage.Image.Height / 2), AlertImage.Image.Width / 2, 
-                    Color.Transparent , configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, configuration.ZKillIskColour, configuration.ZKillShowBar, configuration.ZKillBarColour);
-                Bitmap killBitmap = new Bitmap(RoundedImage);
-                killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
-                AlertImage.Image = killBitmap;
+					// Should we show alliance/corp logo ?
+					PictureBox zKillAgressorLogo = null;
+					PictureBox zKillVictimLogo = null;
+					var KillerLogoUrl = "";
+                    if (_config.AlertPopupShowKillerLogo)
+                    {
+                        if ((alert.Kill.KillerAllianceId ?? 0) != 0)
+                        {
+                            KillerLogoUrl = $"https://images.evetech.net/alliances/{alert.Kill.KillerAllianceId}/logo";
+                        }
+                        if (KillerLogoUrl.Length == 0 && (alert.Kill.KillerCorporationId ?? 0) != 0)
+                        {
+                            KillerLogoUrl = $"https://images.evetech.net/corporations/{alert.Kill.KillerCorporationId}/logo";
+                        }
+                        if (KillerLogoUrl.Length > 0)
+                        {
+                            zKillAgressorLogo = new PictureBox();
+                            zKillAgressorLogo.Load($"{KillerLogoUrl}");
+                        }
+                    }
 
-                ShipName.Text = alert.Kill.VictimShipName;
+					var VictimLogoUrl = "";
+                    if (_config.AlertPopupShowVictimLogo)
+                    {
+                        if ((alert.Kill.VictimAllianceId ?? 0) != 0)
+                        {
+                            VictimLogoUrl = $"https://images.evetech.net/alliances/{alert.Kill.VictimAllianceId}/logo";
+                        }
+                        if (VictimLogoUrl.Length == 0 && (alert.Kill.VictimCorporationId ?? 0) != 0)
+                        {
+                            VictimLogoUrl = $"https://images.evetech.net/corporations/{alert.Kill.VictimCorporationId}/logo";
+                        }
+                        if (VictimLogoUrl.Length > 0)
+                        {
+                            zKillVictimLogo = new PictureBox();
+                            zKillVictimLogo.Load($"{VictimLogoUrl}");
+                        }
+                    }
+
+					Image RoundedImage = ImageGenerator.ClipToCircle(AlertImage.Image, new PointF(AlertImage.Image.Width / 2, AlertImage.Image.Height / 2), AlertImage.Image.Width / 2,
+                        Color.Transparent, configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, configuration.ZKillIskColour, configuration.ZKillShowBar, configuration.ZKillBarColour,
+                        zKillAgressorLogo?.Image, zKillVictimLogo?.Image);
+                    Bitmap killBitmap = new Bitmap(RoundedImage);
+                    killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
+					AlertImage.Image = killBitmap;
+				}
+				catch (Exception e)
+                {
+
+                }
+				ShipName.Text = alert.Kill.VictimShipName;
             }
             else
             {
-                IntelLine.Text = _alert.Entry.LineContent;
+                // Not zKill 
+                AlertImage.Height = AlertImage.Width;
+
+				IntelLine.Text = _alert.Entry.LineContent;
                 ShipName.Text = "";
             }
 

@@ -573,10 +573,20 @@ namespace Quesadilla.Classes
             }
         }
 
-        // makes nice round ellipse/circle images from rectangle images
-        public static Image ClipToCircle(Image srcImage, PointF center, float radius, Color backGround, Color circleColour, int circleWidth, string isk, Color iskColour, bool showBar, Color barColor)
+        private static void AddLogoImage(Graphics g, Image srcLogo, RectangleF Outside, RectangleF Inside, Color FillColour, Color LineColour)
+        {
+			Brush brFill= new SolidBrush(FillColour);
+			Pen penLine = new Pen(LineColour);
+			g.FillRectangle(brFill, Outside);
+			g.DrawRectangle(penLine, Outside.Left, Outside.Top, Outside.Width, Outside.Height);
+			g.DrawImage(srcLogo, Inside);
+		}
+
+		// makes nice round ellipse/circle images from rectangle images
+		public static Image ClipToCircle(Image srcImage, PointF center, float radius, Color backGround, Color circleColour, int circleWidth, string isk, Color iskColour, bool showBar, Color barColor, Image srcAgressorLogo, Image srcVictimLogo)
         {
             int TEXT_SIZE = 135;
+            int LOGOSIZE = 150;
             Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
 
             using (Graphics g = Graphics.FromImage(dstImage))
@@ -587,10 +597,24 @@ namespace Quesadilla.Classes
                 // Main picture
                 RectangleF r = new RectangleF(center.X - radius + circleWidth, center.Y - radius + circleWidth, (radius * 2) - (circleWidth * 2), (radius * 2) - (circleWidth * 2));
 
-                RectangleF rISK = new RectangleF(0, 0, srcImage.Width, srcImage.Height);
+				RectangleF rISK = new RectangleF(0, 0, srcImage.Width, srcImage.Height);
 
-                // enables smoothing of the edge of the circle (less pixelated)
-                g.SmoothingMode = SmoothingMode.AntiAlias;
+				// top left 
+				//new RectangleF(1, 1, logoSize, logoSize); 
+				//new RectangleF(3, 3, logoSize - 2, logoSize - 2);
+
+				// top right
+				//new RectangleF(srcImage.Width - logoSize, 1, logoSize, logoSize);
+				//new RectangleF(srcImage.Width - logoSize + 2, 3, logoSize - 2, logoSize - 2);
+
+				RectangleF rVictimLogoOutside = new RectangleF(dstImage.Width - LOGOSIZE, 1, LOGOSIZE, LOGOSIZE);
+				RectangleF rVictimLogoInside = new RectangleF(dstImage.Width - LOGOSIZE + 2, 3, LOGOSIZE - 2, LOGOSIZE - 2);
+
+				RectangleF rAgressorLogoOutside = new RectangleF(1, dstImage.Height - TEXT_SIZE - LOGOSIZE + 30, LOGOSIZE, LOGOSIZE);
+				RectangleF rAgressorLogoInside = new RectangleF(3, dstImage.Height - TEXT_SIZE - LOGOSIZE + 32, LOGOSIZE - 2, LOGOSIZE - 2);
+
+				// enables smoothing of the edge of the circle (less pixelated)
+				g.SmoothingMode = SmoothingMode.AntiAlias;
 
                 if (backGround != Color.Transparent)
                 {
@@ -601,14 +625,15 @@ namespace Quesadilla.Classes
                     }
                 }
 
-                if (circleWidth > 0)
+				if (circleWidth > 0)
                 {
                     GraphicsPath pathborder = new GraphicsPath();
                     pathborder.AddEllipse(r2);
                     g.SetClip(pathborder);
                     using (Brush br = new SolidBrush(circleColour))
                     {
-                        g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
+                        // Using WIDTH for both makes image square/equal - thus allowing greater height to make isk clearer
+                        g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Width);
                     }
                 }
 
@@ -628,12 +653,20 @@ namespace Quesadilla.Classes
                         LineAlignment = StringAlignment.Center,
                         Trimming = StringTrimming.None,
                     };
-                    if (showBar) g.FillRectangle(new SolidBrush(barColor), 0, srcImage.Height - TEXT_SIZE, srcImage.Width, TEXT_SIZE);
-                    g.DrawString(isk, myfont, new SolidBrush(iskColour), new RectangleF(0, (srcImage.Height - TEXT_SIZE), srcImage.Width, TEXT_SIZE), format);
+                    if (showBar) g.FillRectangle(new SolidBrush(barColor), 0, dstImage.Height - TEXT_SIZE, dstImage.Width, TEXT_SIZE);
+                    g.DrawString(isk, myfont, new SolidBrush(iskColour), new RectangleF(0, (dstImage.Height - TEXT_SIZE), dstImage.Width, TEXT_SIZE), format);
                 }
 
 
-                return dstImage;
+				if (srcAgressorLogo != null)
+				{
+					AddLogoImage(g, srcAgressorLogo, rAgressorLogoOutside, rAgressorLogoInside, Color.Black, Color.White);
+				}
+				if (srcVictimLogo != null)
+				{
+					AddLogoImage(g, srcVictimLogo, rVictimLogoOutside, rVictimLogoInside, Color.Black, Color.White);
+				}
+				return dstImage;
             }
         }
 

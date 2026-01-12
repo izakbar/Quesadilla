@@ -242,7 +242,7 @@
 
         private System.Windows.Forms.Timer timerAlertWindow;
         private System.Windows.Forms.PictureBox AlertImage;
-        private System.Windows.Forms.Timer timerOpacityOpen;
+		private System.Windows.Forms.Timer timerOpacityOpen;
         private System.Windows.Forms.Label AlertText;
         private System.Windows.Forms.Label SystemName;
         private System.Windows.Forms.Label ContextInfo;
@@ -251,5 +251,5 @@
         private System.Windows.Forms.Label RegionName;
         private System.Windows.Forms.Label ShipName;
         private System.Windows.Forms.PictureBox MinimapImage;
-    }
+	}
 }

@@ -830,6 +830,26 @@ img.rounded-corners {
 					Size = new Size(193, 128),
 					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
 				});
+				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "AlertLogoKiller",
+					Color = Color.White,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+					Location = new Point(437, 138),
+					Size = new Size(34, 34),
+					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
+				});
+				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "AlertLogoVictim",
+					Color = Color.White,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+					Location = new Point(516, 122),
+					Size = new Size(34, 34),
+					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
+				});
 			}
 
 			return (c);
@@ -1512,7 +1532,20 @@ img.rounded-corners {
         [DefaultValue(typeof(MapType), "Dotlan")]
         public MapType AlertPopupMinimapRawXY { get; set; }
 
-        [Category("Alert")]
+
+		[Category("Alert")]
+		[DisplayName("Show Zkill Victim Logo")]
+		[Description("When zkill alert - show victim alliance/corp logo")]
+		[DefaultValue(typeof(Boolean), "True")]
+		public Boolean AlertPopupShowVictimLogo { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Show Zkill Killer Logo")]
+		[Description("When zkill alert - show killers alliance/corp logo")]
+		[DefaultValue(typeof(Boolean), "True")]
+		public Boolean AlertPopupShowKillerLogo { get; set; }
+
+		[Category("Alert")]
         [DisplayName("ZKillAlertText")]
         [Description("")]
         [DefaultValue(typeof(string), "{victim} died to {killer} in {system}")]
@@ -1530,7 +1563,8 @@ img.rounded-corners {
         [DefaultValue(typeof(string), "{killer} killed {victim} in {system} {value}")]
         public string ZKillMenuText { get; set; }
 
-        [Category("Alert")]
+
+		[Category("Alert")]
         [DisplayName("ZKillSound")]
         [Description("")]
         [DefaultValue(typeof(string), "quiet_click")]
