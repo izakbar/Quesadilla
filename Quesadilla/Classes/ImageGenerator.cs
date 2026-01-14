@@ -573,20 +573,22 @@ namespace Quesadilla.Classes
             }
         }
 
-        private static void AddLogoImage(Graphics g, Image srcLogo, RectangleF Outside, RectangleF Inside, Color FillColour, Color LineColour)
+        private static void AddLogoImage(Graphics g, Image srcLogo, RectangleF Outside, RectangleF Inside, Color FillColour, Color LineColour, bool drawBox)
         {
-			Brush brFill= new SolidBrush(FillColour);
-			Pen penLine = new Pen(LineColour);
-			g.FillRectangle(brFill, Outside);
-			g.DrawRectangle(penLine, Outside.Left, Outside.Top, Outside.Width, Outside.Height);
+            if (drawBox)
+            {
+                Brush brFill = new SolidBrush(FillColour);
+                Pen penLine = new Pen(LineColour);
+                g.FillRectangle(brFill, Outside);
+                g.DrawRectangle(penLine, Outside.Left, Outside.Top, Outside.Width, Outside.Height);
+            }
+
 			g.DrawImage(srcLogo, Inside);
 		}
 
 		// makes nice round ellipse/circle images from rectangle images
-		public static Image ClipToCircle(Image srcImage, PointF center, float radius, Color backGround, Color circleColour, int circleWidth, string isk, Color iskColour, bool showBar, Color barColor, Image srcAgressorLogo, Image srcVictimLogo)
+		public static Image ClipToCircle(Image srcImage, PointF center, float radius, Color backGround, Color circleColour, int circleWidth, string isk, Color iskColour, bool showBar, Color barColor, Image srcAgressorLogo, Image srcVictimLogo, int iskSize, int logoSize)
         {
-            int TEXT_SIZE = 135;
-            int LOGOSIZE = 150;
             Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
 
             using (Graphics g = Graphics.FromImage(dstImage))
@@ -607,11 +609,11 @@ namespace Quesadilla.Classes
 				//new RectangleF(srcImage.Width - logoSize, 1, logoSize, logoSize);
 				//new RectangleF(srcImage.Width - logoSize + 2, 3, logoSize - 2, logoSize - 2);
 
-				RectangleF rVictimLogoOutside = new RectangleF(dstImage.Width - LOGOSIZE, 1, LOGOSIZE, LOGOSIZE);
-				RectangleF rVictimLogoInside = new RectangleF(dstImage.Width - LOGOSIZE + 2, 3, LOGOSIZE - 2, LOGOSIZE - 2);
+				RectangleF rVictimLogoOutside = new RectangleF(dstImage.Width - logoSize, 1, logoSize, logoSize);
+				RectangleF rVictimLogoInside = new RectangleF(dstImage.Width - logoSize + 2, 3, logoSize - 2, logoSize - 2);
 
-				RectangleF rAgressorLogoOutside = new RectangleF(1, dstImage.Height - TEXT_SIZE - LOGOSIZE + 30, LOGOSIZE, LOGOSIZE);
-				RectangleF rAgressorLogoInside = new RectangleF(3, dstImage.Height - TEXT_SIZE - LOGOSIZE + 32, LOGOSIZE - 2, LOGOSIZE - 2);
+				RectangleF rAgressorLogoOutside = new RectangleF(1, dstImage.Height - iskSize - logoSize + 30, logoSize, logoSize);
+				RectangleF rAgressorLogoInside = new RectangleF(3, dstImage.Height - iskSize - logoSize + 32, logoSize - 2, logoSize - 2);
 
 				// enables smoothing of the edge of the circle (less pixelated)
 				g.SmoothingMode = SmoothingMode.AntiAlias;
@@ -642,10 +644,9 @@ namespace Quesadilla.Classes
                 path.AddEllipse(r);
                 g.SetClip(path);
                 g.DrawImage(srcImage, 0, 0);
+				g.ResetClip();
 
-                g.ResetClip();
-
-                using (Font myfont = new Font("Arial", TEXT_SIZE - 20, FontStyle.Bold))
+                using (Font myfont = new Font("Arial", iskSize - 20, FontStyle.Bold))
                 {
                     var format = new StringFormat
                     {
@@ -653,19 +654,19 @@ namespace Quesadilla.Classes
                         LineAlignment = StringAlignment.Center,
                         Trimming = StringTrimming.None,
                     };
-                    if (showBar) g.FillRectangle(new SolidBrush(barColor), 0, dstImage.Height - TEXT_SIZE, dstImage.Width, TEXT_SIZE);
-                    g.DrawString(isk, myfont, new SolidBrush(iskColour), new RectangleF(0, (dstImage.Height - TEXT_SIZE), dstImage.Width, TEXT_SIZE), format);
+                    if (showBar) g.FillRectangle(new SolidBrush(barColor), 0, dstImage.Height - iskSize, dstImage.Width, iskSize);
+                    g.DrawString(isk, myfont, new SolidBrush(iskColour), new RectangleF(0, (dstImage.Height - iskSize), dstImage.Width, iskSize), format);
                 }
-
 
 				if (srcAgressorLogo != null)
 				{
-					AddLogoImage(g, srcAgressorLogo, rAgressorLogoOutside, rAgressorLogoInside, Color.Black, Color.White);
+					AddLogoImage(g, srcAgressorLogo, rAgressorLogoOutside, rAgressorLogoInside, Color.Black, Color.White, true);
 				}
 				if (srcVictimLogo != null)
 				{
-					AddLogoImage(g, srcVictimLogo, rVictimLogoOutside, rVictimLogoInside, Color.Black, Color.White);
+					AddLogoImage(g, srcVictimLogo, rVictimLogoOutside, rVictimLogoInside, Color.Black, Color.White, true);
 				}
+
 				return dstImage;
             }
         }

@@ -1546,6 +1546,18 @@ img.rounded-corners {
 		public Boolean AlertPopupShowKillerLogo { get; set; }
 
 		[Category("Alert")]
+		[DisplayName("Zkill Logo size")]
+		[Description("Size to use for zkill corp/alliance logo")]
+		[DefaultValue(typeof(int), "150")]
+		public int AlertPopZkillLogoSize { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Zkill ISK height")]
+		[Description("Height to use for zkill isk bar")]
+		[DefaultValue(typeof(int), "130")]
+		public int  AlertPopZkillHeight { get; set; }
+
+		[Category("Alert")]
         [DisplayName("ZKillAlertText")]
         [Description("")]
         [DefaultValue(typeof(string), "{victim} died to {killer} in {system}")]

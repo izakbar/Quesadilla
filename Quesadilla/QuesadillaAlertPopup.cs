@@ -193,7 +193,8 @@ namespace Quesadilla
 
 					Image RoundedImage = ImageGenerator.ClipToCircle(AlertImage.Image, new PointF(AlertImage.Image.Width / 2, AlertImage.Image.Height / 2), AlertImage.Image.Width / 2,
                         Color.Transparent, configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, configuration.ZKillIskColour, configuration.ZKillShowBar, configuration.ZKillBarColour,
-                        zKillAgressorLogo?.Image, zKillVictimLogo?.Image);
+                        zKillAgressorLogo?.Image, zKillVictimLogo?.Image,
+                        _config.AlertPopZkillHeight, _config.AlertPopZkillLogoSize);
                     Bitmap killBitmap = new Bitmap(RoundedImage);
                     killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
 					AlertImage.Image = killBitmap;
