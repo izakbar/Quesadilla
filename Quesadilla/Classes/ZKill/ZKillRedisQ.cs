@@ -130,7 +130,7 @@ namespace Quesadilla.Classes.ZKill
 
                     var km = Program.ESIHandler.GetKillMail(zkill.Package.killID, zkill.Package.Zkb.Hash);
 
-                    var mainAttacker = km.Attackers.Where(o => o.FinalBlow).First();
+                    var mainAttacker = km?.Attackers?.Where(o => o.FinalBlow).First();
 
                     string isk = "";
 
