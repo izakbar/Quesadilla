@@ -20,6 +20,7 @@ using System.Drawing.Imaging;
 using System.Windows.Media;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
 using Quesadilla.Classes.Configuration;
+using Windows.UI.Composition.Effects;
 
 namespace Quesadilla.Classes
 {
@@ -74,21 +75,27 @@ namespace Quesadilla.Classes
             Color SystemColourText,
             Color ZKillColour,
             Color IntelColour,
-			Color AltColour,
-			Color UniHoleColour,
-			Color IncursionColour,
-		    Color IncursionOutlineColour,
-            Color IceColour,
+            Color AltColour,
+            Color UniHoleColour,
+            Color IncursionColour,
+            Color IncursionOutlineColour,
+			Color SecLimitColour,
+			Color SecLimitOutlineColour,
+			Color IceColour,
             Color MercoxitColour,
-			int? animationCycleIntel,
+            int? animationCycleIntel,
             int? animationCycleKills,
-			int? animationCycleAlts,
+            int? animationCycleAlts,
             int? animationCycleUniHoles,
             bool defaultTextSize = false,
             bool showOutOfRegion = false,
+            bool showSecLimit = false,
             int incursionAlphaAmount = 50,
-            int incursionCloudSize = 60,
-            int connectingLineGap = 10
+			int incursionCloudSize = 60,
+			int secLimitAlphaAmount = 50,
+			int secLimitCloudSize = 20,
+			int connectingLineGap = 10,
+            float secLimit = 0.0f
             )
         {
 			double GUI_SCALING = 30;
@@ -312,8 +319,50 @@ namespace Quesadilla.Classes
                 float textSize = defaultTextSize == false ? (TEXT_SIZE / (float)GUI_SCALING) : MINIMUM_TEXT_SIZE;
                 if (textSize < MINIMUM_TEXT_SIZE) textSize = MINIMUM_TEXT_SIZE;
 
-				// draw incursion base if required
-				if (minimapSystems.Where(o => o.solarSystem.Incursion).Count() > 0)
+
+                //Seclimit ?
+                if (showSecLimit && minimapSystems.Where(o => o.solarSystem.Security <= secLimit).Count() > 0)
+                {
+					g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+					Brush secLimitBrush = new SolidBrush(SecLimitColour);
+					Brush secLimitOutlineBrush = new SolidBrush(SecLimitOutlineColour);
+					Pen secLimitOutlinePen = new Pen(secLimitOutlineBrush, 3);
+					float secLimitBlobSize = ((float)secLimitCloudSize / (float)GUI_SCALING);
+					Image secLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
+
+					ColorMatrix secLimitColourMatrix = new ColorMatrix();
+					secLimitColourMatrix.Matrix33 = (float)((float)secLimitAlphaAmount / (float)100);  // alpha !
+					ImageAttributes secLimitImageAttr = new ImageAttributes();
+					secLimitImageAttr.SetColorMatrix(secLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+					using (Graphics gIncursion = Graphics.FromImage(secLimitImage))
+					{
+						foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Incursion))
+						{
+							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+							gIncursion.DrawEllipse(secLimitOutlinePen, currentPoint.X - secLimitBlobSize, currentPoint.Y - secLimitBlobSize, secLimitBlobSize * 2, secLimitBlobSize * 2);
+						}
+
+						foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Security <= secLimit))
+						{
+							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+							gIncursion.FillEllipse(secLimitBrush, currentPoint.X - secLimitBlobSize, currentPoint.Y - secLimitBlobSize, secLimitBlobSize * 2, secLimitBlobSize * 2);
+						}
+
+						g.DrawImage(
+							secLimitImage,
+							// target
+							new Rectangle(0, 0, secLimitImage.Width, secLimitImage.Height),
+							// source
+							0, 0, secLimitImage.Width, secLimitImage.Height,
+							GraphicsUnit.Pixel,
+							secLimitImageAttr
+							);
+					}
+				}
+
+			// draw incursion base if required
+			if (minimapSystems.Where(o => o.solarSystem.Incursion).Count() > 0)
 				{
 					//g.CompositingMode = CompositingMode.SourceOver;
 					//g.CompositingQuality = CompositingQuality.GammaCorrected;

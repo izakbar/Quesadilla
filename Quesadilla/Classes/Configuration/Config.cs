@@ -185,7 +185,11 @@ namespace Quesadilla.Classes
 
                 c.AlertPopupLocation = PopupLocationType.BottomLeft;
                 c.DPSLocation = PopupLocationType.TopRight;
-            }
+                c.AlertPopZkillLogoSize = 120;
+                c.AlertPopupShowKillerLogo = true;
+                c.AlertPopupShowVictimLogo = true;
+                c.MinimapSecLimitValue = -0.7f;
+			}
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
             if (c.ignoreStrings == null)
@@ -1123,6 +1127,45 @@ img.rounded-corners {
 		public Color MinimapIncursionColour { get; set; }
 
 		[Category("Main window")]
+		[DisplayName("Minimap sec limit Indicator colour")]
+		[Description("Colour to use for security limit indicators on the minimap")]
+		[DefaultValue(typeof(Color), "DarkBlue")]
+		public Color MinimapSecLimitColour { get; set; }
+
+		[Category("Main window")]
+		[DisplayName("Minimap sec limit Indicator outline colour")]
+		[Description("Colour to use for security limit indicators on the minimap")]
+		[DefaultValue(typeof(Color), "Blue")]
+		public Color MinimapSecLimitOutlineColour { get; set; }
+
+		[Category("Main window")]
+		[DisplayName("Minimap sec limit Indicator enabled")]
+		[Description("use security limit indicators on the minimap")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool MinimapSecLimit { get; set; }
+
+		[Category("Main window")]
+		[DisplayName("Minimap seclimit Indicator alpha")]
+		[Description("Alpha to use for seclimit indicators on the minimap")]
+		[DefaultValue(typeof(int), "95")]
+		[Range(0, 100)]
+		public int MinimapSecLimitAlpha { get; set; }
+
+		[Category("Main window")]
+		[DisplayName("Minimap seclimit cloud size")]
+		[Description("Size to use for seclimit indicators on the minimap")]
+		[DefaultValue(typeof(int), "60")]
+		[Range(0, 100)]
+		public int MinimapSecLimitCloudSize { get; set; }
+
+		[Category("Main window")]
+		[DisplayName("Minimap seclimit")]
+		[Description("seclimit on the minimap")]
+		[DefaultValue(typeof(float), "-0.7")]
+		[Range(0, 100)]
+		public float MinimapSecLimitValue { get; set; }
+
+		[Category("Main window")]
 		[DisplayName("Minimap incursion Indicator outline colour")]
 		[Description("Colour to use for outline for incursion indicators on the minimap")]
 		[DefaultValue(typeof(Color), "Red")]
@@ -1518,6 +1561,45 @@ img.rounded-corners {
 		[DefaultValue(typeof(int), "30")]
 		[Range(0, 100)]
 		public int AlertPopupMinimapIncursionCloudSize { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap sec limit Indicator colour")]
+		[Description("Colour to use for security limit indicators on the minimap")]
+		[DefaultValue(typeof(Color), "DarkBlue")]
+		public Color AlertPopupMinimapSecLimitColour { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap sec limit Indicator outline colour")]
+		[Description("Colour to use for security limit indicators on the minimap")]
+		[DefaultValue(typeof(Color), "Blue")]
+		public Color AlertPopupMinimapSecLimitOutlineColour { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap sec limit Indicator enabled")]
+		[Description("use security limit indicators on the minimap")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool AlertPopupMinimapSecLimit { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap seclimit Indicator alpha")]
+		[Description("Alpha to use for seclimit indicators on the minimap")]
+		[DefaultValue(typeof(int), "95")]
+		[Range(0, 100)]
+		public int AlertPopupMinimapSecLimitAlpha { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap seclimit cloud size")]
+		[Description("Size to use for seclimit indicators on the minimap")]
+		[DefaultValue(typeof(int), "60")]
+		[Range(0, 100)]
+		public int AlertPopupMinimapSecLimitCloudSize { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap seclimit")]
+		[Description("seclimit on the minimap")]
+		[DefaultValue(typeof(float), "-0.7")]
+		[Range(0, 100)]
+		public float AlertPopupMinimapSecLimitValue { get; set; }
 
 		[Category("Alert")]
 		[DisplayName("Minimap Connection line gap size")]

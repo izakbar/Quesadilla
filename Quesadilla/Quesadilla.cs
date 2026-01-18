@@ -2416,6 +2416,8 @@ namespace Quesadilla
 					Program.MainConfiguration.MinimapUniHoleColour,
 					Program.MainConfiguration.MinimapIncursionColour,
 					Program.MainConfiguration.MinimapIncursionOutlineColour,
+					Program.MainConfiguration.MinimapSecLimitColour,
+					Program.MainConfiguration.MinimapSecLimitOutlineColour,
 					Program.MainConfiguration.MinimapIceColour,
 					Program.MainConfiguration.MinimapMercoxitColour,
                     AnimationStateIntel.Value(),
@@ -2424,9 +2426,13 @@ namespace Quesadilla
                     AnimationStateUniHoles.Value(),
                     false,
                     Program.MainConfiguration.MinimapShowOutOfRegion,
+					Program.MainConfiguration.MinimapSecLimit,
 					Program.MainConfiguration.MinimapIncursionAlpha,
-                    Program.MainConfiguration.MinimapIncursionCloudSize,
-					Program.MainConfiguration.MinimapConnectionGap
+					Program.MainConfiguration.MinimapIncursionCloudSize,
+					Program.MainConfiguration.MinimapSecLimitAlpha,
+					Program.MainConfiguration.MinimapSecLimitCloudSize,
+					Program.MainConfiguration.MinimapConnectionGap,
+				    Program.MainConfiguration.MinimapSecLimitValue
 					);
 //                Bitmap minimapBitmap = new Bitmap(minimapImage);
 //                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));

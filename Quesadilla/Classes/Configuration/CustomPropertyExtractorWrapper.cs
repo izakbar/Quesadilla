@@ -22,6 +22,7 @@ public class CustomPropertyExtractorWrapper : CustomTypeDescriptor
             .Where(o => o.PropertyType == typeof(Color) || 
             o.PropertyType == typeof(bool) ||
 			o.PropertyType == typeof(int) ||
+			o.PropertyType == typeof(float) ||
 			o.PropertyType == typeof(Size) ||
             o.PropertyType == typeof(Point) ||
 			o.PropertyType == typeof(PopupLocationType) ||
