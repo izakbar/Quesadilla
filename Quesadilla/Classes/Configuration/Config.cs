@@ -189,6 +189,10 @@ namespace Quesadilla.Classes
                 c.AlertPopupShowKillerLogo = true;
                 c.AlertPopupShowVictimLogo = true;
                 c.MinimapSecLimitValue = -0.7f;
+                c.MinimapSecLimitColour = Color.LightGoldenrodYellow;
+                c.MinimapSecLimitAlpha = 10;
+                c.MinimapSecLimitCloudSize = 25;
+                c.MinimapSecLimit = true;
 			}
 
             if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
