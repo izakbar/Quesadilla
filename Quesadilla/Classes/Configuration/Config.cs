@@ -586,41 +586,108 @@ namespace Quesadilla.Classes
                     Name = "OBS.ZkillList",
                     FriendlyName = "OBS Zkill Listing",
                     CSS = @"
-.zkillkill {
-  display: inline-grid;
-  position: relative;
-  background-color: transparent;
-  width:100px
-}
-.zkill-ship {
-  width:100px;
-}
-.zkill-victim {
-  color: Gold;
-  position: absolute;
-  bottom: 7px;
-  font-size: 11px;
-  text-align: center; width: 100%;
-}
-.zkill-value {
-  color: LimeGreen;
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  font-size: 18px;
-}
 img.rounded-corners {
-  border-radius: 10%;
+  border-radius: 50%;
+    border: 1px solid red;
 }
 .zkill {
-  border: 3px solid transparent;
+  background-color: #0a0e15;
+    border: 3px solid transparent;
   border-radius: 15px;
-  outline: 2px solid Gold;
-
+  outline: 2px solid steelblue;
   display: inline-block;
   position: relative;
 }
-",
+.zkillkill {
+  display: block;
+  position: relative;
+  background-color: #0a0e15;
+  width:240px;
+  height: 90px;
+}
+
+.zkillkill:not(:last-child) {
+  border-bottom: 2px solid steelblue;
+}
+
+
+.zkill-ship {
+  width:80px;
+  top: 6px;
+  position: absolute;
+}
+.zkill-victim {
+  color: cadetblue;
+  position: absolute;
+  top: 35px;
+  left: 85px;
+  font-size: 15px;
+  text-align: left; width: 65%;
+}
+.zkill-shipname {
+  color: lightgray;
+  position: absolute;
+  top: 50px;
+  left: 85px;
+  font-size: 13px;
+  text-align: left; width: 65%;
+}
+.zkill-value {
+  color: white;
+  background-color: LimeGreen;
+  position: absolute;
+  top: 65px;
+  left: 50px;
+  font-size: 18px;
+  border-radius: 20%;
+}
+
+.zkill-timestamp {
+  color: lightgoldenrodyellow;
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  font-size: 15px;
+  border-radius: 20%;
+}
+.zkill-killer {
+    visibility: hidden;
+}
+.zkill-region {
+  color: white;
+  position: absolute;
+  top: 5px;
+  left: 83px;
+  text-align: right; width: 65%;
+  font-size: 15px;
+}
+.zkill-system {
+  color: orange;
+  position: absolute;
+  top: 22px;
+  left: 83px;
+  text-align: right; width: 65%;
+  font-size: 12px;
+}
+
+.zkill-killer-logo
+{
+    visibility: hidden;
+}
+
+.zkill-victim-logo
+{
+    visibility: hidden;
+}
+
+.zkill-victim-alliance 
+{
+    visibility: hidden;
+}
+.zkill-victim-corporation
+{
+    visibility: hidden;
+}",
                 });
             }
 
