@@ -185,8 +185,11 @@ namespace Quesadilla.Classes
 
                 c.AlertPopupLocation = PopupLocationType.BottomLeft;
                 c.DPSLocation = PopupLocationType.TopRight;
+
                 c.AlertPopZkillLogoSize = 120;
-                c.AlertPopupShowKillerLogo = true;
+                c.AlertPopZkillHeight = 130;
+
+				c.AlertPopupShowKillerLogo = true;
                 c.AlertPopupShowVictimLogo = true;
                 c.MinimapSecLimitValue = -0.7f;
                 c.MinimapSecLimitColour = Color.LightGoldenrodYellow;
@@ -458,14 +461,18 @@ namespace Quesadilla.Classes
                     Name = "OBS.MiningTable",
                     FriendlyName = "OBS Mining Table",
                     CSS = @"
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
+
 .miningcontainer {
   width: 100%;
   position: relative;
+  font-family: 'Roboto Condensed';
 }
 .miningperhour {
-  border: 3px solid transparent;
-  border-radius: 15px;
-  outline: 2px solid Gold;
+  border: 4px solid transparent;
+  border-radius: 10px;
+  background-color: #0a0e15;
+  outline: 1px solid steelblue;
 
   display: inline-block;
   position: absolute;
@@ -523,19 +530,24 @@ namespace Quesadilla.Classes
                     Name = "OBS.Mining",
                     FriendlyName = "OBS Mining Info",
                     CSS = @"
+
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
+
 .miningcontainer {
   width: 100%;
   position: relative;
 }
 .miningperhour {
-  border: 3px solid transparent;
-  border-radius: 15px;
-  outline: 2px solid Gold;
+  border: 4px solid transparent;
+  border-radius: 10px;
+  background-color: #0a0e15;
+  outline: 1px solid steelblue;
 
   display: inline-block;
   position: absolute;
 
   color: green;
+  font-family: 'Roboto Condensed';
   font-size: 24px;
 
   margin: auto;
@@ -556,6 +568,7 @@ namespace Quesadilla.Classes
 .iskperhour {
   border: 4px solid transparent;
   border-radius: 10px;
+  background-color: #0a0e15;
   outline: 1px solid steelblue;
 
   display: inline-block;
@@ -574,9 +587,9 @@ namespace Quesadilla.Classes
                     FriendlyName = "OBS Latest Alert",
                     CSS = @"
 .alert {
-  border: 3px solid transparent;
+  border: 2px solid transparent;
   border-radius: 15px;
-  outline: 2px solid Gold;
+  outline: 2px solid steelblue;
 
   display: inline-block;
   position: relative;
@@ -588,6 +601,8 @@ namespace Quesadilla.Classes
                     Name = "OBS.ZkillList",
                     FriendlyName = "OBS Zkill Listing",
                     CSS = @"
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
+
 img.rounded-corners {
   border-radius: 50%;
     border: 1px solid red;
@@ -623,6 +638,7 @@ img.rounded-corners {
   position: absolute;
   top: 35px;
   left: 85px;
+  font-family: 'Roboto Condensed';
   font-size: 15px;
   text-align: left; width: 65%;
 }
@@ -631,6 +647,7 @@ img.rounded-corners {
   position: absolute;
   top: 50px;
   left: 85px;
+  font-family: 'Roboto Condensed';
   font-size: 13px;
   text-align: left; width: 65%;
 }
@@ -640,6 +657,7 @@ img.rounded-corners {
   position: absolute;
   top: 65px;
   left: 50px;
+  font-family: 'Roboto Condensed';
   font-size: 18px;
   border-radius: 20%;
 }
@@ -649,6 +667,7 @@ img.rounded-corners {
   position: absolute;
   top: 2px;
   left: 5px;
+  font-family: 'Roboto Condensed';
   font-size: 15px;
   border-radius: 20%;
 }
@@ -661,6 +680,7 @@ img.rounded-corners {
   top: 5px;
   left: 83px;
   text-align: right; width: 65%;
+  font-family: 'Roboto Condensed';
   font-size: 15px;
 }
 .zkill-system {
@@ -669,6 +689,7 @@ img.rounded-corners {
   top: 22px;
   left: 83px;
   text-align: right; width: 65%;
+  font-family: 'Roboto Condensed';
   font-size: 12px;
 }
 
