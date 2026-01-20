@@ -547,24 +547,26 @@ namespace Quesadilla.Classes
                     Name = "OBS.ISK",
                     FriendlyName = "OBS ISK Value",
                     CSS = @"
+@import url(https://fonts.googleapis.com/css?family=Titan+One);
+
 .iskcontainer {
   width: 100%;
   position: relative;
 }
 .iskperhour {
-  border: 3px solid transparent;
-  border-radius: 15px;
-  outline: 2px solid Gold;
+  border: 4px solid transparent;
+  border-radius: 10px;
+  outline: 1px solid steelblue;
 
   display: inline-block;
   position: absolute;
 
   color: green;
+  font-family: 'Titan One';
   font-size: 24px;
 
   margin: auto;
-}
-",
+}",
                 });
                 c.CSSData.Add(new CSSData()
                 {

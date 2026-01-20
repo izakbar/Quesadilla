@@ -536,7 +536,7 @@
     {
       "Name": "OBS.ISK",
       "FriendlyName": "OBS ISK Value",
-      "CSS": "\r\n.iskcontainer {\r\n  width: 100%;\r\n  position: relative;\r\n}\r\n.iskperhour {\r\n  border: 3px solid transparent;\r\n  border-radius: 15px;\r\n  outline: 2px solid Gold;\r\n\r\n  display: inline-block;\r\n  position: absolute;\r\n\r\n  color: green;\r\n  font-size: 24px;\r\n\r\n  margin: auto;\r\n}\r\n"
+      "CSS": "@import url(https://fonts.googleapis.com/css?family=Titan+One);\r\n.iskcontainer {\r\nwidth: 100%;\r\nposition: relative;\r\n}\r\n.iskperhour {\r\nborder: 4px solid transparent;\r\nborder-radius: 10px;\r\n  outline: 1px solid steelblue;\r\n display: inline-block;\r\n  position: absolute;\r\n  color: green;\r\n  font-family: 'Titan One';\r\n  font-size: 24px;\r\n  margin: auto;\r\n}"
     },
     {
       "Name": "OBS.LatestAlert",
