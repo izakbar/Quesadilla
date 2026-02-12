@@ -156,14 +156,13 @@ namespace Quesadilla.Classes.ZKill
                         ZKillKill z = new ZKillKill()
                         {
                             ID = zkill.Package.killID,
-                            SolarSystemId = km.SolarSystemId,
-                            Timestamp = km.KillmailTime,
+                            SolarSystemId = km?.SolarSystemId,
+                            Timestamp = (km == null ) ? DateTime.Now : km.KillmailTime,
                             TimeAdded = DateTime.Now,
-
-                            VictimAllianceId = km.Victim.AllianceId,
-                            VictimCharacterId = km.Victim.CharacterId,
-                            VictimCorporationId = km.Victim.CorporationId,
-                            VictimShipTypeId = km.Victim.ShipTypeId,
+                            VictimAllianceId = km?.Victim.AllianceId,
+                            VictimCharacterId = km?.Victim.CharacterId,
+                            VictimCorporationId = km?.Victim.CorporationId,
+                            VictimShipTypeId = km?.Victim.ShipTypeId,
 
                             KillerAllianceId = mainAttacker.AllianceId,
                             KillerCharacterId = mainAttacker.CharacterId,
