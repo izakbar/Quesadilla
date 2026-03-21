@@ -13,6 +13,7 @@ using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -390,7 +391,7 @@ namespace Quesadilla.Classes
 									Logfile = "Quer_Catch.imperium",
 									LogType = Logfile.LogFileType.ChatIntel,
 								});
-				*/
+
 				c.Logfiles.Add(new LogfileConfig()
 				{
 					Enabled = true,
@@ -451,9 +452,40 @@ namespace Quesadilla.Classes
                     Logfile = "izakbar.debug",
                     LogType = Logfile.LogFileType.ChatIntel,
                 });
-            }
 
-            if (c.CSSData== null)
+				*/
+
+				c.Logfiles.Add(new LogfileConfig()
+				{
+					Enabled = true,
+					FriendlyName = "wc.Dek+Fa+PB",
+					Logfile = "wc.Dek+Fa+PB",
+					LogType = Logfile.LogFileType.ChatIntel,
+				});
+				c.Logfiles.Add(new LogfileConfig()
+				{
+					Enabled = true,
+					FriendlyName = "wc.Poch",
+					Logfile = "wc.Poch",
+					LogType = Logfile.LogFileType.ChatIntel,
+				});
+				c.Logfiles.Add(new LogfileConfig()
+				{
+					Enabled = true,
+					FriendlyName = "wc.Vale",
+					Logfile = "wc.Vale",
+					LogType = Logfile.LogFileType.ChatIntel,
+				});
+				c.Logfiles.Add(new LogfileConfig()
+				{
+					Enabled = true,
+					FriendlyName = "wc.Venal+Br+Te",
+					Logfile = "wc.Venal+Br+Te",
+					LogType = Logfile.LogFileType.ChatIntel,
+				});
+			}
+
+			if (c.CSSData== null)
             {
                 c.CSSData = new List<CSSData> { };
                 c.CSSData.Add(new CSSData()
