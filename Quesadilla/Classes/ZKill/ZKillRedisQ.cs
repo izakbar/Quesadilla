@@ -78,7 +78,7 @@ namespace Quesadilla.Classes.ZKill
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
-            string URL = $"https://zkillredisq.stream/listen.php?queueID={ZkillQueueId}";
+            string URL = $"https://zkillredisq.stream/listen.php?queueID={ZkillQueueId}/";
             string strContent = string.Empty;
             try
             {
@@ -151,33 +151,40 @@ namespace Quesadilla.Classes.ZKill
                         isk = Math.Round(zkill.Package.Zkb.TotalValue / 1000000000000,1).ToString() + "t";
                     }
 
-                    ZKillKill z = new ZKillKill()
+                    try
                     {
-                        ID = zkill.Package.killID,
-                        SolarSystemId = km.SolarSystemId,
-                        Timestamp = km.KillmailTime,
-                        TimeAdded = DateTime.Now,
+                        ZKillKill z = new ZKillKill()
+                        {
+                            ID = zkill.Package.killID,
+                            SolarSystemId = km?.SolarSystemId,
+                            Timestamp = (km == null ) ? DateTime.Now : km.KillmailTime,
+                            TimeAdded = DateTime.Now,
+                            VictimAllianceId = km?.Victim.AllianceId,
+                            VictimCharacterId = km?.Victim.CharacterId,
+                            VictimCorporationId = km?.Victim.CorporationId,
+                            VictimShipTypeId = km?.Victim.ShipTypeId,
 
-                        VictimAllianceId = km.Victim.AllianceId,
-                        VictimCharacterId = km.Victim.CharacterId,
-                        VictimCorporationId = km.Victim.CorporationId,
-                        VictimShipTypeId = km.Victim.ShipTypeId,
+                            KillerAllianceId = mainAttacker.AllianceId,
+                            KillerCharacterId = mainAttacker.CharacterId,
+                            KillerCorporationId = mainAttacker.CorporationId,
+                            KillerShipTypeId = mainAttacker.ShipTypeId,
+                            KillerWeaponTypeId = mainAttacker.WeaponTypeId,
 
-                        KillerAllianceId = mainAttacker.AllianceId,
-                        KillerCharacterId = mainAttacker.CharacterId,
-                        KillerCorporationId = mainAttacker.CorporationId,
-                        KillerShipTypeId = mainAttacker.ShipTypeId,
-                        KillerWeaponTypeId = mainAttacker.WeaponTypeId,
+                            href = zkill.Package.Zkb.Href,
 
-                        href = zkill.Package.Zkb.Href,
+                            NPC = zkill.Package.Zkb.Npc,
+                            TotalValue = isk,
 
-                        NPC = zkill.Package.Zkb.Npc,
-                        TotalValue = isk,
+                            Expired = false,
 
-                        Expired = false,
-
-                    };
-                    ZKillEventHandler((object)this, new ZKillEventArgs(z));
+                        };
+                        ZKillEventHandler((object)this, new ZKillEventArgs(z));
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex.Message);
+                        if (ex.InnerException != null) Log.Error(ex.InnerException.Message);
+                    }
                 }
             }
         }

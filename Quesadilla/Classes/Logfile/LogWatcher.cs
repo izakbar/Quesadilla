@@ -150,6 +150,8 @@ namespace Quesadilla.Classes
             List<LogEntry> logEntryList = new List<LogEntry>();
             lock (this)
             {
+                try 
+                { 
                 foreach (KeyValuePair<string, InterestingFile> interestingFile in _interestingFiles)
                 {
                     FileInfo fileInfo = new FileInfo(interestingFile.Key);
@@ -163,107 +165,113 @@ namespace Quesadilla.Classes
                             this._interestingFiles[interestingFile.Key].LastUpdate = DateTime.Now;
                         }
 
-                        if ( this._logFileType == LogFileType.Local )
-                        {
-                            string[] array = ((IEnumerable<string>)newData.Data.Split(new string[1]
+                            if (this._logFileType == LogFileType.Local)
                             {
-                "\n"
-                            }, StringSplitOptions.RemoveEmptyEntries)).Where<string>((Func<string, bool>)(line => line.Length > 0)).ToArray<string>();
-                            if (array.Length != 0)
-                            {
-                                foreach (string input in array)
+                                string[] array = ((IEnumerable<string>)newData.Data.Split(new string[1]
                                 {
-                                    Match match = _localSystemChange.Match(input);
-                                    if (match.Success) OnSystemChange(match.Groups["systemname"].ToString(), interestingFile.Value.CharName);
-                                    match = CHAT_CONNECTION_LOST_MESSAGE.Match(input);
-                                    if (match.Success) OnChatServerChange(false, interestingFile.Value.CharName);
-                                    match = CHAT_CONNECTION_RESTORED_MESSAGE.Match(input);
-                                    if (match.Success) OnChatServerChange(true, interestingFile.Value.CharName);
+                "\n"
+                                }, StringSplitOptions.RemoveEmptyEntries)).Where<string>((Func<string, bool>)(line => line.Length > 0)).ToArray<string>();
+                                if (array.Length != 0)
+                                {
+                                    foreach (string input in array)
+                                    {
+                                        Match match = _localSystemChange.Match(input);
+                                        if (match.Success) OnSystemChange(match.Groups["systemname"].ToString(), interestingFile.Value.CharName);
+                                        match = CHAT_CONNECTION_LOST_MESSAGE.Match(input);
+                                        if (match.Success) OnChatServerChange(false, interestingFile.Value.CharName);
+                                        match = CHAT_CONNECTION_RESTORED_MESSAGE.Match(input);
+                                        if (match.Success) OnChatServerChange(true, interestingFile.Value.CharName);
+                                    }
                                 }
                             }
-                        }
-                        else 
-                        { 
-                        string[] array = ((IEnumerable<string>)newData.Data.Split(new string[1]
-                        {
-                "\n"
-                        }, StringSplitOptions.RemoveEmptyEntries)).Select<string, string>((Func<string, string>)(line => line.Replace(Convert.ToChar(65279).ToString(), "").Replace(Convert.ToChar(65534).ToString(), "").Replace("\r", "").Trim())).Where<string>((Func<string, bool>)(line => line.Length > 0)).ToArray<string>();
-                            if (array.Length != 0)
+                            else
                             {
-                                foreach (string input in array)
+                                string[] array = ((IEnumerable<string>)newData.Data.Split(new string[1]
                                 {
-                                    LogEntry tempLogEntry = new LogEntry();
-                                    Match match = this._logFileType == LogFileType.ChatIntel ? this._chatLogRegex.Match(input) : this._gameLogRegex.Match(input);
-                                    tempLogEntry.RawLine = input;
-                                    tempLogEntry.FileName = fileInfo.Name;
-                                    tempLogEntry.LogPrefix = this._systemChannelPrefix;
-                                    tempLogEntry.TimeAdded = DateTime.Now;
-                                    tempLogEntry.LogType = this._logFileType;
-                                    tempLogEntry.CharacterName = interestingFile.Value.CharName;
+                "\n"
+                                }, StringSplitOptions.RemoveEmptyEntries)).Select<string, string>((Func<string, string>)(line => line.Replace(Convert.ToChar(65279).ToString(), "").Replace(Convert.ToChar(65534).ToString(), "").Replace("\r", "").Trim())).Where<string>((Func<string, bool>)(line => line.Length > 0)).ToArray<string>();
+                                if (array.Length != 0)
+                                {
+                                    foreach (string input in array)
+                                    {
+                                        LogEntry tempLogEntry = new LogEntry();
+                                        Match match = this._logFileType == LogFileType.ChatIntel ? this._chatLogRegex.Match(input) : this._gameLogRegex.Match(input);
+                                        tempLogEntry.RawLine = input;
+                                        tempLogEntry.FileName = fileInfo.Name;
+                                        tempLogEntry.LogPrefix = this._systemChannelPrefix;
+                                        tempLogEntry.TimeAdded = DateTime.Now;
+                                        tempLogEntry.LogType = this._logFileType;
+                                        tempLogEntry.CharacterName = interestingFile.Value.CharName;
 
-                                    if (match.Success)
-                                    {
-                                        tempLogEntry.LogTime = match.Groups["time"].ToString();
-                                        tempLogEntry.LineContent = match.Groups["content"].ToString();
-                                        tempLogEntry.EntryType = LogEntryType.ChatEvent;
-                                        tempLogEntry.ParseSuccess = true;
-                                        if (this._logFileType == LogFileType.ChatIntel)
-                                            tempLogEntry.PlayerName = match.Groups["name"].ToString();
-                                    }
-                                    else
-                                    {
-                                        tempLogEntry.LineContent = input;
-                                        tempLogEntry.ParseSuccess = false;
-                                        tempLogEntry.EntryType = this._logFileType == LogFileType.ChatIntel ? LogEntryType.UnknownChatLogEvent : LogEntryType.UnknownGameLogEvent;
-                                    }
+                                        if (match.Success)
+                                        {
+                                            tempLogEntry.LogTime = match.Groups["time"].ToString();
+                                            tempLogEntry.LineContent = match.Groups["content"].ToString();
+                                            tempLogEntry.EntryType = LogEntryType.ChatEvent;
+                                            tempLogEntry.ParseSuccess = true;
+                                            if (this._logFileType == LogFileType.ChatIntel)
+                                                tempLogEntry.PlayerName = match.Groups["name"].ToString();
+                                        }
+                                        else
+                                        {
+                                            tempLogEntry.LineContent = input;
+                                            tempLogEntry.ParseSuccess = false;
+                                            tempLogEntry.EntryType = this._logFileType == LogFileType.ChatIntel ? LogEntryType.UnknownChatLogEvent : LogEntryType.UnknownGameLogEvent;
+                                        }
 
-                                    if (this._logFileType == LogFileType.Game)
-                                    {
-                                        if (this._gameLogCombatRegex.IsMatch(input))
+                                        if (this._logFileType == LogFileType.Game)
                                         {
-                                            if (!this._interestingFiles[interestingFile.Key].InCombat)
+                                            if (this._gameLogCombatRegex.IsMatch(input))
                                             {
-                                                this._interestingFiles[interestingFile.Key].InCombat = true;
-                                                this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Start, tempLogEntry);
+                                                if (!this._interestingFiles[interestingFile.Key].InCombat)
+                                                {
+                                                    this._interestingFiles[interestingFile.Key].InCombat = true;
+                                                    this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Start, tempLogEntry);
+                                                }
+                                                else
+                                                {
+                                                    this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Combat, tempLogEntry);
+                                                }
+                                                this._interestingFiles[interestingFile.Key].TimeOutTriggered = false;
+                                                this._interestingFiles[interestingFile.Key].LastCombat = this._interestingFiles[interestingFile.Key].LastUpdate;
                                             }
-                                            else
+                                            else if (this._gameLogISKRegex.IsMatch(input))
                                             {
-                                                this.OnCombat(interestingFile.Value.FileName, interestingFile.Value.CharName, CombatEventType.Combat, tempLogEntry);
+                                                this.OnISK(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
                                             }
-                                            this._interestingFiles[interestingFile.Key].TimeOutTriggered = false;
-                                            this._interestingFiles[interestingFile.Key].LastCombat = this._interestingFiles[interestingFile.Key].LastUpdate;
+                                            else if (
+                                                this._gameLogMiningRegex.IsMatch(input) ||
+                                                this._gameLogMiningEndedFullRegex.IsMatch(input) ||
+                                                this._gameLogMiningEndedRoidPoppedRegex.IsMatch(input)
+                                                )
+                                            {
+                                                this.OnMining(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
+                                            }
+                                            else if (this._gameLogCloakRegex.IsMatch(input))
+                                            {
+                                                this.OnDecloak(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
+                                            }
+
                                         }
-                                        else if (this._gameLogISKRegex.IsMatch(input))
+                                        else
                                         {
-                                            this.OnISK(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
-                                        }
-                                        else if (
-                                            this._gameLogMiningRegex.IsMatch(input) ||
-                                            this._gameLogMiningEndedFullRegex.IsMatch(input) ||
-                                            this._gameLogMiningEndedRoidPoppedRegex.IsMatch(input) 
-                                            )
-                                        {
-                                            this.OnMining(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
-                                        }
-                                        else if (this._gameLogCloakRegex.IsMatch(input))
-                                        {
-                                            this.OnDecloak(interestingFile.Value.FileName, interestingFile.Value.CharName, tempLogEntry);
-                                        }
-                                        
-                                    }
-                                    else
-                                    {
-                                        // don't treat as intel if seen in gamelog !
-                                        if (this._previousLogEntries.All<LogEntry>((Func<LogEntry, bool>)(logEntry => logEntry.LineContent != tempLogEntry.LineContent)))
-                                        {
-                                            this._previousLogEntries.Add(tempLogEntry);
-                                            logEntryList.Add(tempLogEntry);
+                                            // don't treat as intel if seen in gamelog !
+                                            if (this._previousLogEntries.All<LogEntry>((Func<LogEntry, bool>)(logEntry => logEntry.LineContent != tempLogEntry.LineContent)))
+                                            {
+                                                this._previousLogEntries.Add(tempLogEntry);
+                                                logEntryList.Add(tempLogEntry);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e.Message);
+                    if (e.InnerException != null) Log.Error(e.InnerException.Message);
                 }
             }
             if (logEntryList.Count <= 0)
