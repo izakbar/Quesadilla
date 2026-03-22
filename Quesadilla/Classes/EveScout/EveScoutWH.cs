@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace Quesadilla.Classes.EveScout
 {
@@ -40,25 +41,25 @@ namespace Quesadilla.Classes.EveScout
             "in_signature": "SPP-328"
         }
          */
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public int Id {  get; set; }
-        [JsonProperty("created_at")]
+        [JsonPropertyName("created_at")]
         public DateTime CreatedTime { get; set; }
-        [JsonProperty("wh_exits_outward")]
+        [JsonPropertyName("wh_exits_outward")]
         public bool Outward { get; set; }
-        [JsonProperty("wh_type")]
+        [JsonPropertyName("wh_type")]
         public string WormholeType { get; set; }
-        [JsonProperty("max_ship_size")]
+        [JsonPropertyName("max_ship_size")]
         public string MaxShipSize { get; set; }
-        [JsonProperty("out_system_id")]
+        [JsonPropertyName("out_system_id")]
         public long FromSystemId { get; set; }
-        [JsonProperty("out_signature")]
+        [JsonPropertyName("out_signature")]
         public string FromSignature { get; set; }
-        [JsonProperty("in_system_id")]
+        [JsonPropertyName("in_system_id")]
         public long ToSystemId { get; set; }
-        [JsonProperty("in_system_class")]
+        [JsonPropertyName("in_system_class")]
         public string ToSystemClass { get; set; }
-        [JsonProperty("in_signature")]
+        [JsonPropertyName("in_signature")]
         public string ToSignature { get; set; }
 
         public string Connector {  get; set; }

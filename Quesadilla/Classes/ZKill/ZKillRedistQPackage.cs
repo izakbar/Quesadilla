@@ -1,19 +1,19 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Quesadilla.Classes.ZKill
 {
     public class ZKillRedistQPackage
     {
-        [JsonProperty("killID")]
+        [JsonPropertyName("killID")]
         public long killID { get; set; }
-        //[JsonProperty("killmail")]
+        //[JsonPropertyName("killmail")]
         //public ZKillRedisQKillmail Killmail { get; set; }
-        [JsonProperty("zkb")]
+        [JsonPropertyName("zkb")]
         public ZkillRedisQZkb Zkb { get; set; }
     }
 }

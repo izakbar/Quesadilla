@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Quesadilla.Classes.Events;
+﻿using Quesadilla.Classes.Events;
 using Quesadilla.Classes.SolarSystems;
 using Quesadilla.Classes.ZKill;
 using Serilog;
@@ -10,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -125,7 +125,7 @@ namespace Quesadilla.Classes.EveScout
             // Parse EveScout
             try
             {
-                var whData = JsonConvert.DeserializeObject<List<EveScoutWH>>(strContent);
+                var whData = JsonSerializer.Deserialize<List<EveScoutWH>>(strContent);
 
                 lock (Signatures)
                 {

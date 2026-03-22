@@ -457,7 +457,7 @@ namespace Quesadilla
         {
             if ( IsZkill )
             {
-                System.Diagnostics.Process.Start($"https://zkillboard.com/kill/{_alert.Kill.ID}");
+                System.Diagnostics.Process.Start($"https://zkillboard.com/kill/{_alert.Kill.ID}/");
             }
         }
 

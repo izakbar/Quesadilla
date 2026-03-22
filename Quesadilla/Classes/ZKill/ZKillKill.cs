@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Quesadilla.Classes.Queues;
+﻿using Quesadilla.Classes.Queues;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +39,7 @@ namespace Quesadilla.Classes.ZKill
         public string ToFeedHtml()
         {
             return 
-            "<div class=zkill><div class=zkill-ship><a href=https://zkillboard.com/kill/" + ID + "><img width=98% src=https://images.evetech.net/types/" + VictimShipTypeId.ToString() + "/render></a>" +
+            "<div class=zkill><div class=zkill-ship><a href=https://zkillboard.com/kill/" + ID + "/><img width=98% src=https://images.evetech.net/types/" + VictimShipTypeId.ToString() + "/render></a>" +
                 "</div>" +
                 "<div class=zkill-value>" + TotalValue + "</div>" +
                 "<div class=zkill-victim>{zkillVictim}</div>" +

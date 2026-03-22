@@ -1,34 +1,34 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Quesadilla.Classes.ZKill
 {
     public class ZKillRedisQVictim
     {
-        [JsonProperty("alliance_id")]
+        [JsonPropertyName("alliance_id")]
         public long AllianceId { get; set; }
 
-        [JsonProperty("character_id")]
+        [JsonPropertyName("character_id")]
         public long CharacterId { get; set; }
 
-        [JsonProperty("corporation_id")]
+        [JsonPropertyName("corporation_id")]
         public long CorporationId { get; set; }
 
-        [JsonProperty("damage_taken")]
+        [JsonPropertyName("damage_taken")]
         public long DamageTaken { get; set; }
 
 /*
-        [JsonProperty("items")]
+        [JsonPropertyName("items")]
         public List<Item> Items { get; set; }
 
-        [JsonProperty("position")]
+        [JsonPropertyName("position")]
         public Position Position { get; set; }
 */
-        [JsonProperty("ship_type_id")]
+        [JsonPropertyName("ship_type_id")]
         public long ShipTypeId { get; set; }
     }
 }

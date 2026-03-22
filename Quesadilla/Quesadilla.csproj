@@ -130,8 +130,12 @@
     <Compile Include="Classes\SolarSystems\SolarSystemBelt.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemMoon.cs" />
     <Compile Include="Classes\SolarSystems\PlanetInfo.cs" />
+    <Compile Include="Classes\ZKill\JsonPropertyNameNameAttribute.cs" />
     <Compile Include="Classes\ZKill\ZKill.cs" />
     <Compile Include="Classes\ZKill\ZKillKill.cs" />
+    <Compile Include="Classes\ZKill\ZKillR2Z2.cs" />
+    <Compile Include="Classes\ZKill\ZKillR2Z2Data.cs" />
+    <Compile Include="Classes\ZKill\ZKillR2Z2ESI.cs" />
     <Compile Include="Classes\ZKill\ZKillRedisQ.cs" />
     <Compile Include="Classes\ZKill\ZKillRedisQAttacker.cs" />
     <Compile Include="Classes\ZKill\ZKillRedisQKillmail.cs" />
@@ -139,6 +143,7 @@
     <Compile Include="Classes\ZKill\ZkillRedisQZkb.cs" />
     <Compile Include="Classes\ZKill\ZKillRedistQData.cs" />
     <Compile Include="Classes\ZKill\ZKillRedistQPackage.cs" />
+    <Compile Include="Classes\ZKill\ZKillSequence.cs" />
     <Compile Include="Controllers\OBSController.cs" />
     <Compile Include="Extensions\StringExtentions.cs" />
     <Compile Include="QuesadillaAlertPopup.cs">

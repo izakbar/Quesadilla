@@ -1,6 +1,6 @@
 ﻿using Cyotek.Windows.Forms;
+using Microsoft.AspNetCore.Mvc.Formatters.Json.Internal;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Newtonsoft.Json;
 using Quesadilla.Classes.Attributes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.SolarSystems;
@@ -15,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
@@ -157,7 +158,7 @@ namespace Quesadilla.Classes
                 StreamReader reader = new StreamReader(filename);
                 var json = reader.ReadToEnd();
                 reader.Close();
-                c = JsonConvert.DeserializeObject<Config>(json);
+                c = JsonSerializer.Deserialize<Config>(json);
             }
             catch (Exception ex)
             {
@@ -987,7 +988,7 @@ img.rounded-corners {
 
         public void Save(string filename)
         {
-            var json = JsonConvert.SerializeObject(this, Formatting.Indented);
+            var json = JsonSerializer.Serialize(this);
             File.WriteAllText(filename, json);
         }
 

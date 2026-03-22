@@ -1,6 +1,5 @@
 ﻿using EVEStandard.Enumerations;
 using EVEStandard;
-using Newtonsoft.Json;
 using Quesadilla.Classes.ESIData;
 using Serilog;
 using System;
@@ -15,8 +14,8 @@ using System.Linq.Expressions;
 using Quesadilla.Classes.Queues;
 using System.Windows.Forms;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using Serilog.Core;
+using System.Text.Json;
 
 namespace Quesadilla.Classes.SolarSystems
 {
@@ -51,7 +50,7 @@ namespace Quesadilla.Classes.SolarSystems
             StreamReader reader = new StreamReader(jsonFile);
             var json = reader.ReadToEnd();
 
-            SolarSystems = JsonConvert.DeserializeObject<Dictionary<int, SolarSystem>>(json);
+            SolarSystems = JsonSerializer.Deserialize<Dictionary<int, SolarSystem>>(json);
             DotlanDeltaRegions = DateTime.Now.AddDays(-10);
             foreach (var s in SolarSystems)
             {
@@ -70,7 +69,7 @@ namespace Quesadilla.Classes.SolarSystems
             StreamReader reader = new StreamReader(jsonFile);
             var json = reader.ReadToEnd();
 
-            ItemTypes = JsonConvert.DeserializeObject<Dictionary<int, ItemType>>(json);
+            ItemTypes = JsonSerializer.Deserialize<Dictionary<int, ItemType>>(json);
         }
         public void ReadESICharacters(string jsonFile)
         {
@@ -80,7 +79,7 @@ namespace Quesadilla.Classes.SolarSystems
                 {
                     StreamReader reader = new StreamReader(jsonFile);
                     var json = reader.ReadToEnd();
-                    ESICharacters = JsonConvert.DeserializeObject<Dictionary<int, ESICharacter>>(json);
+                    ESICharacters = JsonSerializer.Deserialize<Dictionary<int, ESICharacter>>(json);
                     reader.Close() ;
                 }
             }
@@ -91,7 +90,7 @@ namespace Quesadilla.Classes.SolarSystems
         }
         public void WriteESICharacters(string jsonFile)
         {
-            var json = JsonConvert.SerializeObject(ESICharacters);
+            var json = JsonSerializer.Serialize(ESICharacters);
             File.WriteAllText(jsonFile, json);
         }
 
@@ -246,13 +245,12 @@ namespace Quesadilla.Classes.SolarSystems
 
         public void AddAlert(int systemId, AlertQueueItem alert)
         {
-            SolarSystems[systemId].AlertTime = DateTime.Now;
+            SolarSystems[systemId].SetAlertTime(DateTime.Now);
 
             if (!alert.isFaction && !alert.isDecloak && alert.Kill == null && alert.Path != null)
             {
                 // add alert to solarsystem info
-                if (SolarSystems[systemId].Alerts == null) SolarSystems[systemId].Alerts = new List<AlertQueueItem>();
-                SolarSystems[systemId].Alerts.Add(alert);
+                SolarSystems[systemId].AddAlert(alert);
             }
         }
 

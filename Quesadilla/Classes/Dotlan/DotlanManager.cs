@@ -1,5 +1,4 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.EveScout;
 using Quesadilla.Classes.SolarSystems;
@@ -150,9 +149,7 @@ namespace Quesadilla.Classes.Dotlan
                 using (var hc = new HttpClient())
                 {
 
-                    string versionNum = "1";
-                    string userAgent = $"Mozilla/5.0 (Quesadilla version {versionNum} )";
-                    hc.DefaultRequestHeaders.Add("User-Agent", userAgent);
+					hc.DefaultRequestHeaders.Add("User-Agent", Program.UserAgent);
                     hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
 
                     var response = hc.GetAsync(URL).Result;
@@ -233,9 +230,7 @@ namespace Quesadilla.Classes.Dotlan
                 using (var hc = new HttpClient())
                 {
 
-                    string versionNum = "1";
-                    string userAgent = $"Mozilla/5.0 (Quesadilla version {versionNum} )";
-                    hc.DefaultRequestHeaders.Add("User-Agent", userAgent);
+                    hc.DefaultRequestHeaders.Add("User-Agent", Program.UserAgent);
                     hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
 
                     if (LastDotlanDeltaETAG != "")

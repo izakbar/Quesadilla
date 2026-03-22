@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Quesadilla.Classes.Events;
+﻿using Quesadilla.Classes.Events;
 using Quesadilla.Classes.SolarSystems;
 using Serilog;
 using System;
@@ -12,6 +10,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Permissions;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -114,7 +113,7 @@ namespace Quesadilla.Classes.ZKill
 
 
             // Parse killmail
-            var zkill = JsonConvert.DeserializeObject<ZKillRedistQData>(strContent);
+            var zkill = JsonSerializer.Deserialize<ZKillRedistQData>(strContent);
             if (zkill == null || zkill.Package == null)
             {
                 // Wait 10s for next km

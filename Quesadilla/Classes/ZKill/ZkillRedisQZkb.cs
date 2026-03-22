@@ -1,39 +1,39 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Quesadilla.Classes.ZKill
 {
     public class ZkillRedisQZkb
     {
-        [JsonProperty("awox")]
+        [JsonPropertyName("awox")]
         public bool Awox { get; set; }
 
-        [JsonProperty("fittedValue")]
+        [JsonPropertyName("fittedValue")]
         public double FittedValue { get; set; }
 
-        [JsonProperty("hash")]
+        [JsonPropertyName("hash")]
         public string Hash { get; set; }
 
-        [JsonProperty("href")]
+        [JsonPropertyName("href")]
         public string Href { get; set; }
 
-        [JsonProperty("locationID")]
+        [JsonPropertyName("locationID")]
         public long LocationId { get; set; }
 
-        [JsonProperty("npc")]
+        [JsonPropertyName("npc")]
         public bool Npc { get; set; }
 
-        [JsonProperty("points")]
+        [JsonPropertyName("points")]
         public long Points { get; set; }
 
-        [JsonProperty("solo")]
+        [JsonPropertyName("solo")]
         public bool Solo { get; set; }
 
-        [JsonProperty("totalValue")]
+        [JsonPropertyName("totalValue")]
         public double TotalValue { get; set; }
     }
 }

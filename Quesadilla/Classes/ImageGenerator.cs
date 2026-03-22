@@ -482,7 +482,7 @@ namespace Quesadilla.Classes
 
 					// DrawSystemName(g, currentPoint.X, currentPoint.Y, $"{currentSystem.solarSystem.NPCKillsDeltaLastHour}", Color.AliceBlue, textSize); 
 
-					if (currentSystem.solarSystem.Kills != null && currentSystem.solarSystem.Kills.Count() > 0)
+					if (currentSystem.solarSystem.CountKills() > 0)
                     {
                         var circlePen = new Pen(ZKillColour,2);
                         circlesUsed++;
@@ -513,14 +513,15 @@ namespace Quesadilla.Classes
                                 30 * (float)animationCycleIntel, 360);
                         }
 
-                        foreach (var k in currentSystem.solarSystem.Kills)
+                        foreach (var k in currentSystem.solarSystem.GetKills())
                         {
                             sbExtraInformation.AppendLine($"ZKILL {k.Timestamp.ToString("HH:mm:ss")} {k.SolarSystemName} {k.VictimShipName} {k.VictimCharacterName}");
                         }
                     }
 
-                    if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null).Count() > 0)
-                    {
+					//if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null).Count() > 0)
+					if (currentSystem.solarSystem.CountAlerts(false, false, false) > 0)
+					{
                         var circlePen = new Pen(IntelColour,2);
                         circlesUsed++;
                         float circleSize = CIRCLE_INITIAL_GAP + (CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING;
@@ -549,7 +550,7 @@ namespace Quesadilla.Classes
                                 20 * (float)animationCycleIntel, 360);
                         }
 
-                        foreach (var a in currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null))
+                        foreach (var a in currentSystem.solarSystem.GetAlerts(false,false,false))
                         {
                             sbExtraInformation.AppendLine($"{a.Entry.LogTime} {a.Entry.LineContent}");
                         }

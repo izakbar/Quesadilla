@@ -1,27 +1,27 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Quesadilla.Classes.ZKill
 {
     public class ZKillRedisQKillmail
     {
-        [JsonProperty("attackers")]
+        [JsonPropertyName("attackers")]
         public List<ZKillRedisQAttacker> Attackers { get; set; }
 
-        [JsonProperty("killmail_id")]
+        [JsonPropertyName("killmail_id")]
         public long ID { get; set; }
 
-        [JsonProperty("killmail_time")]
+        [JsonPropertyName("killmail_time")]
         public System.DateTimeOffset Timestamp { get; set; }
 
-        [JsonProperty("solar_system_id")]
+        [JsonPropertyName("solar_system_id")]
         public long SolarSystemId { get; set; }
 
-        [JsonProperty("victim")]
+        [JsonPropertyName("victim")]
         public ZKillRedisQVictim Victim { get; set; }
 
     }

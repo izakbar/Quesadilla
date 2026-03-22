@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using EVEStandard.Models;
 using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.ZKill;
 using System;
@@ -24,27 +24,76 @@ namespace Quesadilla.Classes.SolarSystems
 		public double DotlanY { get; set; }
 		public double X2D { get; set; }
 		public double Y2D { get; set; }
-		[JsonIgnore]
-        public Vector3 Xyz { get; set; }
-        [JsonIgnore]
-        public List<ZKillKill> Kills { get; set; }
-        [JsonIgnore]
-        public List<AlertQueueItem> Alerts { get; set; }
-        [JsonIgnore]
-        public DateTime AlertTime { get; set; }
-        [JsonIgnore]
-        private Regex _nameRegex;
-        [JsonIgnore]
-        public Regex NameRegex => this._nameRegex;
         public bool MatchNameRegex(string logLine) => this._nameRegex.IsMatch(logLine);
         public List<SolarSystemConnectionData> ConnectedTo { get; set; }
         public List<PlanetInfo> Planets { get; set; }
-        [JsonIgnore]
-        public int? NPCKillsDeltaLastHour { get; set; }
         public bool Incursion { get; set; }
         public bool IceField { get; set; }
 		public double Security { get; set; }
         public Boolean UniHole {  get; set; }
+
+        private DateTime AlertTime { get; set; }
+		private int? NPCKillsDeltaLastHour { get; set; }
+		private Regex _nameRegex;
+		private Regex NameRegex => this._nameRegex;
+		private List<AlertQueueItem> Alerts { get; set; }
+		public int CountAlerts(bool faction, bool decloak, bool kill)
+		{
+			int count = 0;
+			if (Alerts == null) { return count; }
+			count = Alerts.Where(o => o.isFaction == faction && o.isDecloak == decloak && (o.Kill is null && !kill || (!(o.Kill is null) && kill))).Count();
+			return count;
+		}
+		public List<AlertQueueItem> GetAlerts(bool faction, bool decloak, bool kill)
+		{
+			if (Alerts == null) Alerts = new List<AlertQueueItem>();
+			return Alerts.Where(o => o.isFaction == faction && o.isDecloak == decloak && (o.Kill is null && !kill || (!(o.Kill is null) && kill))).ToList();
+		}
+        public List<ZKillKill> GetKills()
+        {
+            if (Kills == null) { Kills = new List<ZKillKill>(); }
+            return Kills;
+        }
+		public void AddAlert(AlertQueueItem a)
+        {
+			if (Alerts == null) Alerts = new List<AlertQueueItem>();
+			Alerts.Add(a); 
+        }
+		public void RemoveAlert(AlertQueueItem a)
+		{
+            if (Alerts == null) return;
+			Alerts.Remove(a);
+		}
+		private Vector3 Xyz { get; set; }
+		private List<ZKillKill> Kills { get; set; }
+        public int? CountKills()
+        {
+            if (Kills == null) return 0;
+            return Kills.Count();
+		}
+        public void AddKill(ZKillKill kill)
+        {
+            if ( Kills == null ) {  Kills = new List<ZKillKill>();}
+            Kills.Add(kill);
+        }
+        public void RemoveKill(ZKillKill kill)
+        {
+            if (Kills == null) return;
+            Kills.Remove(kill);
+        }
+        public int? GetNPCKillsDeltaLastHour()
+        {
+            return NPCKillsDeltaLastHour;
+		}
+        public void SetNPCKillsDeltaLastHour(int? kills)
+        {
+			NPCKillsDeltaLastHour = kills;
+
+		}
+        public void SetAlertTime(DateTime alertTime)
+        {
+            AlertTime = alertTime;
+        }
 		public void SetNameRegex()
         {
             string str = "";

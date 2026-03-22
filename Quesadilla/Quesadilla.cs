@@ -1,7 +1,6 @@
 ﻿using EVEStandard.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Toolkit.Uwp.Notifications;
-using Newtonsoft.Json;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Dotlan;
@@ -35,6 +34,7 @@ using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -289,8 +289,9 @@ namespace Quesadilla
             // start main tick timer
             mainTimer.Enabled = true;
 
-            Program.ZKillHandler.ZKillFeed.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
-            Program.ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(this.ESI_ProcessNewData);
+			// Program.ZKillHandler.ZKillFeedRedisQ.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
+			Program.ZKillHandler.ZKillFeedR2Z2.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
+			Program.ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(this.ESI_ProcessNewData);
 
             ActivityLineInc = 1;
             ActivityLineMax = Program.MainConfiguration.HeartBeatIndicatorWorkingText.Length - 1;
@@ -2269,7 +2270,7 @@ namespace Quesadilla
             if (!e.DeltaContent.IsNullOrEmpty())
             {
                 Log.Information($"Processing dotlan delta data for {e.RegionName}");
-                Dictionary<string, string> killdDeltadata = JsonConvert.DeserializeObject<Dictionary<string, string>>(e.DeltaContent);
+                Dictionary<string, string> killdDeltadata = JsonSerializer.Deserialize<Dictionary<string, string>>(e.DeltaContent);
 
                 foreach (var kvp in killdDeltadata)
                 {
@@ -2284,7 +2285,7 @@ namespace Quesadilla
 
                         if (Program.Universe.SolarSystems.ContainsKey(systemId))
                         {
-                            Program.Universe.SolarSystems[systemId].NPCKillsDeltaLastHour = killDelta;
+                            Program.Universe.SolarSystems[systemId].SetNPCKillsDeltaLastHour(killDelta);
                         }
                     }
                 }
@@ -2474,7 +2475,7 @@ namespace Quesadilla
                     foreach (var m in mouseOverMinimapSystems)
                     {
                         if (!MouseoverSystemName.Text.IsNullOrEmpty()) MouseoverSystemName.Text += ",";
-                        MouseoverSystemName.Text += m.solarSystem.Name + (m.solarSystem.NPCKillsDeltaLastHour == null ? "" : $"  {m.solarSystem.NPCKillsDeltaLastHour}");
+                        MouseoverSystemName.Text += m.solarSystem.Name + (m.solarSystem.GetNPCKillsDeltaLastHour() == null ? "" : $"  {m.solarSystem.GetNPCKillsDeltaLastHour()}");
                     }
                     ImageGenerator.PaintDrawText(e, MouseoverSystemName);
                 }
@@ -2748,7 +2749,7 @@ namespace Quesadilla
                 t.AddButton(new ToastButton()
                     .SetContent($"View Zkill")
                     .AddArgument("action", "viewURL")
-                    .AddArgument("url", "https://zkillboard.com/kill/" + alert.Kill.ID));
+                    .AddArgument("url", $"https://zkillboard.com/kill/{alert.Kill.ID}/"));
 
                 var shipUrl = $"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render?size=128";
                 shipUrl = "https://quesadilla.prioryofthelemon.co.uk/wp/wp-content/uploads/2024/07/Quesadilla-1.png";

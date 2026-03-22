@@ -78,7 +78,7 @@ namespace Quesadilla.Controllers
 					}
 
 					string kf = $"<div class=zkillkill>" + 
-                        $"<div class=zkill-ship><a href=https://zkillboard.com/kill/{k.ID}><img class=\"rounded-corners\" width=98% src=https://images.evetech.net/types/{k.VictimShipTypeId}/render></a></div>" +
+                        $"<div class=zkill-ship><a href=https://zkillboard.com/kill/{k.ID}/><img class=\"rounded-corners\" width=98% src=https://images.evetech.net/types/{k.VictimShipTypeId}/render></a></div>" +
                         $"<div class=zkill-value>{k.TotalValue}</div>" +
 						$"<div class=zkill-killer>{zkillKiller}</div>" +
 						$"<div class=zkill-victim>{zkillVictim}</div>" +

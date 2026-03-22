@@ -66,8 +66,9 @@ namespace Quesadilla
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
 
         public static Version version = Assembly.GetEntryAssembly().GetName().Version;
+        public static String UserAgent = $"Mozilla/5.0 (Quesadilla version {version.ToString()} )";
 
-        [STAThread]
+		[STAThread]
         static void Main()
         {
             ConfigureSerilog();
@@ -208,12 +209,9 @@ namespace Quesadilla
                         {
                             // remove alert to solarsystem info
                             var solarSystem = Universe.SolarSystems[alert.Path.ToSystemId];
-                            if (solarSystem.Alerts != null)
-                            {
-                                var removed = solarSystem.Alerts.Remove(alert);
-                            }
-                        }
-                        removedAlert = true;
+                            solarSystem.RemoveAlert(alert);
+						}
+						removedAlert = true;
                     }
                     else
                     {

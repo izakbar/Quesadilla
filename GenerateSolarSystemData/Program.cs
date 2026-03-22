@@ -1,7 +1,6 @@
 ﻿using GenerateSolarSystemData.Models.SDE;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using Quesadilla;
 using Quesadilla.Classes;
 using Quesadilla.Classes.SolarSystems;
@@ -11,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection.PortableExecutable;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Xml;
 
@@ -23,7 +23,7 @@ namespace QuesadillaExport
 			Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
 			StreamReader reader = new StreamReader("Quesadilla.Systems.json");
 			var json = reader.ReadToEnd();
-			SolarSystems = JsonConvert.DeserializeObject<Dictionary<int, SolarSystem>>(json);
+			SolarSystems = JsonSerializer.Deserialize<Dictionary<int, SolarSystem>>(json);
 			reader.Close();
 
             StringBuilder UniHoles = new StringBuilder();
@@ -61,7 +61,7 @@ namespace QuesadillaExport
 					}
 				}
 			}
-			json = JsonConvert.SerializeObject(SolarSystems);
+			json = JsonSerializer.Serialize(SolarSystems);
 			File.WriteAllText(@"Quesadilla.Systems.json", json);
 			using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"UniHoleData\UniHoles.txt"))
 			{
@@ -80,7 +80,7 @@ namespace QuesadillaExport
             string json;
             while ((json = readerRegions.ReadLine()) != null)
             {
-                var regionData = JsonConvert.DeserializeObject<mapRegion>(json);
+                var regionData = JsonSerializer.Deserialize<mapRegion>(json);
                 Regions.Add(regionData._key, regionData.Name.en);
             }
             readerRegions.Close();
@@ -89,7 +89,7 @@ namespace QuesadillaExport
 			StreamReader readerSolarsystems = new StreamReader("SDE/mapSolarsystems.jsonl");
 			while ((json = readerSolarsystems.ReadLine()) != null)
 			{
-				var Solarsystem = JsonConvert.DeserializeObject<mapSolarsystem>(json);
+				var Solarsystem = JsonSerializer.Deserialize<mapSolarsystem>(json);
 
                 var ss = new SolarSystem()
 				{
@@ -114,7 +114,7 @@ namespace QuesadillaExport
 			readerSolarsystems.Close();
 
 
-			var Outputjson = JsonConvert.SerializeObject(SolarSystems);
+			var Outputjson = JsonSerializer.Serialize(SolarSystems);
 			File.WriteAllText(@"Quesadilla.Systems.json", Outputjson);
 
 		}
@@ -209,7 +209,7 @@ namespace QuesadillaExport
                     IsRegional = jump.fromRegionId == jump.toRegionId ? false : true,
                 });
             }
-            var json = JsonConvert.SerializeObject(SolarSystems);
+            var json = JsonSerializer.Serialize(SolarSystems);
             File.WriteAllText(@"Quesadilla.Systems.json", json);
         }
 
@@ -218,7 +218,7 @@ namespace QuesadillaExport
             Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
             StreamReader reader = new StreamReader("Quesadilla.Systems.json");
             var json = reader.ReadToEnd();
-            SolarSystems = JsonConvert.DeserializeObject<Dictionary<int, SolarSystem>>(json);
+            SolarSystems = JsonSerializer.Deserialize<Dictionary<int, SolarSystem>>(json);
             reader.Close();
 
             XmlDocument xmldoc = new XmlDocument
@@ -282,7 +282,7 @@ namespace QuesadillaExport
                 solarSystem.Value.DotlanY = dotlanY;
             }
 
-            var Outputjson = JsonConvert.SerializeObject(SolarSystems);
+            var Outputjson = JsonSerializer.Serialize(SolarSystems);
             File.WriteAllText(@"Quesadilla.Systems.json", Outputjson);
         }
 
@@ -292,7 +292,7 @@ namespace QuesadillaExport
 			Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
 			StreamReader reader = new StreamReader("Quesadilla.Systems.json");
 			var json = reader.ReadToEnd();
-			SolarSystems = JsonConvert.DeserializeObject<Dictionary<int, SolarSystem>>(json);
+			SolarSystems = JsonSerializer.Deserialize<Dictionary<int, SolarSystem>>(json);
 			reader.Close();
 
 			var solarSystemJumps = DataAccess.mapSolarSystemJumps.SelectAll();
@@ -305,7 +305,7 @@ namespace QuesadillaExport
 				});
 			}
 
-			var Outputjson = JsonConvert.SerializeObject(SolarSystems);
+			var Outputjson = JsonSerializer.Serialize(SolarSystems);
 			File.WriteAllText(@"Quesadilla.Systems.json", Outputjson);
 
 		}
@@ -324,7 +324,7 @@ namespace QuesadillaExport
                     Id = item.TypeId,
                 });
             }
-            var json = JsonConvert.SerializeObject(ItemTypes);
+            var json = JsonSerializer.Serialize(ItemTypes);
             File.WriteAllText(@"Quesadilla.ItemTypes.json", json);
         }
 
