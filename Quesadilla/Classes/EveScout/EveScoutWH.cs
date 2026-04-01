@@ -42,7 +42,7 @@ namespace Quesadilla.Classes.EveScout
         }
          */
         [JsonPropertyName("id")]
-        public int Id {  get; set; }
+        public string Id {  get; set; }
         [JsonPropertyName("created_at")]
         public DateTime CreatedTime { get; set; }
         [JsonPropertyName("wh_exits_outward")]
