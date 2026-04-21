@@ -513,11 +513,19 @@ namespace Quesadilla.Classes
                                 30 * (float)animationCycleIntel, 360);
                         }
 
-                        foreach (var k in currentSystem.solarSystem.GetKills())
+                        try
                         {
-                            sbExtraInformation.AppendLine($"ZKILL {k.Timestamp.ToString("HH:mm:ss")} {k.SolarSystemName} {k.VictimShipName} {k.VictimCharacterName}");
+                            foreach (var k in currentSystem.solarSystem.GetKills())
+                            {
+                                sbExtraInformation.AppendLine($"ZKILL {k.Timestamp.ToString("HH:mm:ss")} {k.SolarSystemName} {k.VictimShipName} {k.VictimCharacterName}");
+                            }
                         }
-                    }
+                        catch (Exception ex)
+                        {
+                        }
+
+
+					}
 
 					//if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null).Count() > 0)
 					if (currentSystem.solarSystem.CountAlerts(false, false, false) > 0)

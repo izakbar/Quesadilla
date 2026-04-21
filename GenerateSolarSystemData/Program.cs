@@ -81,7 +81,7 @@ namespace QuesadillaExport
             while ((json = readerRegions.ReadLine()) != null)
             {
                 var regionData = JsonSerializer.Deserialize<mapRegion>(json);
-                Regions.Add(regionData._key, regionData.Name.en);
+                Regions.Add(regionData._key, regionData.name.en);
             }
             readerRegions.Close();
 
@@ -94,19 +94,19 @@ namespace QuesadillaExport
                 var ss = new SolarSystem()
 				{
 					Id = Solarsystem._key,
-					Name = Solarsystem.Name.en,
+					Name = Solarsystem.name.en,
 					RegionName = Regions[Solarsystem.regionID],
-					X = Solarsystem.Position.X,
-					Y = Solarsystem.Position.Y,
-					Z = Solarsystem.Position.Z,
+					X = Solarsystem.position.X,
+					Y = Solarsystem.position.Y,
+					Z = Solarsystem.position.Z,
 					Security = Solarsystem.securityStatus,
 					ConnectedTo = new List<SolarSystemConnectionData>(),
 				};
 
-                if (Solarsystem.Position2D != null)
+                if (Solarsystem.position2D != null)
                 {
-                    ss.X2D = 0- Solarsystem.Position2D.X;
-                    ss.Y2D = Solarsystem.Position2D.Y;
+                    ss.X2D = 0- Solarsystem.position2D.X;
+                    ss.Y2D = Solarsystem.position2D.Y;
                 }
 
 				SolarSystems.Add(Solarsystem._key, ss);
