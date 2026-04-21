@@ -13,6 +13,8 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>\\dsmfluf3\Development\EVE\Quesadilla\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
@@ -30,8 +32,6 @@
     <ApplicationVersion>0.2.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>false</BootstrapperEnabled>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -395,6 +395,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="images\DefaultAlert.png" />
+    <None Include="images\Insidiouslogo.png" />
     <None Include="images\INITlogo.png" />
     <None Include="Resources\Sounds\full.wav" />
     <None Include="Resources\Sounds\pop1.wav" />

@@ -35,7 +35,7 @@ namespace Quesadilla
 
         private void alliance_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("https://www.bravecollective.com/");
+            System.Diagnostics.Process.Start("https://auth.insidiousevil.org/");
         }
 
         private void timerOpen_Tick(object sender, EventArgs e)

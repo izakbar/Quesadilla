@@ -94,7 +94,7 @@
 			// 
 			// alliance
 			// 
-			this.alliance.Image = global::Quesadilla.Properties.Resources.INITlogo;
+			this.alliance.Image = global::Quesadilla.Properties.Resources.Insidiouslogo;
 			this.alliance.Location = new System.Drawing.Point(742, 388);
 			this.alliance.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.alliance.Name = "alliance";
