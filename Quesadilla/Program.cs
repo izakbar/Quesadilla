@@ -28,6 +28,7 @@ using Serilog;
 using Serilog.Formatting.Display;
 using Serilog.Sinks.WinForms.Base;
 using System.Collections.Concurrent;
+using EVEStandard.Models;
 
 namespace Quesadilla
 {
@@ -78,7 +79,8 @@ namespace Quesadilla
             esiClient = new EVEStandardAPI(
                     "Quesadilla",                  // User agent
                     DataSource.Tranquility,         // Server [Tranquility/Singularity]
-                    TimeSpan.FromSeconds(30));       // Timeout
+					CompatibilityDate.v2025_12_16,
+					TimeSpan.FromSeconds(30));       // Timeout
 
             ESIHandler = new ESIWorker(esiClient, Log.Logger);
             Universe = new UniverseManager(esiClient, Log.Logger);

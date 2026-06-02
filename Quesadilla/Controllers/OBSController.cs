@@ -159,7 +159,7 @@ namespace Quesadilla.Controllers
             if (Program.q != null)
             {
                 string isk = Program.GetIskLastHour(toon);
-                if (!isk.IsNullOrEmpty())
+                if (!string.IsNullOrEmpty(isk))
                 {
                     output += $"<div class=iskcontainer><div class=iskperhour>{isk}</div></div>";
 
@@ -180,7 +180,7 @@ namespace Quesadilla.Controllers
             if (Program.q != null)
             {
                 string mining = Program.GetMiningLastHour(toon);
-                if (!mining.IsNullOrEmpty())
+                if (!string.IsNullOrEmpty(mining))
                 {
                     output += $"<div class=miningcontainer><div class=miningperhour>{mining}</div></div>";
 
@@ -201,7 +201,7 @@ namespace Quesadilla.Controllers
             if (Program.q != null)
             {
                 var mining = Program.GetMiningLastHourDetail(toon, totalsOnly);
-                if (!mining.IsNullOrEmpty())
+                if (mining != null)
                 {
                     output += $"<div class=miningcontainer><div class=miningperhour>";
 

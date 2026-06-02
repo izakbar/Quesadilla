@@ -211,7 +211,7 @@ namespace Quesadilla.Classes.SolarSystems
             }
             try
             {
-                var characterInfo = _esiClient.Character.GetCharacterPublicInfoV5Async(characterId).Result;
+                var characterInfo = _esiClient.Character.GetCharacterPublicInfoAsync(characterId).Result;
                 ESICharacters.Add(characterId, new ESICharacter()
                 {
                     CharacterId = characterId,

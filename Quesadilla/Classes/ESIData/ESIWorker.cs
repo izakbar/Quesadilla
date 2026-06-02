@@ -135,14 +135,14 @@ namespace Quesadilla.Classes.ESIData
             {
 
                 _log.Debug($"Getting planet information for {systemId}");
-                var systemInfo = _esiClient.Universe.GetSolarSystemInfoV4Async(systemId).Result.Model;
+                var systemInfo = _esiClient.Universe.GetSolarSystemInfoAsync(systemId).Result.Model;
                 if (systemInfo != null)
                 {
                     _log.Debug($"{systemInfo.Name} {systemInfo.Planets.Count}");
                     List<PlanetInfo> planets = new List<PlanetInfo>();
                     foreach (var p in systemInfo.Planets)
                     {
-                        var planetInfo = _esiClient.Universe.GetPlanetInfoV1Async(p.PlanetId).Result.Model;
+                        var planetInfo = _esiClient.Universe.GetPlanetInfoAsync(p.PlanetId).Result.Model;
                         var newPlanet = new PlanetInfo()
                         {
                             PlanetId = planetInfo.PlanetId,
@@ -171,7 +171,7 @@ namespace Quesadilla.Classes.ESIData
         {
             try
             {
-                var planetInfo = _esiClient.Universe.GetPlanetInfoV1Async(planetId).Result.Model;
+                var planetInfo = _esiClient.Universe.GetPlanetInfoAsync(planetId).Result.Model;
                 if (planetInfo != null)
                 {
                 }
@@ -228,7 +228,7 @@ namespace Quesadilla.Classes.ESIData
         {
             try
             {
-                var kill = _esiClient.Killmails.GetKillmailV1Async((int)killId, killHash);
+                var kill = _esiClient.Killmails.GetKillmailAsync((int)killId, killHash);
                 return kill.Result.Model;
             }
             catch (Exception ex)

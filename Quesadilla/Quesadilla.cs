@@ -2216,7 +2216,7 @@ namespace Quesadilla
             Log.Information($"Processing dotlan data for {e.RegionName}");
 
             // if update is map data
-            if (!e.MapContent.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(e.MapContent))
             {
                 Log.Information($"Processing dotlan map data for {e.RegionName}");
                 XmlDocument xmldoc = new XmlDocument
@@ -2267,7 +2267,7 @@ namespace Quesadilla
             }
 
             // if update is delta data 
-            if (!e.DeltaContent.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(e.DeltaContent))
             {
                 Log.Information($"Processing dotlan delta data for {e.RegionName}");
                 Dictionary<string, string> killdDeltadata = JsonSerializer.Deserialize<Dictionary<string, string>>(e.DeltaContent);
@@ -2373,7 +2373,7 @@ namespace Quesadilla
         {
             shouldUpdateMinimap = false;
 
-            if (CurrentActiveToon.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(CurrentActiveToon))
             {
                 MainMinimap.Visible = false;
                 this.Invalidate();
@@ -2474,7 +2474,7 @@ namespace Quesadilla
                     MouseoverSystemName.Text = "";
                     foreach (var m in mouseOverMinimapSystems)
                     {
-                        if (!MouseoverSystemName.Text.IsNullOrEmpty()) MouseoverSystemName.Text += ",";
+                        if (!string.IsNullOrEmpty(MouseoverSystemName.Text)) MouseoverSystemName.Text += ",";
                         MouseoverSystemName.Text += m.solarSystem.Name + (m.solarSystem.GetNPCKillsDeltaLastHour() == null ? "" : $"  {m.solarSystem.GetNPCKillsDeltaLastHour()}");
                     }
                     ImageGenerator.PaintDrawText(e, MouseoverSystemName);

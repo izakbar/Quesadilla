@@ -11,9 +11,9 @@ namespace Quesadilla.Classes.SolarSystems
 {
     public class PlanetInfo
     {
-        public int PlanetId { get; set; }
+        public long PlanetId { get; set; }
         public string PlanetName { get; set; }
-        public int PlanetTypeId { get; set; }
+        public long PlanetTypeId { get; set; }
         public string PlanetTypeName { get; set; }
     }
 }

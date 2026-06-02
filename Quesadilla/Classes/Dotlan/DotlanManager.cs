@@ -102,7 +102,7 @@ namespace Quesadilla.Classes.Dotlan
                 }
             }
 
-            if (!regionToProcess.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(regionToProcess))
             {
                 // get region map data if required
                 string dotlanMapContent = "";
