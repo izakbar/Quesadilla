@@ -470,7 +470,7 @@ namespace Quesadilla.Classes
 				}
 
 				// storm detection
-				float circleSizeStorm = 30 / (float)GUI_SCALING;
+				float circleSizeStorm = 40 / (float)GUI_SCALING;
 				float blobSize = (SYSTEM_CIRCLE_SIZE / (float)GUI_SCALING);
 				if (blobSize < MINIMUM_BLOB_SIZE || float.IsInfinity(blobSize))
 				{
