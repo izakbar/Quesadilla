@@ -195,7 +195,7 @@ namespace Quesadilla.Classes
                 c.AlertPopupShowVictimLogo = true;
                 c.MinimapSecLimitValue = -0.7f;
                 c.MinimapSecLimitColour = Color.LightGoldenrodYellow;
-                c.MinimapSecLimitAlpha = 10;
+                c.MinimapSecLimitAlpha = 50;
                 c.MinimapSecLimitCloudSize = 25;
                 c.MinimapSecLimit = true;
 			}
@@ -1274,7 +1274,7 @@ img.rounded-corners {
 		[Category("Main window")]
 		[DisplayName("Minimap seclimit Indicator alpha")]
 		[Description("Alpha to use for seclimit indicators on the minimap")]
-		[DefaultValue(typeof(int), "95")]
+		[DefaultValue(typeof(int), "75")]
 		[Range(0, 100)]
 		public int MinimapSecLimitAlpha { get; set; }
 
@@ -1346,7 +1346,7 @@ img.rounded-corners {
         [Category("Main window")]
         [DisplayName("Minimap show out of region systems")]
         [Description("Show systems outside current region if in configured jumps range {MinimapJumps}")]
-        [DefaultValue(typeof(bool), "true")]
+        [DefaultValue(typeof(bool), "false")]
         public bool MinimapShowOutOfRegion { get; set; }
 
         [Category("Main window")]

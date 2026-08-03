@@ -2234,6 +2234,7 @@ namespace Quesadilla
                 // I do not KNOW this for sure
                 // :(
 
+/*
 				var jumps2 = Program.Universe.FindConnections(storm.SystemId, 2);
 				if (jumps2.Contains(storm.SystemId))
 					jumps2.Remove(storm.SystemId);
@@ -2279,6 +2280,7 @@ namespace Quesadilla
 					    }
 				}
 				storm.WeakSystemIds = storm.WeakSystemIds.Except(RemoveSystems).ToList();
+*/
 			}
 		}
 
