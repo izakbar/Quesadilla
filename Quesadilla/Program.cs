@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Media;
-using System.Reflection;
-using System.Resources;
-using System.Web.WebPages;
-using System.Windows.Forms;
+﻿using EVEStandard;
 using EVEStandard.Enumerations;
-using EVEStandard;
+using EVEStandard.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -27,8 +16,20 @@ using Quesadilla.Classes.ZKill;
 using Serilog;
 using Serilog.Formatting.Display;
 using Serilog.Sinks.WinForms.Base;
+using System;
+using System.Collections;
 using System.Collections.Concurrent;
-using EVEStandard.Models;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Media;
+using System.Net.Http;
+using System.Reflection;
+using System.Resources;
+using System.Web.WebPages;
+using System.Windows.Forms;
 
 namespace Quesadilla
 {
@@ -76,7 +77,9 @@ namespace Quesadilla
 
             MainConfiguration = Config.Load(configuration_filename);
 
-            esiClient = new EVEStandardAPI(
+
+
+			esiClient = new EVEStandardAPI(
                     "Quesadilla",                  // User agent
                     DataSource.Tranquility,         // Server [Tranquility/Singularity]
 					CompatibilityDate.v2025_12_16,

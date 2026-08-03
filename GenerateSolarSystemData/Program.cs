@@ -89,7 +89,13 @@ namespace QuesadillaExport
 			StreamReader readerSolarsystems = new StreamReader("SDE/mapSolarsystems.jsonl");
 			while ((json = readerSolarsystems.ReadLine()) != null)
 			{
-				var Solarsystem = JsonSerializer.Deserialize<mapSolarsystem>(json);
+
+				var options = new JsonSerializerOptions
+				{
+					PropertyNameCaseInsensitive = true
+				};
+				
+				var Solarsystem = JsonSerializer.Deserialize<mapSolarsystem>(json, options);
 
                 var ss = new SolarSystem()
 				{

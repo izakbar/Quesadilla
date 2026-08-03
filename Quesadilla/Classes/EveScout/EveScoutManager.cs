@@ -1,4 +1,6 @@
-﻿using Quesadilla.Classes.Events;
+﻿using EVEStandard.Models;
+using HtmlAgilityPack;
+using Quesadilla.Classes.Events;
 using Quesadilla.Classes.SolarSystems;
 using Quesadilla.Classes.ZKill;
 using Serilog;
@@ -12,15 +14,18 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Forms;
 
 namespace Quesadilla.Classes.EveScout
 {
     public class EveScoutManager
     {
         private ILogger log = Log.ForContext<EveScoutManager>();
-        public List<EveScoutWH> Signatures = new List<EveScoutWH>();
+		public List<EveScoutWH> Signatures = new List<EveScoutWH>();
+		public List<EveScoutStorm> Storms = new List<EveScoutStorm>();
 
-        private BackgroundWorker Worker;
+		private BackgroundWorker Worker;
 
         private bool FeedPaused = false;
         private System.Timers.Timer t;
@@ -80,16 +85,98 @@ namespace Quesadilla.Classes.EveScout
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
+			if (EveScoutEventHandler != null)
+			{
+				EveScoutEventHandler((object)this, new EveScoutEventArgs());
+			}
+			
             GetEveScoutData("Thera");
-            Thread.Sleep(5);
+            Thread.Sleep(500);
             GetEveScoutData("Turnur");
-            if (EveScoutEventHandler != null)
-            {
-                EveScoutEventHandler((object)this, new EveScoutEventArgs());
-            }
-        }
+            
+            Thread.Sleep(500);
+            GetEveScoutWeather();
 
-        private void GetEveScoutData(string whConnector)
+			Thread.Sleep(2000);
+			if (EveScoutEventHandler != null)
+			{
+				EveScoutEventHandler((object)this, new EveScoutEventArgs());
+			}
+		}
+
+        private void GetEveScoutWeather()
+        {
+			string strContent = string.Empty;
+			try
+			{
+				Log.Information($"Getting Weather Data from EveScout");
+				HttpClient hc = new HttpClient();
+				string URL = $"https://evescoutrescue.com/home/stormtrack.php";
+				var response = hc.GetAsync(URL).Result;
+				if (response.IsSuccessStatusCode)
+				{
+					strContent = response.Content.ReadAsStringAsync().Result;
+				}
+				else
+				{
+					strContent = "Error";
+				}
+			}
+			catch
+			{
+				log.Error($"EveScout for Weather request failed");
+				return;
+			}
+
+			// if we have an error - sleep a long time - consider pause
+			if (strContent == "Error")
+			{
+				log.Error("Getting error back from EveScout Weather - sleeping worker");
+				Thread.Sleep(500000);
+				return;
+			}
+
+            // Parse EveScout Weather
+            try
+            {
+                HtmlAgilityPack.HtmlDocument weatherData = new HtmlAgilityPack.HtmlDocument();
+                weatherData.LoadHtml(strContent);
+
+                lock (Storms)
+                {
+                    // clear down previous entries and readd new
+                    Storms.Clear();
+
+                    // Locate the storm tracking table
+                    var weatherRows = weatherData.DocumentNode.SelectNodes("//table//tr");
+
+                    foreach (var weatherRow in weatherRows.Skip(1)) // skip header row
+                    {
+                        var weatherCells = weatherRow.SelectNodes("td");
+                        if (weatherCells == null || weatherCells.Count < 3)
+                            continue;
+
+
+                        var parsedSystemId = (long)Program.Universe.SolarSystems.Values.Where(o => o.Name == weatherCells[1].InnerText.Trim()).FirstOrDefault()?.Id;
+						Storms.Add(new EveScoutStorm()
+                        {
+							RegionName = weatherCells[1].InnerText.Trim(),
+							SystemName = weatherCells[1].InnerText.Trim(),
+							StormName = weatherCells[2].InnerText.Trim(),
+							StormType = weatherCells[3].InnerText.Trim(),
+                            SystemId = (int)parsedSystemId
+						});
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error($"EveScout Weather request failed");
+                return;
+            }
+		}
+
+		private void GetEveScoutData(string whConnector)
         {
             string strContent = string.Empty;
             try

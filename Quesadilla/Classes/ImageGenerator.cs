@@ -62,7 +62,40 @@ namespace Quesadilla.Classes
                     );
             }
         }
-        public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, MapType whichMap, ref string extraInformation, ref List<MinimapSystem> returnMinimapSystems,
+
+
+        public static void DrawStorm(string stormType, string location, Graphics g, Point currentPoint, float circleSize, float blobSize)
+		{
+			float[] dashSet = { 8, 4, 8, 4 };
+			//circlePen.DashStyle = DashStyle.DashDot;
+			Pen circlePen = new Pen(Color.White, 2);
+			Brush circleBrush = new SolidBrush(Color.White);
+			if (location == "CENTRE") circlePen = new Pen(Color.Red, 2);
+			if (location == "STRONG") circlePen = new Pen(Color.Orange, 2);
+			if (location == "WEAK") circlePen = new Pen(Color.Yellow, 2);
+
+            switch (stormType)
+            {
+                case "Electric": circleBrush = new SolidBrush(Color.Blue);
+                    break;
+            }
+
+			//circlePen.DashPattern = dashSet;
+			circlePen.DashPattern = dashSet;
+
+			g.FillEllipse(circleBrush,
+				currentPoint.X - (blobSize + circleSize), currentPoint.Y - (blobSize + circleSize),
+				(blobSize + circleSize) * 2, (blobSize + circleSize) * 2);
+
+			g.DrawArc(circlePen,
+				//currentPoint.X - (blobSize + (circleSize) + (float)animationCycleAlts), currentPoint.Y - (blobSize + (circleSize) + (float)animationCycleAlts),
+				currentPoint.X - (blobSize + circleSize), currentPoint.Y - (blobSize + circleSize),
+				//(blobSize + circleSize + (float)animationCycleAlts) * 2, (blobSize + circleSize + (float)animationCycleAlts) * 2,
+				(blobSize + circleSize) * 2, (blobSize + circleSize) * 2,
+				20, 360);
+		}
+
+		public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, MapType whichMap, ref string extraInformation, ref List<MinimapSystem> returnMinimapSystems,
             bool showSystemText,
             bool Border, Color BorderColor,
             Color LineColourNormal,
@@ -335,18 +368,18 @@ namespace Quesadilla.Classes
 					ImageAttributes secLimitImageAttr = new ImageAttributes();
 					secLimitImageAttr.SetColorMatrix(secLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 
-					using (Graphics gIncursion = Graphics.FromImage(secLimitImage))
+					using (Graphics gSecLimit = Graphics.FromImage(secLimitImage))
 					{
-						foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Incursion))
+						foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Security <= secLimit))
 						{
 							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-							gIncursion.DrawEllipse(secLimitOutlinePen, currentPoint.X - secLimitBlobSize, currentPoint.Y - secLimitBlobSize, secLimitBlobSize * 2, secLimitBlobSize * 2);
+							gSecLimit.DrawEllipse(secLimitOutlinePen, currentPoint.X - secLimitBlobSize, currentPoint.Y - secLimitBlobSize, secLimitBlobSize * 2, secLimitBlobSize * 2);
 						}
 
 						foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Security <= secLimit))
 						{
 							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-							gIncursion.FillEllipse(secLimitBrush, currentPoint.X - secLimitBlobSize, currentPoint.Y - secLimitBlobSize, secLimitBlobSize * 2, secLimitBlobSize * 2);
+							gSecLimit.FillEllipse(secLimitBrush, currentPoint.X - secLimitBlobSize, currentPoint.Y - secLimitBlobSize, secLimitBlobSize * 2, secLimitBlobSize * 2);
 						}
 
 						g.DrawImage(
@@ -406,8 +439,29 @@ namespace Quesadilla.Classes
 					}
 				}
 
-                // draw connections
-                float lineGap = (float)(connectingLineGap / GUI_SCALING); 
+                // storm detection
+                foreach (var currentSystem in minimapSystems)
+                {
+                    float circleSizeStorm = 30 / (float)GUI_SCALING;
+					Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+					float blobSize = (SYSTEM_CIRCLE_SIZE / (float)GUI_SCALING);
+					if (blobSize < MINIMUM_BLOB_SIZE || float.IsInfinity(blobSize))
+					{
+						blobSize = MINIMUM_BLOB_SIZE;
+					}
+					foreach (var storm in Program.Universe.Storms)
+                    {
+                        if ((storm.SystemId == currentSystem.solarSystem.Id))
+                            DrawStorm(storm.StormType, "CENTRE", g, currentPoint, circleSizeStorm, blobSize);
+                        if (storm.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id))
+                            DrawStorm(storm.StormType, "STRONG", g, currentPoint, circleSizeStorm, blobSize);
+                        if (storm.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id))
+                            DrawStorm(storm.StormType, "WEAK", g, currentPoint, circleSizeStorm, blobSize);
+                    }
+                }
+
+				// draw connections
+				float lineGap = (float)(connectingLineGap / GUI_SCALING); 
                 if ( lineGap < 0) lineGap = 0.1f;
 				foreach (var connection in minimapConnectingSystems)
                 {
@@ -478,7 +532,6 @@ namespace Quesadilla.Classes
 								20 * (float)animationCycleUniHoles, 360);
 						}
 					}
-
 
 					// DrawSystemName(g, currentPoint.X, currentPoint.Y, $"{currentSystem.solarSystem.NPCKillsDeltaLastHour}", Color.AliceBlue, textSize); 
 

@@ -1,21 +1,22 @@
-﻿using EVEStandard.Enumerations;
-using EVEStandard;
+﻿using EVEStandard;
+using EVEStandard.Enumerations;
+using Microsoft.IdentityModel.Tokens;
 using Quesadilla.Classes.ESIData;
+using Quesadilla.Classes.EveScout;
+using Quesadilla.Classes.Queues;
 using Serilog;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq.Expressions;
-using Quesadilla.Classes.Queues;
-using System.Windows.Forms;
-using Microsoft.IdentityModel.Tokens;
-using Serilog.Core;
+using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Quesadilla.Classes.SolarSystems
 {
@@ -27,7 +28,8 @@ namespace Quesadilla.Classes.SolarSystems
         private const long LOWEST_WH_SYSTEM_ID = 31000000;
 
         public Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
-        public Dictionary<string, int> Names = new Dictionary<string, int>();
+		public List<EveScoutStorm> Storms = new List<EveScoutStorm>();
+		public Dictionary<string, int> Names = new Dictionary<string, int>();
         public Dictionary<int, ItemType> ItemTypes = new Dictionary<int, ItemType>();
 
         public Dictionary<int, ESICharacter> ESICharacters = new Dictionary<int, ESICharacter>();
@@ -36,6 +38,8 @@ namespace Quesadilla.Classes.SolarSystems
 
         public Dictionary<string, DateTime> DotlanMapRegions = new Dictionary<string, DateTime>();
         public DateTime DotlanDeltaRegions;
+
+		public double MetersPerLightYear = 9.4607304725808e15;
 
         public int HomeSolarSystemID { get; set; }
 
@@ -270,6 +274,23 @@ namespace Quesadilla.Classes.SolarSystems
             }
 
             return returnSystems;
+        }
+
+        public List<int> FindConnections(int systemId, int jumps)
+        {
+			HashSet<int> data = new HashSet<int>();
+
+			foreach (var system in Program.Universe.SolarSystems[systemId].ConnectedTo)
+			{
+                data.Add(system.ToSystemId);
+				if (jumps > 1)
+				{
+					foreach( var sys in FindConnections(system.ToSystemId, jumps-1) ) {
+						data.Add(sys);
+					}
+				}
+			}
+			return data.ToList();
         }
 
     }
