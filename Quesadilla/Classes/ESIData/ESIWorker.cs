@@ -114,12 +114,15 @@ namespace Quesadilla.Classes.ESIData
                     case ESIRequestType.System:
                         ESIGetSystem(request.RequestContext);
                         break;
-                    case ESIRequestType.Planet:
-                        ESIGetPlanet(request.RequestContext);
-                        break;
-                }
+					case ESIRequestType.Planet:
+						ESIGetPlanet(request.RequestContext);
+						break;
+					case ESIRequestType.Incursions:
+						ESIGetIncursions();
+						break;
+				}
 
-                if (ESIEventHandler != null)
+				if (ESIEventHandler != null)
                 {
                     ESIEventHandler((object)this, new ESIEventArgs()
                     {
@@ -187,7 +190,40 @@ namespace Quesadilla.Classes.ESIData
             }
         }
 
-        private void EnqueueRequest(ESIRequestType type, int context)
+        private void ESIGetIncursions()
+        {
+			try
+			{
+                var incursionInfo = _esiClient.Incursion.ListIncursionsAsync().Result;
+				if (incursionInfo != null)
+				{
+                    // clear all incursions
+                    foreach( var s in Program.Universe.SolarSystems.Where(o => o.Value.Incursion)) {
+                        s.Value.Incursion = false;
+                    }
+
+                    // add new ones
+					foreach (var incursion in  incursionInfo.Model)
+                    {
+                        foreach(var systemId in incursion.InfestedSolarSystems)
+                        {
+                            Program.Universe.SolarSystems[(int)systemId].Incursion = true;
+                        }
+                    }
+				}
+			}
+			catch (Exception ex)
+			{
+				_log.Error($"Error getting incursions ESI data");
+				_log.Debug(ex.Message);
+				if (ex.InnerException != null)
+				{
+					_log.Debug(ex.InnerException.Message);
+				}
+			}
+		}
+
+		private void EnqueueRequest(ESIRequestType type, int context)
         {
             lock (ESIRequests)
             {
@@ -219,12 +255,16 @@ namespace Quesadilla.Classes.ESIData
         {
             EnqueueRequest(ESIRequestType.Moon, moonid);
         }
-        public void EnqueueRequestBelt(int beltid)
-        {
-            EnqueueRequest(ESIRequestType.Belt, beltid);
-        }
+		public void EnqueueRequestBelt(int beltid)
+		{
+			EnqueueRequest(ESIRequestType.Belt, beltid);
+		}
+		public void EnqueueRequestIncursions()
+		{
+			EnqueueRequest(ESIRequestType.Incursions, -1);
+		}
 
-        public Killmail GetKillMail(long killId, string killHash)
+		public Killmail GetKillMail(long killId, string killHash)
         {
             try
             {

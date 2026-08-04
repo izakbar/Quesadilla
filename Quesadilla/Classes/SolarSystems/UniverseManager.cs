@@ -292,6 +292,5 @@ namespace Quesadilla.Classes.SolarSystems
 			}
 			return data.ToList();
         }
-
     }
 }

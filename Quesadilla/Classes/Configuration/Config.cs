@@ -194,9 +194,9 @@ namespace Quesadilla.Classes
 				c.AlertPopupShowKillerLogo = true;
                 c.AlertPopupShowVictimLogo = true;
                 c.MinimapSecLimitValue = -0.7f;
-                c.MinimapSecLimitColour = Color.LightGoldenrodYellow;
-                c.MinimapSecLimitAlpha = 50;
-                c.MinimapSecLimitCloudSize = 25;
+                c.MinimapSecLimitColour = Color.Aqua;
+                c.MinimapSecLimitAlpha = 10;
+                c.MinimapSecLimitCloudSize = 30;
                 c.MinimapSecLimit = true;
 			}
 
@@ -1301,7 +1301,7 @@ img.rounded-corners {
 		[Category("Main window")]
 		[DisplayName("Minimap incursion Indicator alpha")]
 		[Description("Alpha to use for incursion indicators on the minimap")]
-		[DefaultValue(typeof(int), "95")]
+		[DefaultValue(typeof(int), "40")]
         [Range(0, 100)]
 		public int MinimapIncursionAlpha { get; set; }
 
@@ -1678,7 +1678,7 @@ img.rounded-corners {
 		[Category("Alert")]
 		[DisplayName("Minimap incursion Indicator alpha")]
 		[Description("Alpha to use for incursion indicators on the alert popup")]
-		[DefaultValue(typeof(int), "95")]
+		[DefaultValue(typeof(int), "40")]
 		[Range(0, 100)]
         public int AlertPopupMinimapIncursionAlpha { get; set; }
 

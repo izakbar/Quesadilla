@@ -13,5 +13,6 @@ namespace Quesadilla.Classes.ESIData
         Moon,
         Belt,
         Killmail,
+        Incursions
     }
 }

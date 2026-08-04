@@ -310,7 +310,8 @@ namespace Quesadilla
 			// get processes
 			UpdateEveProcesses(true);
 
-        }
+            Program.ESIHandler.EnqueueRequestIncursions();
+		}
 
         private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
         {
@@ -2297,10 +2298,10 @@ namespace Quesadilla
                     XmlResolver = null
                 };
                 XmlNodeList dotlanXYNodes = null;
-                XmlNodeList dotlanIncursionNodes = null;
+                //XmlNodeList dotlanIncursionNodes = null;
                 xmldoc.LoadXml(e.MapContent);
                 dotlanXYNodes = xmldoc.SelectNodes(@"//*[@id='sysuse']/*");
-                dotlanIncursionNodes = xmldoc.SelectNodes(@"//*[@id='glow']/*");
+//                dotlanIncursionNodes = xmldoc.SelectNodes(@"//*[@id='glow']/*");
 
                 double dotlanX = 0;
                 double dotlanY = 0;
@@ -2328,6 +2329,7 @@ namespace Quesadilla
                             s.IceField = true;
                         }
 
+/*
                         // default to no incursion
                         s.Incursion = false;
                         XmlNode incursionNode = xmldoc.SelectSingleNode($@"//*[@id='glow']/*[@id='{link.Replace("def", "inc")}']");
@@ -2335,6 +2337,7 @@ namespace Quesadilla
                         {
                             s.Incursion = true;
                         }
+*/
                     }
                 }
             }
