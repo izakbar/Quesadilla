@@ -82,7 +82,7 @@ namespace Quesadilla
 			esiClient = new EVEStandardAPI(
                     "Quesadilla",                  // User agent
                     DataSource.Tranquility,         // Server [Tranquility/Singularity]
-					CompatibilityDate.v2025_12_16,
+					CompatibilityDate.v2026_06_09,
 					TimeSpan.FromSeconds(30));       // Timeout
 
             ESIHandler = new ESIWorker(esiClient, Log.Logger);

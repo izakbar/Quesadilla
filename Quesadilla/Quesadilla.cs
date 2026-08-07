@@ -310,6 +310,7 @@ namespace Quesadilla
 			// get processes
 			UpdateEveProcesses(true);
 
+            GetSkyhookTimers();
         }
 
         private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
@@ -1084,6 +1085,8 @@ namespace Quesadilla
                 CheckEveScoutConnection(c);
 
                 GetSystemInfo(foundSystemId);
+
+                GetSkyhookTimers();
 
                 // TODO                if (this._conf.CameraFollowCharacter && this.CentreOnCharacter.Text == key) this.ZoomTo(num1);
             }
@@ -2165,6 +2168,11 @@ namespace Quesadilla
             EveScoutStatus.Text = status.ToString().Trim();
         }
 
+        private void GetSkyhookTimers()
+        {
+            Program.ESIHandler.EnqueueRequestSkyhookData();
+		}
+
         private void CheckEveScoutConnection(Character c)
         {
 
@@ -2212,7 +2220,6 @@ namespace Quesadilla
             {
                 CheckEveScoutConnection(c);
             }
-
             EveScoutProcessStormData();
         }
 

@@ -15,5 +15,7 @@ namespace Quesadilla.Classes.SolarSystems
         public string PlanetName { get; set; }
         public long PlanetTypeId { get; set; }
         public string PlanetTypeName { get; set; }
-    }
+		public DateTime? SkyhookVulneralbilityStart { get; set; }
+		public DateTime? SkyhookVulneralbilityEnd { get; set; }
+	}
 }
