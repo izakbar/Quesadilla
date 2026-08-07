@@ -13,6 +13,7 @@ namespace Quesadilla.Classes.ESIData
         Moon,
         Belt,
         Killmail,
+        SkyhookTheftData,
         Incursions
     }
 }

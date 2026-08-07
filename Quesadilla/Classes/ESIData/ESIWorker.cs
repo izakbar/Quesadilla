@@ -40,7 +40,7 @@ namespace Quesadilla.Classes.ESIData
         {
             _esiClient = esiClient;
             _log = Log;
-            _MAX_ESI_REQUESTS = 5; // maybe in config later ?
+            _MAX_ESI_REQUESTS = 50; // maybe in config later ?
 
             FeedPaused = true;
 
@@ -119,6 +119,9 @@ namespace Quesadilla.Classes.ESIData
 						break;
 					case ESIRequestType.Incursions:
 						ESIGetIncursions();
+						break;
+					case ESIRequestType.SkyhookTheftData:
+                        ESIGetRaidableSkyhooks();
 						break;
 				}
 
@@ -243,11 +246,15 @@ namespace Quesadilla.Classes.ESIData
                 }
             }
         }
-        public void EnqueueRequestSystem(int systemid)
-        {
-            EnqueueRequest(ESIRequestType.System, systemid);
-        }
-        public void EnqueueRequestPlanet(int planetid)
+		public void EnqueueRequestSkyhookData()
+		{
+			EnqueueRequest(ESIRequestType.SkyhookTheftData, -1);
+		}
+		public void EnqueueRequestSystem(int systemid)
+		{
+			EnqueueRequest(ESIRequestType.System, systemid);
+		}
+		public void EnqueueRequestPlanet(int planetid)
         {
             EnqueueRequest(ESIRequestType.Planet, planetid);
         }
@@ -277,5 +284,25 @@ namespace Quesadilla.Classes.ESIData
                 return null;
             }
 		}
+
+        public void ESIGetRaidableSkyhooks()
+        {
+            var hooks = _esiClient.Activities.ListRaidableSkyhooksAsync().Result.Model;
+			foreach (var hook in hooks.Skyhooks)
+            { 
+			    Log.Debug($"Hook : {hook.SolarSystemId} {hook.PlanetId} {hook.TheftVulnerability.Start} {hook.TheftVulnerability.End}");
+                var solarSystem = Program.Universe.SolarSystems[(int)hook.SolarSystemId];
+
+                if (solarSystem.Planets != null) // might not have loaded yet :-/
+                {
+                    var planet = solarSystem.Planets.Where(o => o.PlanetId == hook.PlanetId).FirstOrDefault();
+                    if (planet != null)
+                    {
+                        planet.SkyhookVulneralbilityStart = hook.TheftVulnerability.Start;
+                        planet.SkyhookVulneralbilityEnd = hook.TheftVulnerability.End;
+                    }
+                }
+			}  
+        }
     }
 }

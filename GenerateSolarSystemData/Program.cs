@@ -18,7 +18,7 @@ namespace QuesadillaExport
 {
     internal class Program
     {
-        static void GenerateUniHoleData()
+		static void GenerateUniHoleData()
         {
 			Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
 			StreamReader reader = new StreamReader("Quesadilla.Systems.json");
@@ -119,8 +119,37 @@ namespace QuesadillaExport
 			}
 			readerSolarsystems.Close();
 
+			// Read planets
+			var itemTypes = DataAccess.invTypes.SelectAll();
+			StreamReader readerPlanets = new StreamReader("SDE/mapPlanets.jsonl");
+            while ((json = readerPlanets.ReadLine()) != null)
+            {
 
-			var Outputjson = JsonSerializer.Serialize(SolarSystems);
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var planet = JsonSerializer.Deserialize<mapPlanet>(json, options);
+                var solarSystem = SolarSystems[planet.solarSystemID];
+                if ( solarSystem.Planets == null)
+				{
+					solarSystem.Planets = new List<PlanetInfo>();
+				}
+
+				solarSystem.Planets.Add(new PlanetInfo()
+                {
+                    PlanetId = planet._key,
+                    PlanetTypeId = planet.typeID,
+                    PlanetTypeName = itemTypes.FirstOrDefault(i => i.TypeId == planet.typeID)?.TypeName ?? "Unknown",
+                    PlanetName = planet.celestialIndex.ToString()
+                });
+			}
+
+
+
+
+				var Outputjson = JsonSerializer.Serialize(SolarSystems);
 			File.WriteAllText(@"Quesadilla.Systems.json", Outputjson);
 
 		}
