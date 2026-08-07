@@ -247,9 +247,11 @@ namespace Quesadilla
             TickCounts["AnimationRefresh"] = 0;
             TickCounts["ISKPerHour"] = 0;
             TickCounts["MiningPerHour"] = 0;
-            TickCounts["MiningDetail"] = 0;
+			TickCounts["MiningDetail"] = 0;
 
-            AnimationStateKills = new AnimationState(state:0, direction:-1, maximum:36, pulse:false);
+			TickCounts["IncursionData"] = 0;
+
+			AnimationStateKills = new AnimationState(state:0, direction:-1, maximum:36, pulse:false);
             AnimationStateIntel = new AnimationState(state:1, direction:1, maximum:18, pulse:false);
 			AnimationStateAlts = new AnimationState(state: 2, direction: -1, maximum: 12, pulse: false);
 			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
@@ -460,13 +462,19 @@ namespace Quesadilla
             }
             WorkingIndicator.Text = Program.MainConfiguration.HeartBeatIndicatorWorkingText[activityLine].ToString();
 
-            if (++TickCounts["LogfileCheck"] > Program.MainConfiguration.HowManyTicksBeforeLogfileCheck)
-            {
-                Program.LogfileWatchersProcessing();
-                TickCounts["LogfileCheck"] = 0;
-            }
+			if (++TickCounts["LogfileCheck"] > Program.MainConfiguration.HowManyTicksBeforeLogfileCheck)
+			{
+				Program.LogfileWatchersProcessing();
+				TickCounts["LogfileCheck"] = 0;
+			}
 
-            if (shouldUpdateMinimap)
+			if (++TickCounts["IncursionData"] > Program.MainConfiguration.HowManyTicksBeforeIncursionData)
+			{
+                Program.ESIHandler.EnqueueRequestIncursions();
+				TickCounts["IncursionData"] = 0;
+			}
+
+			if (shouldUpdateMinimap)
             {
                 UpdateMinimap();
             }

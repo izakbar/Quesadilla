@@ -1057,14 +1057,22 @@ img.rounded-corners {
         [DefaultValue(typeof(int), "4")]
         public int HowManyTicksBeforeLogfileCheck { get; set; }
 
-        [Category("Tick Timing")]
-        [ReadOnly(true)]
-        [DisplayName("HowManyTicksRefreshProcesses")]
-        [Description("How many ticks before refreshing process list")]
-        [DefaultValue(typeof(int), "20")]
-        public int HowManyTicksRefreshProcesses { get; set; }
+		[Category("Tick Timing")]
+		[ReadOnly(true)]
+		[DisplayName("HowManyTicksRefreshProcesses")]
+		[Description("How many ticks before refreshing process list")]
+		[DefaultValue(typeof(int), "20")]
 
-        [Category("Tick Timing")]
+		public int HowManyTicksRefreshProcesses { get; set; }
+
+		[Category("Tick Timing")]
+		[ReadOnly(true)]
+		[DisplayName("HowManyTicksBeforeIncursionData")]
+		[Description("How many ticks before refreshing Incursion Data")]
+		[DefaultValue(typeof(int), "3600")]
+		public int HowManyTicksBeforeIncursionData { get; set; }
+
+		[Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksMapAnimation")]
         [Description("How many ticks between animation of map")]
