@@ -948,7 +948,7 @@
           }
         }
       },
-      "Microsoft.Bcl.AsyncInterfaces/10.0.9": {
+      "Microsoft.Bcl.AsyncInterfaces/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Threading.Tasks.Extensions": "4.6.3"
@@ -1202,11 +1202,11 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration/10.0.9": {
+      "Microsoft.Extensions.Configuration/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.dll": {
@@ -1222,10 +1222,10 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.Abstractions/10.0.9": {
+      "Microsoft.Extensions.Configuration.Abstractions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.9",
+          "Microsoft.Extensions.Primitives": "10.0.10",
           "System.ValueTuple": "4.6.2"
         },
         "compile": {
@@ -1261,11 +1261,11 @@
           "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets": {}
         }
       },
-      "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.9": {
+      "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.EnvironmentVariables.dll": {
@@ -1281,14 +1281,14 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.FileExtensions/10.0.9": {
+      "Microsoft.Extensions.Configuration.FileExtensions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Physical": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Physical": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.FileExtensions.dll": {
@@ -1304,14 +1304,14 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.Json/10.0.9": {
+      "Microsoft.Extensions.Configuration.Json/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Configuration.FileExtensions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "System.Text.Json": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Configuration.FileExtensions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "System.Text.Json": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.Json.dll": {
@@ -1408,10 +1408,10 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Abstractions/10.0.9": {
+      "Microsoft.Extensions.FileProviders.Abstractions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.FileProviders.Abstractions.dll": {
@@ -1447,12 +1447,12 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Physical/10.0.9": {
+      "Microsoft.Extensions.FileProviders.Physical/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileSystemGlobbing": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.FileProviders.Physical.dll": {
@@ -1468,7 +1468,7 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileSystemGlobbing/10.0.9": {
+      "Microsoft.Extensions.FileSystemGlobbing/10.0.10": {
         "type": "package",
         "compile": {
           "lib/net462/Microsoft.Extensions.FileSystemGlobbing.dll": {
@@ -1645,7 +1645,7 @@
           "buildTransitive/net462/Microsoft.Extensions.Options.targets": {}
         }
       },
-      "Microsoft.Extensions.Primitives/10.0.9": {
+      "Microsoft.Extensions.Primitives/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.6.3",
@@ -1973,13 +1973,14 @@
           }
         }
       },
-      "PointyHatGames.EVEStandard/4.1.0": {
+      "PointyHatGames.EVEStandard/4.1.1": {
         "type": "package",
         "dependencies": {
           "Macross.Json.Extensions": "3.0.0",
           "Microsoft.CSharp": "4.7.0",
           "Microsoft.Extensions.Logging": "10.0.9",
           "Microsoft.IdentityModel.JsonWebTokens": "8.19.1",
+          "System.Memory": "4.6.3",
           "System.Text.Json": "10.0.9"
         },
         "compile": {
@@ -2326,7 +2327,7 @@
           "lib/net46/System.IO.FileSystem.Primitives.dll": {}
         }
       },
-      "System.IO.Pipelines/10.0.9": {
+      "System.IO.Pipelines/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.6.1",
@@ -2811,7 +2812,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Text.Encodings.Web/10.0.9": {
+      "System.Text.Encodings.Web/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.6.1",
@@ -2832,15 +2833,15 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "System.Text.Json/10.0.9": {
+      "System.Text.Json/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.10",
           "System.Buffers": "4.6.1",
-          "System.IO.Pipelines": "10.0.9",
+          "System.IO.Pipelines": "10.0.10",
           "System.Memory": "4.6.3",
           "System.Runtime.CompilerServices.Unsafe": "6.1.2",
-          "System.Text.Encodings.Web": "10.0.9",
+          "System.Text.Encodings.Web": "10.0.10",
           "System.Threading.Tasks.Extensions": "4.6.3",
           "System.ValueTuple": "4.6.2"
         },
@@ -3954,7 +3955,7 @@
           }
         }
       },
-      "Microsoft.Bcl.AsyncInterfaces/10.0.9": {
+      "Microsoft.Bcl.AsyncInterfaces/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Threading.Tasks.Extensions": "4.6.3"
@@ -4187,11 +4188,11 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration/10.0.9": {
+      "Microsoft.Extensions.Configuration/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.dll": {
@@ -4207,10 +4208,10 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.Abstractions/10.0.9": {
+      "Microsoft.Extensions.Configuration.Abstractions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.9",
+          "Microsoft.Extensions.Primitives": "10.0.10",
           "System.ValueTuple": "4.6.2"
         },
         "compile": {
@@ -4246,11 +4247,11 @@
           "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets": {}
         }
       },
-      "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.9": {
+      "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.EnvironmentVariables.dll": {
@@ -4266,14 +4267,14 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.FileExtensions/10.0.9": {
+      "Microsoft.Extensions.Configuration.FileExtensions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Physical": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Physical": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.FileExtensions.dll": {
@@ -4289,14 +4290,14 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.Json/10.0.9": {
+      "Microsoft.Extensions.Configuration.Json/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Configuration.FileExtensions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "System.Text.Json": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Configuration.FileExtensions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "System.Text.Json": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.Json.dll": {
@@ -4393,10 +4394,10 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Abstractions/10.0.9": {
+      "Microsoft.Extensions.FileProviders.Abstractions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.FileProviders.Abstractions.dll": {
@@ -4432,12 +4433,12 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Physical/10.0.9": {
+      "Microsoft.Extensions.FileProviders.Physical/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileSystemGlobbing": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.FileProviders.Physical.dll": {
@@ -4453,7 +4454,7 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileSystemGlobbing/10.0.9": {
+      "Microsoft.Extensions.FileSystemGlobbing/10.0.10": {
         "type": "package",
         "compile": {
           "lib/net462/Microsoft.Extensions.FileSystemGlobbing.dll": {
@@ -4630,7 +4631,7 @@
           "buildTransitive/net462/Microsoft.Extensions.Options.targets": {}
         }
       },
-      "Microsoft.Extensions.Primitives/10.0.9": {
+      "Microsoft.Extensions.Primitives/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.6.3",
@@ -4948,13 +4949,14 @@
           }
         }
       },
-      "PointyHatGames.EVEStandard/4.1.0": {
+      "PointyHatGames.EVEStandard/4.1.1": {
         "type": "package",
         "dependencies": {
           "Macross.Json.Extensions": "3.0.0",
           "Microsoft.CSharp": "4.7.0",
           "Microsoft.Extensions.Logging": "10.0.9",
           "Microsoft.IdentityModel.JsonWebTokens": "8.19.1",
+          "System.Memory": "4.6.3",
           "System.Text.Json": "10.0.9"
         },
         "compile": {
@@ -5281,7 +5283,7 @@
           "lib/net46/System.IO.FileSystem.Primitives.dll": {}
         }
       },
-      "System.IO.Pipelines/10.0.9": {
+      "System.IO.Pipelines/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.6.1",
@@ -5694,7 +5696,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Text.Encodings.Web/10.0.9": {
+      "System.Text.Encodings.Web/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.6.1",
@@ -5715,15 +5717,15 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "System.Text.Json/10.0.9": {
+      "System.Text.Json/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.10",
           "System.Buffers": "4.6.1",
-          "System.IO.Pipelines": "10.0.9",
+          "System.IO.Pipelines": "10.0.10",
           "System.Memory": "4.6.3",
           "System.Runtime.CompilerServices.Unsafe": "6.1.2",
-          "System.Text.Encodings.Web": "10.0.9",
+          "System.Text.Encodings.Web": "10.0.10",
           "System.Threading.Tasks.Extensions": "4.6.3",
           "System.ValueTuple": "4.6.2"
         },
@@ -6837,7 +6839,7 @@
           }
         }
       },
-      "Microsoft.Bcl.AsyncInterfaces/10.0.9": {
+      "Microsoft.Bcl.AsyncInterfaces/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Threading.Tasks.Extensions": "4.6.3"
@@ -7065,11 +7067,11 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration/10.0.9": {
+      "Microsoft.Extensions.Configuration/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.dll": {
@@ -7085,10 +7087,10 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.Abstractions/10.0.9": {
+      "Microsoft.Extensions.Configuration.Abstractions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.9",
+          "Microsoft.Extensions.Primitives": "10.0.10",
           "System.ValueTuple": "4.6.2"
         },
         "compile": {
@@ -7124,11 +7126,11 @@
           "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets": {}
         }
       },
-      "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.9": {
+      "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.EnvironmentVariables.dll": {
@@ -7144,14 +7146,14 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.FileExtensions/10.0.9": {
+      "Microsoft.Extensions.Configuration.FileExtensions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Physical": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Physical": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.FileExtensions.dll": {
@@ -7167,14 +7169,14 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.Json/10.0.9": {
+      "Microsoft.Extensions.Configuration.Json/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Configuration.FileExtensions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "System.Text.Json": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Configuration.FileExtensions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "System.Text.Json": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.Json.dll": {
@@ -7271,10 +7273,10 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Abstractions/10.0.9": {
+      "Microsoft.Extensions.FileProviders.Abstractions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.FileProviders.Abstractions.dll": {
@@ -7310,12 +7312,12 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Physical/10.0.9": {
+      "Microsoft.Extensions.FileProviders.Physical/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileSystemGlobbing": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.FileProviders.Physical.dll": {
@@ -7331,7 +7333,7 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileSystemGlobbing/10.0.9": {
+      "Microsoft.Extensions.FileSystemGlobbing/10.0.10": {
         "type": "package",
         "compile": {
           "lib/net462/Microsoft.Extensions.FileSystemGlobbing.dll": {
@@ -7508,7 +7510,7 @@
           "buildTransitive/net462/Microsoft.Extensions.Options.targets": {}
         }
       },
-      "Microsoft.Extensions.Primitives/10.0.9": {
+      "Microsoft.Extensions.Primitives/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.6.3",
@@ -7826,13 +7828,14 @@
           }
         }
       },
-      "PointyHatGames.EVEStandard/4.1.0": {
+      "PointyHatGames.EVEStandard/4.1.1": {
         "type": "package",
         "dependencies": {
           "Macross.Json.Extensions": "3.0.0",
           "Microsoft.CSharp": "4.7.0",
           "Microsoft.Extensions.Logging": "10.0.9",
           "Microsoft.IdentityModel.JsonWebTokens": "8.19.1",
+          "System.Memory": "4.6.3",
           "System.Text.Json": "10.0.9"
         },
         "compile": {
@@ -8159,7 +8162,7 @@
           "lib/net46/System.IO.FileSystem.Primitives.dll": {}
         }
       },
-      "System.IO.Pipelines/10.0.9": {
+      "System.IO.Pipelines/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.6.1",
@@ -8572,7 +8575,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Text.Encodings.Web/10.0.9": {
+      "System.Text.Encodings.Web/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.6.1",
@@ -8593,15 +8596,15 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "System.Text.Json/10.0.9": {
+      "System.Text.Json/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.10",
           "System.Buffers": "4.6.1",
-          "System.IO.Pipelines": "10.0.9",
+          "System.IO.Pipelines": "10.0.10",
           "System.Memory": "4.6.3",
           "System.Runtime.CompilerServices.Unsafe": "6.1.2",
-          "System.Text.Encodings.Web": "10.0.9",
+          "System.Text.Encodings.Web": "10.0.10",
           "System.Threading.Tasks.Extensions": "4.6.3",
           "System.ValueTuple": "4.6.2"
         },
@@ -9715,7 +9718,7 @@
           }
         }
       },
-      "Microsoft.Bcl.AsyncInterfaces/10.0.9": {
+      "Microsoft.Bcl.AsyncInterfaces/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Threading.Tasks.Extensions": "4.6.3"
@@ -9946,11 +9949,11 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration/10.0.9": {
+      "Microsoft.Extensions.Configuration/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.dll": {
@@ -9966,10 +9969,10 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.Abstractions/10.0.9": {
+      "Microsoft.Extensions.Configuration.Abstractions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.9",
+          "Microsoft.Extensions.Primitives": "10.0.10",
           "System.ValueTuple": "4.6.2"
         },
         "compile": {
@@ -10005,11 +10008,11 @@
           "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets": {}
         }
       },
-      "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.9": {
+      "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.EnvironmentVariables.dll": {
@@ -10025,14 +10028,14 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.FileExtensions/10.0.9": {
+      "Microsoft.Extensions.Configuration.FileExtensions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Physical": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Physical": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.FileExtensions.dll": {
@@ -10048,14 +10051,14 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.Json/10.0.9": {
+      "Microsoft.Extensions.Configuration.Json/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Configuration.FileExtensions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "System.Text.Json": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Configuration.FileExtensions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "System.Text.Json": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.Json.dll": {
@@ -10152,10 +10155,10 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Abstractions/10.0.9": {
+      "Microsoft.Extensions.FileProviders.Abstractions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.FileProviders.Abstractions.dll": {
@@ -10191,12 +10194,12 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Physical/10.0.9": {
+      "Microsoft.Extensions.FileProviders.Physical/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileSystemGlobbing": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.FileProviders.Physical.dll": {
@@ -10212,7 +10215,7 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileSystemGlobbing/10.0.9": {
+      "Microsoft.Extensions.FileSystemGlobbing/10.0.10": {
         "type": "package",
         "compile": {
           "lib/net462/Microsoft.Extensions.FileSystemGlobbing.dll": {
@@ -10389,7 +10392,7 @@
           "buildTransitive/net462/Microsoft.Extensions.Options.targets": {}
         }
       },
-      "Microsoft.Extensions.Primitives/10.0.9": {
+      "Microsoft.Extensions.Primitives/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.6.3",
@@ -10707,13 +10710,14 @@
           }
         }
       },
-      "PointyHatGames.EVEStandard/4.1.0": {
+      "PointyHatGames.EVEStandard/4.1.1": {
         "type": "package",
         "dependencies": {
           "Macross.Json.Extensions": "3.0.0",
           "Microsoft.CSharp": "4.7.0",
           "Microsoft.Extensions.Logging": "10.0.9",
           "Microsoft.IdentityModel.JsonWebTokens": "8.19.1",
+          "System.Memory": "4.6.3",
           "System.Text.Json": "10.0.9"
         },
         "compile": {
@@ -11040,7 +11044,7 @@
           "lib/net46/System.IO.FileSystem.Primitives.dll": {}
         }
       },
-      "System.IO.Pipelines/10.0.9": {
+      "System.IO.Pipelines/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.6.1",
@@ -11453,7 +11457,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Text.Encodings.Web/10.0.9": {
+      "System.Text.Encodings.Web/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.6.1",
@@ -11474,15 +11478,15 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "System.Text.Json/10.0.9": {
+      "System.Text.Json/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.10",
           "System.Buffers": "4.6.1",
-          "System.IO.Pipelines": "10.0.9",
+          "System.IO.Pipelines": "10.0.10",
           "System.Memory": "4.6.3",
           "System.Runtime.CompilerServices.Unsafe": "6.1.2",
-          "System.Text.Encodings.Web": "10.0.9",
+          "System.Text.Encodings.Web": "10.0.10",
           "System.Threading.Tasks.Extensions": "4.6.3",
           "System.ValueTuple": "4.6.2"
         },
@@ -12596,7 +12600,7 @@
           }
         }
       },
-      "Microsoft.Bcl.AsyncInterfaces/10.0.9": {
+      "Microsoft.Bcl.AsyncInterfaces/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Threading.Tasks.Extensions": "4.6.3"
@@ -12827,11 +12831,11 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration/10.0.9": {
+      "Microsoft.Extensions.Configuration/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.dll": {
@@ -12847,10 +12851,10 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.Abstractions/10.0.9": {
+      "Microsoft.Extensions.Configuration.Abstractions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.9",
+          "Microsoft.Extensions.Primitives": "10.0.10",
           "System.ValueTuple": "4.6.2"
         },
         "compile": {
@@ -12886,11 +12890,11 @@
           "buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets": {}
         }
       },
-      "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.9": {
+      "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.EnvironmentVariables.dll": {
@@ -12906,14 +12910,14 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.FileExtensions/10.0.9": {
+      "Microsoft.Extensions.Configuration.FileExtensions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Physical": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Physical": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.FileExtensions.dll": {
@@ -12929,14 +12933,14 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.Configuration.Json/10.0.9": {
+      "Microsoft.Extensions.Configuration.Json/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "10.0.9",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Configuration.FileExtensions": "10.0.9",
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "System.Text.Json": "10.0.9"
+          "Microsoft.Extensions.Configuration": "10.0.10",
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Configuration.FileExtensions": "10.0.10",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "System.Text.Json": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.Configuration.Json.dll": {
@@ -13033,10 +13037,10 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Abstractions/10.0.9": {
+      "Microsoft.Extensions.FileProviders.Abstractions/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.FileProviders.Abstractions.dll": {
@@ -13072,12 +13076,12 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Physical/10.0.9": {
+      "Microsoft.Extensions.FileProviders.Physical/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.9",
-          "Microsoft.Extensions.FileSystemGlobbing": "10.0.9",
-          "Microsoft.Extensions.Primitives": "10.0.9"
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.10",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         },
         "compile": {
           "lib/net462/Microsoft.Extensions.FileProviders.Physical.dll": {
@@ -13093,7 +13097,7 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Extensions.FileSystemGlobbing/10.0.9": {
+      "Microsoft.Extensions.FileSystemGlobbing/10.0.10": {
         "type": "package",
         "compile": {
           "lib/net462/Microsoft.Extensions.FileSystemGlobbing.dll": {
@@ -13270,7 +13274,7 @@
           "buildTransitive/net462/Microsoft.Extensions.Options.targets": {}
         }
       },
-      "Microsoft.Extensions.Primitives/10.0.9": {
+      "Microsoft.Extensions.Primitives/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Memory": "4.6.3",
@@ -13588,13 +13592,14 @@
           }
         }
       },
-      "PointyHatGames.EVEStandard/4.1.0": {
+      "PointyHatGames.EVEStandard/4.1.1": {
         "type": "package",
         "dependencies": {
           "Macross.Json.Extensions": "3.0.0",
           "Microsoft.CSharp": "4.7.0",
           "Microsoft.Extensions.Logging": "10.0.9",
           "Microsoft.IdentityModel.JsonWebTokens": "8.19.1",
+          "System.Memory": "4.6.3",
           "System.Text.Json": "10.0.9"
         },
         "compile": {
@@ -13921,7 +13926,7 @@
           "lib/net46/System.IO.FileSystem.Primitives.dll": {}
         }
       },
-      "System.IO.Pipelines/10.0.9": {
+      "System.IO.Pipelines/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.6.1",
@@ -14334,7 +14339,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Text.Encodings.Web/10.0.9": {
+      "System.Text.Encodings.Web/10.0.10": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.6.1",
@@ -14355,15 +14360,15 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "System.Text.Json/10.0.9": {
+      "System.Text.Json/10.0.10": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.10",
           "System.Buffers": "4.6.1",
-          "System.IO.Pipelines": "10.0.9",
+          "System.IO.Pipelines": "10.0.10",
           "System.Memory": "4.6.3",
           "System.Runtime.CompilerServices.Unsafe": "6.1.2",
-          "System.Text.Encodings.Web": "10.0.9",
+          "System.Text.Encodings.Web": "10.0.10",
           "System.Threading.Tasks.Extensions": "4.6.3",
           "System.ValueTuple": "4.6.2"
         },
@@ -15270,10 +15275,10 @@
         "microsoft.aspnetcore.webutilities.nuspec"
       ]
     },
-    "Microsoft.Bcl.AsyncInterfaces/10.0.9": {
-      "sha512": "Aq7M8lG6BrHeatqKqncVm9m55ec34k6nnfPRLe/PvGg+b/pAsRM2ejofeKmCLjTXMa+5NGXm382f8CG/D5WDow==",
+    "Microsoft.Bcl.AsyncInterfaces/10.0.10": {
+      "sha512": "TFI6OKYE1XZz4SGuTSH70c6SBdPpFktXsoa1gCxTr3mKrhmXirnvaS0tKz+J3ZWICEAmMpEGn59nO4ICtUpQXA==",
       "type": "package",
-      "path": "microsoft.bcl.asyncinterfaces/10.0.9",
+      "path": "microsoft.bcl.asyncinterfaces/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -15288,7 +15293,7 @@
         "lib/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.xml",
         "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll",
         "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.xml",
-        "microsoft.bcl.asyncinterfaces.10.0.9.nupkg.sha512",
+        "microsoft.bcl.asyncinterfaces.10.0.10.nupkg.sha512",
         "microsoft.bcl.asyncinterfaces.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -15572,10 +15577,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Configuration/10.0.9": {
-      "sha512": "woZsWLhOQsASuxbmgiZJqiGUBNo3IjRdXC92xt8rRokza+P6/nIsnzq7sm9Or6ZYcRl2kL1ufj8HVzp1QlPTXw==",
+    "Microsoft.Extensions.Configuration/10.0.10": {
+      "sha512": "plJWK2zpWuuyxI8F8s2scx6Je7N1Ajjs6HvYUGKwRnDMWIVIz9FHwAkiT7ASgrvAOd10T0FPVlh9BzAJJME+jg==",
       "type": "package",
-      "path": "microsoft.extensions.configuration/10.0.9",
+      "path": "microsoft.extensions.configuration/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -15596,15 +15601,15 @@
         "lib/net9.0/Microsoft.Extensions.Configuration.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.xml",
-        "microsoft.extensions.configuration.10.0.9.nupkg.sha512",
+        "microsoft.extensions.configuration.10.0.10.nupkg.sha512",
         "microsoft.extensions.configuration.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Configuration.Abstractions/10.0.9": {
-      "sha512": "qGhRPd3VxfLV9UqatVOiD9mAeUbj2KiMwGFYC5uXlzExiZQoe4X/hdmzGIU7BQjNLTqCnnbTHVyBglG3668/HA==",
+    "Microsoft.Extensions.Configuration.Abstractions/10.0.10": {
+      "sha512": "5Vnd2I75DmZCVEjSynIdJ/0EGafgnLQwgR3t2C2/fkjx/nRG+cLwxLLdInoHeCEpkD5K4Ov/g9ZCRYrl4TRsaA==",
       "type": "package",
-      "path": "microsoft.extensions.configuration.abstractions/10.0.9",
+      "path": "microsoft.extensions.configuration.abstractions/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -15625,7 +15630,7 @@
         "lib/net9.0/Microsoft.Extensions.Configuration.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.Abstractions.xml",
-        "microsoft.extensions.configuration.abstractions.10.0.9.nupkg.sha512",
+        "microsoft.extensions.configuration.abstractions.10.0.10.nupkg.sha512",
         "microsoft.extensions.configuration.abstractions.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -15671,10 +15676,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.9": {
-      "sha512": "JhKySWIL8+N4yFt4HPm1rGKCHooze+MBdTdpXc0bd/PGm31TrSUi2m0Nek1y441Wlv/RE6VH0W/DCv2xnmy8FA==",
+    "Microsoft.Extensions.Configuration.EnvironmentVariables/10.0.10": {
+      "sha512": "KRfFSSCV58vEdU7mPED/YMzeovIWF5P0g8s9K8n9HEfy0/WzMq37SrPdXdFN5/dFT/rPMHpF7AvpoXHckbcBFg==",
       "type": "package",
-      "path": "microsoft.extensions.configuration.environmentvariables/10.0.9",
+      "path": "microsoft.extensions.configuration.environmentvariables/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -15695,15 +15700,15 @@
         "lib/net9.0/Microsoft.Extensions.Configuration.EnvironmentVariables.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.EnvironmentVariables.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.EnvironmentVariables.xml",
-        "microsoft.extensions.configuration.environmentvariables.10.0.9.nupkg.sha512",
+        "microsoft.extensions.configuration.environmentvariables.10.0.10.nupkg.sha512",
         "microsoft.extensions.configuration.environmentvariables.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Configuration.FileExtensions/10.0.9": {
-      "sha512": "NgLB9cYnIb0/djSDcnqo4GIGGWooxGmr/gCUe3/CRXcKqLizOFui8MyW4EVkTB/KNJL+oXdMXnD6ZRm3Y+qkrQ==",
+    "Microsoft.Extensions.Configuration.FileExtensions/10.0.10": {
+      "sha512": "ZOhZYwvbXGTgGVRwswIirofEMVHuWdxjdh0JeUZXwaF9cgcjXdz/t0ELtgaevw7ezTyv47yPNCgGreWtLkn3IQ==",
       "type": "package",
-      "path": "microsoft.extensions.configuration.fileextensions/10.0.9",
+      "path": "microsoft.extensions.configuration.fileextensions/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -15724,15 +15729,15 @@
         "lib/net9.0/Microsoft.Extensions.Configuration.FileExtensions.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.FileExtensions.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.FileExtensions.xml",
-        "microsoft.extensions.configuration.fileextensions.10.0.9.nupkg.sha512",
+        "microsoft.extensions.configuration.fileextensions.10.0.10.nupkg.sha512",
         "microsoft.extensions.configuration.fileextensions.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Configuration.Json/10.0.9": {
-      "sha512": "LiFKJgc9jZEW+7RhcSfsvCwoikt1lDdOqOn+whZC5zVHyg/gExftHl2QPtmfiHsEdDNg+Y+BDr6835tOfj8Y7A==",
+    "Microsoft.Extensions.Configuration.Json/10.0.10": {
+      "sha512": "uvJ6sHwjgrkMEJOgiC76G0mcZGXerwyyWkwX34EOjCbxKG6TCtfAoqDKAMsCvEBf9HxjlGQEgqsSMOGCmGBf+A==",
       "type": "package",
-      "path": "microsoft.extensions.configuration.json/10.0.9",
+      "path": "microsoft.extensions.configuration.json/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -15755,7 +15760,7 @@
         "lib/netstandard2.0/Microsoft.Extensions.Configuration.Json.xml",
         "lib/netstandard2.1/Microsoft.Extensions.Configuration.Json.dll",
         "lib/netstandard2.1/Microsoft.Extensions.Configuration.Json.xml",
-        "microsoft.extensions.configuration.json.10.0.9.nupkg.sha512",
+        "microsoft.extensions.configuration.json.10.0.10.nupkg.sha512",
         "microsoft.extensions.configuration.json.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -15867,10 +15872,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.FileProviders.Abstractions/10.0.9": {
-      "sha512": "Oxn4vqDk+EwceTMpZxVm7L/UZEAM1qIQlNP1+7tBZckD+P4SKrm/5X4gMTPCTdpnau/xY8Sb4/0d6onomSg4ZA==",
+    "Microsoft.Extensions.FileProviders.Abstractions/10.0.10": {
+      "sha512": "c5zqFCY9DiIpMovLd7/d/CTiEtrMOuQ639dhv3PABtKQIKNQikSHwQt8+N679uii9q+B55lgK28Uv64FOwEu8w==",
       "type": "package",
-      "path": "microsoft.extensions.fileproviders.abstractions/10.0.9",
+      "path": "microsoft.extensions.fileproviders.abstractions/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -15891,7 +15896,7 @@
         "lib/net9.0/Microsoft.Extensions.FileProviders.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Abstractions.xml",
-        "microsoft.extensions.fileproviders.abstractions.10.0.9.nupkg.sha512",
+        "microsoft.extensions.fileproviders.abstractions.10.0.10.nupkg.sha512",
         "microsoft.extensions.fileproviders.abstractions.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -15925,10 +15930,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.FileProviders.Physical/10.0.9": {
-      "sha512": "zm8WVod4swgprGrkxkuSILlbXqdDRqF+3y6U0I7jlmj4PMyKN6d8pzXZHUn5lr/gZVULzk/+FeTYlTupt6akpg==",
+    "Microsoft.Extensions.FileProviders.Physical/10.0.10": {
+      "sha512": "jhJAyo38kSrH3ARvWUk0h8itogVnQu2DCZuPo+s0Z+tXes0ugTxMPaHYzap85785eHQmPFqD9TYERqBbtGxn/w==",
       "type": "package",
-      "path": "microsoft.extensions.fileproviders.physical/10.0.9",
+      "path": "microsoft.extensions.fileproviders.physical/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -15949,15 +15954,15 @@
         "lib/net9.0/Microsoft.Extensions.FileProviders.Physical.xml",
         "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Physical.dll",
         "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Physical.xml",
-        "microsoft.extensions.fileproviders.physical.10.0.9.nupkg.sha512",
+        "microsoft.extensions.fileproviders.physical.10.0.10.nupkg.sha512",
         "microsoft.extensions.fileproviders.physical.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.FileSystemGlobbing/10.0.9": {
-      "sha512": "mvRf9qOH/LslWIee/h+lsElnoUyKotEwoPL31soqScmO/eoxObaTCLCdx2DdqPdRi9LnB+7qKZ49jfyrLZuc+w==",
+    "Microsoft.Extensions.FileSystemGlobbing/10.0.10": {
+      "sha512": "jSOCVxEwCd4Aq925kJVz1kSO1EpX2OHYKL04qVREXkDU7Ce3pVDdHPYm+fEy8y/th2kJf/DAstRHpJAqoNWP8w==",
       "type": "package",
-      "path": "microsoft.extensions.filesystemglobbing/10.0.9",
+      "path": "microsoft.extensions.filesystemglobbing/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -15978,7 +15983,7 @@
         "lib/net9.0/Microsoft.Extensions.FileSystemGlobbing.xml",
         "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.dll",
         "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.xml",
-        "microsoft.extensions.filesystemglobbing.10.0.9.nupkg.sha512",
+        "microsoft.extensions.filesystemglobbing.10.0.10.nupkg.sha512",
         "microsoft.extensions.filesystemglobbing.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -16251,10 +16256,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.Primitives/10.0.9": {
-      "sha512": "fmEbAUFsaIKirgLt/lYhuFRBwhcSJN31jjHgCdbQxJiWOum6EdLjkbgGuukSP9z/a+9LibaxII/kF+GwOXgC4g==",
+    "Microsoft.Extensions.Primitives/10.0.10": {
+      "sha512": "5wu/GrYVd8mG2DVUw3vFJzF+O336TyTGg/Kmcgw9bfwYhCoFiV5lR5QeEmKecJyrW4W54nMfD3p3589E8a7czQ==",
       "type": "package",
-      "path": "microsoft.extensions.primitives/10.0.9",
+      "path": "microsoft.extensions.primitives/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -16275,7 +16280,7 @@
         "lib/net9.0/Microsoft.Extensions.Primitives.xml",
         "lib/netstandard2.0/Microsoft.Extensions.Primitives.dll",
         "lib/netstandard2.0/Microsoft.Extensions.Primitives.xml",
-        "microsoft.extensions.primitives.10.0.9.nupkg.sha512",
+        "microsoft.extensions.primitives.10.0.10.nupkg.sha512",
         "microsoft.extensions.primitives.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -17137,16 +17142,16 @@
         "newtonsoft.json.bson.nuspec"
       ]
     },
-    "PointyHatGames.EVEStandard/4.1.0": {
-      "sha512": "p7We4rRNPXphy0SXThD46h3ytGZ2NVONdqipXkU8OXvwAq86fQwWIYHh8/EZlUcB5oQnBQ7C41UGYcQOhSKekw==",
+    "PointyHatGames.EVEStandard/4.1.1": {
+      "sha512": "oU0fRTIo9pqHE4wVG2FEt1x334Apaac7qdfqf49dMH6CTkH6VlFuJVsHqnKkSlShIdJXU1xaShr5RXqQAyMHkA==",
       "type": "package",
-      "path": "pointyhatgames.evestandard/4.1.0",
+      "path": "pointyhatgames.evestandard/4.1.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "lib/netstandard2.0/EVEStandard.dll",
         "lib/netstandard2.1/EVEStandard.dll",
-        "pointyhatgames.evestandard.4.1.0.nupkg.sha512",
+        "pointyhatgames.evestandard.4.1.1.nupkg.sha512",
         "pointyhatgames.evestandard.nuspec"
       ]
     },
@@ -18222,10 +18227,10 @@
         "system.io.filesystem.primitives.nuspec"
       ]
     },
-    "System.IO.Pipelines/10.0.9": {
-      "sha512": "raEAXJHu1ERuQnLhfaMUhK19A+i/CLHH5tFWi+azKxq2O4kzgvdeNuZTzMzyT7pyM1+zE2Pqb2g/DXJsuPp/LQ==",
+    "System.IO.Pipelines/10.0.10": {
+      "sha512": "7WX0W96y3dpQdYG4sEGdh38g3/0lOD4/dKbn2rRVOVzKhzoZUn2gKNIKaFeKWs8RCbpFfmmEWsRhSy95hMpvqA==",
       "type": "package",
-      "path": "system.io.pipelines/10.0.9",
+      "path": "system.io.pipelines/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -18246,7 +18251,7 @@
         "lib/net9.0/System.IO.Pipelines.xml",
         "lib/netstandard2.0/System.IO.Pipelines.dll",
         "lib/netstandard2.0/System.IO.Pipelines.xml",
-        "system.io.pipelines.10.0.9.nupkg.sha512",
+        "system.io.pipelines.10.0.10.nupkg.sha512",
         "system.io.pipelines.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -19746,10 +19751,10 @@
         "system.text.encoding.extensions.nuspec"
       ]
     },
-    "System.Text.Encodings.Web/10.0.9": {
-      "sha512": "65bbI+LWcVgq1mzPtv6bJF+ZXeeIawld/puK9ixD1l3gJGM2IU4gkYbZoKLVjsXJXbrZqSRf86RlKf1TcCTY1Q==",
+    "System.Text.Encodings.Web/10.0.10": {
+      "sha512": "o16m2YpDN/pjHsnxf9pTGwkpcuvjW8v1/wGUwJtM1c3QZUKm7ZEO/eYRJg7iIx6GxS2Zv9lAMHpiQwHDdgqauA==",
       "type": "package",
-      "path": "system.text.encodings.web/10.0.9",
+      "path": "system.text.encodings.web/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -19778,15 +19783,15 @@
         "runtimes/wasi/lib/net10.0/System.Text.Encodings.Web.xml",
         "runtimes/win/lib/net9.0/System.Text.Encodings.Web.dll",
         "runtimes/win/lib/net9.0/System.Text.Encodings.Web.xml",
-        "system.text.encodings.web.10.0.9.nupkg.sha512",
+        "system.text.encodings.web.10.0.10.nupkg.sha512",
         "system.text.encodings.web.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
-    "System.Text.Json/10.0.9": {
-      "sha512": "mD4f7hUvjXEbLAnROibQswbYguGnfzN17gtkuqAHU1a0gJsqe7LXtV+0tItJsYrCBBpPYHiHFlLtjzG2ZEt5uQ==",
+    "System.Text.Json/10.0.10": {
+      "sha512": "bmsO6UdYtBdtn32zYXfsh7KlyTIzV/3V9hdT9RIb4pXKgYOsNxXR+VbWigNwBtNFVGYGm6Hwmqw5a+/IWFd36Q==",
       "type": "package",
-      "path": "system.text.json/10.0.9",
+      "path": "system.text.json/10.0.10",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -19850,7 +19855,7 @@
         "lib/net9.0/System.Text.Json.xml",
         "lib/netstandard2.0/System.Text.Json.dll",
         "lib/netstandard2.0/System.Text.Json.xml",
-        "system.text.json.10.0.9.nupkg.sha512",
+        "system.text.json.10.0.10.nupkg.sha512",
         "system.text.json.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -20406,12 +20411,12 @@
       "Microsoft.AspNetCore.Hosting >= 2.3.11",
       "Microsoft.AspNetCore.Mvc >= 2.3.11",
       "Microsoft.AspNetCore.Server.Kestrel >= 2.3.11",
-      "Microsoft.Extensions.Configuration >= 10.0.9",
-      "Microsoft.Extensions.Configuration.EnvironmentVariables >= 10.0.9",
-      "Microsoft.Extensions.Configuration.Json >= 10.0.9",
+      "Microsoft.Extensions.Configuration >= 10.0.10",
+      "Microsoft.Extensions.Configuration.EnvironmentVariables >= 10.0.10",
+      "Microsoft.Extensions.Configuration.Json >= 10.0.10",
       "Microsoft.Toolkit.Uwp.Notifications >= 7.1.3",
       "Newtonsoft.Json >= 13.0.4",
-      "PointyHatGames.EVEStandard >= 4.1.0",
+      "PointyHatGames.EVEStandard >= 4.1.1",
       "Serilog >= 3.1.1",
       "Serilog.Sinks.File >= 5.0.0",
       "Serilog.Sinks.WinForms >= 2.4.3"
@@ -20489,15 +20494,15 @@
           },
           "Microsoft.Extensions.Configuration": {
             "target": "Package",
-            "version": "[10.0.9, )"
+            "version": "[10.0.10, )"
           },
           "Microsoft.Extensions.Configuration.EnvironmentVariables": {
             "target": "Package",
-            "version": "[10.0.9, )"
+            "version": "[10.0.10, )"
           },
           "Microsoft.Extensions.Configuration.Json": {
             "target": "Package",
-            "version": "[10.0.9, )"
+            "version": "[10.0.10, )"
           },
           "Microsoft.Toolkit.Uwp.Notifications": {
             "target": "Package",
@@ -20509,7 +20514,7 @@
           },
           "PointyHatGames.EVEStandard": {
             "target": "Package",
-            "version": "[4.1.0, )"
+            "version": "[4.1.1, )"
           },
           "Serilog": {
             "target": "Package",
