@@ -1047,7 +1047,7 @@ img.rounded-corners {
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeDPSGraphUpdate")]
         [Description("How many ticks between DPS graph update")]
-        [DefaultValue(typeof(int), "15")]
+        [DefaultValue(typeof(int), "4")]
         public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
 
         [Category("Tick Timing")]

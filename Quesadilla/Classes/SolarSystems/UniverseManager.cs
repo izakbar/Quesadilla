@@ -199,7 +199,14 @@ namespace Quesadilla.Classes.SolarSystems
             }
 
             _log.Debug("Found path");
-            _pathfindingCache.Add(FoundPath.PathId, FoundPath);
+            try
+            {
+                _pathfindingCache.Add(FoundPath.PathId, FoundPath);
+            }
+            catch
+            {
+
+            }
             return (FoundPath);
         }
 

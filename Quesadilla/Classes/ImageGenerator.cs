@@ -613,12 +613,70 @@ namespace Quesadilla.Classes
 					{
 						DrawSystemName(g, currentPoint.X-10, currentPoint.Y-3, "✦", MercoxitColour, textSize);
 					}
-					
-                    // do we have ice !
-					if ( currentSystem.solarSystem.IceField == true )
+
+					// do we have ice !
+					if (currentSystem.solarSystem.IceField == true)
+					{
+						DrawSystemName(g, currentPoint.X + 10, currentPoint.Y - 3, "❅", IceColour, textSize);
+					}
+
+
+                    // Check skyhooks
+                    bool skyhooksVulnerable = false;
+                    bool skyhooksVulnerableSoon = false;
+
+					float addX = (float)(6 + (blobSize / 2) / GUI_SCALING);
+					float addY = (float)(20 + (blobSize / 2) / GUI_SCALING);
+
+					//float addX = (float)(4) + (blobSize / 2);
+					//float addY = (float)(10) + (blobSize / 2);
+					//float circleSizeNow = (float)(10 / GUI_SCALING);
+					//float circleSizeLater = (float)(9 / GUI_SCALING);
+
+                    float skyhookTextSize = (float)(10 / GUI_SCALING);
+
+					uint animationCycleSkyhooks = 10;
+
+					DateTime utcNow = DateTime.UtcNow;
+                    foreach (var p in currentSystem.solarSystem.Planets.Where(o => o.SkyhookVulneralbilityStart != null && o.SkyhookVulneralbilityEnd >= utcNow) )
                     {
-                        DrawSystemName(g, currentPoint.X+10, currentPoint.Y-3, "❅", IceColour, textSize);
-                    }
+						if (p.SkyhookVulneralbilityStart > utcNow)
+							skyhooksVulnerableSoon = true;
+						if (p.SkyhookVulneralbilityStart <= utcNow)
+							skyhooksVulnerable = true;
+					}
+
+					if (skyhooksVulnerableSoon)
+					{
+						/*
+												var circlePen = new Pen(Color.Orange, 1);
+												float[] dashSet = { 4, 8, 4, 8 };
+												circlePen.DashPattern = dashSet;
+												g.DrawArc(circlePen,
+													currentPoint.X + addX - (circleSizeLater/2) - ((circleSizeLater - circleSizeNow)/2), currentPoint.Y - addY - circleSizeLater,
+													circleSizeLater * 2, circleSizeLater * 2,
+													20 * (float)animationCycleSkyhooks, 360);
+						*/
+						DrawSystemName(g, currentPoint.X + (int)addX, currentPoint.Y - (int)addY - (int)skyhookTextSize, "S", Color.Orange, skyhookTextSize);
+					}
+
+					if (skyhooksVulnerable)
+                    {
+						/*
+												var circlePen = new Pen(Color.LightSeaGreen, 1);
+												float[] dashSet = { 6, 8, 6, 8 };
+												circlePen.DashPattern = dashSet;
+												g.DrawArc(circlePen,
+													currentPoint.X + addX - (circleSizeNow/2), currentPoint.Y - addY - circleSizeNow,
+													circleSizeNow * 2, circleSizeNow * 2,
+													20 * (float)animationCycleSkyhooks, 360);
+						*/
+						DrawSystemName(g, currentPoint.X + (int)addX, currentPoint.Y - (int)addY - (int)skyhookTextSize, "S", Color.Green, skyhookTextSize);
+					}
+/*
+					if (skyhooksVulnerable || skyhooksVulnerableSoon )
+						DrawSystemName(g, currentPoint.X + (int)addX + (int)(circleSizeNow / 2), currentPoint.Y - (int)addY - (int)(circleSizeNow) - (int)(skyhookTextSize/2), "S", Color.WhiteSmoke, skyhookTextSize);
+*/
 
 					// Unihole ?
 					if (currentSystem.solarSystem.UniHole == true)

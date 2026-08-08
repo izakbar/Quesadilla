@@ -35,8 +35,9 @@ namespace Quesadilla.Classes.ESIData
         public Queue<ESIRequest> ESIRequests = new Queue<ESIRequest>();
 
         private string LastETAG = "";
+        private Dictionary<string, DateTime> retryAfterList = new Dictionary<string, DateTime>();
 
-        public ESIWorker(EVEStandardAPI esiClient, ILogger Log)
+		public ESIWorker(EVEStandardAPI esiClient, ILogger Log)
         {
             _esiClient = esiClient;
             _log = Log;
@@ -287,22 +288,56 @@ namespace Quesadilla.Classes.ESIData
 
         public void ESIGetRaidableSkyhooks()
         {
-            var hooks = _esiClient.Activities.ListRaidableSkyhooksAsync().Result.Model;
-			foreach (var hook in hooks.Skyhooks)
-            { 
-			    Log.Debug($"Hook : {hook.SolarSystemId} {hook.PlanetId} {hook.TheftVulnerability.Start} {hook.TheftVulnerability.End}");
-                var solarSystem = Program.Universe.SolarSystems[(int)hook.SolarSystemId];
+            if (!retryAfterCheck(System.Reflection.MethodBase.GetCurrentMethod().Name)) return;
 
-                if (solarSystem.Planets != null) // might not have loaded yet :-/
+            try
+            {
+                var hooks = _esiClient.Activities.ListRaidableSkyhooksAsync().Result;
+                StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, hooks.RetryAfter);
+
+                foreach (var hook in hooks.Model.Skyhooks)
                 {
-                    var planet = solarSystem.Planets.Where(o => o.PlanetId == hook.PlanetId).FirstOrDefault();
-                    if (planet != null)
+                    Log.Debug($"Hook : {hook.SolarSystemId} {hook.PlanetId} {hook.TheftVulnerability.Start} {hook.TheftVulnerability.End}");
+                    var solarSystem = Program.Universe.SolarSystems[(int)hook.SolarSystemId];
+
+                    if (solarSystem.Planets != null) // might not have loaded yet :-/
                     {
-                        planet.SkyhookVulneralbilityStart = hook.TheftVulnerability.Start;
-                        planet.SkyhookVulneralbilityEnd = hook.TheftVulnerability.End;
+                        var planet = solarSystem.Planets.Where(o => o.PlanetId == hook.PlanetId).FirstOrDefault();
+                        if (planet != null)
+                        {
+                            planet.SkyhookVulneralbilityStart = hook.TheftVulnerability.Start;
+                            planet.SkyhookVulneralbilityEnd = hook.TheftVulnerability.End;
+                        }
                     }
                 }
-			}  
+            }
+            catch
+            {
+                if (!retryAfterList.ContainsKey(System.Reflection.MethodBase.GetCurrentMethod().Name))
+                {
+                    StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, 120);
+                }
+			}
+		}
+
+        private void StoreRetryAfter(string method, int seconds) {
+            retryAfterList[method] = DateTime.Now.AddSeconds(seconds);
+		}
+
+        private bool retryAfterCheck(string method)
+        {
+            bool result = true;
+            if ( retryAfterList.ContainsKey(method) )
+            {
+                if (retryAfterList[method] > DateTime.Now )
+                {
+                    result = false;
+                } 
+
+			}
+
+            return result;
         }
-    }
+
+	}
 }
