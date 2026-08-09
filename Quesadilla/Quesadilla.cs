@@ -151,9 +151,11 @@ namespace Quesadilla
 
         private Thread splashScreenThread;
         private QuesadillaSplashScreen splashScreen;
-        public QuesadillaDPSGraph DPSGraphWindow = null;
+		public QuesadillaDPSGraph DPSGraphWindow = null;
 
-        private Color OriginalBackgroundColour;
+		public QuesadillaOverlayMap OverlayMapWindow = null;
+
+		private Color OriginalBackgroundColour;
         private int mapScale = 100;
 
         private List<ProcessInfo> knowProcesses = new List<ProcessInfo>();
@@ -314,6 +316,12 @@ namespace Quesadilla
 
             GetSkyhookTimers();
             Program.ESIHandler.EnqueueRequestIncursions();
+
+            if (Program.MainConfiguration.ShowWindowOverlayMap)
+            {
+                OverlayMapWindow = new QuesadillaOverlayMap(this);
+                OverlayMapWindow.Show();
+            }
 		}
 
         private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
@@ -1854,44 +1862,83 @@ namespace Quesadilla
 								DPSGraphWindow.Show();
                             }
                         }
-                        UpdateISK();
+
+						if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
+						{
+							if (CurrentActiveToon == null || CurrentActiveToon == "")
+							{
+								OverlayMapWindow.Hide();
+							}
+							else
+							{
+								OverlayMapWindow.UpdateMapData();
+                                OverlayMapWindow.TopMost = true;
+								if (NoActiveEveProcess)
+								{
+									SendWindowTop(OverlayMapWindow.Handle);
+								}
+								OverlayMapWindow.Show();
+							}
+						}
+
+						UpdateISK();
                         shouldUpdateMinimap = true;
                         shouldUpdatePlanetInfo = true;
 					} 
 
-                    if (DPSGraphWindow != null &&
-                        (
-                        PrevRect.Top != currentEveWindowRect.Top || PrevRect.Bottom != currentEveWindowRect.Bottom ||
-                        PrevRect.Left != currentEveWindowRect.Left || PrevRect.Right != currentEveWindowRect.Right
-                        )
+                    if (
+						PrevRect.Top != currentEveWindowRect.Top || PrevRect.Bottom != currentEveWindowRect.Bottom ||
+						PrevRect.Left != currentEveWindowRect.Left || PrevRect.Right != currentEveWindowRect.Right
 						)
                     {
-						DPSGraphWindow.SetScreenPosition();
-                    }
+						if (DPSGraphWindow != null)
+							DPSGraphWindow.SetScreenPosition();
+
+						if (OverlayMapWindow != null)
+							OverlayMapWindow.SetScreenPosition();
+					}
+
 					if ( NoActiveEveProcess) NoActiveEveProcess = false;
 
 				}
 				else
                 {
-                    // not eve window 
+					// not eve window 
 
 					if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
-                    {
-                        if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
-                        {
-                            DPSGraphWindow.Hide();
-                        } else
-                        {
-                            if (DPSGraphWindow.TopMost != false)
-                            {
-                                currentEveWindowRect = PrevRect;
-                                DPSGraphWindow.TopMost = false;
-                                SendWindowBack(DPSGraphWindow.Handle);
-                            }
+					{
+						if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
+						{
+							DPSGraphWindow.Hide();
+						}
+						else
+						{
+							if (DPSGraphWindow.TopMost != false)
+							{
+								currentEveWindowRect = PrevRect;
+								DPSGraphWindow.TopMost = false;
+								SendWindowBack(DPSGraphWindow.Handle);
+							}
 						}
 					}
-                }
-            }
+					if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
+					{
+						if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
+						{
+							OverlayMapWindow.Hide();
+						}
+						else
+						{
+							if (OverlayMapWindow.TopMost != false)
+							{
+								currentEveWindowRect = PrevRect; // smaybe move this out
+								OverlayMapWindow.TopMost = false;
+								SendWindowBack(OverlayMapWindow.Handle);
+							}
+						}
+					}
+				}
+			}
 
             if (foregroundWindowTitle == null)
             {
@@ -2472,8 +2519,12 @@ namespace Quesadilla
             }
 
             UpdateISK();
+			if (OverlayMapWindow != null)
+			{
+				OverlayMapWindow.UpdateMapData();
+			}
 
-            var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
+			var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
 
             PathInfo _dummyPath = null;
             if (c != null)

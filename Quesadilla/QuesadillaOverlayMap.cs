@@ -1,0 +1,140 @@
+﻿using EVEStandard.Models;
+using Microsoft.Extensions.Configuration;
+using Quesadilla.Classes;
+using Quesadilla.Classes.Configuration;
+using Quesadilla.Classes.SolarSystems;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
+
+namespace Quesadilla
+{
+    public partial class QuesadillaOverlayMap : TransparentOverlayForm
+	{
+		private Quesadilla _main;
+		private AnimationState AnimationStateKills;
+		private AnimationState AnimationStateIntel;
+		private AnimationState AnimationStateAlts;
+		private AnimationState AnimationStateUniHoles;
+
+		public QuesadillaOverlayMap(Quesadilla mainForm) : base()
+        {
+            _main = mainForm;
+            InitializeComponent();
+
+            Width = Program.MainConfiguration.OverlayMapWindowSize.Width <= 100 ? 100 : Program.MainConfiguration.OverlayMapWindowSize.Width;
+            Height = Program.MainConfiguration.OverlayMapWindowSize.Height <= 50 ? 50 : Program.MainConfiguration.OverlayMapWindowSize.Height;
+
+			AnimationStateKills = new AnimationState(state: 0, direction: -1, maximum: 36, pulse: false);
+			AnimationStateIntel = new AnimationState(state: 1, direction: 1, maximum: 18, pulse: false);
+			AnimationStateAlts = new AnimationState(state: 2, direction: -1, maximum: 12, pulse: false);
+			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
+
+			SetScreenPosition();
+        }
+
+        public void SetScreenPosition()
+        {
+            // position on screen
+                        Location = new Point()
+                        {
+                            X = _main.currentEveWindowRect.Left + Program.MainConfiguration.OverlayMapWindowPosition.X,
+                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.OverlayMapWindowPosition.Y,
+                        };
+        }
+
+        public void UpdateMapData()
+        {
+			string Toon = "";
+			if (_main.CurrentActiveToon != null && _main.CurrentActiveToon != "")
+			{
+				Toon = _main.CurrentActiveToon;
+			}
+
+			if (Toon == null || Toon == "" )
+			{
+				OverlayMinimap.Visible = false;
+				return;
+			}
+			else
+			{
+				OverlayMinimap.Visible = true;
+				// Set position based on eve window ?
+				SetScreenPosition();
+			}
+
+			var c = Program.CharacterList.Where(o => o.CharacterName == Toon).FirstOrDefault();
+
+			PathInfo _dummyPath = null;
+			if (c != null)
+			{
+				_dummyPath = new PathInfo()
+				{
+					FromSystemName = c.Location,
+					FromSystemId = c.LocationId,
+					ToSystemName = c.Location,
+					ToSystemId = c.LocationId,
+					ToSystemRegionName = "",
+					PathSystems = new List<int> { c.LocationId },
+				};
+			}
+
+			string extraInformation = "";
+			List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
+
+			AnimationStateKills.Advance();
+			AnimationStateIntel.Advance();
+			AnimationStateAlts.Advance();
+			AnimationStateUniHoles.Advance();
+
+			Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(OverlayMinimap.Width, OverlayMinimap.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
+				Program.MainConfiguration.OverlayMinimapJumps, Program.MainConfiguration.OverlayMapMapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation, ref MinimapSystems,
+				Program.MainConfiguration.OverlayMinimapShowSystemText,
+				Program.MainConfiguration.OverlayShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
+				Program.MainConfiguration.OverlayMinimapLineColourNormal,
+				Program.MainConfiguration.OverlayMinimapLineColourOutOfRegion,
+				Program.MainConfiguration.OverlayMinimapLineColourRoute,
+				Program.MainConfiguration.OverlayMinimapSystemColourNormal,
+				Program.MainConfiguration.OverlayMinimapSystemColourRoute,
+				Program.MainConfiguration.OverlayMinimapSystemColourFrom,
+				Program.MainConfiguration.OverlayMinimapSystemColourTo,
+				Program.MainConfiguration.OverlayMinimapSystemColourText,
+				Program.MainConfiguration.OverlayMinimapZKillColour,
+				Program.MainConfiguration.OverlayMinimapIntelColour,
+				Program.MainConfiguration.OverlayMinimapAltPositionColour,
+				Program.MainConfiguration.OverlayMinimapUniHoleColour,
+				Program.MainConfiguration.OverlayMinimapIncursionColour,
+				Program.MainConfiguration.OverlayMinimapIncursionOutlineColour,
+				Program.MainConfiguration.OverlayMinimapSecLimitColour,
+				Program.MainConfiguration.OverlayMinimapSecLimitOutlineColour,
+				Program.MainConfiguration.OverlayMinimapIceColour,
+				Program.MainConfiguration.OverlayMinimapMercoxitColour,
+					AnimationStateIntel.Value(),
+					AnimationStateKills.Value(),
+					AnimationStateAlts.Value(),
+					AnimationStateUniHoles.Value(),
+				false,
+				Program.MainConfiguration.OverlayMinimapShowOutOfRegion,
+				Program.MainConfiguration.OverlayMinimapSecLimit,
+				Program.MainConfiguration.OverlayMinimapIncursionAlpha,
+				Program.MainConfiguration.OverlayMinimapIncursionCloudSize,
+				Program.MainConfiguration.OverlayMinimapSecLimitAlpha,
+				Program.MainConfiguration.OverlayMinimapSecLimitCloudSize,
+				Program.MainConfiguration.OverlayMinimapConnectionGap,
+				Program.MainConfiguration.OverlayMinimapSecLimitValue
+				);
+			//                Bitmap minimapBitmap = new Bitmap(minimapImage);
+			//                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
+			OverlayMinimap.Image = minimapImage;
+		}
+
+	}
+}

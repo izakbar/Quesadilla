@@ -141,6 +141,9 @@
     <Compile Include="Classes\SolarSystems\SolarSystemBelt.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemMoon.cs" />
     <Compile Include="Classes\SolarSystems\PlanetInfo.cs" />
+    <Compile Include="Classes\Windows\TransparentOverlayForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Classes\ZKill\JsonPropertyNameNameAttribute.cs" />
     <Compile Include="Classes\ZKill\ZKill.cs" />
     <Compile Include="Classes\ZKill\ZKillKill.cs" />
@@ -206,6 +209,12 @@
     <Compile Include="QuesadillaConfiguration.Designer.cs">
       <DependentUpon>QuesadillaConfiguration.cs</DependentUpon>
     </Compile>
+    <Compile Include="QuesadillaOverlayMap.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuesadillaOverlayMap.Designer.cs">
+      <DependentUpon>QuesadillaOverlayMap.cs</DependentUpon>
+    </Compile>
     <Compile Include="QuesadillaDPSGraph.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -219,6 +228,9 @@
       <DependentUpon>QuesadillaSplashScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <EmbeddedResource Include="Classes\Windows\TransparentOverlayForm.resx">
+      <DependentUpon>TransparentOverlayForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="QuesadillaAlertPopup.resx">
       <DependentUpon>QuesadillaAlertPopup.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -239,6 +251,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="QuesadillaConfiguration.resx">
       <DependentUpon>QuesadillaConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="QuesadillaOverlayMap.resx">
+      <DependentUpon>QuesadillaOverlayMap.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="QuesadillaDPSGraph.resx">
       <DependentUpon>QuesadillaDPSGraph.cs</DependentUpon>

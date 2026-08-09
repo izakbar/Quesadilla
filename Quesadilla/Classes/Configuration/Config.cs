@@ -185,7 +185,10 @@ namespace Quesadilla.Classes
 				c.DPSGraphWindowSize = new Size(250, 100);
                 c.DPSGraphWindowSizeAdjust = new Point(10, 15);
 
-                c.AlertPopupLocation = PopupLocationType.BottomLeft;
+				c.OverlayMapWindowSize = new Size(500, 300);
+				c.OverlayMapWindowPosition = new Point(250, 10);
+
+				c.AlertPopupLocation = PopupLocationType.BottomLeft;
                 c.DPSLocation = PopupLocationType.TopRight;
 
                 c.AlertPopZkillLogoSize = 120;
@@ -1360,7 +1363,7 @@ img.rounded-corners {
         [Category("Main window")]
         [DisplayName("Show Extra Information")]
         [Description("The extra information display shows zkill and alert activity recently in systems on the current minimap view")]
-        [DefaultValue(typeof(bool), "true")]
+        [DefaultValue(typeof(bool), "false")]
         public bool MainWindowShowExtraInformation { get; set; }
 
         [Category("Main window")]
@@ -2001,5 +2004,234 @@ img.rounded-corners {
         [Description("")]
         [DefaultValue(typeof(bool), "true")]
         public bool ShowAlertFancyNotification { get; set; }
-    }
+
+
+
+		[Category("OverlayMap")]
+		[DisplayName("Overlay map Window size")]
+		[Description("Size of the Overlay map")]
+		public Size OverlayMapWindowSize { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Overlay Map position inside client")]
+		[Description("Overlay Map position inside client")]
+		public Point OverlayMapWindowPosition { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Show Overlay Map")]
+		[Description("")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool ShowWindowOverlayMap { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Overlay Minimap zoom map scale")]
+		[Description("How to scale overlay window minimap - default 70")]
+		[DefaultValue(typeof(int), "6cl0")]
+		public int OverlayMapMapScale { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Show Minimap Border")]
+		[Description("Show border on the minimap")]
+		[DefaultValue(typeof(bool), "false")]
+		public bool OverlayShowMinimapBorder { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap Jumps")]
+		[Description("How many jumps to show in the minimap away from starting system")]
+		[DefaultValue(typeof(int), "3")]
+		public int OverlayMinimapJumps { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Show system text on minimap")]
+		[Description("")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool OverlayMinimapShowSystemText { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap Normal connection colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "Gainsboro")]
+		public Color OverlayMinimapLineColourNormal { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap Out of region connection colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "DimGray")]
+		public Color OverlayMinimapLineColourOutOfRegion { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap Border Colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "SteelBlue")]
+		public Color OverlayMinimapBorderColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap Route connection colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "Tomato")]
+		public Color OverlayMinimapLineColourRoute { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap normal system colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "Gainsboro")]
+		public Color OverlayMinimapSystemColourNormal { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap route system colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "Pink")]
+		public Color OverlayMinimapSystemColourRoute { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap from system colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "Red")]
+		public Color OverlayMinimapSystemColourFrom { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap to system colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "Green")]
+		public Color OverlayMinimapSystemColourTo { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap system name colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "LemonChiffon")]
+		public Color OverlayMinimapSystemColourText { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap zkill indicator colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "Red")]
+		public Color OverlayMinimapZKillColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap intel indicator colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "Orange")]
+		public Color OverlayMinimapIntelColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap system name colour for mouseover")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "OrangeRed")]
+		public Color OverlayMinimapMouseoverSystemColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap zoom delta")]
+		[Description("How much to adjust zoom on mouse scroll")]
+		[DefaultValue(typeof(int), "5")]
+		public int OverlayMainWindowMouseScrollAmount { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap Alt Indicator colour")]
+				[Description("Colour to use for the logged in alt indicators on the minimap")]
+				[DefaultValue(typeof(Color), "Aqua")]
+				public Color OverlayMinimapAltPositionColour { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap Unihole Indicator colour")]
+				[Description("Colour to use for Unihole indicators on the minimap")]
+				[DefaultValue(typeof(Color), "Fuchsia")]
+				public Color OverlayMinimapUniHoleColour { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap incursion Indicator colour")]
+				[Description("Colour to use for incursion indicators on the minimap")]
+				[DefaultValue(typeof(Color), "DarkGreen")]
+				public Color OverlayMinimapIncursionColour { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap sec limit Indicator colour")]
+				[Description("Colour to use for security limit indicators on the minimap")]
+				[DefaultValue(typeof(Color), "DarkBlue")]
+				public Color OverlayMinimapSecLimitColour { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap sec limit Indicator outline colour")]
+				[Description("Colour to use for security limit indicators on the minimap")]
+				[DefaultValue(typeof(Color), "Blue")]
+				public Color OverlayMinimapSecLimitOutlineColour { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap sec limit Indicator enabled")]
+				[Description("use security limit indicators on the minimap")]
+				[DefaultValue(typeof(bool), "true")]
+				public bool OverlayMinimapSecLimit { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap seclimit Indicator alpha")]
+				[Description("Alpha to use for seclimit indicators on the minimap")]
+				[DefaultValue(typeof(int), "75")]
+				[Range(0, 100)]
+				public int OverlayMinimapSecLimitAlpha { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap seclimit cloud size")]
+				[Description("Size to use for seclimit indicators on the minimap")]
+				[DefaultValue(typeof(int), "60")]
+				[Range(0, 100)]
+				public int OverlayMinimapSecLimitCloudSize { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap seclimit")]
+				[Description("seclimit on the minimap")]
+				[DefaultValue(typeof(float), "-0.7")]
+				[Range(0, 100)]
+				public float OverlayMinimapSecLimitValue { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap incursion Indicator outline colour")]
+				[Description("Colour to use for outline for incursion indicators on the minimap")]
+				[DefaultValue(typeof(Color), "Red")]
+				public Color OverlayMinimapIncursionOutlineColour { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap incursion Indicator alpha")]
+				[Description("Alpha to use for incursion indicators on the minimap")]
+				[DefaultValue(typeof(int), "40")]
+				[Range(0, 100)]
+				public int OverlayMinimapIncursionAlpha { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap incursion cloud size")]
+				[Description("Size to use for incursion indicators on the minimap")]
+				[DefaultValue(typeof(int), "60")]
+				[Range(0, 100)]
+				public int OverlayMinimapIncursionCloudSize { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap connection line gap size")]
+				[Description("Size of gap at each side of connection on minimap")]
+				[DefaultValue(typeof(int), "10")]
+				[Range(0, 100)]
+				public int OverlayMinimapConnectionGap { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap Ice Indicator colour")]
+				[Description("Colour to use for ice indicatos on the minimap")]
+				[DefaultValue(typeof(Color), "Cyan")]
+				public Color OverlayMinimapIceColour { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap Mercoxit Indicator colour")]
+				[Description("Colour to use for Mercoxit indicatos on the minimap")]
+				[DefaultValue(typeof(Color), "IndianRed")]
+				public Color OverlayMinimapMercoxitColour { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Maptype to use")]
+				[Description("Which map layout to use for the Minimap")]
+				[DefaultValue(typeof(MapType), "Dotlan")]
+				public MapType OverlayMinimapRawXY { get; set; }
+
+		[Category("OverlayMap")]
+				[DisplayName("Minimap show out of region systems")]
+				[Description("Show systems outside current region if in configured jumps range {MinimapJumps}")]
+				[DefaultValue(typeof(bool), "false")]
+				public bool OverlayMinimapShowOutOfRegion { get; set; }
+
+	}
 }
