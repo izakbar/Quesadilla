@@ -2222,6 +2222,11 @@ namespace Quesadilla
             }
 
             EveScoutStatus.Text = status.ToString().Trim();
+            if ( OverlayMapWindow != null )
+            {
+                OverlayMapWindow.EveScountInfo = EveScoutStatus.Text;
+
+			}
         }
 
         private void GetSkyhookTimers()

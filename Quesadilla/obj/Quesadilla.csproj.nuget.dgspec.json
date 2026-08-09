@@ -24,15 +24,15 @@
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net48"
+          "net481"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net48": {
-            "framework": "net48",
+          "net481": {
+            "framework": "net481",
             "projectReferences": {}
           }
         },
@@ -43,8 +43,8 @@
         }
       },
       "frameworks": {
-        "net48": {
-          "framework": "net48",
+        "net481": {
+          "framework": "net481",
           "dependencies": {
             "Cyotek.Windows.Forms.ColorPicker": {
               "target": "Package",

@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    ".NETFramework,Version=v4.8": {
+    ".NETFramework,Version=v4.8.1": {
       "Cyotek.Windows.Forms.ColorPicker/1.7.2": {
         "type": "package",
         "frameworkAssemblies": [
@@ -3008,7 +3008,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.8/win": {
+    ".NETFramework,Version=v4.8.1/win": {
       "Cyotek.Windows.Forms.ColorPicker/1.7.2": {
         "type": "package",
         "frameworkAssemblies": [
@@ -5892,7 +5892,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.8/win-arm64": {
+    ".NETFramework,Version=v4.8.1/win-arm64": {
       "Cyotek.Windows.Forms.ColorPicker/1.7.2": {
         "type": "package",
         "frameworkAssemblies": [
@@ -8771,7 +8771,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.8/win-x64": {
+    ".NETFramework,Version=v4.8.1/win-x64": {
       "Cyotek.Windows.Forms.ColorPicker/1.7.2": {
         "type": "package",
         "frameworkAssemblies": [
@@ -11653,7 +11653,7 @@
         }
       }
     },
-    ".NETFramework,Version=v4.8/win-x86": {
+    ".NETFramework,Version=v4.8.1/win-x86": {
       "Cyotek.Windows.Forms.ColorPicker/1.7.2": {
         "type": "package",
         "frameworkAssemblies": [
@@ -20404,7 +20404,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    ".NETFramework,Version=v4.8": [
+    ".NETFramework,Version=v4.8.1": [
       "Cyotek.Windows.Forms.ColorPicker >= 1.7.2",
       "HtmlAgilityPack >= 1.12.4",
       "Microsoft.AspNet.WebPages >= 3.3.0",
@@ -20446,15 +20446,15 @@
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net48"
+        "net481"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net48": {
-          "framework": "net48",
+        "net481": {
+          "framework": "net481",
           "projectReferences": {}
         }
       },
@@ -20465,8 +20465,8 @@
       }
     },
     "frameworks": {
-      "net48": {
-        "framework": "net48",
+      "net481": {
+        "framework": "net481",
         "dependencies": {
           "Cyotek.Windows.Forms.ColorPicker": {
             "target": "Package",

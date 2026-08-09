@@ -185,8 +185,8 @@ namespace Quesadilla.Classes
 				c.DPSGraphWindowSize = new Size(250, 100);
                 c.DPSGraphWindowSizeAdjust = new Point(10, 15);
 
-				c.OverlayMapWindowSize = new Size(500, 300);
-				c.OverlayMapWindowPosition = new Point(250, 10);
+				c.OverlayMapWindowSize = new Size(600, 350);
+				c.OverlayMapWindowPosition = new Point(275, 1);
 
 				c.AlertPopupLocation = PopupLocationType.BottomLeft;
                 c.DPSLocation = PopupLocationType.TopRight;
@@ -2026,7 +2026,7 @@ img.rounded-corners {
 		[Category("OverlayMap")]
 		[DisplayName("Overlay Minimap zoom map scale")]
 		[Description("How to scale overlay window minimap - default 70")]
-		[DefaultValue(typeof(int), "6cl0")]
+		[DefaultValue(typeof(int), "80")]
 		public int OverlayMapMapScale { get; set; }
 
 		[Category("OverlayMap")]
@@ -2068,7 +2068,7 @@ img.rounded-corners {
 		[Category("OverlayMap")]
 		[DisplayName("Minimap Route connection colour")]
 		[Description("")]
-		[DefaultValue(typeof(Color), "Tomato")]
+		[DefaultValue(typeof(Color), "Red")]
 		public Color OverlayMinimapLineColourRoute { get; set; }
 
 		[Category("OverlayMap")]
@@ -2080,7 +2080,7 @@ img.rounded-corners {
 		[Category("OverlayMap")]
 		[DisplayName("Minimap route system colour")]
 		[Description("")]
-		[DefaultValue(typeof(Color), "Pink")]
+		[DefaultValue(typeof(Color), "Red")]
 		public Color OverlayMinimapSystemColourRoute { get; set; }
 
 		[Category("OverlayMap")]

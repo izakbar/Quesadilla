@@ -28,36 +28,23 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.OverlayMinimap = new System.Windows.Forms.PictureBox();
-			((System.ComponentModel.ISupportInitialize)(this.OverlayMinimap)).BeginInit();
 			this.SuspendLayout();
-			// 
-			// OverlayMinimap
-			// 
-			this.OverlayMinimap.BackColor = System.Drawing.Color.Transparent;
-			this.OverlayMinimap.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.OverlayMinimap.Location = new System.Drawing.Point(0, 0);
-			this.OverlayMinimap.Name = "OverlayMinimap";
-			this.OverlayMinimap.Size = new System.Drawing.Size(372, 362);
-			this.OverlayMinimap.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-			this.OverlayMinimap.TabIndex = 11;
-			this.OverlayMinimap.TabStop = false;
 			// 
 			// QuesadillaOverlayMap
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
+			this.BackColor = System.Drawing.SystemColors.AppWorkspace;
 			this.ClientSize = new System.Drawing.Size(372, 362);
-			this.Controls.Add(this.OverlayMinimap);
+			this.Enabled = false;
+			this.ForeColor = System.Drawing.SystemColors.ButtonFace;
 			this.Name = "QuesadillaOverlayMap";
 			this.Text = "Map Overlay";
-			((System.ComponentModel.ISupportInitialize)(this.OverlayMinimap)).EndInit();
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
-
-		private System.Windows.Forms.PictureBox OverlayMinimap;
 	}
 }

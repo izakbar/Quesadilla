@@ -10,6 +10,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -24,6 +25,11 @@ namespace Quesadilla
 		private AnimationState AnimationStateIntel;
 		private AnimationState AnimationStateAlts;
 		private AnimationState AnimationStateUniHoles;
+
+		private Image _sourceImage = null;
+		private string _statusText = string.Empty;
+
+		public string EveScountInfo = "";
 
 		public QuesadillaOverlayMap(Quesadilla mainForm) : base()
         {
@@ -51,7 +57,19 @@ namespace Quesadilla
                         };
         }
 
-        public void UpdateMapData()
+		protected override void RenderOverlay(Graphics g)
+		{
+
+			if (_sourceImage != null)
+			{
+				g.DrawImage(_sourceImage, 0, 0, Width, Height); // Image works directly with DrawImage
+				var brush = new SolidBrush(Color.FromArgb(180, 0, 0, 0)); // 180/255 alpha, real transparency
+				var font = new Font("Segoe UI", 12f, FontStyle.Bold);
+				g.DrawString($"{_statusText}", font, Brushes.Green, 0, 0);
+			}
+		}
+
+		public void UpdateMapData()
         {
 			string Toon = "";
 			if (_main.CurrentActiveToon != null && _main.CurrentActiveToon != "")
@@ -61,12 +79,12 @@ namespace Quesadilla
 
 			if (Toon == null || Toon == "" )
 			{
-				OverlayMinimap.Visible = false;
+//				OverlayMinimap.Visible = false;
 				return;
 			}
 			else
 			{
-				OverlayMinimap.Visible = true;
+//				OverlayMinimap.Visible = true;
 				// Set position based on eve window ?
 				SetScreenPosition();
 			}
@@ -95,7 +113,7 @@ namespace Quesadilla
 			AnimationStateAlts.Advance();
 			AnimationStateUniHoles.Advance();
 
-			Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(OverlayMinimap.Width, OverlayMinimap.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
+			Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
 				Program.MainConfiguration.OverlayMinimapJumps, Program.MainConfiguration.OverlayMapMapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation, ref MinimapSystems,
 				Program.MainConfiguration.OverlayMinimapShowSystemText,
 				Program.MainConfiguration.OverlayShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
@@ -133,7 +151,10 @@ namespace Quesadilla
 				);
 			//                Bitmap minimapBitmap = new Bitmap(minimapImage);
 			//                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
-			OverlayMinimap.Image = minimapImage;
+			_sourceImage = minimapImage;
+			_statusText = EveScountInfo;
+
+			RenderAndUpdate();
 		}
 
 	}
