@@ -197,9 +197,10 @@ namespace Quesadilla.Classes
 				c.AlertPopupShowKillerLogo = true;
                 c.AlertPopupShowVictimLogo = true;
                 c.MinimapSecLimitValue = -0.7f;
-                c.MinimapSecLimitColour = Color.Aqua;
-                c.MinimapSecLimitAlpha = 10;
-                c.MinimapSecLimitCloudSize = 30;
+
+                //c.MinimapSecLimitColour = Color.Aqua;
+                //c.MinimapSecLimitAlpha = 10;
+                //c.MinimapSecLimitCloudSize = 30;
                 c.MinimapSecLimit = true;
 			}
 
@@ -1142,13 +1143,25 @@ img.rounded-corners {
         [DefaultValue(typeof(bool), "false")]
         public bool ShowMinimapBorder { get; set; }
 
-        [Category("Main window")]
-        [DisplayName("Show system text on minimap")]
-        [Description("")]
-        [DefaultValue(typeof(bool), "true")]
-        public bool MinimapShowSystemText { get; set; }
+		[Category("Main window")]
+		[DisplayName("Show system text on minimap")]
+		[Description("")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool MinimapShowSystemText { get; set; }
 
-        [Category("Main window")]
+		[Category("Main window")]
+		[DisplayName("Show all system text on minimap")]
+		[Description("")]
+		[DefaultValue(typeof(bool), "false")]
+		public bool MinimapShowAllSystemText { get; set; }
+
+		[Category("Main window")]
+		[DisplayName("Show connecting system text on minimap")]
+		[Description("")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool MinimapShowConnectingSystemText { get; set; }
+
+		[Category("Main window")]
         [DisplayName("Minimap Border Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "SteelBlue")]
@@ -1196,13 +1209,25 @@ img.rounded-corners {
         [DefaultValue(typeof(Color), "Green")]
         public Color MinimapSystemColourTo { get; set; }
 
-        [Category("Main window")]
-        [DisplayName("Minimap system name colour")]
-        [Description("")]
-        [DefaultValue(typeof(Color), "LemonChiffon")]
-        public Color MinimapSystemColourText { get; set; }
+		[Category("Main window")]
+		[DisplayName("Minimap system name colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "LemonChiffon")]
+		public Color MinimapSystemColourText { get; set; }
 
-        [Category("Main window")]
+		[Category("Main window")]
+		[DisplayName("Minimap all system name colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "PaleGoldenrod")]
+		public Color MinimapAllSystemColourText { get; set; }
+
+		[Category("Main window")]
+		[DisplayName("Minimap connecting system name colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "DarkKhaki")]
+		public Color MinimapConnectingSystemColourText { get; set; }
+
+		[Category("Main window")]
         [DisplayName("Minimap zkill indicator colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "Red")]
@@ -1285,14 +1310,14 @@ img.rounded-corners {
 		[Category("Main window")]
 		[DisplayName("Minimap seclimit Indicator alpha")]
 		[Description("Alpha to use for seclimit indicators on the minimap")]
-		[DefaultValue(typeof(int), "75")]
+		[DefaultValue(typeof(int), "60")]
 		[Range(0, 100)]
 		public int MinimapSecLimitAlpha { get; set; }
 
 		[Category("Main window")]
 		[DisplayName("Minimap seclimit cloud size")]
 		[Description("Size to use for seclimit indicators on the minimap")]
-		[DefaultValue(typeof(int), "60")]
+		[DefaultValue(typeof(int), "55")]
 		[Range(0, 100)]
 		public int MinimapSecLimitCloudSize { get; set; }
 
@@ -1319,7 +1344,7 @@ img.rounded-corners {
 		[Category("Main window")]
 		[DisplayName("Minimap incursion cloud size")]
 		[Description("Size to use for incursion indicators on the minimap")]
-		[DefaultValue(typeof(int), "60")]
+		[DefaultValue(typeof(int), "65")]
 		[Range(0, 100)]
 		public int MinimapIncursionCloudSize { get; set; }
 
@@ -1578,13 +1603,25 @@ img.rounded-corners {
         [DefaultValue(typeof(bool), "false")]
         public bool AlertPopupShowMinimapBorder { get; set; }
 
-        [Category("Alert")]
-        [DisplayName("Minimap Show System Text")]
-        [Description("Show to/from system names in minimap")]
-        [DefaultValue(typeof(bool), "true")]
-        public bool AlertPopupMinimapShowSystemText { get; set; }
+		[Category("Alert")]
+		[DisplayName("Minimap Show System Text")]
+		[Description("Show to/from system names in minimap")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool AlertPopupMinimapShowSystemText { get; set; }
 
-        [Category("Alert")]
+		[Category("Alert")]
+		[DisplayName("Minimap Show All System Text")]
+		[Description("Show all system names in minimap")]
+		[DefaultValue(typeof(bool), "false")]
+		public bool AlertPopupMinimapShowAllSystemText { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap Show Connecting System Text")]
+		[Description("Show connecting system names in minimap")]
+		[DefaultValue(typeof(bool), "false")]
+		public bool AlertPopupMinimapShowConnectingSystemText { get; set; }
+
+		[Category("Alert")]
         [DisplayName("Minimap Border Colour")]
         [Description("")]
         [DefaultValue(typeof(Color), "SteelBlue")]
@@ -1638,6 +1675,17 @@ img.rounded-corners {
         [DefaultValue(typeof(Color), "LemonChiffon")]
         public Color AlertPopupMinimapSystemColourText { get; set; }
 
+		[Category("Alert")]
+		[DisplayName("Minimap all system name colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "PaleGoldenrod")]
+		public Color AlertPopupMinimapAllSystemColourText { get; set; }
+		[Category("Alert")]
+		[DisplayName("Minimap connecting system name colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "DarkKhaki")]
+		public Color AlertPopupMinimapConnectingSystemColourText { get; set; }
+		
         [Category("Alert")]
         [DisplayName("Minimap zkill indicator colour")]
         [Description("")]
@@ -1696,7 +1744,7 @@ img.rounded-corners {
 		[Category("Alert")]
 		[DisplayName("Minimap incursion Indicator size")]
 		[Description("Size of each incursion indicator on the alert popup")]
-		[DefaultValue(typeof(int), "30")]
+		[DefaultValue(typeof(int), "65")]
 		[Range(0, 100)]
 		public int AlertPopupMinimapIncursionCloudSize { get; set; }
 
@@ -1721,14 +1769,14 @@ img.rounded-corners {
 		[Category("Alert")]
 		[DisplayName("Minimap seclimit Indicator alpha")]
 		[Description("Alpha to use for seclimit indicators on the minimap")]
-		[DefaultValue(typeof(int), "95")]
+		[DefaultValue(typeof(int), "60")]
 		[Range(0, 100)]
 		public int AlertPopupMinimapSecLimitAlpha { get; set; }
 
 		[Category("Alert")]
 		[DisplayName("Minimap seclimit cloud size")]
 		[Description("Size to use for seclimit indicators on the minimap")]
-		[DefaultValue(typeof(int), "60")]
+		[DefaultValue(typeof(int), "55")]
 		[Range(0, 100)]
 		public int AlertPopupMinimapSecLimitCloudSize { get; set; }
 
@@ -2048,6 +2096,18 @@ img.rounded-corners {
 		public bool OverlayMinimapShowSystemText { get; set; }
 
 		[Category("OverlayMap")]
+		[DisplayName("Show all system text on minimap")]
+		[Description("")]
+		[DefaultValue(typeof(bool), "false")]
+		public bool OverlayMinimapShowAllSystemText { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Show connecting system text on minimap")]
+		[Description("")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool OverlayMinimapShowConnectingSystemText { get; set; }
+
+		[Category("OverlayMap")]
 		[DisplayName("Minimap Normal connection colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "Gainsboro")]
@@ -2100,6 +2160,18 @@ img.rounded-corners {
 		[Description("")]
 		[DefaultValue(typeof(Color), "LemonChiffon")]
 		public Color OverlayMinimapSystemColourText { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap all system name colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "PaleGoldernRod")]
+		public Color OverlayMinimapAllSystemColourText { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap connecting system name colour")]
+		[Description("")]
+		[DefaultValue(typeof(Color), "DarkKhaki")]
+		public Color OverlayMinimapConnectingSystemColourText { get; set; }
 
 		[Category("OverlayMap")]
 		[DisplayName("Minimap zkill indicator colour")]
@@ -2164,14 +2236,14 @@ img.rounded-corners {
 		[Category("OverlayMap")]
 				[DisplayName("Minimap seclimit Indicator alpha")]
 				[Description("Alpha to use for seclimit indicators on the minimap")]
-				[DefaultValue(typeof(int), "75")]
+				[DefaultValue(typeof(int), "60")]
 				[Range(0, 100)]
 				public int OverlayMinimapSecLimitAlpha { get; set; }
 
 		[Category("OverlayMap")]
 				[DisplayName("Minimap seclimit cloud size")]
 				[Description("Size to use for seclimit indicators on the minimap")]
-				[DefaultValue(typeof(int), "60")]
+				[DefaultValue(typeof(int), "55")]
 				[Range(0, 100)]
 				public int OverlayMinimapSecLimitCloudSize { get; set; }
 
@@ -2198,7 +2270,7 @@ img.rounded-corners {
 		[Category("OverlayMap")]
 				[DisplayName("Minimap incursion cloud size")]
 				[Description("Size to use for incursion indicators on the minimap")]
-				[DefaultValue(typeof(int), "60")]
+				[DefaultValue(typeof(int), "65")]
 				[Range(0, 100)]
 				public int OverlayMinimapIncursionCloudSize { get; set; }
 

@@ -32,15 +32,17 @@
 			// 
 			// QuesadillaOverlayMap
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
 			this.BackColor = System.Drawing.SystemColors.AppWorkspace;
-			this.ClientSize = new System.Drawing.Size(372, 362);
+			this.ClientSize = new System.Drawing.Size(558, 557);
 			this.Enabled = false;
 			this.ForeColor = System.Drawing.SystemColors.ButtonFace;
+			this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.Name = "QuesadillaOverlayMap";
 			this.Text = "Map Overlay";
+			this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.QuesadillaOverlayMap_MouseMove);
 			this.ResumeLayout(false);
 
 		}

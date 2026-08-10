@@ -94,8 +94,15 @@ namespace Quesadilla.Classes.SolarSystems
         }
         public void WriteESICharacters(string jsonFile)
         {
-            var json = JsonSerializer.Serialize(ESICharacters);
-            File.WriteAllText(jsonFile, json);
+            try
+            {
+                var json = JsonSerializer.Serialize(ESICharacters);
+                File.WriteAllText(jsonFile, json);
+            }
+            catch 
+            {
+
+            }
         }
 
         public PathInfo FindAndCachePath(int fromSystemId, int toSystemId)
@@ -299,5 +306,14 @@ namespace Quesadilla.Classes.SolarSystems
 			}
 			return data.ToList();
         }
-    }
+		public void GetSystemInfo(int systemid)
+		{
+			// check if we need to pull data from ESI for system (planets/moons/belts)
+			if (Program.Universe.SolarSystems[systemid].Planets == null)
+			{
+				Program.ESIHandler.EnqueueRequestSystem(systemid);
+			}
+		}
+
+	}
 }

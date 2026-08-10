@@ -48,10 +48,10 @@
 			// pictureBox1
 			// 
 			this.pictureBox1.Image = global::Quesadilla.Properties.Resources.Quesadilla;
-			this.pictureBox1.Location = new System.Drawing.Point(8, 8);
-			this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+			this.pictureBox1.Location = new System.Drawing.Point(12, 12);
+			this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(171, 166);
+			this.pictureBox1.Size = new System.Drawing.Size(256, 255);
 			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.pictureBox1.TabIndex = 0;
 			this.pictureBox1.TabStop = false;
@@ -61,10 +61,10 @@
 			this.richTextBox1.BackColor = System.Drawing.SystemColors.Window;
 			this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.richTextBox1.Enabled = false;
-			this.richTextBox1.Location = new System.Drawing.Point(183, 8);
-			this.richTextBox1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+			this.richTextBox1.Location = new System.Drawing.Point(274, 12);
+			this.richTextBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.richTextBox1.Name = "richTextBox1";
-			this.richTextBox1.Size = new System.Drawing.Size(421, 242);
+			this.richTextBox1.Size = new System.Drawing.Size(632, 372);
 			this.richTextBox1.TabIndex = 1;
 			this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
 			this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
@@ -72,10 +72,10 @@
 			// paulmart
 			// 
 			this.paulmart.Image = global::Quesadilla.Properties.Resources.Paulmart_small;
-			this.paulmart.Location = new System.Drawing.Point(58, 178);
-			this.paulmart.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+			this.paulmart.Location = new System.Drawing.Point(87, 274);
+			this.paulmart.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.paulmart.Name = "paulmart";
-			this.paulmart.Size = new System.Drawing.Size(121, 32);
+			this.paulmart.Size = new System.Drawing.Size(182, 49);
 			this.paulmart.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.paulmart.TabIndex = 4;
 			this.paulmart.TabStop = false;
@@ -83,10 +83,10 @@
 			// corp
 			// 
 			this.corp.Image = global::Quesadilla.Properties.Resources.therapy;
-			this.corp.Location = new System.Drawing.Point(555, 252);
-			this.corp.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+			this.corp.Location = new System.Drawing.Point(832, 388);
+			this.corp.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.corp.Name = "corp";
-			this.corp.Size = new System.Drawing.Size(57, 57);
+			this.corp.Size = new System.Drawing.Size(86, 88);
 			this.corp.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.corp.TabIndex = 5;
 			this.corp.TabStop = false;
@@ -95,10 +95,10 @@
 			// alliance
 			// 
 			this.alliance.Image = global::Quesadilla.Properties.Resources.NClogo;
-			this.alliance.Location = new System.Drawing.Point(495, 252);
-			this.alliance.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+			this.alliance.Location = new System.Drawing.Point(742, 388);
+			this.alliance.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.alliance.Name = "alliance";
-			this.alliance.Size = new System.Drawing.Size(56, 57);
+			this.alliance.Size = new System.Drawing.Size(84, 88);
 			this.alliance.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.alliance.TabIndex = 6;
 			this.alliance.TabStop = false;
@@ -108,10 +108,10 @@
 			// 
 			this.izakbar.BackColor = System.Drawing.Color.Transparent;
 			this.izakbar.Image = ((System.Drawing.Image)(resources.GetObject("izakbar.Image")));
-			this.izakbar.Location = new System.Drawing.Point(8, 178);
-			this.izakbar.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+			this.izakbar.Location = new System.Drawing.Point(12, 274);
+			this.izakbar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.izakbar.Name = "izakbar";
-			this.izakbar.Size = new System.Drawing.Size(46, 64);
+			this.izakbar.Size = new System.Drawing.Size(69, 98);
 			this.izakbar.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.izakbar.TabIndex = 7;
 			this.izakbar.TabStop = false;
@@ -126,18 +126,17 @@
 			// VersionNumber
 			// 
 			this.VersionNumber.AutoSize = true;
-			this.VersionNumber.Location = new System.Drawing.Point(21, 21);
-			this.VersionNumber.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.VersionNumber.Location = new System.Drawing.Point(32, 32);
 			this.VersionNumber.Name = "VersionNumber";
-			this.VersionNumber.Size = new System.Drawing.Size(49, 13);
+			this.VersionNumber.Size = new System.Drawing.Size(75, 20);
 			this.VersionNumber.TabIndex = 8;
 			this.VersionNumber.Text = "XXXXXX";
 			// 
 			// QuesadillaSplashScreen
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(611, 313);
+			this.ClientSize = new System.Drawing.Size(916, 482);
 			this.ControlBox = false;
 			this.Controls.Add(this.VersionNumber);
 			this.Controls.Add(this.izakbar);
@@ -147,7 +146,7 @@
 			this.Controls.Add(this.paulmart);
 			this.Controls.Add(this.richTextBox1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-			this.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+			this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "QuesadillaSplashScreen";

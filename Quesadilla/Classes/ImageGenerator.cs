@@ -22,6 +22,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
 using Quesadilla.Classes.Configuration;
 using Windows.UI.Composition.Effects;
 using System.Windows.Forms.DataVisualization.Charting;
+using Windows.Devices.Display;
 
 namespace Quesadilla.Classes
 {
@@ -42,15 +43,15 @@ namespace Quesadilla.Classes
         private const int CIRCLE_RADIUS = 3;
         private const int SYSTEM_CIRCLE_SIZE = 6;
 
-        private const float MINIMUM_TEXT_SIZE = 10;
+        private const float MINIMUM_TEXT_SIZE = 9;
         private const int MINIMUM_BLOB_SIZE = 3;
         private const float MINIMUM_CIRCLE_SIZE = 2.3f;
 
-        public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c, float textSize = MINIMUM_TEXT_SIZE )
+        public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c, float textSize = MINIMUM_TEXT_SIZE, bool enforceMinimumSize = true )
         {
             // ensure we do not go too small
-            if (textSize < MINIMUM_TEXT_SIZE || float.IsInfinity(textSize) ) textSize = MINIMUM_TEXT_SIZE;
-
+            if ( enforceMinimumSize && (textSize < MINIMUM_TEXT_SIZE || float.IsInfinity(textSize) ) ) textSize = MINIMUM_TEXT_SIZE;
+            if (float.IsInfinity(textSize)) return;
             using (Font myfont = new Font("Verdana", textSize, FontStyle.Regular))
             {
                 g.TextRenderingHint = TextRenderingHint.AntiAlias;
@@ -74,16 +75,16 @@ namespace Quesadilla.Classes
 			switch (stormType)
 			{
 				case "Electric":
-					circleBrush = new SolidBrush(Color.DeepSkyBlue);
+					circleBrush = new HatchBrush(HatchStyle.Percent60, Color.DeepSkyBlue);
 					break;
 				case "Plasma":
-					circleBrush = new SolidBrush(Color.DarkRed);
+					circleBrush = new HatchBrush(HatchStyle.Percent60, Color.DarkRed);
 					break;
 				case "Gamma":
-					circleBrush = new SolidBrush(Color.ForestGreen);
+					circleBrush = new HatchBrush(HatchStyle.Percent60, Color.ForestGreen);
 					break;
 				case "Exotic":
-					circleBrush = new SolidBrush(Color.BlueViolet);
+					circleBrush = new HatchBrush(HatchStyle.Percent60, Color.BlueViolet);
 					break;
 			}
 
@@ -126,8 +127,35 @@ namespace Quesadilla.Classes
             }
 		}
 
-		public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, MapType whichMap, ref string extraInformation, ref List<MinimapSystem> returnMinimapSystems,
-            bool showSystemText,
+        private static void MapCircles(Graphics g, List<MinimapSystem> systems, Point originPoint, float size, Pen outlinePen, Brush fillBrush) 
+        {
+			Brush eraserBrush = new SolidBrush(Color.Black);
+			// outlines
+			foreach (var currentSystem in systems)
+			{
+				Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+				g.DrawEllipse(outlinePen, currentPoint.X - size, currentPoint.Y - size, size * 2, size * 2);
+			}
+
+			// clear any overspill
+			foreach (var currentSystem in systems)
+			{
+				Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+				g.FillEllipse(eraserBrush, currentPoint.X - size, currentPoint.Y - size, size * 2, size * 2);
+			}
+
+            // fill inside
+			foreach (var currentSystem in systems)
+			{
+				Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+				g.FillEllipse(fillBrush, currentPoint.X - size, currentPoint.Y - size, size * 2, size * 2);
+			}
+		}
+
+
+		public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, 
+            MapType whichMap, ref string extraInformation, ref List<MinimapSystem> returnMinimapSystems,
+            bool showSystemText,bool showAllSystemsText, bool showConnectingSystemsText,
             bool Border, Color BorderColor,
             Color LineColourNormal,
             Color LineColourOutOfRegion,
@@ -136,15 +164,13 @@ namespace Quesadilla.Classes
             Color SystemColourRoute,
             Color SystemColourFrom,
             Color SystemColourTo,
-            Color SystemColourText,
-            Color ZKillColour,
+			Color SystemColourText, Color SystemColourAllText, Color SystemColourConnectingText,
+			Color ZKillColour,
             Color IntelColour,
             Color AltColour,
             Color UniHoleColour,
-            Color IncursionColour,
-            Color IncursionOutlineColour,
-			Color SecLimitColour,
-			Color SecLimitOutlineColour,
+            Color IncursionColour,Color IncursionOutlineColour,
+			Color SecLimitColour,Color SecLimitOutlineColour,
 			Color IceColour,
             Color MercoxitColour,
             int? animationCycleIntel,
@@ -172,10 +198,12 @@ namespace Quesadilla.Classes
 
             Point center = new Point((srcImage.Width / 2) - 1, (srcImage.Height / 2) - 1);
 
-            // quick note on x/y coord calcs
-            // dotlan calcs need to be inverted to make sure map displays correctly - not an error
+			Brush eraserBrush = new SolidBrush(Color.Black);
 
-            using (Graphics g = Graphics.FromImage(dstImage))
+			// quick note on x/y coord calcs
+			// dotlan calcs need to be inverted to make sure map displays correctly - not an error
+
+			using (Graphics g = Graphics.FromImage(dstImage))
             {
 
                 Brush backgroundBrush = new SolidBrush(Color.FromArgb(0, Color.PaleGoldenrod));
@@ -210,14 +238,15 @@ namespace Quesadilla.Classes
 
                     if (minimapSystems.Where(o => o.solarSystem.Name == nextSolarSystem.Name).Count() == 0)
                     {
-                        minimapSystems.Add(new MinimapSystem()
+						
+						minimapSystems.Add(new MinimapSystem()
                         {
                             solarSystem = nextSolarSystem,
                             fromSystem = pathSystem == path.FromSystemId ? true : false,
                             toSystem = pathSystem == path.ToSystemId ? true : false,
                             route = true,
                             textDisplay = (pathSystem == path.FromSystemId || pathSystem == path.ToSystemId) ? true : false,
-
+                            textDisplayConnecting = false,
 							X = ( 
                             whichMap == MapType.SDE ? (int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING) :
                             ( whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.X2D - nextSolarSystem.X2D) / LY_SCALING) :
@@ -269,7 +298,7 @@ namespace Quesadilla.Classes
 
                                 if (showOutOfRegion == false && linkedSolarSystem.RegionName != FromSystem.RegionName) continue; // do not add to systems
 
-                                    var linkedMinimapSystem = minimapSystems.Where(o => o.solarSystem.Id == linkedSolarSystem.Id).FirstOrDefault();
+                                var linkedMinimapSystem = minimapSystems.Where(o => o.solarSystem.Id == linkedSolarSystem.Id).FirstOrDefault();
                                 if (minimapSystems.Where(o => o.solarSystem.Name == linkedSolarSystem.Name).Count() == 0 &&
                                     minimapSystemsAdditional.Where(o => o.solarSystem.Name == linkedSolarSystem.Name).Count() == 0)
                                 {
@@ -280,6 +309,7 @@ namespace Quesadilla.Classes
                                         toSystem = false,
                                         route = false,
                                         textDisplay = false,
+										textDisplayConnecting = (linkedSolarSystem.ConnectedTo.Where(o => o.ToSystemId == FromSystem.Id).Count() > 0),
 										X = (
 							                whichMap == MapType.SDE ? (int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING) :
 							                (whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.X2D - linkedSolarSystem.X2D) / LY_SCALING) :
@@ -388,7 +418,9 @@ namespace Quesadilla.Classes
                 if (showSecLimit && minimapSystems.Where(o => o.solarSystem.Security <= secLimit).Count() > 0)
                 {
 					g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-					Brush secLimitBrush = new SolidBrush(SecLimitColour);
+					//Brush secLimitBrush = new SolidBrush(SecLimitColour);
+					Brush secLimitBrush = new HatchBrush(HatchStyle.Percent30, SecLimitColour);
+
 					Brush secLimitOutlineBrush = new SolidBrush(SecLimitOutlineColour);
 					Pen secLimitOutlinePen = new Pen(secLimitOutlineBrush, 3);
 					float secLimitBlobSize = ((float)secLimitCloudSize / (float)GUI_SCALING);
@@ -401,22 +433,11 @@ namespace Quesadilla.Classes
 
 					using (Graphics gSecLimit = Graphics.FromImage(secLimitImage))
 					{
-						foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Security <= secLimit))
-						{
-							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-							gSecLimit.DrawEllipse(secLimitOutlinePen, currentPoint.X - secLimitBlobSize, currentPoint.Y - secLimitBlobSize, secLimitBlobSize * 2, secLimitBlobSize * 2);
-						}
-						foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Security <= secLimit))
-						{
-							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-							gSecLimit.FillEllipse(secLimitBrush, currentPoint.X - secLimitBlobSize, currentPoint.Y - secLimitBlobSize, secLimitBlobSize * 2, secLimitBlobSize * 2);
-						}
+						MapCircles(gSecLimit, minimapSystems.Where(o => o.solarSystem.Security <= secLimit).ToList(), originPoint, secLimitBlobSize, secLimitOutlinePen, secLimitBrush);
 
 						g.DrawImage(
-							secLimitImage,
-							// target
+							secLimitImage,  
 							new Rectangle(0, 0, secLimitImage.Width, secLimitImage.Height),
-							// source
 							0, 0, secLimitImage.Width, secLimitImage.Height,
 							GraphicsUnit.Pixel,
 							secLimitImageAttr
@@ -431,7 +452,9 @@ namespace Quesadilla.Classes
 					//g.CompositingQuality = CompositingQuality.GammaCorrected;
 					g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
-					Brush incursionBrush = new SolidBrush(IncursionColour);
+					//Brush incursionBrush = new SolidBrush(IncursionColour);
+					Brush incursionBrush = new HatchBrush(HatchStyle.Percent50, IncursionColour);
+
 					Brush incursionOutlineBrush = new SolidBrush(IncursionOutlineColour);
                     Pen incursionOutlinePen = new Pen(incursionOutlineBrush, 3);
 					float incursionBlobSize = ((float) incursionCloudSize / (float)GUI_SCALING);
@@ -445,23 +468,11 @@ namespace Quesadilla.Classes
 
 					using (Graphics gIncursion = Graphics.FromImage(incursionImage))
 					{
-						foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Incursion))
-						{
-							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-							gIncursion.DrawEllipse(incursionOutlinePen, currentPoint.X - incursionBlobSize, currentPoint.Y - incursionBlobSize, incursionBlobSize * 2, incursionBlobSize * 2);
-						}
 
-						foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.Incursion))
-						{
-							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-							gIncursion.FillEllipse(incursionBrush, currentPoint.X - incursionBlobSize, currentPoint.Y - incursionBlobSize, incursionBlobSize * 2, incursionBlobSize * 2);
-						}
-
+						MapCircles(gIncursion, minimapSystems.Where(o => o.solarSystem.Incursion).ToList(), originPoint, incursionBlobSize, incursionOutlinePen, incursionBrush);
 						g.DrawImage(
 							incursionImage,
-							// target
 							new Rectangle(0, 0, incursionImage.Width, incursionImage.Height),
-							// source
 							0, 0, incursionImage.Width, incursionImage.Height,
 							GraphicsUnit.Pixel,
 							incursionImageAttr
@@ -628,11 +639,6 @@ namespace Quesadilla.Classes
 					float addX = (float)(6 + (blobSize / 2) / GUI_SCALING);
 					float addY = (float)(20 + (blobSize / 2) / GUI_SCALING);
 
-					//float addX = (float)(4) + (blobSize / 2);
-					//float addY = (float)(10) + (blobSize / 2);
-					//float circleSizeNow = (float)(10 / GUI_SCALING);
-					//float circleSizeLater = (float)(9 / GUI_SCALING);
-
                     float skyhookTextSize = (float)(10 / GUI_SCALING);
 
 					uint animationCycleSkyhooks = 10;
@@ -673,10 +679,6 @@ namespace Quesadilla.Classes
 						*/
 						DrawSystemName(g, currentPoint.X + (int)addX, currentPoint.Y - (int)addY - (int)skyhookTextSize, "S", Color.Green, skyhookTextSize);
 					}
-/*
-					if (skyhooksVulnerable || skyhooksVulnerableSoon )
-						DrawSystemName(g, currentPoint.X + (int)addX + (int)(circleSizeNow / 2), currentPoint.Y - (int)addY - (int)(circleSizeNow) - (int)(skyhookTextSize/2), "S", Color.WhiteSmoke, skyhookTextSize);
-*/
 
 					// Unihole ?
 					if (currentSystem.solarSystem.UniHole == true)
@@ -732,9 +734,7 @@ namespace Quesadilla.Classes
                             //circlePen.DashStyle = DashStyle.DashDot;
                             circlePen.DashPattern = dashSet;
                             g.DrawArc(circlePen,
-                                //currentPoint.X - (blobSize + (circleSize) + (float)animationCycleAlts), currentPoint.Y - (blobSize + (circleSize) + (float)animationCycleAlts),
                                 currentPoint.X - (blobSize + circleSize), currentPoint.Y - (blobSize + circleSize),
-                                //(blobSize + circleSize + (float)animationCycleAlts) * 2, (blobSize + circleSize + (float)animationCycleAlts) * 2,
                                 (blobSize + circleSize) * 2, (blobSize + circleSize) * 2,
                                 30 * (float)animationCycleIntel, 360);
                         }
@@ -753,7 +753,6 @@ namespace Quesadilla.Classes
 
 					}
 
-					//if (currentSystem.solarSystem.Alerts != null && currentSystem.solarSystem.Alerts.Where(o => !o.isFaction && !o.isDecloak && o.Kill is null).Count() > 0)
 					if (currentSystem.solarSystem.CountAlerts(false, false, false) > 0)
 					{
                         var circlePen = new Pen(IntelColour,2);
@@ -777,9 +776,7 @@ namespace Quesadilla.Classes
                             //circlePen.DashStyle = DashStyle.DashDot;
                             circlePen.DashPattern = dashSet;
                             g.DrawArc(circlePen,
-                                //currentPoint.X - (blobSize + (circleSize) + (float)animationCycleAlts), currentPoint.Y - (blobSize + (circleSize) + (float)animationCycleAlts),
                                 currentPoint.X - (blobSize + circleSize), currentPoint.Y - (blobSize + circleSize),
-                                //(blobSize + circleSize + (float)animationCycleAlts) * 2, (blobSize + circleSize + (float)animationCycleAlts) * 2,
                                 (blobSize + circleSize) * 2, (blobSize + circleSize) * 2,
                                 20 * (float)animationCycleIntel, 360);
                         }
@@ -812,30 +809,47 @@ namespace Quesadilla.Classes
                         else
                         {
                             float[] dashSet = { 4,4,2,2,1,1 };
-                            //circlePen.DashStyle = DashStyle.DashDot;
                             circlePen.DashPattern = dashSet;
                             g.DrawArc(circlePen,
-                                //currentPoint.X - (blobSize + (circleSize) + (float)animationCycleAlts), currentPoint.Y - (blobSize + (circleSize) + (float)animationCycleAlts),
                                 currentPoint.X - (blobSize + circleSize) , currentPoint.Y - (blobSize + circleSize),
-                                //(blobSize + circleSize + (float)animationCycleAlts) * 2, (blobSize + circleSize + (float)animationCycleAlts) * 2,
                                 (blobSize + circleSize) * 2, (blobSize + circleSize) * 2, 
                                 10 * (float)animationCycleAlts, 360);
                         }
                     }
                 }
 
-                // draw text
-                if (showSystemText)
+                // show all systems names ?
+                if (showAllSystemsText)
                 {
-                    foreach (var currentSystem in minimapSystems)
+                    foreach (var currentSystem in minimapSystems.Where(o => ! o.textDisplayConnecting && ! o.textDisplay))
                     {
-                        if (!currentSystem.textDisplay) continue;
-                        Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-                        DrawSystemName(g, currentPoint.X, currentPoint.Y, currentSystem.solarSystem.Name, SystemColourText, textSize);
-                    }
-                }
+						Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y); 
+                        DrawSystemName(g, currentPoint.X, currentPoint.Y, currentSystem.solarSystem.Name, SystemColourAllText, textSize / 3 * 2, false);
+					}
+				}
 
-                extraInformation = sbExtraInformation.ToString();
+				// show all connecting systems names
+				if (showConnectingSystemsText)
+				{
+					foreach (var currentSystem in minimapSystems.Where(o => o.textDisplayConnecting && !o.textDisplay))
+					{
+						Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+						DrawSystemName(g, currentPoint.X, currentPoint.Y, currentSystem.solarSystem.Name, SystemColourConnectingText, textSize / 4 * 3, false);
+					}
+				}
+
+				// show systems name
+				if (showSystemText)
+				{
+					foreach (var currentSystem in minimapSystems.Where(o => o.textDisplay))
+					{
+						Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+						DrawSystemName(g, currentPoint.X, currentPoint.Y, currentSystem.solarSystem.Name, SystemColourText, textSize);
+					}
+				}
+
+
+				extraInformation = sbExtraInformation.ToString();
 
                 if (returnMinimapSystems != null)
                 {

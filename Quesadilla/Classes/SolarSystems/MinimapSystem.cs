@@ -13,8 +13,9 @@ namespace Quesadilla.Classes.SolarSystems
         public bool fromSystem { get; set; }
         public bool toSystem { get; set; }
         public bool route { get; set; }
-        public bool textDisplay { get; set; }
-        public int X { get; set; }
+		public bool textDisplay { get; set; }
+		public bool textDisplayConnecting { get; set; }
+		public int X { get; set; }
         public int Y { get; set; }
     }
 }

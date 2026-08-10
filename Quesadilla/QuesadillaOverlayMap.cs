@@ -18,7 +18,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Quesadilla
 {
-    public partial class QuesadillaOverlayMap : TransparentOverlayForm
+	public partial class QuesadillaOverlayMap : TransparentOverlayForm
 	{
 		private Quesadilla _main;
 		private AnimationState AnimationStateKills;
@@ -31,13 +31,16 @@ namespace Quesadilla
 
 		public string EveScountInfo = "";
 
-		public QuesadillaOverlayMap(Quesadilla mainForm) : base()
-        {
-            _main = mainForm;
-            InitializeComponent();
+		private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
+		private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
 
-            Width = Program.MainConfiguration.OverlayMapWindowSize.Width <= 100 ? 100 : Program.MainConfiguration.OverlayMapWindowSize.Width;
-            Height = Program.MainConfiguration.OverlayMapWindowSize.Height <= 50 ? 50 : Program.MainConfiguration.OverlayMapWindowSize.Height;
+		public QuesadillaOverlayMap(Quesadilla mainForm) : base()
+		{
+			_main = mainForm;
+			InitializeComponent();
+
+			Width = Program.MainConfiguration.OverlayMapWindowSize.Width <= 100 ? 100 : Program.MainConfiguration.OverlayMapWindowSize.Width;
+			Height = Program.MainConfiguration.OverlayMapWindowSize.Height <= 50 ? 50 : Program.MainConfiguration.OverlayMapWindowSize.Height;
 
 			AnimationStateKills = new AnimationState(state: 0, direction: -1, maximum: 36, pulse: false);
 			AnimationStateIntel = new AnimationState(state: 1, direction: 1, maximum: 18, pulse: false);
@@ -45,17 +48,17 @@ namespace Quesadilla
 			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
 
 			SetScreenPosition();
-        }
+		}
 
-        public void SetScreenPosition()
-        {
-            // position on screen
-                        Location = new Point()
-                        {
-                            X = _main.currentEveWindowRect.Left + Program.MainConfiguration.OverlayMapWindowPosition.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.OverlayMapWindowPosition.Y,
-                        };
-        }
+		public void SetScreenPosition()
+		{
+			// position on screen
+			Location = new Point()
+			{
+				X = _main.currentEveWindowRect.Left + Program.MainConfiguration.OverlayMapWindowPosition.X,
+				Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.OverlayMapWindowPosition.Y,
+			};
+		}
 
 		protected override void RenderOverlay(Graphics g)
 		{
@@ -70,21 +73,21 @@ namespace Quesadilla
 		}
 
 		public void UpdateMapData()
-        {
+		{
 			string Toon = "";
 			if (_main.CurrentActiveToon != null && _main.CurrentActiveToon != "")
 			{
 				Toon = _main.CurrentActiveToon;
 			}
 
-			if (Toon == null || Toon == "" )
+			if (Toon == null || Toon == "")
 			{
-//				OverlayMinimap.Visible = false;
+				//				OverlayMinimap.Visible = false;
 				return;
 			}
 			else
 			{
-//				OverlayMinimap.Visible = true;
+				//				OverlayMinimap.Visible = true;
 				// Set position based on eve window ?
 				SetScreenPosition();
 			}
@@ -106,7 +109,6 @@ namespace Quesadilla
 			}
 
 			string extraInformation = "";
-			List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
 
 			AnimationStateKills.Advance();
 			AnimationStateIntel.Advance();
@@ -115,7 +117,7 @@ namespace Quesadilla
 
 			Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
 				Program.MainConfiguration.OverlayMinimapJumps, Program.MainConfiguration.OverlayMapMapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation, ref MinimapSystems,
-				Program.MainConfiguration.OverlayMinimapShowSystemText,
+				Program.MainConfiguration.OverlayMinimapShowSystemText, Program.MainConfiguration.OverlayMinimapShowAllSystemText, Program.MainConfiguration.OverlayMinimapShowConnectingSystemText,
 				Program.MainConfiguration.OverlayShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
 				Program.MainConfiguration.OverlayMinimapLineColourNormal,
 				Program.MainConfiguration.OverlayMinimapLineColourOutOfRegion,
@@ -124,7 +126,7 @@ namespace Quesadilla
 				Program.MainConfiguration.OverlayMinimapSystemColourRoute,
 				Program.MainConfiguration.OverlayMinimapSystemColourFrom,
 				Program.MainConfiguration.OverlayMinimapSystemColourTo,
-				Program.MainConfiguration.OverlayMinimapSystemColourText,
+				Program.MainConfiguration.OverlayMinimapSystemColourText, Program.MainConfiguration.OverlayMinimapAllSystemColourText, Program.MainConfiguration.OverlayMinimapConnectingSystemColourText,
 				Program.MainConfiguration.OverlayMinimapZKillColour,
 				Program.MainConfiguration.OverlayMinimapIntelColour,
 				Program.MainConfiguration.OverlayMinimapAltPositionColour,
@@ -157,5 +159,17 @@ namespace Quesadilla
 			RenderAndUpdate();
 		}
 
+		private void QuesadillaOverlayMap_MouseMove(object sender, MouseEventArgs e)
+		{
+			mouseOverMinimapSystems = Program.Universe.MouseOverSystem(e.X, e.Y, MinimapSystems);
+			if (mouseOverMinimapSystems.Count() > 0)
+			{
+				foreach (var s in mouseOverMinimapSystems)
+				{
+					Program.Universe.GetSystemInfo((int)s.solarSystem.Id);
+				}
+				this.Invalidate();
+			}
+		}
 	}
 }

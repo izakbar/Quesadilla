@@ -1101,7 +1101,7 @@ namespace Quesadilla
 
                 CheckEveScoutConnection(c);
 
-                GetSystemInfo(foundSystemId);
+                Program.Universe.GetSystemInfo(foundSystemId);
 
                 GetSkyhookTimers();
 
@@ -1159,14 +1159,6 @@ namespace Quesadilla
             shouldUpdateMinimap = true;
         }
 
-        private void GetSystemInfo(int systemid)
-        {
-            // check if we need to pull data from ESI for system (planets/moons/belts)
-            if (Program.Universe.SolarSystems[systemid].Planets == null)
-            {
-                Program.ESIHandler.EnqueueRequestSystem(systemid);
-            }
-        }
 
         private void _localWatcher_ChatServerChange(object sender, ProcessChatServerChangeEventArgs e)
         {
@@ -2550,8 +2542,8 @@ namespace Quesadilla
                 string extraInformation = "";
                 Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MainMinimap.Width, MainMinimap.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
                     Program.MainConfiguration.MinimapJumps, mapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation, ref MinimapSystems,
-                    Program.MainConfiguration.MinimapShowSystemText,
-                    Program.MainConfiguration.ShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
+					Program.MainConfiguration.MinimapShowSystemText, Program.MainConfiguration.MinimapShowAllSystemText, Program.MainConfiguration.MinimapShowConnectingSystemText,
+					Program.MainConfiguration.ShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
                     Program.MainConfiguration.MinimapLineColourNormal,
                     Program.MainConfiguration.MinimapLineColourOutOfRegion,
                     Program.MainConfiguration.MinimapLineColourRoute,
@@ -2559,8 +2551,8 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapSystemColourRoute,
                     Program.MainConfiguration.MinimapSystemColourFrom,
                     Program.MainConfiguration.MinimapSystemColourTo,
-                    Program.MainConfiguration.MinimapSystemColourText,
-                    Program.MainConfiguration.MinimapZKillColour,
+					Program.MainConfiguration.MinimapSystemColourText, Program.MainConfiguration.MinimapAllSystemColourText, Program.MainConfiguration.MinimapConnectingSystemColourText,
+					Program.MainConfiguration.MinimapZKillColour,
                     Program.MainConfiguration.MinimapIntelColour,
 					Program.MainConfiguration.MinimapAltPositionColour,
 					Program.MainConfiguration.MinimapUniHoleColour,
@@ -2844,7 +2836,7 @@ namespace Quesadilla
             {
                 foreach (var s in mouseOverMinimapSystems)
                 {
-                    GetSystemInfo((int)s.solarSystem.Id);
+                    Program.Universe.GetSystemInfo((int)s.solarSystem.Id);
                 }
                 this.Invalidate();
             }
