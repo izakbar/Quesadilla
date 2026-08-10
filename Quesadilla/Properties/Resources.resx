@@ -118,9 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="520-5204963_red-explosion-png-icons-explosion-clip-art-transparent" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\images\520-5204963_red-explosion-png-icons-explosion-clip-art-transparent.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="pop1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\pop1.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -135,9 +132,6 @@
   </data>
   <data name="bg_zub" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\bg_zub.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="RedCoin3" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Sounds\RedCoin3.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="SuitFly" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\SuitFly.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -160,14 +154,14 @@
   <data name="bg_imperium" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\bg_imperium.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="q" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\q.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="button5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Sounds\button5.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="bg_goons" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\images\bg_goons.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="bg_paulmart" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\bg_paulmart.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="harpsichord" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Sounds\harpsichord.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="spacebar" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\spacebar.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -178,23 +172,32 @@
   <data name="StarCoin" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\StarCoin.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="bg_paulmart2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\images\bg_paulmart2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Insidiouslogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\images\Insidiouslogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="bg_DefaultAlert" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\DefaultAlert.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="bg_Aura" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\bg_Aura.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Boo2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Sounds\Boo2.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="button5" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Sounds\button5.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="therapy" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\images\therapy.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="full" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\full.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="quiet_click" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Sounds\quiet-click.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="q" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\q.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="bg_m2_monument" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\images\bg_m2_monument.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="bg_aura1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\images\bg_Aura1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Quesadilla" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\Quesadilla.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -202,8 +205,8 @@
   <data name="SuitSpin" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\SuitSpin.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="izakbar" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\images\izakbar.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="RedCoin3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Sounds\RedCoin3.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Bravelogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\Bravelogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -211,8 +214,8 @@
   <data name="bg_massacre_m2_xfe" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\bg_massacre_m2_xfe.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="bg_m2_monument" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\images\bg_m2_monument.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="harpsichord" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Sounds\harpsichord.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="violin" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\violin.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -226,8 +229,8 @@
   <data name="flute" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\flute.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="bg_paulmart2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\images\bg_paulmart2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="izakbar" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\images\izakbar.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="RedCoin2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\RedCoin2.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -235,14 +238,11 @@
   <data name="skamos66" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\skamos66.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="bg_aura1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\images\bg_Aura1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="tuba" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\tuba.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="bg_goons" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\images\bg_goons.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Boo2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Sounds\Boo2.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="_1up1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\1up1.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -253,14 +253,17 @@
   <data name="Powerup" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\Powerup.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="Coin" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Sounds\Coin.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="INITlogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\INITlogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="bg_paladin" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\bg_paladin.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="therapy" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\images\therapy.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="quiet_click" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Sounds\quiet-click.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="bg_zirnitra" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\bg_zirnitra.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -268,10 +271,10 @@
   <data name="KamekLaugh" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Sounds\KamekLaugh.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Coin" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Sounds\Coin.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="520-5204963_red-explosion-png-icons-explosion-clip-art-transparent" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\images\520-5204963_red-explosion-png-icons-explosion-clip-art-transparent.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Insidiouslogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\images\Insidiouslogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="NClogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\images\NClogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

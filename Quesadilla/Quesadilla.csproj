@@ -423,6 +423,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="images\DefaultAlert.png" />
+    <None Include="images\NClogo.png" />
     <None Include="images\Insidiouslogo.png" />
     <None Include="images\INITlogo.png" />
     <None Include="Resources\Sounds\full.wav" />
