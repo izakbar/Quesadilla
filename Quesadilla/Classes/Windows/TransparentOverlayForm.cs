@@ -18,8 +18,8 @@ namespace Quesadilla.Classes
 
 		[DllImport("user32.dll", SetLastError = true)]
 		private static extern bool UpdateLayeredWindow(
-	IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize,
-	IntPtr hdcSrc, ref POINT pprSrc, int crKey, ref BLENDFUNCTION pblend, int dwFlags);
+			IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize,
+			IntPtr hdcSrc, ref POINT pprSrc, int crKey, ref BLENDFUNCTION pblend, int dwFlags);
 
 		[DllImport("user32.dll")]
 		private static extern IntPtr GetDC(IntPtr hWnd);
@@ -39,6 +39,9 @@ namespace Quesadilla.Classes
 		[DllImport("gdi32.dll")]
 		private static extern bool DeleteObject(IntPtr hObject);
 
+		[DllImport("user32.dll")]
+		private static extern bool GetCursorPos(out POINT lpPoint);
+
 		[StructLayout(LayoutKind.Sequential)]
 		private struct POINT { public int X, Y; public POINT(int x, int y) { X = x; Y = y; } }
 
@@ -51,6 +54,12 @@ namespace Quesadilla.Classes
 		{
 			public byte BlendOp, BlendFlags, SourceConstantAlpha, AlphaFormat;
 		}
+
+		// mouse tracking
+		private readonly Timer _mouseTrackTimer = new Timer();
+		private Point _lastMousePos = new Point(int.MinValue, int.MinValue);
+		private bool _mouseWasInside = false;
+		private bool _enableMouseTracking = false;
 
 		private const int ULW_ALPHA = 0x02;
 		private const byte AC_SRC_OVER = 0x00;
@@ -65,7 +74,8 @@ namespace Quesadilla.Classes
 		public TransparentOverlayForm()
 		{
 			TopMost = true;
-			ApplyTransparentOverlayStyle(); // <-- this was missing; without it TransparencyKey is never set
+			ApplyTransparentOverlayStyle(); 
+			InitMouseTracking();
 		}
 
 		protected void ApplyTransparentOverlayStyle()
@@ -178,5 +188,67 @@ namespace Quesadilla.Classes
 				return cp;
 			}
 		}
+
+		protected bool EnableMouseTracking
+		{
+			get => _enableMouseTracking;
+			set
+			{
+				_enableMouseTracking = value;
+				_mouseTrackTimer.Enabled = value && IsHandleCreated;
+			}
+		}
+
+		protected int MouseTrackIntervalMs
+		{
+			get => _mouseTrackTimer.Interval;
+			set => _mouseTrackTimer.Interval = value;
+		}
+
+		private void InitMouseTracking()
+		{
+			_mouseTrackTimer.Interval = 33; // ~30 checks/sec by default
+			_mouseTrackTimer.Tick += MouseTrackTimer_Tick;
+		}
+
+		private void MouseTrackTimer_Tick(object sender, EventArgs e)
+		{
+			if (!IsHandleCreated || !Visible) return;
+			if (!GetCursorPos(out POINT screenPt)) return;
+
+			Point clientPt = PointToClient(new Point(screenPt.X, screenPt.Y));
+			bool inside = ClientRectangle.Contains(clientPt);
+
+			if (inside)
+			{
+				if (clientPt != _lastMousePos)
+				{
+					_lastMousePos = clientPt;
+					_mouseWasInside = true;
+					OnOverlayMouseMove(clientPt);
+				}
+			}
+			else if (_mouseWasInside)
+			{
+				_mouseWasInside = false;
+				_lastMousePos = new Point(int.MinValue, int.MinValue);
+				OnOverlayMouseLeave();
+			}
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing) _mouseTrackTimer.Dispose();
+			base.Dispose(disposing);
+		}
+
+		protected override void OnHandleCreated(EventArgs e)
+		{
+			base.OnHandleCreated(e);
+			if (EnableMouseTracking) _mouseTrackTimer.Enabled = true;
+		}
+
+		protected virtual void OnOverlayMouseMove(Point clientLocation) { }
+		protected virtual void OnOverlayMouseLeave() { }
 	}
 }

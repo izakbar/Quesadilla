@@ -1310,7 +1310,7 @@ img.rounded-corners {
 		[Category("Main window")]
 		[DisplayName("Minimap seclimit Indicator alpha")]
 		[Description("Alpha to use for seclimit indicators on the minimap")]
-		[DefaultValue(typeof(int), "60")]
+		[DefaultValue(typeof(int), "70")]
 		[Range(0, 100)]
 		public int MinimapSecLimitAlpha { get; set; }
 
@@ -1337,7 +1337,7 @@ img.rounded-corners {
 		[Category("Main window")]
 		[DisplayName("Minimap incursion Indicator alpha")]
 		[Description("Alpha to use for incursion indicators on the minimap")]
-		[DefaultValue(typeof(int), "40")]
+		[DefaultValue(typeof(int), "60")]
         [Range(0, 100)]
 		public int MinimapIncursionAlpha { get; set; }
 
@@ -1737,7 +1737,7 @@ img.rounded-corners {
 		[Category("Alert")]
 		[DisplayName("Minimap incursion Indicator alpha")]
 		[Description("Alpha to use for incursion indicators on the alert popup")]
-		[DefaultValue(typeof(int), "40")]
+		[DefaultValue(typeof(int), "60")]
 		[Range(0, 100)]
         public int AlertPopupMinimapIncursionAlpha { get; set; }
 
@@ -1769,7 +1769,7 @@ img.rounded-corners {
 		[Category("Alert")]
 		[DisplayName("Minimap seclimit Indicator alpha")]
 		[Description("Alpha to use for seclimit indicators on the minimap")]
-		[DefaultValue(typeof(int), "60")]
+		[DefaultValue(typeof(int), "70")]
 		[Range(0, 100)]
 		public int AlertPopupMinimapSecLimitAlpha { get; set; }
 
@@ -2236,7 +2236,7 @@ img.rounded-corners {
 		[Category("OverlayMap")]
 				[DisplayName("Minimap seclimit Indicator alpha")]
 				[Description("Alpha to use for seclimit indicators on the minimap")]
-				[DefaultValue(typeof(int), "60")]
+				[DefaultValue(typeof(int), "70")]
 				[Range(0, 100)]
 				public int OverlayMinimapSecLimitAlpha { get; set; }
 
@@ -2263,7 +2263,7 @@ img.rounded-corners {
 		[Category("OverlayMap")]
 				[DisplayName("Minimap incursion Indicator alpha")]
 				[Description("Alpha to use for incursion indicators on the minimap")]
-				[DefaultValue(typeof(int), "40")]
+				[DefaultValue(typeof(int), "60")]
 				[Range(0, 100)]
 				public int OverlayMinimapIncursionAlpha { get; set; }
 

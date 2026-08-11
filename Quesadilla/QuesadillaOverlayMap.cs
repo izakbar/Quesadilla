@@ -33,6 +33,7 @@ namespace Quesadilla
 
 		private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
 		private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
+		private Point mouseOverPoint;
 
 		public QuesadillaOverlayMap(Quesadilla mainForm) : base()
 		{
@@ -47,6 +48,7 @@ namespace Quesadilla
 			AnimationStateAlts = new AnimationState(state: 2, direction: -1, maximum: 12, pulse: false);
 			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
 
+			EnableMouseTracking = true;
 			SetScreenPosition();
 		}
 
@@ -69,6 +71,13 @@ namespace Quesadilla
 				var brush = new SolidBrush(Color.FromArgb(180, 0, 0, 0)); // 180/255 alpha, real transparency
 				var font = new Font("Segoe UI", 12f, FontStyle.Bold);
 				g.DrawString($"{_statusText}", font, Brushes.Green, 0, 0);
+			}
+
+			if (mouseOverMinimapSystems.Count > 0)
+			{
+				var brush = new SolidBrush(Color.Red);
+				var font = new Font("Segoe UI", 12f, FontStyle.Bold);
+				g.DrawString($"{mouseOverMinimapSystems[0].solarSystem.Name}", font, brush, mouseOverPoint);
 			}
 		}
 
@@ -159,16 +168,34 @@ namespace Quesadilla
 			RenderAndUpdate();
 		}
 
-		private void QuesadillaOverlayMap_MouseMove(object sender, MouseEventArgs e)
+
+
+		protected override void OnOverlayMouseMove(Point clientLocation)
 		{
-			mouseOverMinimapSystems = Program.Universe.MouseOverSystem(e.X, e.Y, MinimapSystems);
-			if (mouseOverMinimapSystems.Count() > 0)
+			var hovered = Program.Universe.MouseOverSystem(clientLocation.X, clientLocation.Y, MinimapSystems);
+
+			if (hovered.Count() > 0)
 			{
-				foreach (var s in mouseOverMinimapSystems)
-				{
+				foreach (var s in hovered)
 					Program.Universe.GetSystemInfo((int)s.solarSystem.Id);
-				}
-				this.Invalidate();
+			}
+
+			// Only redraw if the hover set actually changed, to avoid re-rendering
+			// on every single poll tick while the mouse is merely sitting still inside.
+			if (!mouseOverMinimapSystems.SequenceEqual(hovered))
+			{
+				mouseOverMinimapSystems = hovered;
+				mouseOverPoint = new Point(clientLocation.X, clientLocation.Y);
+				RenderAndUpdate(); // replaces the old Invalidate() — painting is manual now, Invalidate does nothing
+			}
+		}
+
+		protected override void OnOverlayMouseLeave()
+		{
+			if (mouseOverMinimapSystems.Count > 0)
+			{
+				mouseOverMinimapSystems.Clear();
+				RenderAndUpdate();
 			}
 		}
 	}

@@ -42,7 +42,6 @@
 			this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
 			this.Name = "QuesadillaOverlayMap";
 			this.Text = "Map Overlay";
-			this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.QuesadillaOverlayMap_MouseMove);
 			this.ResumeLayout(false);
 
 		}
