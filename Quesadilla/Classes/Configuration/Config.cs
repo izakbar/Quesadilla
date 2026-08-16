@@ -138,6 +138,7 @@ namespace Quesadilla.Classes
 
             c.MainWindowItemLocations = DuplicateLocations(MainWindowItemLocations);
 			c.AlertWindowItemLocations = DuplicateLocations(AlertWindowItemLocations);
+            c.OverlayWindowItemLocations = DuplicateLocations(OverlayWindowItemLocations);
 
 			c.InitialPosition = new Point(InitialPosition.X, InitialPosition.Y);
 			c.MainWindowSize = new Size(MainWindowSize.Width, MainWindowSize.Height);
@@ -985,6 +986,35 @@ img.rounded-corners {
 					Size = new Size(34, 34),
 					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
 				});
+			}
+
+			if (c.OverlayWindowItemLocations == null)
+			{
+				c.OverlayWindowItemLocations = new List<ConfigurationItemLocationInformation>();
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "RattingData",
+					Color = Color.Aqua,
+					AlternateColor = Color.Orange,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+					Location = new Point(440, 323),
+					Size = new Size(118, 15),
+					Font = new Font("Microsoft Sans Serif", 9f, FontStyle.Regular),
+				});
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "MiningData",
+					Color = Color.Aqua,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Orange,
+					IsVisible = true,
+					Location = new Point(300, 323),
+					Size = new Size(118, 15),
+					Font = new Font("Microsoft Sans Serif", 9f, FontStyle.Regular),
+				});
+
+
 			}
 
 			return (c);
@@ -2304,6 +2334,10 @@ img.rounded-corners {
 				[Description("Show systems outside current region if in configured jumps range {MinimapJumps}")]
 				[DefaultValue(typeof(bool), "false")]
 				public bool OverlayMinimapShowOutOfRegion { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Item Locations")]
+		public List<ConfigurationItemLocationInformation> OverlayWindowItemLocations { get; set; }
 
 	}
 }

@@ -35,6 +35,9 @@ namespace Quesadilla
 		private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
 		private Point mouseOverPoint;
 
+		public Label RattingData = new Label() { Name = "RattingData" };
+		public Label MiningData = new Label() { Name = "MiningData" };
+
 		public QuesadillaOverlayMap(Quesadilla mainForm) : base()
 		{
 			_main = mainForm;
@@ -50,6 +53,11 @@ namespace Quesadilla
 
 			EnableMouseTracking = true;
 			SetScreenPosition();
+
+			this.Controls.Add(RattingData);
+			this.Controls.Add(MiningData);
+
+			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.OverlayWindowItemLocations, 0, false, false, true);
 		}
 
 		public void SetScreenPosition()
@@ -79,6 +87,10 @@ namespace Quesadilla
 				var font = new Font("Segoe UI", 12f, FontStyle.Bold);
 				g.DrawString($"{mouseOverMinimapSystems[0].solarSystem.Name}", font, brush, mouseOverPoint);
 			}
+
+
+			ImageGenerator.PaintDrawText(g, RattingData);
+
 		}
 
 		public void UpdateMapData()

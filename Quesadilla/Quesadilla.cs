@@ -395,7 +395,11 @@ namespace Quesadilla
             BackColor = Program.MainConfiguration.MainWindowBackgroundColour;
             ForeColor = Program.MainConfiguration.MainWindowTextColour;
 
-            Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.MainWindowItemLocations, TopbarPanel.Height, MiningPerHourTotal, ISKPerHourTotal, false);
+			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.MainWindowItemLocations, TopbarPanel.Height, MiningPerHourTotal, ISKPerHourTotal, false);
+            if (OverlayMapWindow != null)
+            {
+                Program.MainConfiguration.ApplyConfiguration(OverlayMapWindow, Program.MainConfiguration.OverlayWindowItemLocations, 0, MiningPerHourTotal, ISKPerHourTotal, false);
+            }
 
 			RebuildAlertsMenu();
             RebuildBackgroundsMenu();
@@ -2600,14 +2604,14 @@ namespace Quesadilla
         private void Quesadilla_Paint(object sender, PaintEventArgs e)
         {
 
-            ImageGenerator.PaintDrawText(e, CurrentClient);
-            ImageGenerator.PaintDrawText(e, RattingData);
-            ImageGenerator.PaintDrawText(e, MiningData);
-            ImageGenerator.PaintDrawText(e, AlertsOutstanding);
+            ImageGenerator.PaintDrawText(e.Graphics, CurrentClient);
+            ImageGenerator.PaintDrawText(e.Graphics, RattingData);
+            ImageGenerator.PaintDrawText(e.Graphics, MiningData);
+            ImageGenerator.PaintDrawText(e.Graphics, AlertsOutstanding);
 
             if (MainMinimap.Visible)
             {
-                if (Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, ExtraInformation);
+                if (Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e.Graphics, ExtraInformation);
                 if (mouseOverMinimapSystems.Count() > 0)
                 {
                     MouseoverSystemName.Text = "";
@@ -2616,7 +2620,7 @@ namespace Quesadilla
                         if (!string.IsNullOrEmpty(MouseoverSystemName.Text)) MouseoverSystemName.Text += ",";
                         MouseoverSystemName.Text += m.solarSystem.Name + (m.solarSystem.GetNPCKillsDeltaLastHour() == null ? "" : $"  {m.solarSystem.GetNPCKillsDeltaLastHour()}");
                     }
-                    ImageGenerator.PaintDrawText(e, MouseoverSystemName);
+                    ImageGenerator.PaintDrawText(e.Graphics, MouseoverSystemName);
                 }
             }
 
@@ -2749,19 +2753,37 @@ namespace Quesadilla
                     RattingData.Text = Program.GetIskLastHour(CurrentActiveToon);
                     RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
                     this.Invalidate();
-                    //lblISK.Visible = true;
-                }
+
+                    if ( OverlayMapWindow != null)
+                    {
+						OverlayMapWindow.RattingData.Text = Program.GetIskLastHour(CurrentActiveToon);
+						OverlayMapWindow.RattingData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
+                        OverlayMapWindow.UpdateMapData();
+					}
+					//lblISK.Visible = true;
+				}
                 else
                 {
                     //lblISK.Visible = false;
                     RattingData.Text = "";
-                }
-            } else
+					if (OverlayMapWindow != null)
+					{
+						OverlayMapWindow.RattingData.Text = "";
+						OverlayMapWindow.UpdateMapData();
+					}
+				}
+			} else
             {
                 RattingData.Text = Program.GetIskLastHour("");
                 RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).AlternateColor;
+				if (OverlayMapWindow != null)
+				{
+					OverlayMapWindow.RattingData.Text = Program.GetIskLastHour("");
+					OverlayMapWindow.RattingData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData")).AlternateColor;
+					OverlayMapWindow.UpdateMapData();
+				}
 			}
-        }
+		}
         private void UpdateMining()
         {
 
@@ -2772,20 +2794,37 @@ namespace Quesadilla
                     MiningData.Text = Program.GetMiningLastHour(CurrentActiveToon);
                     MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
 					this.Invalidate();
-                    //lblISK.Visible = true;
-                }
-                else
+					//lblISK.Visible = true;
+					if (OverlayMapWindow != null)
+					{
+						OverlayMapWindow.MiningData.Text = Program.GetIskLastHour(CurrentActiveToon);
+						OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
+						OverlayMapWindow.UpdateMapData();
+					}
+				}
+				else
                 {
                     //lblISK.Visible = false;
                     MiningData.Text = "";
-                }
-            }
+					if (OverlayMapWindow != null)
+					{
+						OverlayMapWindow.MiningData.Text = "";
+						OverlayMapWindow.UpdateMapData();
+					}
+				}
+			}
             else
             {
                 MiningData.Text = Program.GetMiningLastHour("");
                 MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
+				if (OverlayMapWindow != null)
+				{
+					OverlayMapWindow.MiningData.Text = Program.GetMiningLastHour("");
+					OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
+					OverlayMapWindow.UpdateMapData();
+				}
 			}
-        }
+		}
 
         private void UpdateMiningCSV()
         {
@@ -2974,7 +3013,7 @@ namespace Quesadilla
         {
             if (MainMinimap.Visible)
             {
-                if (Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e, ExtraInformation);
+                if (Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e.Graphics, ExtraInformation);
                 if (mouseOverMinimapSystems.Count() > 0)
                 {
                     foreach (var m in mouseOverMinimapSystems)

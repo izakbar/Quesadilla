@@ -414,37 +414,6 @@ namespace Quesadilla.Classes
                 if (textSize < MINIMUM_TEXT_SIZE) textSize = MINIMUM_TEXT_SIZE;
 
 
-                //Seclimit ?
-                if (showSecLimit && minimapSystems.Where(o => o.solarSystem.Security <= secLimit).Count() > 0)
-                {
-					g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-					//Brush secLimitBrush = new SolidBrush(SecLimitColour);
-					Brush secLimitBrush = new HatchBrush(HatchStyle.Percent30, SecLimitColour);
-
-					Brush secLimitOutlineBrush = new SolidBrush(SecLimitOutlineColour);
-					Pen secLimitOutlinePen = new Pen(secLimitOutlineBrush, 3);
-					float secLimitBlobSize = ((float)secLimitCloudSize / (float)GUI_SCALING);
-					Image secLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
-
-					ColorMatrix secLimitColourMatrix = new ColorMatrix();
-					secLimitColourMatrix.Matrix33 = (float)((float)secLimitAlphaAmount / (float)100);  // alpha !
-					ImageAttributes secLimitImageAttr = new ImageAttributes();
-					secLimitImageAttr.SetColorMatrix(secLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-
-					using (Graphics gSecLimit = Graphics.FromImage(secLimitImage))
-					{
-						MapCircles(gSecLimit, minimapSystems.Where(o => o.solarSystem.Security <= secLimit).ToList(), originPoint, secLimitBlobSize, secLimitOutlinePen, secLimitBrush);
-
-						g.DrawImage(
-							secLimitImage,  
-							new Rectangle(0, 0, secLimitImage.Width, secLimitImage.Height),
-							0, 0, secLimitImage.Width, secLimitImage.Height,
-							GraphicsUnit.Pixel,
-							secLimitImageAttr
-							);
-					}
-				}
-
 			// draw incursion base if required
 			if (minimapSystems.Where(o => o.solarSystem.Incursion).Count() > 0)
 				{
@@ -479,6 +448,38 @@ namespace Quesadilla.Classes
 							);
 					}
 				}
+
+				//Seclimit ?
+				if (showSecLimit && minimapSystems.Where(o => o.solarSystem.Security <= secLimit).Count() > 0)
+				{
+					g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+					//Brush secLimitBrush = new SolidBrush(SecLimitColour);
+					Brush secLimitBrush = new HatchBrush(HatchStyle.Percent30, SecLimitColour);
+
+					Brush secLimitOutlineBrush = new SolidBrush(SecLimitOutlineColour);
+					Pen secLimitOutlinePen = new Pen(secLimitOutlineBrush, 3);
+					float secLimitBlobSize = ((float)secLimitCloudSize / (float)GUI_SCALING);
+					Image secLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
+
+					ColorMatrix secLimitColourMatrix = new ColorMatrix();
+					secLimitColourMatrix.Matrix33 = (float)((float)secLimitAlphaAmount / (float)100);  // alpha !
+					ImageAttributes secLimitImageAttr = new ImageAttributes();
+					secLimitImageAttr.SetColorMatrix(secLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+					using (Graphics gSecLimit = Graphics.FromImage(secLimitImage))
+					{
+						MapCircles(gSecLimit, minimapSystems.Where(o => o.solarSystem.Security <= secLimit).ToList(), originPoint, secLimitBlobSize, secLimitOutlinePen, secLimitBrush);
+
+						g.DrawImage(
+							secLimitImage,
+							new Rectangle(0, 0, secLimitImage.Width, secLimitImage.Height),
+							0, 0, secLimitImage.Width, secLimitImage.Height,
+							GraphicsUnit.Pixel,
+							secLimitImageAttr
+							);
+					}
+				}
+
 
 				// storm detection
 				float circleSizeStorm = 40 / (float)GUI_SCALING;
@@ -969,18 +970,19 @@ namespace Quesadilla.Classes
             }
         }
 
-        public static void PaintDrawText(PaintEventArgs e, System.Windows.Forms.Label l)
-        {
-            var flags = TextFormatFlags.Right;
-            if (l.TextAlign == ContentAlignment.TopLeft || l.TextAlign == ContentAlignment.BottomLeft || l.TextAlign == ContentAlignment.MiddleLeft) flags = TextFormatFlags.Left;
-            flags = flags | TextFormatFlags.WordBreak;
+		public static void PaintDrawText(Graphics g, System.Windows.Forms.Label l)
+		{
+            //if (l.Visible == false) return; 
+			var flags = TextFormatFlags.Right;
+			if (l.TextAlign == ContentAlignment.TopLeft || l.TextAlign == ContentAlignment.BottomLeft || l.TextAlign == ContentAlignment.MiddleLeft) flags = TextFormatFlags.Left;
+			flags = flags | TextFormatFlags.WordBreak;
 
-            e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+			g.TextRenderingHint = TextRenderingHint.AntiAlias;
 
-            TextRenderer.DrawText(e.Graphics, l.Text, l.Font, new Rectangle(l.Left, l.Top, l.Width, l.Height), l.ForeColor, flags);
-        }
+			TextRenderer.DrawText(g, l.Text, l.Font, new Rectangle(l.Left, l.Top, l.Width, l.Height), l.ForeColor, flags);
+		}
 
-        public static Size PaintDrawText(PaintEventArgs e, string s, int x, int y, Color c, Font f)
+		public static Size PaintDrawText(PaintEventArgs e, string s, int x, int y, Color c, Font f)
         {
             var flags = TextFormatFlags.Left;
             // if (l.TextAlign == ContentAlignment.TopLeft || l.TextAlign == ContentAlignment.BottomLeft || l.TextAlign == ContentAlignment.MiddleLeft) flags = TextFormatFlags.Left;

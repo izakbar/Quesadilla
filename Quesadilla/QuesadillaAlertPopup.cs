@@ -531,16 +531,16 @@ namespace Quesadilla
 
         private void QuesadillaAlertPopup_Paint(object sender, PaintEventArgs e)
         {
-            if ( _config.GetConfiguration("AlertText" , _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e, AlertText);
-			if (_config.GetConfiguration("SystemName", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e, SystemName);
-			if (_config.GetConfiguration("RegionName", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e,RegionName);
-			if (_config.GetConfiguration("ContextInfo", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e,ContextInfo);
+            if ( _config.GetConfiguration("AlertText" , _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, AlertText);
+			if (_config.GetConfiguration("SystemName", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, SystemName);
+			if (_config.GetConfiguration("RegionName", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics,RegionName);
+			if (_config.GetConfiguration("ContextInfo", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics,ContextInfo);
             if (_config.GetConfiguration("ShipName", _config.AlertWindowItemLocations).IsVisible && ShowShipname)
             {
-                ImageGenerator.PaintDrawText(e, ShipName);
+                ImageGenerator.PaintDrawText(e.Graphics, ShipName);
             }
-			if (_config.GetConfiguration("ContextInfo", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e, ContextInfo);
-			if (_config.GetConfiguration("IntelLine", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e, IntelLine);
+			if (_config.GetConfiguration("ContextInfo", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, ContextInfo);
+			if (_config.GetConfiguration("IntelLine", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, IntelLine);
 
             if (MinimapImage.Visible)
             {
