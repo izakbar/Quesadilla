@@ -42,8 +42,9 @@ namespace Quesadilla.Classes
 
         private const int CIRCLE_RADIUS = 3;
         private const int SYSTEM_CIRCLE_SIZE = 6;
+        private const int STORM_CIRCLE_SIZE = 40;
 
-        private const float MINIMUM_TEXT_SIZE = 9;
+		private const float MINIMUM_TEXT_SIZE = 9;
         private const int MINIMUM_BLOB_SIZE = 3;
         private const float MINIMUM_CIRCLE_SIZE = 2.3f;
 
@@ -363,17 +364,30 @@ namespace Quesadilla.Classes
                 int minX = 0;
                 int minY = 0;
 
-                foreach (var currentSystem in minimapSystems)
+                int sizeAdjust = (int)SYSTEM_CIRCLE_SIZE + (Math.Max(Math.Max(STORM_CIRCLE_SIZE, secLimitCloudSize), incursionCloudSize));
+
+				foreach (var currentSystem in minimapSystems)
                 {
-                    maxX = Math.Max(maxX, currentSystem.X);
-                    maxY = Math.Max(maxY, currentSystem.Y);
-                    minX = Math.Min(minX, currentSystem.X);
-                    minY = Math.Min(minY, currentSystem.Y);
+                    maxX = Math.Max(maxX, currentSystem.X );
+                    maxY = Math.Max(maxY, currentSystem.Y );
+                    minX = Math.Min(minX, currentSystem.X );
+                    minY = Math.Min(minY, currentSystem.Y );
                 }
-                int maxSize = Math.Max((int)(maxX - minX), (int)(maxY - minY));
-                int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (8);
-                GUI_SCALING = (int)Math.Round((double)(maxSize) / ((pictureSize * (whichMap == MapType.SDE ? .8 : (whichMap == MapType.SDE2D ? .8 : .8 )) )));
-                GUI_SCALING = GUI_SCALING * (((double)mapScale / 100));
+
+				maxX += sizeAdjust; maxY += sizeAdjust;
+				minX -= sizeAdjust; minY -= sizeAdjust;
+				if (minX < 0) { maxX += Math.Abs(minX); minX = 0; }
+				if (minY < 0) { maxY += Math.Abs(minY); minY = 0; }
+
+				//int maxSize = Math.Max((int)(maxX - minX), (int)(maxY - minY));
+                //int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (8);
+
+				double GUI_SCALINGx = (double)(maxX - minX) / (srcImage.Width * (whichMap == MapType.SDE ? .9 : (whichMap == MapType.SDE2D ? .9 : .9)));
+				double GUI_SCALINGy = (double)(maxY - minY)/ (srcImage.Height * (whichMap == MapType.SDE ? .9 : (whichMap == MapType.SDE2D ? .9 : .9)));
+				GUI_SCALING = Math.Max(GUI_SCALINGx, GUI_SCALINGy);
+
+				//GUI_SCALING = (int)Math.Round((double)(maxSize) / ((pictureSize * (whichMap == MapType.SDE ? .9 : (whichMap == MapType.SDE2D ? .9 : .9 )) )));
+				GUI_SCALING = GUI_SCALING * (((double)mapScale / 100));
                 // Apply scale
                 maxX = 0; maxY = 0; minX = 0; minY = 0;
                 if (GUI_SCALING > 0)
@@ -482,7 +496,7 @@ namespace Quesadilla.Classes
 
 
 				// storm detection
-				float circleSizeStorm = 40 / (float)GUI_SCALING;
+				float circleSizeStorm = STORM_CIRCLE_SIZE / (float)GUI_SCALING;
 				float blobSize = (SYSTEM_CIRCLE_SIZE / (float)GUI_SCALING);
 				if (blobSize < MINIMUM_BLOB_SIZE || float.IsInfinity(blobSize))
 				{

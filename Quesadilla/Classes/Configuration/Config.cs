@@ -1284,7 +1284,7 @@ img.rounded-corners {
         [Category("Main window")]
         [DisplayName("Minimap zoom initial map scale")]
         [Description("How to scale main window minimap - default 100")]
-        [DefaultValue(typeof(int), "70")]
+        [DefaultValue(typeof(int), "90")]
         public int MainWindowMapScale { get; set; }
         
 
@@ -2104,7 +2104,7 @@ img.rounded-corners {
 		[Category("OverlayMap")]
 		[DisplayName("Overlay Minimap zoom map scale")]
 		[Description("How to scale overlay window minimap - default 70")]
-		[DefaultValue(typeof(int), "80")]
+		[DefaultValue(typeof(int), "90")]
 		public int OverlayMapMapScale { get; set; }
 
 		[Category("OverlayMap")]

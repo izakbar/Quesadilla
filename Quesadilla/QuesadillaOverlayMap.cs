@@ -34,6 +34,7 @@ namespace Quesadilla
 		private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
 		private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
 		private Point mouseOverPoint;
+		private int mapScale = 100;
 
 		public Label RattingData = new Label() { Name = "RattingData" };
 		public Label MiningData = new Label() { Name = "MiningData" };
@@ -58,6 +59,9 @@ namespace Quesadilla
 			this.Controls.Add(MiningData);
 
 			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.OverlayWindowItemLocations, 0, false, false, true);
+
+			mapScale = Program.MainConfiguration.OverlayMapMapScale;
+			if (mapScale == 0) mapScale = 100;
 		}
 
 		public void SetScreenPosition()
