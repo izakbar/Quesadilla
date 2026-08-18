@@ -1021,7 +1021,7 @@ img.rounded-corners {
 					IsVisible = true,
                     Location = new Point(1, 1),
                     Size = new Size(400, 13),
-                    Font = new Font("Segoe UI", 8.75f, FontStyle.Regular),
+                    Font = new Font("Segoe UI", 9f, FontStyle.Regular),
                 });
 
 
