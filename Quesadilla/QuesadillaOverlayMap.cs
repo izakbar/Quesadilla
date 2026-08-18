@@ -27,9 +27,6 @@ namespace Quesadilla
 		private AnimationState AnimationStateUniHoles;
 
 		private Image _sourceImage = null;
-		private string _statusText = string.Empty;
-
-		public string EveScountInfo = "";
 
 		private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
 		private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
@@ -38,6 +35,7 @@ namespace Quesadilla
 
 		public Label RattingData = new Label() { Name = "RattingData" };
 		public Label MiningData = new Label() { Name = "MiningData" };
+		public Label EveScoutStatus = new Label() { Name = "EveScoutStatus" };
 
 		public QuesadillaOverlayMap(Quesadilla mainForm) : base()
 		{
@@ -57,6 +55,7 @@ namespace Quesadilla
 
 			this.Controls.Add(RattingData);
 			this.Controls.Add(MiningData);
+			this.Controls.Add(EveScoutStatus);
 
 			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.OverlayWindowItemLocations, 0, false, false, true);
 
@@ -80,14 +79,13 @@ namespace Quesadilla
 			if (_sourceImage != null)
 			{
 				g.DrawImage(_sourceImage, 0, 0, Width, Height); // Image works directly with DrawImage
-				var brush = new SolidBrush(Color.FromArgb(180, 0, 0, 0)); // 180/255 alpha, real transparency
-				var font = new Font("Segoe UI", 12f, FontStyle.Bold);
-				g.DrawString($"{_statusText}", font, Brushes.Green, 0, 0);
+
+				ImageGenerator.PaintDrawText(g, EveScoutStatus);
 			}
 
 			if (mouseOverMinimapSystems.Count > 0)
 			{
-				var brush = new SolidBrush(Color.Red);
+				var brush = new SolidBrush(Program.MainConfiguration.OverlayMinimapMouseoverSystemColour);
 				var font = new Font("Segoe UI", 12f, FontStyle.Bold);
 				g.DrawString($"{mouseOverMinimapSystems[0].solarSystem.Name}", font, brush, mouseOverPoint);
 			}
@@ -179,8 +177,6 @@ namespace Quesadilla
 			//                Bitmap minimapBitmap = new Bitmap(minimapImage);
 			//                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
 			_sourceImage = minimapImage;
-			_statusText = EveScountInfo;
-
 			RenderAndUpdate();
 		}
 

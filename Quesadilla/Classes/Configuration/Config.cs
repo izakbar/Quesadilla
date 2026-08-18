@@ -1013,6 +1013,16 @@ img.rounded-corners {
 					Size = new Size(118, 15),
 					Font = new Font("Microsoft Sans Serif", 9f, FontStyle.Regular),
 				});
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "EveScoutStatus",
+                    Color = Color.LimeGreen,
+					BackColor = Color.Transparent,
+					IsVisible = true,
+                    Location = new Point(1, 1),
+                    Size = new Size(400, 13),
+                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                });
 
 
 			}

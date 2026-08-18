@@ -2220,12 +2220,11 @@ namespace Quesadilla
             EveScoutStatus.Text = status.ToString().Trim();
             if ( OverlayMapWindow != null )
             {
-                OverlayMapWindow.EveScountInfo = EveScoutStatus.Text;
-
+                OverlayMapWindow.EveScoutStatus.Text = EveScoutStatus.Text;
 			}
-        }
+		}
 
-        private void GetSkyhookTimers()
+		private void GetSkyhookTimers()
         {
             Program.ESIHandler.EnqueueRequestSkyhookData();
 		}
