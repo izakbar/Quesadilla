@@ -85,14 +85,19 @@ namespace Quesadilla
 
 			if (mouseOverMinimapSystems.Count > 0)
 			{
+				//var brushBackground = new SolidBrush(Color.Navy);
 				var brush = new SolidBrush(Program.MainConfiguration.OverlayMinimapMouseoverSystemColour);
-				var font = new Font("Segoe UI", 12f, FontStyle.Bold);
+				var font = new Font("Segoe UI", 12f, FontStyle.Regular);
+
+				//Size size = TextRenderer.MeasureText($"{mouseOverMinimapSystems[0].solarSystem.Name}", font);
+				//g.FillRectangle(brushBackground, mouseOverPoint.X - 1, mouseOverPoint.Y, size.Width + 1, size.Height);
+
 				g.DrawString($"{mouseOverMinimapSystems[0].solarSystem.Name}", font, brush, mouseOverPoint);
 			}
 
 
 			ImageGenerator.PaintDrawText(g, RattingData);
-
+			ImageGenerator.PaintDrawText(g, MiningData);
 		}
 
 		public void UpdateMapData()
@@ -197,7 +202,7 @@ namespace Quesadilla
 			if (!mouseOverMinimapSystems.SequenceEqual(hovered))
 			{
 				mouseOverMinimapSystems = hovered;
-				mouseOverPoint = new Point(clientLocation.X, clientLocation.Y);
+				mouseOverPoint = new Point(clientLocation.X + 6, clientLocation.Y + 4);
 				RenderAndUpdate(); // replaces the old Invalidate() — painting is manual now, Invalidate does nothing
 			}
 		}

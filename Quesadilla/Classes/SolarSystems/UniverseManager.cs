@@ -275,7 +275,7 @@ namespace Quesadilla.Classes.SolarSystems
         public List<MinimapSystem> MouseOverSystem(int X, int Y, List<MinimapSystem> mSystems)
         {
             List<MinimapSystem> returnSystems = new List<MinimapSystem>();
-            const int tolerance = 2;
+            const int tolerance = 3;
 
             foreach(var m in mSystems)
             {

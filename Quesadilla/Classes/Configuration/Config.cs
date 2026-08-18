@@ -1000,7 +1000,7 @@ img.rounded-corners {
 					IsVisible = true,
 					Location = new Point(440, 323),
 					Size = new Size(118, 15),
-					Font = new Font("Microsoft Sans Serif", 9f, FontStyle.Regular),
+					Font = new Font("Impact", 10f, FontStyle.Regular),
 				});
 				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
 				{
@@ -1011,7 +1011,7 @@ img.rounded-corners {
 					IsVisible = true,
 					Location = new Point(300, 323),
 					Size = new Size(118, 15),
-					Font = new Font("Microsoft Sans Serif", 9f, FontStyle.Regular),
+					Font = new Font("Impact", 10f, FontStyle.Regular),
 				});
 				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
 				{
@@ -1021,7 +1021,7 @@ img.rounded-corners {
 					IsVisible = true,
                     Location = new Point(1, 1),
                     Size = new Size(400, 13),
-                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                    Font = new Font("Segoe UI", 8.75f, FontStyle.Regular),
                 });
 
 
@@ -2228,7 +2228,7 @@ img.rounded-corners {
 		[Category("OverlayMap")]
 		[DisplayName("Minimap system name colour for mouseover")]
 		[Description("")]
-		[DefaultValue(typeof(Color), "OrangeRed")]
+		[DefaultValue(typeof(Color), "Orchid")]
 		public Color OverlayMinimapMouseoverSystemColour { get; set; }
 
 		[Category("OverlayMap")]
