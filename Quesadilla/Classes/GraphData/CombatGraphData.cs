@@ -5,7 +5,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quesadilla.Classes
+namespace Quesadilla.Classes.GraphData
 {
     public class CombatGraphData
     {

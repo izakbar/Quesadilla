@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
+using Quesadilla.Classes.GraphData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -39,7 +40,6 @@ namespace Quesadilla
                 this.MinimizeBox = false;
                 this.FormBorderStyle = FormBorderStyle.None;
             }
-
 
             Width = Program.MainConfiguration.DPSGraphWindowSize.Width <= 100 ? 100 : Program.MainConfiguration.DPSGraphWindowSize.Width;
             Height = Program.MainConfiguration.DPSGraphWindowSize.Height <= 50 ? 50 : Program.MainConfiguration.DPSGraphWindowSize.Height;

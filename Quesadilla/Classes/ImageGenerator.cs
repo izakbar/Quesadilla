@@ -551,60 +551,66 @@ namespace Quesadilla.Classes
                     }
                 }
 
+                try
+                {
+                    // go through systems used 3 times - draw weak first, then strong then centre
+                    for (int stormStrength = 0; stormStrength <= 2; stormStrength++)
+                    {
+                        // clear background 
+                        foreach (var currentSystem in minimapSystems)
+                        {
+                            Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+                            foreach (var storm in Program.Universe.Storms)
+                            {
+                                if (stormStrength == 0 && storm.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id))
+                                    DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false);
+                                if (stormStrength == 1 && storm.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id))
+                                    DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false);
+                                if (stormStrength == 2 && storm.SystemId == currentSystem.solarSystem.Id)
+                                    DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false);
+                            }
+                        }
 
-				// go through systems used 3 times - draw weak first, then strong then centre
-				for (int stormStrength = 0; stormStrength <= 2; stormStrength++)
-				{
-					// clear background 
-					foreach (var currentSystem in minimapSystems)
-					{
-						Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-						foreach (var storm in Program.Universe.Storms)
-						{
-							if (stormStrength == 0 && storm.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id))
-								DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false);
-							if (stormStrength == 1 && storm.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id))
-								DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false);
-							if (stormStrength == 2 && storm.SystemId == currentSystem.solarSystem.Id)
-								DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false);
-						}
-					}
+                        stormLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
+                        using (Graphics gStorm = Graphics.FromImage(stormLimitImage))
+                        {
+                            switch (stormStrength)
+                            {
+                                case 0: stormAlphaAmount = 90; break;
+                                case 1: stormAlphaAmount = 120; break;
+                                case 2: stormAlphaAmount = 155; break;
+                            }
 
-					stormLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
-					using (Graphics gStorm = Graphics.FromImage(stormLimitImage))
-					{
-						switch (stormStrength)
-						{
-							case 0: stormAlphaAmount = 90; break;
-							case 1: stormAlphaAmount = 120; break;
-							case 2: stormAlphaAmount = 155; break;
-						}
+                            stormLimitColourMatrix.Matrix33 = (float)((float)stormAlphaAmount / (float)255);  // alpha !
+                            stormImageAttr.SetColorMatrix(stormLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 
-						stormLimitColourMatrix.Matrix33 = (float)((float)stormAlphaAmount / (float)255);  // alpha !
-						stormImageAttr.SetColorMatrix(stormLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                            foreach (var currentSystem in minimapSystems)
+                            {
+                                Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+                                foreach (var storm in Program.Universe.Storms)
+                                {
+                                    if (stormStrength == 0 && storm.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id))
+                                        DrawStorm(storm.StormType, "WEAK", gStorm, currentPoint, circleSizeStorm, blobSize, false);
+                                    if (stormStrength == 1 && storm.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id))
+                                        DrawStorm(storm.StormType, "STRONG", gStorm, currentPoint, circleSizeStorm, blobSize, false);
+                                    if (stormStrength == 2 && storm.SystemId == currentSystem.solarSystem.Id)
+                                        DrawStorm(storm.StormType, "CENTRE", gStorm, currentPoint, circleSizeStorm, blobSize, false);
+                                }
+                            }
+                            g.DrawImage(
+                               stormLimitImage, // target
+                               new Rectangle(0, 0, stormLimitImage.Width, stormLimitImage.Height), // source
+                               0, 0, stormLimitImage.Width, stormLimitImage.Height,
+                               GraphicsUnit.Pixel,
+                               stormImageAttr
+                               );
+                        }
+                    }
+                }
+                catch 
+                {
 
-						foreach (var currentSystem in minimapSystems)
-						{
-							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-							foreach (var storm in Program.Universe.Storms)
-							{
-								if (stormStrength == 0 && storm.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id))
-									DrawStorm(storm.StormType, "WEAK", gStorm, currentPoint, circleSizeStorm, blobSize, false);
-								if (stormStrength == 1 && storm.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id))
-									DrawStorm(storm.StormType, "STRONG", gStorm, currentPoint, circleSizeStorm, blobSize, false);
-								if (stormStrength == 2 && storm.SystemId == currentSystem.solarSystem.Id)
-									DrawStorm(storm.StormType, "CENTRE", gStorm, currentPoint, circleSizeStorm, blobSize, false);
-							}
-						}
-						g.DrawImage(
-						   stormLimitImage, // target
-						   new Rectangle(0, 0, stormLimitImage.Width, stormLimitImage.Height), // source
-						   0, 0, stormLimitImage.Width, stormLimitImage.Height,
-						   GraphicsUnit.Pixel,
-						   stormImageAttr
-						   );
-					}
-				}
+                }
 
 			// draw connections
 			float lineGap = (float)(connectingLineGap / GUI_SCALING); 

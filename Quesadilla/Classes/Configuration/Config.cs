@@ -774,7 +774,7 @@ img.rounded-corners {
 					IsVisible = true,
                     Location = new Point(2, 2),
                     Size = new Size(265, 21),
-                    Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold),
+                    Font = new Font("Segoe UI", 12.0f, FontStyle.Bold),
                 });
                 c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
                 {
@@ -784,7 +784,7 @@ img.rounded-corners {
 					IsVisible = true,
                     Location = new Point(0, 218),
                     Size = new Size(163, 13),
-                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                    Font = new Font("Segoe UI", 8.25f, FontStyle.Regular),
                 });
 
                 c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
@@ -795,7 +795,7 @@ img.rounded-corners {
 					IsVisible = true,
                     Location = new Point(240, 3),
                     Size = new Size(114, 11),
-                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                    Font = new Font("Segoe UI", 8.25f, FontStyle.Regular),
                 });
 
                 c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
@@ -807,7 +807,7 @@ img.rounded-corners {
                     IsVisible = true,
                     Location = new Point(200, 3),
                     Size = new Size(118, 11),
-                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                    Font = new Font("Segoe UI", 8.25f, FontStyle.Bold),
                 });
 
                 c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
@@ -819,7 +819,7 @@ img.rounded-corners {
 					IsVisible = true,
                     Location = new Point(350, 3),
                     Size = new Size(118, 11),
-                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                    Font = new Font("Segoe UI", 8.25f, FontStyle.Bold),
                 });
 
                 c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
@@ -855,7 +855,7 @@ img.rounded-corners {
 					IsVisible = true,
 					Location = new Point(270, 18),
 					Size = new Size(360, 170),
-					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+					Font = new Font("Segoe UI Variable", 8.25f, FontStyle.Regular),
 				});
 
 				c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
@@ -879,7 +879,7 @@ img.rounded-corners {
                     IsVisible = true,
                     Location = new Point(471, 3),
                     Size = new Size(152, 20),
-                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+                    Font = new Font("Segoe UI Variable", 8.25f, FontStyle.Regular),
                 });
 			}
 
@@ -904,7 +904,7 @@ img.rounded-corners {
 					IsVisible = true,
 					Location = new Point(115, 4),
 					Size = new Size(280, 31),
-					Font = new Font("Microsoft Sans Serif", 20.0f, FontStyle.Bold),
+					Font = new Font("Segoe UI Variable", 20.0f, FontStyle.Bold),
 				});
 				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
 				{
@@ -914,7 +914,7 @@ img.rounded-corners {
 					IsVisible = true,
 					Location = new Point(275, 36),
 					Size = new Size(120, 13),
-					Font = new Font("Microsoft Sans Serif", 8.0f, FontStyle.Bold),
+					Font = new Font("Segoe UI Variable", 8.0f, FontStyle.Bold),
 				});
 				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
 				{
@@ -944,7 +944,7 @@ img.rounded-corners {
 					IsVisible = true,
 					Location = new Point(180, 125),
 					Size = new Size(150, 13),
-					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
+					Font = new Font("Segoe UI Variable", 8.25f, FontStyle.Bold),
 				});
 				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
 				{
@@ -1020,9 +1020,35 @@ img.rounded-corners {
 					BackColor = Color.Transparent,
 					IsVisible = true,
                     Location = new Point(1, 1),
-                    Size = new Size(400, 13),
-                    Font = new Font("Segoe UI", 9f, FontStyle.Regular),
+                    Size = new Size(640, 13),
+                    Font = new Font("Segoe UI Variable", 9f, FontStyle.Regular),
                 });
+
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "Minimap",
+					Color = Color.White,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Red,
+					IsVisible = true,
+					Location = new Point(0,0),
+					Size = new Size(600, 350),
+					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+				});
+
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "IskPerMinuteChart",
+					Color = Color.Orchid,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Red,
+					IsVisible = true,
+					Location = new Point(280, 250),
+					Size = new Size(300, 100),
+					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+				});
+
+
 
 
 			}

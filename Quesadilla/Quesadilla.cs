@@ -2773,14 +2773,21 @@ namespace Quesadilla
 				}
 			} else
             {
-                RattingData.Text = Program.GetIskLastHour("");
-                RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).AlternateColor;
-				if (OverlayMapWindow != null)
-				{
-					OverlayMapWindow.RattingData.Text = Program.GetIskLastHour("");
-					OverlayMapWindow.RattingData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData")).AlternateColor;
-					OverlayMapWindow.UpdateMapData();
-				}
+                try
+                {
+                    RattingData.Text = Program.GetIskLastHour("");
+                    RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).AlternateColor;
+                    if (OverlayMapWindow != null)
+                    {
+                        OverlayMapWindow.RattingData.Text = Program.GetIskLastHour("");
+                        OverlayMapWindow.RattingData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData")).AlternateColor;
+                        OverlayMapWindow.UpdateMapData();
+                    }
+                }
+                catch
+                {
+
+                }
 			}
 		}
         private void UpdateMining()
