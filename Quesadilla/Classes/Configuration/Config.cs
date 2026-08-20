@@ -1032,7 +1032,7 @@ img.rounded-corners {
 					AlternateColor = Color.Red,
 					IsVisible = true,
 					Location = new Point(0,0),
-					Size = new Size(600, 350),
+					Size = new Size(500, 350),
 					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
 				});
 
@@ -1043,7 +1043,7 @@ img.rounded-corners {
 					BackColor = Color.Transparent,
 					AlternateColor = Color.Red,
 					IsVisible = true,
-					Location = new Point(280, 250),
+					Location = new Point(280, 220),
 					Size = new Size(300, 100),
 					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
 				});
@@ -2370,6 +2370,69 @@ img.rounded-corners {
 				[Description("Show systems outside current region if in configured jumps range {MinimapJumps}")]
 				[DefaultValue(typeof(bool), "false")]
 				public bool OverlayMinimapShowOutOfRegion { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("ISK Graph Label colour")]
+		[Description("Colour to use for ISK Graph Label")]
+		[DefaultValue(typeof(Color), "LightGoldenrodYellow")]
+		public Color OverlayISKGraphLabelColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("ISK Graph Y Line colour")]
+		[Description("Colour to use for ISK Graph Y Line")]
+		[DefaultValue(typeof(Color), "Purple")]
+		public Color OverlayISKGraphYColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("ISK Graph Low Boundry")]
+		[Description("ISK Amount for Low boundry")]
+		[DefaultValue(typeof(double), "1000000")]
+		public double OverlayISKGraphLowBoundry { get; set; }
+		[Category("OverlayMap")]
+		[DisplayName("ISK Graph Low Boundry Colour")]
+		[Description("Colour to use for ISK Graph Low Boundry")]
+		[DefaultValue(typeof(Color), "Green")]
+		public Color OverlayISKGraphLowBoundryColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("ISK Graph Low Boundry")]
+		[Description("ISK Amount for Low boundry")]
+		[DefaultValue(typeof(double), "5000000")]
+		public double OverlayISKGraphMediumBoundry { get; set; }
+		[Category("OverlayMap")]
+		[DisplayName("ISK Graph Low Boundry Colour")]
+		[Description("Colour to use for ISK Graph Low Boundry")]
+		[DefaultValue(typeof(Color), "Orange")]
+		public Color OverlayISKGraphMediumBoundryColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("ISK Graph Low Boundry")]
+		[Description("ISK Amount for Low boundry")]
+		[DefaultValue(typeof(double), "10000000")]
+		public double OverlayISKGraphHighBoundry { get; set; }
+		[Category("OverlayMap")]
+		[DisplayName("ISK Graph Low Boundry Colour")]
+		[Description("Colour to use for ISK Graph Low Boundry")]
+		[DefaultValue(typeof(Color), "Red")]
+		public Color OverlayISKGraphHighBoundryColour { get; set; }
+
+
+
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap alpha")]
+		[Description("Alpha to use for minimap on overlay window")]
+		[DefaultValue(typeof(int), "70")]
+		[Range(0, 100)]
+		public int OverlayMinimapAlpha { get; set; }
+		[Category("OverlayMap")]
+		[DisplayName("ISK per min graph alpha")]
+		[Description("Alpha to use for ISK per min graph")]
+		[DefaultValue(typeof(int), "70")]
+		[Range(0, 100)]
+		public int OverlayISKGraphAlpha { get; set; }
+
+
 
 		[Category("OverlayMap")]
 		[DisplayName("Item Locations")]

@@ -81,16 +81,15 @@ namespace Quesadilla
 
 			// need these alpha values to be configurable
 			ColorMatrix colourMatrix = new ColorMatrix();
-			colourMatrix.Matrix33 = (float)((float)70 / (float)100);  // alpha !
+			colourMatrix.Matrix33 = (float)((float)Program.MainConfiguration.OverlayMinimapAlpha / (float)100);  // alpha !
 			ImageAttrMainMap.SetColorMatrix(colourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 
 			colourMatrix = new ColorMatrix();
-			colourMatrix.Matrix33 = (float)((float)50 / (float)100);  // alpha !
+			colourMatrix.Matrix33 = (float)((float)Program.MainConfiguration.OverlayISKGraphAlpha / (float)100);  // alpha !
 			ImageAttrISKGraph.SetColorMatrix(colourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 
 			SetupIskPerMinuteChart();
 		}
-
 
 		private void SetupIskPerMinuteChart()
 		{
@@ -101,19 +100,20 @@ namespace Quesadilla
 
 			iskPerMinuteChart.ChartAreas[0].AxisY.LineDashStyle = ChartDashStyle.Dash;
 			iskPerMinuteChart.ChartAreas[0].AxisY.LineColor = Color.Red;
-			iskPerMinuteChart.ChartAreas[0].AxisY.MajorGrid.LineColor = Color.Purple;
-			iskPerMinuteChart.ChartAreas[0].AxisY.LabelStyle.ForeColor = Color.LightGoldenrodYellow;
+			iskPerMinuteChart.ChartAreas[0].AxisY.MajorGrid.LineColor = Program.MainConfiguration.OverlayISKGraphYColour;
+			iskPerMinuteChart.ChartAreas[0].AxisY.LabelStyle.ForeColor = Program.MainConfiguration.OverlayISKGraphLabelColour;
 
-			iskPerMinuteChart.ChartAreas[0].AxisX.LineDashStyle = ChartDashStyle.Dash;
-			iskPerMinuteChart.ChartAreas[0].AxisX.LineColor = Color.Yellow;
-			iskPerMinuteChart.ChartAreas[0].AxisX.MajorGrid.LineColor = Color.Green;
+			iskPerMinuteChart.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
 			iskPerMinuteChart.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
+
+			iskPerMinuteChart.ChartAreas[0].AxisX.IsMarginVisible = false;
+			iskPerMinuteChart.ChartAreas[0].AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dash;
 
 			_sourceIskPerMinuteImage = new Bitmap(iskPerMinuteChart.Width, iskPerMinuteChart.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
 
 			iskPerMinuteTimer = new Timer()
 			{
-				Interval = 3000,
+				Interval = 5000,
 				Enabled = false,
 			};
 			iskPerMinuteTimer.Tick += (s, e) => UpdateIskPerMinuteChart();
@@ -156,6 +156,8 @@ namespace Quesadilla
 			toonIskIn.Color = Color.Green;
 			toonIskIn.YAxisType = AxisType.Primary;
 			toonIskIn.XAxisType = AxisType.Primary;
+			toonIskIn["PointWidth"] = "1";
+
 			//toonIskIn.BorderWidth = LineSize;
 			toonIskIn.BorderDashStyle = ChartDashStyle.Solid;
 
@@ -210,15 +212,13 @@ namespace Quesadilla
 
 			// now go thru from start -> end in slot seconds
 
-			var graphStartXp = (int)Math.Truncate((curr - start).TotalSeconds / span);
-			if (graphStartXp < 0) graphStartXp = 0;
-			var graphEndXp = (int)Math.Truncate((end - start).TotalSeconds / span);
+			//var graphStartXp = (int)Math.Truncate((curr - start).TotalSeconds / span);
+			//if (graphStartXp < 0) graphStartXp = 0;
+			//var graphEndXp = (int)Math.Truncate((end - start).TotalSeconds / span);
+			//iskPerMinuteChart.ChartAreas[0].AxisX.Minimum = graphStartXp + 1 > graphEndXp ? graphStartXp : graphStartXp + 1;
+			//iskPerMinuteChart.ChartAreas[0].AxisX.Maximum = graphEndXp;
 
-			iskPerMinuteChart.ChartAreas[0].AxisX.Minimum = graphStartXp + 1 > graphEndXp ? graphStartXp : graphStartXp + 1;
-			iskPerMinuteChart.ChartAreas[0].AxisX.Maximum = graphEndXp;
-
-			double maxIsk = 0;
-
+			double maxIsk = 0; // default to 20m being highest value
 			while (curr <= end)
 			{
 				var minutes = (int)Math.Truncate((curr - start).TotalSeconds / span);
@@ -237,22 +237,23 @@ namespace Quesadilla
 				toonIskIn.Points.AddXY(minutes, Isk);
 			}
 
-			double iskBoundry1 = 1000000;
-			double iskBoundry2 = 5000000;
-			double iskBoundry3 = 10000000;
+			// show rag for different values
+			double iskBoundry1 = Program.MainConfiguration.OverlayISKGraphLowBoundry;
+			double iskBoundry2 = Program.MainConfiguration.OverlayISKGraphMediumBoundry;
+			double iskBoundry3 = Program.MainConfiguration.OverlayISKGraphHighBoundry;
 			for (int i = 0; i < toonIskIn.Points.Count; i++)
 			{
 				var pointIsk = toonIskIn.Points[i].YValues[0];
 				if (pointIsk > iskBoundry3) {
-					toonIskIn.Points[i].Color = Color.Red; continue;
+					toonIskIn.Points[i].Color = Program.MainConfiguration.OverlayISKGraphHighBoundryColour; continue;
 				}
 				if (pointIsk > iskBoundry2) {
-					toonIskIn.Points[i].Color = Color.Orange; continue;
+					toonIskIn.Points[i].Color = Program.MainConfiguration.OverlayISKGraphMediumBoundryColour; continue;
 				}
-				toonIskIn.Points[i].Color = Color.Green;
+				toonIskIn.Points[i].Color = Program.MainConfiguration.OverlayISKGraphLowBoundryColour;
 			}
 
-			iskPerMinuteChart.ChartAreas[0].AxisY.Interval = iskPerMinuteChart.ChartAreas[0].AxisY.Maximum / 3;
+			iskPerMinuteChart.ChartAreas[0].AxisY.Interval = 5000000; //iskPerMinuteChart.ChartAreas[0].AxisY.Maximum / 3;
 
 			if (maxIsk > 1000000)
 			{
@@ -268,7 +269,7 @@ namespace Quesadilla
 				}
 		
 
-
+/*
 			// dump to csv
 			if (Program.MainConfiguration.DPSSaveCSV)
 			{
@@ -280,7 +281,7 @@ namespace Quesadilla
 					}
 				}
 			}
-
+*/
 			// Store graph to image
 			_sourceIskPerMinuteImage.Dispose();
 			_sourceIskPerMinuteImage = new Bitmap(iskPerMinuteChart.Width, iskPerMinuteChart.Height);
