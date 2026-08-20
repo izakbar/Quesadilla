@@ -186,6 +186,7 @@ namespace Quesadilla
 			curr = DateTime.Now.AddSeconds(-1 * span * 30);
 			start = curr;
 
+
 			foreach (var currToon in Program.ISK.Keys)
 			{
 				if (currToon == Toon || Toon == "*ALL*")
@@ -219,6 +220,7 @@ namespace Quesadilla
 			//iskPerMinuteChart.ChartAreas[0].AxisX.Maximum = graphEndXp;
 
 			double maxIsk = 0; // default to 20m being highest value
+			double totalIsk = 0;
 			while (curr <= end)
 			{
 				var minutes = (int)Math.Truncate((curr - start).TotalSeconds / span);
@@ -235,6 +237,7 @@ namespace Quesadilla
 
 				curr = curr.AddSeconds(span);
 				toonIskIn.Points.AddXY(minutes, Isk);
+				totalIsk += Isk;
 			}
 
 			// show rag for different values
@@ -267,26 +270,18 @@ namespace Quesadilla
 				{
 					iskPerMinuteChart.ChartAreas[0].Axes[1].LabelStyle.Format = "";
 				}
+
 		
-
-/*
-			// dump to csv
-			if (Program.MainConfiguration.DPSSaveCSV)
-			{
-				using (var file = File.CreateText(Toon + "_raw_isk.csv"))
-				{
-					foreach (var a in _iskGraphData.Keys)
-					{
-						file.WriteLine(a + "," + _iskGraphData[a].ToCSV());
-					}
-				}
-			}
-*/
 			// Store graph to image
-			_sourceIskPerMinuteImage.Dispose();
-			_sourceIskPerMinuteImage = new Bitmap(iskPerMinuteChart.Width, iskPerMinuteChart.Height);
-
-			iskPerMinuteChart.DrawToBitmap(_sourceIskPerMinuteImage, new Rectangle(0, 0, _sourceIskPerMinuteImage.Width, _sourceIskPerMinuteImage.Height));
+			if (_sourceIskPerMinuteImage != null) _sourceIskPerMinuteImage.Dispose();
+			if (totalIsk > 0)
+			{
+				_sourceIskPerMinuteImage = new Bitmap(iskPerMinuteChart.Width, iskPerMinuteChart.Height);
+				iskPerMinuteChart.DrawToBitmap(_sourceIskPerMinuteImage, new Rectangle(0, 0, _sourceIskPerMinuteImage.Width, _sourceIskPerMinuteImage.Height));
+			} else
+			{
+				iskPerMinuteChart.Visible = false;
+			}
 		}
 
 		public void SetScreenPosition()
