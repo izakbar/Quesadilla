@@ -327,13 +327,17 @@ namespace Quesadilla
 
 			if (_sourceIskPerMinuteImage != null)
 			{
-				g.DrawImage(
-					_sourceIskPerMinuteImage,
-					new Rectangle(iskPerMinuteChart.Left, iskPerMinuteChart.Top, iskPerMinuteChart.Width, iskPerMinuteChart.Height),
-					0, 0, _sourceIskPerMinuteImage.Width, _sourceIskPerMinuteImage.Height,                                        
-					GraphicsUnit.Pixel,
-					ImageAttrISKGraph
-				);
+				try
+				{
+					g.DrawImage(
+						_sourceIskPerMinuteImage,
+						new Rectangle(iskPerMinuteChart.Left, iskPerMinuteChart.Top, iskPerMinuteChart.Width, iskPerMinuteChart.Height),
+						0, 0, _sourceIskPerMinuteImage.Width, _sourceIskPerMinuteImage.Height,
+						GraphicsUnit.Pixel,
+						ImageAttrISKGraph
+					);
+				}
+				catch { }
 			}
 
 		}

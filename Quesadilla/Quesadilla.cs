@@ -2803,7 +2803,7 @@ namespace Quesadilla
 					//lblISK.Visible = true;
 					if (OverlayMapWindow != null)
 					{
-						OverlayMapWindow.MiningData.Text = Program.GetIskLastHour(CurrentActiveToon);
+						OverlayMapWindow.MiningData.Text = Program.GetMiningLastHour(CurrentActiveToon);
 						OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
 						OverlayMapWindow.UpdateMapData();
 					}
