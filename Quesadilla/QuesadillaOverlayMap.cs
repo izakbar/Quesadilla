@@ -98,16 +98,10 @@ namespace Quesadilla
 			iskPerMinuteChart.ChartAreas.Add(chartArea);
 			iskPerMinuteChart.BackColor = Color.Transparent;
 
-			iskPerMinuteChart.ChartAreas[0].AxisY.LineDashStyle = ChartDashStyle.Dash;
-			iskPerMinuteChart.ChartAreas[0].AxisY.LineColor = Color.Red;
-			iskPerMinuteChart.ChartAreas[0].AxisY.MajorGrid.LineColor = Program.MainConfiguration.OverlayISKGraphYColour;
-			iskPerMinuteChart.ChartAreas[0].AxisY.LabelStyle.ForeColor = Program.MainConfiguration.OverlayISKGraphLabelColour;
-
 			iskPerMinuteChart.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
 			iskPerMinuteChart.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
 
 			iskPerMinuteChart.ChartAreas[0].AxisX.IsMarginVisible = false;
-			iskPerMinuteChart.ChartAreas[0].AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dash;
 
 			_sourceIskPerMinuteImage = new Bitmap(iskPerMinuteChart.Width, iskPerMinuteChart.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
 
@@ -140,7 +134,7 @@ namespace Quesadilla
 				iskPerMinuteChart.Visible = true;
 			}
 
-			if (Program.MainConfiguration.DPSAllToons)
+			if (Program.MainConfiguration.OverlayISKGraphAllToons)
 			{
 				Toon = "*ALL*";
 			}
@@ -148,13 +142,18 @@ namespace Quesadilla
 			int maxPoints = Program.MainConfiguration.GraphCombatMaxPoints;
 			int minSpanSize = Program.MainConfiguration.GraphCombatMinPointSeconds;
 
-			int LineSize = Program.MainConfiguration.DPSGraphLineSize;
-
 			var toonIskIn = iskPerMinuteChart.Series.Add(Toon + " ISK");
 			toonIskIn.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Column;
 			toonIskIn.Points.Clear();
 			toonIskIn.Color = Color.Green;
-			toonIskIn.YAxisType = AxisType.Primary;
+			if (Program.MainConfiguration.OverlayISKGraphYLegendRight)
+			{
+				toonIskIn.YAxisType = AxisType.Secondary;
+			}
+			else
+			{
+				toonIskIn.YAxisType = AxisType.Primary;
+			}
 			toonIskIn.XAxisType = AxisType.Primary;
 			toonIskIn["PointWidth"] = "1";
 
@@ -256,19 +255,44 @@ namespace Quesadilla
 				toonIskIn.Points[i].Color = Program.MainConfiguration.OverlayISKGraphLowBoundryColour;
 			}
 
-			iskPerMinuteChart.ChartAreas[0].AxisY.Interval = 5000000; //iskPerMinuteChart.ChartAreas[0].AxisY.Maximum / 3;
+			int axis = 1;
+			if (Program.MainConfiguration.OverlayISKGraphYLegendRight)
+			{
+				iskPerMinuteChart.ChartAreas[0].AxisY2.Interval = 5000000; //iskPerMinuteChart.ChartAreas[0].AxisY.Maximum / 3;
+				iskPerMinuteChart.ChartAreas[0].AxisY2.IsReversed = Program.MainConfiguration.OverlayISKGraphYReversed;
+
+				iskPerMinuteChart.ChartAreas[0].AxisY2.LineDashStyle = ChartDashStyle.Dash;
+				iskPerMinuteChart.ChartAreas[0].AxisY2.LineColor = Color.Red;
+				iskPerMinuteChart.ChartAreas[0].AxisY2.MajorGrid.LineColor = Program.MainConfiguration.OverlayISKGraphYColour;
+				iskPerMinuteChart.ChartAreas[0].AxisY2.LabelStyle.ForeColor = Program.MainConfiguration.OverlayISKGraphLabelColour;
+				iskPerMinuteChart.ChartAreas[0].AxisY2.MajorGrid.LineDashStyle = ChartDashStyle.Dash;
+
+				axis = 3;
+			}
+			else
+			{
+
+				iskPerMinuteChart.ChartAreas[0].AxisY.LineDashStyle = ChartDashStyle.Dash;
+				iskPerMinuteChart.ChartAreas[0].AxisY.LineColor = Color.Red;
+				iskPerMinuteChart.ChartAreas[0].AxisY.MajorGrid.LineColor = Program.MainConfiguration.OverlayISKGraphYColour;
+				iskPerMinuteChart.ChartAreas[0].AxisY.LabelStyle.ForeColor = Program.MainConfiguration.OverlayISKGraphLabelColour;
+				iskPerMinuteChart.ChartAreas[0].AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dash;
+
+				iskPerMinuteChart.ChartAreas[0].AxisY.Interval = 5000000; //iskPerMinuteChart.ChartAreas[0].AxisY.Maximum / 3;
+				iskPerMinuteChart.ChartAreas[0].AxisY.IsReversed = Program.MainConfiguration.OverlayISKGraphYReversed;
+			}
 
 			if (maxIsk > 1000000)
 			{
-				iskPerMinuteChart.ChartAreas[0].Axes[1].LabelStyle.Format = "{0:0,,.#}M";
+				iskPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "{0:0,,.#}M";
 			}
 			else if (maxIsk > 1000)
 				{
-					iskPerMinuteChart.ChartAreas[0].Axes[1].LabelStyle.Format = "{0:0,.#}K";
+					iskPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "{0:0,.#}K";
 				}
 				else
 				{
-					iskPerMinuteChart.ChartAreas[0].Axes[1].LabelStyle.Format = "";
+					iskPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "";
 				}
 
 		

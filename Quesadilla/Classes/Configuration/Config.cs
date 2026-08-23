@@ -998,7 +998,7 @@ img.rounded-corners {
 					AlternateColor = Color.Orange,
 					BackColor = Color.Transparent,
 					IsVisible = true,
-					Location = new Point(440, 323),
+					Location = new Point(440, 12),
 					Size = new Size(118, 15),
 					Font = new Font("Impact", 10f, FontStyle.Regular),
 				});
@@ -1043,8 +1043,8 @@ img.rounded-corners {
 					BackColor = Color.Transparent,
 					AlternateColor = Color.Red,
 					IsVisible = true,
-					Location = new Point(280, 220),
-					Size = new Size(300, 100),
+					Location = new Point(320, 32),
+					Size = new Size(280, 80),
 					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
 				});
 
@@ -2425,6 +2425,7 @@ img.rounded-corners {
 		[DefaultValue(typeof(int), "70")]
 		[Range(0, 100)]
 		public int OverlayMinimapAlpha { get; set; }
+
 		[Category("OverlayMap")]
 		[DisplayName("ISK per min graph alpha")]
 		[Description("Alpha to use for ISK per min graph")]
@@ -2432,6 +2433,23 @@ img.rounded-corners {
 		[Range(0, 100)]
 		public int OverlayISKGraphAlpha { get; set; }
 
+		[Category("OverlayMap")]
+		[DisplayName("ISK per min graph Y reversed")]
+		[Description("Flip Y axis from bottom to top")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool OverlayISKGraphYReversed { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("ISK per min graph Y legends on right")]
+		[Description("Y legends on right side of graph")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool OverlayISKGraphYLegendRight { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("ISK Graph All toons together")]
+		[Description("Combine data from all toons")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool OverlayISKGraphAllToons { get; set; }
 
 
 		[Category("OverlayMap")]
