@@ -31,6 +31,7 @@ namespace Quesadilla
 
 		private Image _sourceMapImage = null;
 		private Bitmap _sourceIskPerMinuteImage = null;
+		private Bitmap _sourceMinedPerMinuteImage = null;
 
 		private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
 		private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
@@ -43,12 +44,15 @@ namespace Quesadilla
 		public PictureBox Minimap = new PictureBox() { Name = "Minimap" };
 
 		public Chart iskPerMinuteChart = new Chart() { Name = "IskPerMinuteChart" };
-		private Timer iskPerMinuteTimer = null;
+		public Chart minedPerMinuteChart = new Chart() { Name = "MinedPerMinuteChart" };
+		private Timer xPerMinuteTimer = null;
 		private Dictionary<int, IskGraphData> _iskGraphData = new Dictionary<int, IskGraphData>();
+		private Dictionary<int, MinedGraphData> _minedGraphData = new Dictionary<int, MinedGraphData>();
 
 
 		private ImageAttributes ImageAttrMainMap = new ImageAttributes();
 		private ImageAttributes ImageAttrISKGraph = new ImageAttributes();
+		private ImageAttributes ImageAttrMinedGraph = new ImageAttributes();
 
 		public QuesadillaOverlayMap(Quesadilla mainForm) : base()
 		{
@@ -72,6 +76,7 @@ namespace Quesadilla
 			this.Controls.Add(Minimap);
 
 			this.Controls.Add(iskPerMinuteChart);
+			this.Controls.Add(minedPerMinuteChart);
 
 			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.OverlayWindowItemLocations, 0, false, false, true);
 
@@ -88,10 +93,14 @@ namespace Quesadilla
 			colourMatrix.Matrix33 = (float)((float)Program.MainConfiguration.OverlayISKGraphAlpha / (float)100);  // alpha !
 			ImageAttrISKGraph.SetColorMatrix(colourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 
-			SetupIskPerMinuteChart();
+			colourMatrix = new ColorMatrix();
+			colourMatrix.Matrix33 = (float)((float)Program.MainConfiguration.OverlayMinedGraphAlpha / (float)100);  // alpha !
+			ImageAttrMinedGraph.SetColorMatrix(colourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+			SetupPerMinuteCharts();
 		}
 
-		private void SetupIskPerMinuteChart()
+		private void SetupPerMinuteCharts()
 		{
 			ChartArea chartArea = new ChartArea("ISK");
 			chartArea.BackColor = Color.Transparent;
@@ -105,13 +114,27 @@ namespace Quesadilla
 
 			_sourceIskPerMinuteImage = new Bitmap(iskPerMinuteChart.Width, iskPerMinuteChart.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
 
-			iskPerMinuteTimer = new Timer()
+
+			chartArea = new ChartArea("Mining");
+			chartArea.BackColor = Color.Transparent;
+			minedPerMinuteChart.ChartAreas.Add(chartArea);
+			minedPerMinuteChart.BackColor = Color.Transparent;
+
+			minedPerMinuteChart.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
+			minedPerMinuteChart.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
+
+			minedPerMinuteChart.ChartAreas[0].AxisX.IsMarginVisible = false;
+
+			_sourceMinedPerMinuteImage = new Bitmap(minedPerMinuteChart.Width, minedPerMinuteChart.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+
+
+			xPerMinuteTimer = new Timer()
 			{
 				Interval = 5000,
 				Enabled = false,
 			};
-			iskPerMinuteTimer.Tick += (s, e) => UpdateIskPerMinuteChart();
-			iskPerMinuteTimer.Start();
+			xPerMinuteTimer.Tick += (s, e) => UpdatePerMinuteChart();
+			xPerMinuteTimer.Start();
 		}
 
 		private void UpdateIskPerMinuteChart()
@@ -138,9 +161,6 @@ namespace Quesadilla
 			{
 				Toon = "*ALL*";
 			}
-
-			int maxPoints = Program.MainConfiguration.GraphCombatMaxPoints;
-			int minSpanSize = Program.MainConfiguration.GraphCombatMinPointSeconds;
 
 			var toonIskIn = iskPerMinuteChart.Series.Add(Toon + " ISK");
 			toonIskIn.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Column;
@@ -210,13 +230,6 @@ namespace Quesadilla
 				}
 			}
 
-			// now go thru from start -> end in slot seconds
-
-			//var graphStartXp = (int)Math.Truncate((curr - start).TotalSeconds / span);
-			//if (graphStartXp < 0) graphStartXp = 0;
-			//var graphEndXp = (int)Math.Truncate((end - start).TotalSeconds / span);
-			//iskPerMinuteChart.ChartAreas[0].AxisX.Minimum = graphStartXp + 1 > graphEndXp ? graphStartXp : graphStartXp + 1;
-			//iskPerMinuteChart.ChartAreas[0].AxisX.Maximum = graphEndXp;
 
 			double maxIsk = 0; // default to 20m being highest value
 			double totalIsk = 0;
@@ -246,10 +259,12 @@ namespace Quesadilla
 			for (int i = 0; i < toonIskIn.Points.Count; i++)
 			{
 				var pointIsk = toonIskIn.Points[i].YValues[0];
-				if (pointIsk > iskBoundry3) {
+				if (pointIsk > iskBoundry3)
+				{
 					toonIskIn.Points[i].Color = Program.MainConfiguration.OverlayISKGraphHighBoundryColour; continue;
 				}
-				if (pointIsk > iskBoundry2) {
+				if (pointIsk > iskBoundry2)
+				{
 					toonIskIn.Points[i].Color = Program.MainConfiguration.OverlayISKGraphMediumBoundryColour; continue;
 				}
 				toonIskIn.Points[i].Color = Program.MainConfiguration.OverlayISKGraphLowBoundryColour;
@@ -287,25 +302,244 @@ namespace Quesadilla
 				iskPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "{0:0,,.#}M";
 			}
 			else if (maxIsk > 1000)
-				{
-					iskPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "{0:0,.#}K";
-				}
-				else
-				{
-					iskPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "";
-				}
+			{
+				iskPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "{0:0,.#}K";
+			}
+			else
+			{
+				iskPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "";
+			}
 
-		
+
 			// Store graph to image
 			if (_sourceIskPerMinuteImage != null) _sourceIskPerMinuteImage.Dispose();
 			if (totalIsk > 0)
 			{
 				_sourceIskPerMinuteImage = new Bitmap(iskPerMinuteChart.Width, iskPerMinuteChart.Height);
 				iskPerMinuteChart.DrawToBitmap(_sourceIskPerMinuteImage, new Rectangle(0, 0, _sourceIskPerMinuteImage.Width, _sourceIskPerMinuteImage.Height));
-			} else
+			}
+			else
 			{
 				iskPerMinuteChart.Visible = false;
 			}
+		}
+
+		private void UpdateMinedPerMinuteChart()
+		{
+			minedPerMinuteChart.Series.Clear();
+			string Toon = "";
+
+			if (_main.CurrentActiveToon != null && _main.CurrentActiveToon != "")
+			{
+				Toon = _main.CurrentActiveToon;
+			}
+
+			if (Toon == null || Toon == "" || !Program.Mining.ContainsKey(Toon))
+			{
+				minedPerMinuteChart.Visible = false;
+				return;
+			}
+			else
+			{
+				minedPerMinuteChart.Visible = true;
+			}
+
+			if (Program.MainConfiguration.OverlayMinedGraphAllToons)
+			{
+				Toon = "*ALL*";
+			}
+
+
+			var toonWasted = minedPerMinuteChart.Series.Add(Toon + " Wasted");
+			toonWasted.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StackedArea;
+			toonWasted.Points.Clear();
+			toonWasted.Color = Program.MainConfiguration.OverlayMinedGraphWastedColour;
+			toonWasted.XAxisType = AxisType.Primary;
+			toonWasted["PointWidth"] = "1";
+			toonWasted.BorderDashStyle = ChartDashStyle.Solid;
+
+			var toonMined = minedPerMinuteChart.Series.Add(Toon + " Mined");
+			toonMined.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StackedArea;
+			toonMined.Points.Clear();
+			toonMined.Color = Program.MainConfiguration.OverlayMinedGraphMinedColour; ;
+			if (Program.MainConfiguration.OverlayMinedGraphYLegendRight)
+			{
+				toonMined.YAxisType = AxisType.Secondary;
+			}
+			else
+			{
+				toonMined.YAxisType = AxisType.Primary;
+			}
+			toonMined.XAxisType = AxisType.Primary;
+			toonMined["PointWidth"] = "1";
+			toonMined.BorderDashStyle = ChartDashStyle.Solid;
+
+			toonWasted.YAxisType = toonMined.YAxisType;
+
+
+			_minedGraphData.Clear();
+
+			DateTime start = DateTime.Now;
+			DateTime end = start;
+
+			// work out start/end times of combat - for cuirrent/all toons
+			foreach (var currToon in Program.Mining.Keys)
+			{
+				if (currToon == Toon || Toon == "*ALL*")
+				{
+					if (Program.Mining[currToon].Count > 0)
+					{
+						if (Program.Mining[currToon].First().TimeAdded < start) start = Program.Mining[currToon].First().TimeAdded;
+						if (Program.Mining[currToon].Last().TimeAdded > end) end = Program.Mining[currToon].Last().TimeAdded;
+					}
+				}
+			}
+			TimeSpan totalTime = end - start;
+
+			var span = 60;
+
+			DateTime curr = start;
+			curr = DateTime.Now.AddSeconds(-1 * span * 30);
+			start = curr;
+
+
+			Random r  = new Random();
+
+			foreach (var currToon in Program.Mining.Keys)
+			{
+				if (currToon == Toon || Toon == "*ALL*")
+				{
+					// setup second slots
+					foreach (var c in Program.Mining[currToon].OrderBy(o => o.TimeAdded).ToList())
+					{
+						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds / span);
+						if (!_minedGraphData.ContainsKey(slot))
+						{
+							// slot does not exist - create
+							_minedGraphData[slot] = new MinedGraphData()
+							{
+								MinedAmount = 0,
+								WastageAmount = 0,
+							};
+						}
+						if (c.MiningAmount != 0 || c.WastageAmount != 0)
+						{
+							_minedGraphData[slot].MinedAmount += c.MiningAmount;
+							_minedGraphData[slot].WastageAmount += c.WastageAmount;
+							// ignore minint item for now
+						}
+					}
+				}
+			}
+
+
+			int maxMined = 0; int totalMined = 0;
+			int maxWasted = 0; int totalWasted = 0;
+			while (curr <= end)
+			{
+				var minutes = (int)Math.Truncate((curr - start).TotalSeconds / span);
+				int mined = 0; int wasted = 0;
+				if (_iskGraphData.ContainsKey(minutes))
+				{
+					mined += _minedGraphData[minutes].MinedAmount;
+					wasted += _minedGraphData[minutes].WastageAmount;
+				} 
+
+				if (mined > maxMined)
+				{
+					maxMined = mined;
+				}
+
+				if (wasted > maxWasted)
+				{
+					maxWasted = wasted;
+				}
+
+				curr = curr.AddSeconds(span);
+				toonMined.Points.AddXY(minutes, mined);
+				toonWasted.Points.AddXY(minutes, wasted);
+				totalMined += mined;totalWasted += wasted;
+			}
+
+/*
+			// show rag for different values
+			double iskBoundry1 = Program.MainConfiguration.OverlayISKGraphLowBoundry;
+			double iskBoundry2 = Program.MainConfiguration.OverlayISKGraphMediumBoundry;
+			double iskBoundry3 = Program.MainConfiguration.OverlayISKGraphHighBoundry;
+			for (int i = 0; i < toonMined.Points.Count; i++)
+			{
+				var pointIsk = toonMined.Points[i].YValues[0];
+				if (pointIsk > iskBoundry3)
+				{
+					toonMined.Points[i].Color = Program.MainConfiguration.OverlayISKGraphHighBoundryColour; continue;
+				}
+				if (pointIsk > iskBoundry2)
+				{
+					toonMined.Points[i].Color = Program.MainConfiguration.OverlayISKGraphMediumBoundryColour; continue;
+				}
+				toonMined.Points[i].Color = Program.MainConfiguration.OverlayISKGraphLowBoundryColour;
+			}
+*/
+
+			int axis = 1;
+			if (Program.MainConfiguration.OverlayMinedGraphYLegendRight)
+			{
+				minedPerMinuteChart.ChartAreas[0].AxisY2.Interval = 1000;
+				minedPerMinuteChart.ChartAreas[0].AxisY2.IsReversed = Program.MainConfiguration.OverlayMinedGraphYReversed;
+
+				minedPerMinuteChart.ChartAreas[0].AxisY2.LineDashStyle = ChartDashStyle.Dash;
+				minedPerMinuteChart.ChartAreas[0].AxisY2.LineColor = Color.Red;
+				minedPerMinuteChart.ChartAreas[0].AxisY2.MajorGrid.LineColor = Program.MainConfiguration.OverlayMinedGraphYColour;
+				minedPerMinuteChart.ChartAreas[0].AxisY2.LabelStyle.ForeColor = Program.MainConfiguration.OverlayMinedGraphLabelColour;
+				minedPerMinuteChart.ChartAreas[0].AxisY2.MajorGrid.LineDashStyle = ChartDashStyle.Dash;
+
+				axis = 3;
+			}
+			else
+			{
+
+				minedPerMinuteChart.ChartAreas[0].AxisY.LineDashStyle = ChartDashStyle.Dash;
+				minedPerMinuteChart.ChartAreas[0].AxisY.LineColor = Color.Red;
+				minedPerMinuteChart.ChartAreas[0].AxisY.MajorGrid.LineColor = Program.MainConfiguration.OverlayMinedGraphYColour;
+				minedPerMinuteChart.ChartAreas[0].AxisY.LabelStyle.ForeColor = Program.MainConfiguration.OverlayMinedGraphLabelColour;
+				minedPerMinuteChart.ChartAreas[0].AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dash;
+
+				minedPerMinuteChart.ChartAreas[0].AxisY.Interval = 1000; //minedPerMinuteChart.ChartAreas[0].AxisY.Maximum / 3;
+				minedPerMinuteChart.ChartAreas[0].AxisY.IsReversed = Program.MainConfiguration.OverlayMinedGraphYReversed;
+			}
+
+			if (maxMined > 1000000)
+			{
+				minedPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "{0:0,,.#}M";
+			}
+			else if (maxMined > 1000)
+			{
+				minedPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "{0:0,.#}K";
+			}
+			else
+			{
+				minedPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "";
+			}
+
+
+			// Store graph to image
+			if (_sourceMinedPerMinuteImage != null) _sourceMinedPerMinuteImage.Dispose();
+			if (totalMined > 0)
+			{
+				_sourceMinedPerMinuteImage = new Bitmap(minedPerMinuteChart.Width, minedPerMinuteChart.Height);
+				minedPerMinuteChart.DrawToBitmap(_sourceMinedPerMinuteImage, new Rectangle(0, 0, _sourceMinedPerMinuteImage.Width, _sourceMinedPerMinuteImage.Height));
+			}
+			else
+			{
+				minedPerMinuteChart.Visible = false;
+			}
+		}
+
+		private void UpdatePerMinuteChart()
+		{
+
+			UpdateIskPerMinuteChart();
+			UpdateMinedPerMinuteChart();
 		}
 
 		public void SetScreenPosition()
@@ -359,6 +593,21 @@ namespace Quesadilla
 						0, 0, _sourceIskPerMinuteImage.Width, _sourceIskPerMinuteImage.Height,
 						GraphicsUnit.Pixel,
 						ImageAttrISKGraph
+					);
+				}
+				catch { }
+			}
+
+			if (_sourceMinedPerMinuteImage != null)
+			{
+				try
+				{
+					g.DrawImage(
+						_sourceMinedPerMinuteImage,
+						new Rectangle(minedPerMinuteChart.Left, minedPerMinuteChart.Top, minedPerMinuteChart.Width, minedPerMinuteChart.Height),
+						0, 0, _sourceMinedPerMinuteImage.Width, _sourceMinedPerMinuteImage.Height,
+						GraphicsUnit.Pixel,
+						ImageAttrMinedGraph
 					);
 				}
 				catch { }

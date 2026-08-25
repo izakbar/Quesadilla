@@ -1047,6 +1047,17 @@ img.rounded-corners {
 					Size = new Size(280, 80),
 					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
 				});
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "MinedPerMinuteChart",
+					Color = Color.Orchid,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Red,
+					IsVisible = true,
+					Location = new Point(320, 270),
+					Size = new Size(280, 80),
+					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+				});
 
 
 
@@ -2384,10 +2395,35 @@ img.rounded-corners {
 		public Color OverlayISKGraphYColour { get; set; }
 
 		[Category("OverlayMap")]
+		[DisplayName("Mined Graph Label colour")]
+		[Description("Colour to use for Mined Graph Label")]
+		[DefaultValue(typeof(Color), "LightGoldenrodYellow")]
+		public Color OverlayMinedGraphLabelColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Mined Graph Y Line colour")]
+		[Description("Colour to use for Mined Graph Y Line")]
+		[DefaultValue(typeof(Color), "Purple")]
+		public Color OverlayMinedGraphYColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Mined Graph Mined Amount colour")]
+		[Description("Colour to use for Mined Graph Mined Amount")]
+		[DefaultValue(typeof(Color), "Green")]
+		public Color OverlayMinedGraphMinedColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Mined Graph Wasted Amount colour")]
+		[Description("Colour to use for Mined Graph Wasted Amount")]
+		[DefaultValue(typeof(Color), "Red")]
+		public Color OverlayMinedGraphWastedColour { get; set; }
+
+		[Category("OverlayMap")]
 		[DisplayName("ISK Graph Low Boundry")]
 		[Description("ISK Amount for Low boundry")]
 		[DefaultValue(typeof(double), "1000000")]
 		public double OverlayISKGraphLowBoundry { get; set; }
+
 		[Category("OverlayMap")]
 		[DisplayName("ISK Graph Low Boundry Colour")]
 		[Description("Colour to use for ISK Graph Low Boundry")]
@@ -2434,6 +2470,13 @@ img.rounded-corners {
 		public int OverlayISKGraphAlpha { get; set; }
 
 		[Category("OverlayMap")]
+		[DisplayName("Mined per min graph alpha")]
+		[Description("Alpha to use for Mined per min graph")]
+		[DefaultValue(typeof(int), "60")]
+		[Range(0, 100)]
+		public int OverlayMinedGraphAlpha { get; set; }
+
+		[Category("OverlayMap")]
 		[DisplayName("ISK per min graph Y reversed")]
 		[Description("Flip Y axis from bottom to top")]
 		[DefaultValue(typeof(bool), "true")]
@@ -2450,6 +2493,24 @@ img.rounded-corners {
 		[Description("Combine data from all toons")]
 		[DefaultValue(typeof(bool), "true")]
 		public bool OverlayISKGraphAllToons { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Mined per min graph Y reversed")]
+		[Description("Flip Y axis from bottom to top")]
+		[DefaultValue(typeof(bool), "false")]
+		public bool OverlayMinedGraphYReversed { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Mined per min graph Y legends on right")]
+		[Description("Y legends on right side of graph")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool OverlayMinedGraphYLegendRight { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Mined Graph All toons together")]
+		[Description("Combine data from all toons")]
+		[DefaultValue(typeof(bool), "true")]
+		public bool OverlayMinedGraphAllToons { get; set; }
 
 
 		[Category("OverlayMap")]
