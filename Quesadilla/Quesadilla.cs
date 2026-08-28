@@ -6,6 +6,7 @@ using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Dotlan;
 using Quesadilla.Classes.ESIData;
 using Quesadilla.Classes.Events;
+using Quesadilla.Classes.EVEOPreview;
 using Quesadilla.Classes.EveScout;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Processes;
@@ -1095,6 +1096,8 @@ namespace Quesadilla
                     Program.CharacterList.Add(c);
                 }
 
+                EveOClient.UpdateSystem(c.CharacterName, c.Location);
+
                 // add to list of regions to check on dotlan
                 string region = Program.Universe.SolarSystems[foundSystemId].RegionName;
                 if (!DotlanProcessor.RegionsToCheck.Contains(region))
@@ -1296,7 +1299,7 @@ namespace Quesadilla
                 var alert = Program.ActiveAlerts.Where(o => o.ShowAlert).Reverse().Take(1).ToList().First();
                 //var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
                 //NewAlertWindow.Show(this);
-                ShowAlert(alert);
+                ShowAlert(alert, false);
             }
         }
 
@@ -1358,13 +1361,15 @@ namespace Quesadilla
                 {
                     InCombat = true;
                     this.Invalidate();
+                    EveOClient.Agression(e.Entry.CharacterName, true);
                 }
                 else
                 {
                     InCombat = true;
-                }
+					EveOClient.Agression(e.Entry.CharacterName, true);
+				}
 
-                if (!Program.Combat.ContainsKey(e.Entry.CharacterName))
+				if (!Program.Combat.ContainsKey(e.Entry.CharacterName))
                 {
                     Program.Combat.Add(e.Entry.CharacterName, new List<CombatLine>());
                 }
@@ -1523,9 +1528,9 @@ namespace Quesadilla
                     DPSGraphWindow.Close();
                     DPSGraphWindow = null;
                 };
-
-            }
-        }
+				EveOClient.Agression(e.Entry.CharacterName, false);
+			}
+		}
         private void logFile_ProcessISK(object sender, ProcessISKEventArgs e)
         {
             //Log.Information("COMBAT:" + e.CombatEvent);
@@ -2891,11 +2896,12 @@ namespace Quesadilla
         {
 
         }
-        private void ShowAlert(AlertQueueItem alert)
+        private void ShowAlert(AlertQueueItem alert, bool sendToEveO = true)
         {
             if (Program.MainConfiguration.ShowAlertFancyNotification) ShowAlertWindow(alert);
             if (Program.MainConfiguration.ShowAlertWindowsNotification) ShowAlertToast(alert);
-        }
+            if (sendToEveO) EveOClient.AlertClient(alert);
+		}
         private void ShowAlertWindow(AlertQueueItem alert)
         {
             // try to prevent new alert stealing focus

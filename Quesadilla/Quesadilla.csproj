@@ -103,6 +103,11 @@
   <ItemGroup>
     <Compile Include="Classes\AnimationState.cs" />
     <Compile Include="Classes\Attributes\IsColourAttribute.cs" />
+    <Compile Include="Classes\EVEOPreview\EveOAgression.cs" />
+    <Compile Include="Classes\EVEOPreview\EveOAlertClient.cs" />
+    <Compile Include="Classes\EVEOPreview\EveOClient.cs" />
+    <Compile Include="Classes\EVEOPreview\EveOEnvelope.cs" />
+    <Compile Include="Classes\EVEOPreview\EveOSystemUpdate.cs" />
     <Compile Include="Classes\Extensions\DateTimeExtensions.cs" />
     <Compile Include="Classes\GraphData\CombatGraphData.cs" />
     <Compile Include="Classes\Configuration\ConfigurationItemLocationInformation.cs" />
