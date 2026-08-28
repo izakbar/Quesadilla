@@ -1528,7 +1528,7 @@ namespace Quesadilla
                     DPSGraphWindow.Close();
                     DPSGraphWindow = null;
                 };
-				EveOClient.Agression(e.Entry.CharacterName, false);
+				//EveOClient.Agression(e.Entry.CharacterName, false);
 			}
 		}
         private void logFile_ProcessISK(object sender, ProcessISKEventArgs e)

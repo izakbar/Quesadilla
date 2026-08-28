@@ -137,7 +137,7 @@ namespace Quesadilla.Classes.EVEOPreview
 
 				var agressionCommand = new EveOEnvelope(
 					Guid.NewGuid(),
-					EveOSystemUpdate.MessageType,
+					EveOAgression.MessageType,
 					JsonSerializer.SerializeToElement(
 						new EveOAgression
 						{
