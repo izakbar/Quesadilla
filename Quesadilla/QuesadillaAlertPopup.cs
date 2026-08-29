@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
+using Quesadilla.Classes.ImageGeneration;
 using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.SolarSystems;
 using Serilog.Debugging;

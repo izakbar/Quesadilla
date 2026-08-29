@@ -4,6 +4,7 @@ using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Extensions;
 using Quesadilla.Classes.GraphData;
+using Quesadilla.Classes.ImageGeneration;
 using Quesadilla.Classes.SolarSystems;
 using System;
 using System.Collections.Generic;
@@ -461,26 +462,6 @@ namespace Quesadilla
 				totalMined += mined;totalWasted += wasted;
 			}
 
-/*
-			// show rag for different values
-			double iskBoundry1 = Program.MainConfiguration.OverlayISKGraphLowBoundry;
-			double iskBoundry2 = Program.MainConfiguration.OverlayISKGraphMediumBoundry;
-			double iskBoundry3 = Program.MainConfiguration.OverlayISKGraphHighBoundry;
-			for (int i = 0; i < toonMined.Points.Count; i++)
-			{
-				var pointIsk = toonMined.Points[i].YValues[0];
-				if (pointIsk > iskBoundry3)
-				{
-					toonMined.Points[i].Color = Program.MainConfiguration.OverlayISKGraphHighBoundryColour; continue;
-				}
-				if (pointIsk > iskBoundry2)
-				{
-					toonMined.Points[i].Color = Program.MainConfiguration.OverlayISKGraphMediumBoundryColour; continue;
-				}
-				toonMined.Points[i].Color = Program.MainConfiguration.OverlayISKGraphLowBoundryColour;
-			}
-*/
-
 			int axis = 1;
 			if (Program.MainConfiguration.OverlayMinedGraphYLegendRight)
 			{
@@ -497,7 +478,6 @@ namespace Quesadilla
 			}
 			else
 			{
-
 				minedPerMinuteChart.ChartAreas[0].AxisY.LineDashStyle = ChartDashStyle.Dash;
 				minedPerMinuteChart.ChartAreas[0].AxisY.LineColor = Color.Red;
 				minedPerMinuteChart.ChartAreas[0].AxisY.MajorGrid.LineColor = Program.MainConfiguration.OverlayMinedGraphYColour;
@@ -537,7 +517,6 @@ namespace Quesadilla
 
 		private void UpdatePerMinuteChart()
 		{
-
 			UpdateIskPerMinuteChart();
 			UpdateMinedPerMinuteChart();
 		}
@@ -554,7 +533,6 @@ namespace Quesadilla
 
 		protected override void RenderOverlay(Graphics g)
 		{
-
 			if (_sourceMapImage != null)
 			{
 				g.DrawImage(
@@ -571,7 +549,7 @@ namespace Quesadilla
 			if (mouseOverMinimapSystems.Count > 0)
 			{
 				//var brushBackground = new SolidBrush(Color.Navy);
-				var brush = new SolidBrush(Program.MainConfiguration.OverlayMinimapMouseoverSystemColour);
+				var brush = GDICache.GetBrush(Program.MainConfiguration.OverlayMinimapMouseoverSystemColour);
 				var font = new Font("Segoe UI", 12f, FontStyle.Regular);
 
 				//Size size = TextRenderer.MeasureText($"{mouseOverMinimapSystems[0].solarSystem.Name}", font);

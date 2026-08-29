@@ -119,6 +119,7 @@
     <Compile Include="Classes\EveScout\EveScoutStorm.cs" />
     <Compile Include="Classes\GraphData\IskGraphData.cs" />
     <Compile Include="Classes\GraphData\MinedGraphData.cs" />
+    <Compile Include="Classes\ImageGeneration\GDICache.cs" />
     <Compile Include="Classes\Logfile\CombatLine.cs" />
     <Compile Include="Classes\Configuration\CSSData.cs" />
     <Compile Include="Classes\Configuration\LogfileConfig.cs" />
@@ -135,7 +136,7 @@
     <Compile Include="Classes\EveScout\EveScoutManager.cs" />
     <Compile Include="Classes\EveScout\EveScoutWH.cs" />
     <Compile Include="Classes\Extensions\PropertyGridExtensions.cs" />
-    <Compile Include="Classes\ImageGenerator.cs" />
+    <Compile Include="Classes\ImageGeneration\ImageGenerator.cs" />
     <Compile Include="Classes\Logfile\IskLine.cs" />
     <Compile Include="Classes\Logfile\MiningLine.cs" />
     <Compile Include="Classes\MiningDetails.cs" />

@@ -8,6 +8,7 @@ using Quesadilla.Classes.ESIData;
 using Quesadilla.Classes.Events;
 using Quesadilla.Classes.EVEOPreview;
 using Quesadilla.Classes.EveScout;
+using Quesadilla.Classes.ImageGeneration;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Processes;
 using Quesadilla.Classes.Queues;
@@ -184,6 +185,7 @@ namespace Quesadilla
         AnimationState AnimationStateIntel;
 		AnimationState AnimationStateAlts;
 		AnimationState AnimationStateUniHoles;
+		AnimationState AnimationStateCombat;
 
 		private bool ISKPerHourTotal = false;
         private bool MiningPerHourTotal = false;
@@ -258,6 +260,7 @@ namespace Quesadilla
             AnimationStateIntel = new AnimationState(state:1, direction:1, maximum:18, pulse:false);
 			AnimationStateAlts = new AnimationState(state: 2, direction: -1, maximum: 12, pulse: false);
 			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
+			AnimationStateCombat = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
 
 			menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
@@ -635,6 +638,7 @@ namespace Quesadilla
                 AnimationStateIntel.Advance();
 				AnimationStateAlts.Advance();
 				AnimationStateUniHoles.Advance();
+				AnimationStateCombat.Advance();
 
 				UpdateMinimap();
                 TickCounts["AnimationRefresh"] = 0;
@@ -2647,9 +2651,12 @@ namespace Quesadilla
                     combatTop = AlertsOutstanding.Top + AlertsOutstanding.Height + 8;
                 }
 
-                Brush systemBrush = new SolidBrush(Color.Red);
-                e.Graphics.FillEllipse(systemBrush, combatLeft - CIRCLE_RADIUS, combatTop - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
-            }
+                //Brush systemBrush = GDICache.GetBrush(Color.Red);
+                //e.Graphics.FillEllipse(systemBrush, combatLeft - CIRCLE_RADIUS, combatTop - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
+
+                ImageGenerator.DrawPulseOrb(e.Graphics,new Point(combatLeft, combatTop),Color.Red,CIRCLE_RADIUS, AnimationStateCombat.Value(), glowLayers: 4,pulseSize: 4,maxAlpha: 120);
+
+			}
 
 
             if (Program.MainConfiguration.ShowPlanetInformation && CurrentActiveToon != null && CurrentActiveToon != "")
@@ -2693,7 +2700,7 @@ namespace Quesadilla
                                     case "(Oceanic)": dotColour = Program.MainConfiguration.PlanetInfoOceanicColour; break;
                                     default: dotColour = Color.Red; break;
                                 }
-                                systemBrush = new SolidBrush(dotColour);
+                                systemBrush = GDICache.GetBrush(dotColour);
                                 e.Graphics.FillEllipse(systemBrush, currentX - Program.MainConfiguration.PlanetInfoViewSize, currentY - Program.MainConfiguration.PlanetInfoViewSize, Program.MainConfiguration.PlanetInfoViewSize * 2, Program.MainConfiguration.PlanetInfoViewSize * 2);
 
                                 // set x/y
@@ -2735,16 +2742,6 @@ namespace Quesadilla
                     }
                 }
             }
-
-            /*
-            if (Program.MainConfiguration.HeartBeatIndicator)
-            {
-                Brush lineBrush = new SolidBrush(Program.MainConfiguration.HeartBeatIndicatorColour);
-                Pen linePen = new Pen(lineBrush);
-
-                e.Graphics.DrawLine(linePen, new Point(0, 0), new Point(0, activityLine));
-            }
-            */
         }
 
         private void UpdateISK()
