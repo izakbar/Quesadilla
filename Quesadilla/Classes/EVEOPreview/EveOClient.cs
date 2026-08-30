@@ -149,7 +149,7 @@ namespace Quesadilla.Classes.EVEOPreview
 
 				var response = await _reader.ReadLineAsync();
 			}
-			catch (Exception ex)
+			catch 
 			{
 			}
 			finally

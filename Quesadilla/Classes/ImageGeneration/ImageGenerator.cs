@@ -732,20 +732,45 @@ namespace Quesadilla.Classes.ImageGeneration
 					}
 
 					// Unihole
+					int uniHoleAdjust = 0;
 					if (currentSystem.solarSystem.UniHole)
 					{
-						DrawPulseIndicator(g,currentPoint,UniHoleColour,blobSize,animationCycleUniHoles,pulseSize: 6.5f,maxAlpha: 60,glowLayers: 3,ringWidth: 2.0f);
+						DrawPulseIndicator(g,currentPoint,UniHoleColour,blobSize,animationCycleUniHoles,pulseSize: (20 / (float)GUI_SCALING),maxAlpha: 60,glowLayers: 3,ringWidth: 2.0f);
+						uniHoleAdjust = 1;
 					}
 
 					// DrawSystemName(g, currentPoint.X, currentPoint.Y, $"{currentSystem.solarSystem.NPCKillsDeltaLastHour}", Color.AliceBlue, textSize); 
 
-                    //kills ?
+					// active alt in sytstem ?
+					if (Program.CharacterList.Any(o => o.IsClientActive && !o.IsCurrentlActiveClient && o.LocationId == currentSystem.solarSystem.Id))
+					{
+						circlesUsed++;
+						float circleSize = CIRCLE_INITIAL_GAP + uniHoleAdjust + ((CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING);
+						if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
+						DrawPulseIndicator(g, currentPoint, AltColour, blobSize + circleSize, animationCycleAlts, pulseSize: (40 / (float)GUI_SCALING), maxAlpha: 100);
+					}
+					
+					// Intel alerts
+					if (currentSystem.solarSystem.CountAlerts(false, false, false) > 0)
+					{
+						circlesUsed++;
+						float circleSize = CIRCLE_INITIAL_GAP + uniHoleAdjust + ((CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING);
+
+						if (circleSize < MINIMUM_CIRCLE_SIZE ||float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
+						DrawPulseIndicator(g,currentPoint,IntelColour,blobSize + circleSize,animationCycleIntel,pulseSize: (50 / (float)GUI_SCALING),maxAlpha: 120,glowLayers: 4,ringWidth: 2.0f);
+						foreach (var a in currentSystem.solarSystem.GetAlerts(false, false, false))
+						{
+							sbExtraInformation.AppendLine($"{a.Entry.LogTime} {a.Entry.LineContent}");
+						}
+					}
+
+					//kills ?
 					if (currentSystem.solarSystem.CountKills() > 0)
 					{
 						circlesUsed++;
-						float circleSize =CIRCLE_INITIAL_GAP +((CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING);
-                        if (circleSize < MINIMUM_CIRCLE_SIZE ||float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
-						DrawPulseIndicator(g,currentPoint,ZKillColour,blobSize + circleSize,animationCycleKills,pulseSize: 8.0f,maxAlpha: 160,glowLayers: 4,ringWidth: 2.0f);
+						float circleSize = CIRCLE_INITIAL_GAP + uniHoleAdjust + ((CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING);
+						if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
+						DrawPulseIndicator(g, currentPoint, ZKillColour, blobSize + circleSize, animationCycleKills, pulseSize: (70 / (float)GUI_SCALING), maxAlpha: 160, glowLayers: 4, ringWidth: 2.0f);
 						try
 						{
 							foreach (var k in currentSystem.solarSystem.GetKills())
@@ -758,32 +783,10 @@ namespace Quesadilla.Classes.ImageGeneration
 						}
 					}
 
-					// Intel alerts
-					if (currentSystem.solarSystem.CountAlerts(false, false, false) > 0)
-					{
-						circlesUsed++;
-						float circleSize =CIRCLE_INITIAL_GAP +((CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING);
-
-						if (circleSize < MINIMUM_CIRCLE_SIZE ||float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
-						DrawPulseIndicator(g,currentPoint,IntelColour,blobSize + circleSize,animationCycleIntel,pulseSize: 12.0f,maxAlpha: 120,glowLayers: 4,ringWidth: 2.0f);
-						foreach (var a in currentSystem.solarSystem.GetAlerts(false, false, false))
-						{
-							sbExtraInformation.AppendLine($"{a.Entry.LogTime} {a.Entry.LineContent}");
-						}
-					}
-
-					// active alt in sytstem ?
-					if (Program.CharacterList.Any(o =>o.IsClientActive &&!o.IsCurrentlActiveClient &&o.LocationId == currentSystem.solarSystem.Id))
-					{
-						circlesUsed++;
-						float circleSize =CIRCLE_INITIAL_GAP +((CIRCLE_INCREASE_GAP * circlesUsed)/ (float)GUI_SCALING);
-						if (circleSize < MINIMUM_CIRCLE_SIZE ||float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
-						DrawPulseIndicator(g,currentPoint,AltColour,blobSize + circleSize,animationCycleAlts,pulseSize: 10,maxAlpha: 100);
-					}
 				}
 
-                // show all systems names ?
-                if (showAllSystemsText)
+				// show all systems names ?
+				if (showAllSystemsText)
                 {
                     foreach (var currentSystem in minimapSystems.Where(o => ! o.textDisplayConnecting && ! o.textDisplay))
                     {

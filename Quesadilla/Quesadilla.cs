@@ -252,6 +252,7 @@ namespace Quesadilla
 			TickCounts["MiningDetail"] = 0;
 
 			TickCounts["IncursionData"] = 0;
+			TickCounts["UpdateEveOLocations"] = 0;
 
 			AnimationStateKills = new AnimationState(state:0, direction:-1, maximum:36, pulse:false);
             AnimationStateIntel = new AnimationState(state:1, direction:1, maximum:18, pulse:false);
@@ -627,6 +628,14 @@ namespace Quesadilla
                 CombatAdded = false;
                 TickCounts["SinceLastDPSGraphUpdate"] = 0;
             }
+
+            if ( ++TickCounts["UpdateEveOLocations"] > Program.MainConfiguration.HowManyTicksBeforeEveOLocationUpdate) 
+            {
+                foreach (var c in Program.CharacterList) {
+                    EveOClient.UpdateSystem(c.CharacterName, c.Location);
+                }
+				TickCounts["UpdateEveOLocations"] = 0;
+			}
 
             if (++TickCounts["AnimationRefresh"] > Program.MainConfiguration.HowManyTicksMapAnimation)
             {

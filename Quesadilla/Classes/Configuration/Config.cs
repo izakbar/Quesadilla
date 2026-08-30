@@ -1131,7 +1131,15 @@ img.rounded-corners {
         [DefaultValue(typeof(int), "4")]
         public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
 
-        [Category("Tick Timing")]
+		[Category("Tick Timing")]
+		[ReadOnly(true)]
+		[DisplayName("How often to update EveO Location")]
+		[Description("How many ticks between EveO Location update if no location change")]
+		[DefaultValue(typeof(int), "60")]
+		public int HowManyTicksBeforeEveOLocationUpdate { get; set; }
+
+
+		[Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeLogfileCheck")]
         [Description("How many ticks between logfile checks")]
