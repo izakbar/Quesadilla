@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Configuration;
+using Quesadilla.Classes.Extensions;
 using Quesadilla.Classes.GraphData;
 using System;
 using System.Collections.Generic;
@@ -165,7 +166,13 @@ namespace Quesadilla
 
         public void UpdateDPSGraph()
         {
-            int maxPoints = Program.MainConfiguration.GraphCombatMaxPoints;
+			if (InvokeRequired)
+			{
+				BeginInvoke((MethodInvoker)UpdateDPSGraph);
+				return;
+			}
+
+			int maxPoints = Program.MainConfiguration.GraphCombatMaxPoints;
             int minSpanSize = Program.MainConfiguration.GraphCombatMinPointSeconds;
 
             int LineSize = Program.MainConfiguration.DPSGraphLineSize;
@@ -354,8 +361,9 @@ namespace Quesadilla
                     // setup second slots
                     foreach (var c in Program.Combat[currToon].OrderBy(o => o.TimeAdded).ToList())
                     {
-                        var slot = (int)Math.Truncate((c.TimeAdded - start).TotalSeconds);
-                        if (!_combatGraphData.ContainsKey(slot))
+						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds);
+
+						if (!_combatGraphData.ContainsKey(slot))
                         {
                             // slot does not exist - create
                             _combatGraphData[slot] = new CombatGraphData()
@@ -568,5 +576,19 @@ namespace Quesadilla
             }
         }
 
-    }
+		public void SetTopMost(bool topMost)
+		{
+			if (InvokeRequired)
+			{
+				BeginInvoke(new Action(() =>
+				{
+					TopMost = topMost;
+				}));
+
+				return;
+			}
+
+			TopMost = topMost;
+		}
+	}
 }

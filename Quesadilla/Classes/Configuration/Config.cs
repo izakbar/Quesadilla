@@ -26,28 +26,40 @@ namespace Quesadilla.Classes
 {
     public class Config
     {
-        public void ApplyConfiguration(Form form, List<ConfigurationItemLocationInformation> locations, int topAdjust, bool MiningPerHourTotal, bool ISKPerHourTotal, bool ignoreVisible)
-        {
+		public void ApplyConfiguration(Form form,List<ConfigurationItemLocationInformation> locations,int topAdjust,bool miningPerHourTotal,bool iskPerHourTotal,bool ignoreVisible)
+		{
+			if (form.InvokeRequired)
+			{
+				form.BeginInvoke((MethodInvoker)(() =>
+					ApplyConfiguration(form,locations,topAdjust,miningPerHourTotal,iskPerHourTotal,ignoreVisible)));
+				return;
+			}
+
 			foreach (ConfigurationItemLocationInformation item in locations)
 			{
 				var foundItem = form.Controls.Find(item.Name, true).FirstOrDefault();
+
 				if (foundItem != null)
 				{
-					if (!foundItem.Name.Equals("ChatServerDown") && !ignoreVisible) foundItem.Visible = item.IsVisible;
-					foundItem.Location = new Point(item.Location.X, item.Location.Y + topAdjust);
+					if (!foundItem.Name.Equals("ChatServerDown") && !ignoreVisible)
+						foundItem.Visible = item.IsVisible;
+
+					foundItem.Location =
+						new Point(item.Location.X, item.Location.Y + topAdjust);
 
 					foundItem.ForeColor = item.Color;
 					foundItem.BackColor = item.BackColor;
 					foundItem.Size = item.Size;
 					foundItem.Font = item.Font;
 
-					// check for special flipflop cases
-					if (foundItem.Name.Equals("MiningData") && MiningPerHourTotal) foundItem.ForeColor = item.AlternateColor;
-					if (foundItem.Name.Equals("RattingData") && ISKPerHourTotal) foundItem.ForeColor = item.AlternateColor;
+					if (foundItem.Name.Equals("MiningData") && miningPerHourTotal)
+						foundItem.ForeColor = item.AlternateColor;
+
+					if (foundItem.Name.Equals("RattingData") && iskPerHourTotal)
+						foundItem.ForeColor = item.AlternateColor;
 				}
 			}
 		}
-
         public ConfigurationItemLocationInformation GetConfiguration(string name, List<ConfigurationItemLocationInformation> locations)
         {
             ConfigurationItemLocationInformation foundItem = locations.Find(o => o.Name == name);

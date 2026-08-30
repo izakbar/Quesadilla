@@ -102,21 +102,18 @@ namespace Quesadilla.Classes
 							{
 								if (tick.TryBeginExecution())
 								{
-									ThreadPool.QueueUserWorkItem(_ =>
+									try
 									{
-										try
-										{
-											tick.Execute();
-										}
-										catch (Exception ex)
-										{
-											Console.WriteLine(ex);
-										}
-										finally
-										{
-											tick.EndExecution();
-										}
-									});
+										tick.Execute();
+									}
+									catch (Exception ex)
+									{
+										Console.WriteLine(ex);
+									}
+									finally
+									{
+										tick.EndExecution();
+									}
 								}
 							}
 							catch (Exception ex)

@@ -147,9 +147,10 @@ namespace Quesadilla
 
         private List<PlanetInfoDisplay> CurrentPlanetInfos = new List<PlanetInfoDisplay>();
 
-        public TickManager TickManager;
+		public TickManager TickManagerUpdates;
+		public TickManager TickManagerUI;
 
-        private Thread splashScreenThread;
+		private Thread splashScreenThread;
         private QuesadillaSplashScreen splashScreen;
         public QuesadillaDPSGraph DPSGraphWindow = null;
 
@@ -249,22 +250,23 @@ namespace Quesadilla
 			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 18, pulse: true);
 			AnimationStateCombat = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
 
-            TickManager = new TickManager(Program.MainConfiguration.TickMiliseconds);
-			TickManager.RegisterTick("AnimationRefresh", 0, Program.MainConfiguration.HowManyTicksMapAnimation, RefreshAnimations);
-			TickManager.RegisterTick("UpdateEveOLocations", 500, Program.MainConfiguration.HowManyTicksBeforeEveOLocationUpdate, RefreshEveLocations);
-			TickManager.RegisterTick("IncursionData", 10000, Program.MainConfiguration.HowManyTicksBeforeIncursionData, RefreshIncursionData);
-			TickManager.RegisterTick("MiningDetail",0,Program.MainConfiguration.HowManyTicksMiningCSVOutput,RefreshMiningCSV);
-			TickManager.RegisterTick("MiningPerHour",0,Program.MainConfiguration.HowManyTicksBeforeSwitchMiningPerHour,RefreshMiningPerHour);
-			TickManager.RegisterTick("ISKPerHour", 0, Program.MainConfiguration.HowManyTicksBeforeSwitchISKPerHour, RefreshISKPerHour);
-			TickManager.RegisterTick("SinceLastCleardown",0,Program.MainConfiguration.HowManyTicksBeforeCleardown,PerformCleardown);
-			TickManager.RegisterTick("SinceLastDPSGraphUpdate",0,Program.MainConfiguration.HowManyTicksBeforeDPSGraphUpdate,UpdateDPSGraphWindow);
-			TickManager.RegisterTick("SinceLastAlert", 0, Program.MainConfiguration.HowManyTicksBeforeAlert, ProcessAlertQueue);
-			TickManager.RegisterTick("LogfileCheck", 500, Program.MainConfiguration.HowManyTicksBeforeLogfileCheck, Program.LogfileWatchersProcessing);
-			TickManager.RegisterTick("RefreshProcesses", 0, Program.MainConfiguration.HowManyTicksRefreshProcesses, RefreshProcesses);
-			TickManager.RegisterTick("UpdateProcesses", 0, 2, UpdateProcessesTick);
-			TickManager.RegisterTick("GeneralTick", 0, 2, GeneralTick);
+			TickManagerUpdates = new TickManager(Program.MainConfiguration.TickMiliseconds);
+			TickManagerUpdates.RegisterTick("UpdateEveOLocations", 500, Program.MainConfiguration.HowManyTicksBeforeEveOLocationUpdate, RefreshEveLocations);
+			TickManagerUpdates.RegisterTick("IncursionData", 10000, Program.MainConfiguration.HowManyTicksBeforeIncursionData, RefreshIncursionData);
+			TickManagerUpdates.RegisterTick("SinceLastCleardown",0,Program.MainConfiguration.HowManyTicksBeforeCleardown,PerformCleardown);
+			TickManagerUpdates.RegisterTick("SinceLastDPSGraphUpdate",0,Program.MainConfiguration.HowManyTicksBeforeDPSGraphUpdate,UpdateDPSGraphWindow);
+			TickManagerUpdates.RegisterTick("LogfileCheck", 500, Program.MainConfiguration.HowManyTicksBeforeLogfileCheck, Program.LogfileWatchersProcessing);
+			TickManagerUpdates.RegisterTick("GeneralTick", 0, 2, GeneralTick);
 
-			TickManager.Start();
+			TickManagerUI = new TickManager(Program.MainConfiguration.TickMiliseconds);
+			TickManagerUI.RegisterTick("AnimationRefresh", 0, Program.MainConfiguration.HowManyTicksMapAnimation, RefreshAnimations);
+			TickManagerUI.RegisterTick("MiningDetail", 0, Program.MainConfiguration.HowManyTicksMiningCSVOutput, RefreshMiningCSV);
+			TickManagerUI.RegisterTick("MiningPerHour", 0, Program.MainConfiguration.HowManyTicksBeforeSwitchMiningPerHour, RefreshMiningPerHour);
+			TickManagerUI.RegisterTick("ISKPerHour", 0, Program.MainConfiguration.HowManyTicksBeforeSwitchISKPerHour, RefreshISKPerHour);
+			TickManagerUI.RegisterTick("SinceLastAlert", 0, Program.MainConfiguration.HowManyTicksBeforeAlert, ProcessAlertQueue);
+
+			TickManagerUI.RegisterTick("RefreshProcesses", 0, Program.MainConfiguration.HowManyTicksRefreshProcesses, RefreshProcesses);
+			TickManagerUI.RegisterTick("UpdateProcesses", 0, 2, UpdateProcessesTick);
 
 			menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
@@ -323,9 +325,13 @@ namespace Quesadilla
                 OverlayMapWindow = new QuesadillaOverlayMap(this);
                 OverlayMapWindow.Show();
             }
-        }
 
-        private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
+
+			TickManagerUpdates.Start();
+			TickManagerUI.Start();
+		}
+
+		private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
         {
             throw new NotImplementedException();
         }
@@ -1031,11 +1037,15 @@ namespace Quesadilla
             {
                 if (!((MenuItem)sender).Checked)
                 {
-                    DPSGraphWindow.Close();
+						DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
+						{
+							DPSGraphWindow.Hide();
+						}));
+/*
                     DPSGraphWindow = null;
-
                     DPSGraphWindow = new QuesadillaDPSGraph(this);
                     DPSGraphWindow.Show();
+*/
                 }
             }
         }
@@ -1062,12 +1072,14 @@ namespace Quesadilla
 
             if (InCombat && DPSGraphWindow != null && Program.MainConfiguration.DPSShowWindow)
             {
-                DPSGraphWindow.Close();
-                DPSGraphWindow = null;
-            }
-        }
+				DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
+				{
+					DPSGraphWindow.Hide();
+				}));
+			}
+		}
 
-        private void trayIconMenuDPSTransparent(object sender, EventArgs e)
+		private void trayIconMenuDPSTransparent(object sender, EventArgs e)
         {
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
             Program.MainConfiguration.DPSGraphTransparent = ((MenuItem)sender).Checked;
@@ -1084,7 +1096,7 @@ namespace Quesadilla
                     case false:
                         DPSGraphWindow.TransparencyKey = DPSGraphWindow.TransparentColour;
                         DPSGraphWindow.BackColor = OriginalBackgroundColour;
-                        DPSGraphWindow.Text = "Queadilla DPS";
+                        DPSGraphWindow.Text = "Quesadilla DPS";
                         break;
                 }
             }
@@ -1616,10 +1628,6 @@ namespace Quesadilla
             IntelLog.ScrollToCaret();
         }
 
-        private void chartDPS_Click(object sender, EventArgs e)
-        {
-
-        }
         protected override CreateParams CreateParams
         {
             get
@@ -1680,20 +1688,28 @@ namespace Quesadilla
                         {
                             if (CurrentActiveToon == null || CurrentActiveToon == "")
                             {
-                                DPSGraphWindow.Hide();
-                            }
-                            else
+								DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
+								{
+									DPSGraphWindow.Hide();
+								}));
+							}
+							else
                             {
                                 CombatAdded = true;
-                                DPSGraphWindow.UpdateDPSGraph();
-                                DPSGraphWindow.TopMost = Program.MainConfiguration.DPSGraphStayOnTop;
-                                if (NoActiveEveProcess)
-                                {
-                                    SendWindowTop(DPSGraphWindow.Handle);
-                                }
-                                DPSGraphWindow.Show();
-                            }
-                        }
+
+									DPSGraphWindow.UpdateDPSGraph();
+									DPSGraphWindow.SetTopMost(Program.MainConfiguration.DPSGraphStayOnTop);
+								DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
+								{
+									if (NoActiveEveProcess)
+									{
+										SendWindowTop(DPSGraphWindow.Handle);
+									}
+									DPSGraphWindow.Show();
+								}));
+								
+							}
+						}
 
                         if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
                         {
@@ -1723,8 +1739,13 @@ namespace Quesadilla
                         PrevRect.Left != currentEveWindowRect.Left || PrevRect.Right != currentEveWindowRect.Right
                         )
                     {
-                        if (DPSGraphWindow != null)
-                            DPSGraphWindow.SetScreenPosition();
+						if (DPSGraphWindow != null)
+						{
+							DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
+							{
+								DPSGraphWindow.SetScreenPosition();
+							}));
+						}
 
                         if (OverlayMapWindow != null)
                             OverlayMapWindow.SetScreenPosition();
@@ -1748,8 +1769,15 @@ namespace Quesadilla
                             if (DPSGraphWindow.TopMost != false)
                             {
                                 currentEveWindowRect = PrevRect;
-                                DPSGraphWindow.TopMost = false;
-                                SendWindowBack(DPSGraphWindow.Handle);
+                                DPSGraphWindow.SetTopMost(false);
+
+								if (DPSGraphWindow != null)
+								{
+									DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
+									{
+										SendWindowBack(DPSGraphWindow.Handle);
+									}));
+								}
                             }
                         }
                     }
@@ -2688,7 +2716,14 @@ namespace Quesadilla
         }
         private void ShowAlert(AlertQueueItem alert, bool sendToEveO = true)
         {
-            if (Program.MainConfiguration.ShowAlertFancyNotification) ShowAlertWindow(alert);
+
+			if (InvokeRequired)
+			{
+				BeginInvoke((MethodInvoker)(() => ShowAlert(alert, sendToEveO)));
+				return;
+			}
+
+			if (Program.MainConfiguration.ShowAlertFancyNotification) ShowAlertWindow(alert);
             if (Program.MainConfiguration.ShowAlertWindowsNotification) ShowAlertToast(alert);
             if (sendToEveO) EveOClient.AlertClient(alert);
         }
@@ -3050,26 +3085,27 @@ namespace Quesadilla
 				return;
 			}
 
-			if (Program.MainConfiguration.DPSShowWindow &&
-				DPSGraphWindow == null)
+			UI(() =>
 			{
-				DPSGraphWindow = new QuesadillaDPSGraph(this);
-				DPSGraphWindow.Show();
-			}
-
-			if (DPSGraphWindow != null)
-			{
-				UI(() =>
+				if (Program.MainConfiguration.DPSShowWindow &&
+					DPSGraphWindow == null)
 				{
-					DPSGraphWindow.UpdateDPSGraph();
-				});
-			}
+					DPSGraphWindow = new QuesadillaDPSGraph(this);
+					DPSGraphWindow.Show();
+				}
 
-			CombatAdded = false;
+				if (DPSGraphWindow != null)
+				{
+                    {
+                        DPSGraphWindow.UpdateDPSGraph();
+					}
+
+					CombatAdded = false;
+				}
+			});
 		}
 
-
-        private void GeneralTick()
+		private void GeneralTick()
         {
 			activityLine += ActivityLineInc;
 			if (activityLine > ActivityLineMax)
