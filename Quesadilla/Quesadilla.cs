@@ -100,9 +100,6 @@ namespace Quesadilla
 		// bonus:  <color=#fff0ff45>Critical mining success!<color=0x77ffffff><font size=10> You mined an additional <color=#fff0ff45><font size=12>107<color=0x77ffffff><font size=10> units of <color=0xffffffff><font size=12>Otavite
 		// residue: <color=0x77ffffff>Additional <font size=12><color=#ffff454b>23<color=0x77ffffff><font size=10> units depleted from asteroid as residue
 
-
-
-
 		private readonly Regex _DecloakRegexMobileObservatory = new Regex("cloak deactivates due to a pulse from a Mobile Observatory", RegexOptions.Compiled);
         private readonly Regex _DecloakRegexProximity = new Regex("Your cloak deactivates due to proximity to (?<decloakProximity>.*)", RegexOptions.Compiled);
 
@@ -259,7 +256,7 @@ namespace Quesadilla
 			AnimationStateKills = new AnimationState(state:0, direction:-1, maximum:36, pulse:false);
             AnimationStateIntel = new AnimationState(state:1, direction:1, maximum:18, pulse:false);
 			AnimationStateAlts = new AnimationState(state: 2, direction: -1, maximum: 12, pulse: false);
-			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
+			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 18, pulse: true);
 			AnimationStateCombat = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
 
 			menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
@@ -305,7 +302,6 @@ namespace Quesadilla
 
             ActivityLineInc = 1;
             ActivityLineMax = Program.MainConfiguration.HeartBeatIndicatorWorkingText.Length - 1;
-
 
 			foreach (Control c in this.TopbarPanel.Controls)
 			{
@@ -790,7 +786,6 @@ namespace Quesadilla
 
                 if (intSet.Count > 0)
                 {
-
                     AlertQueueItem insertedAlert = null;
 
                     Log.Information(entry.LineContent);
@@ -2910,7 +2905,6 @@ namespace Quesadilla
 
         private void ShowAlertToast(AlertQueueItem alert)
         {
-
             ToastNotificationManagerCompat.OnActivated += toastArgs =>
             {
                 // Obtain the arguments from the notification

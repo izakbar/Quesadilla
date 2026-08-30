@@ -734,7 +734,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					// Unihole
 					if (currentSystem.solarSystem.UniHole)
 					{
-						DrawPulseIndicator(g,currentPoint,UniHoleColour,blobSize,animationCycleUniHoles,pulseSize: 5.0f,maxAlpha: 60,glowLayers: 3,ringWidth: 2.0f);
+						DrawPulseIndicator(g,currentPoint,UniHoleColour,blobSize,animationCycleUniHoles,pulseSize: 6.5f,maxAlpha: 60,glowLayers: 3,ringWidth: 2.0f);
 					}
 
 					// DrawSystemName(g, currentPoint.X, currentPoint.Y, $"{currentSystem.solarSystem.NPCKillsDeltaLastHour}", Color.AliceBlue, textSize); 
