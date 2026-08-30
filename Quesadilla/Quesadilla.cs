@@ -93,14 +93,14 @@ namespace Quesadilla
         private readonly Regex _MiningRegexRoidExploded = new Regex("(?<miningDevice>.*)\\sdeactivates as it finds the resource it was harvesting\\s(?<miningHowItEnded>.*)", RegexOptions.Compiled);
         private readonly Regex _MiningRegexCargoFull = new Regex("Your\\s*(?<miningDevice>.*)\\s*has completed operations. Ship.s cargo hold is full.*", RegexOptions.Compiled);
 
-		private readonly Regex _MiningRegexAmounts = new Regex("^<color=.*>\\s*You mined\\s*<font size=..><color=.*>(?<miningAmount>.*)<color=.*><font size=..>\\s*units* of\\s*<color=.*><font size=..>\\s*(?<miningContext>.*)", RegexOptions.Compiled);
-		private readonly Regex _MiningRegexAmountsCritical = new Regex("^^<color=.*>\\s*Critical mining success!\\s*<color=.*><font size=..>\\sYou mined an additional\\s<color=.*><font size=..>(?<miningAmount>.*)<color=.*><font size=..>\\s*units* of\\s*<color=.*><font size=..>\\s*(?<miningContext>.*)", RegexOptions.Compiled);
-		private readonly Regex _MiningRegexAmountsResidue = new Regex("^^<color=.*>\\s*Additional\\s*<font size=..><color=.*>(?<miningResidue>.*)<color=.*><font size=..>\\s*units depleted from asteroid as residue", RegexOptions.Compiled);
-		// normal: <color=0x77ffffff>You mined <font size=12><color=#ff8dc169>40<color=0x77ffffff><font size=10> units of <color=0xffffffff><font size=12>Arkonor
-		// bonus:  <color=#fff0ff45>Critical mining success!<color=0x77ffffff><font size=10> You mined an additional <color=#fff0ff45><font size=12>107<color=0x77ffffff><font size=10> units of <color=0xffffffff><font size=12>Otavite
-		// residue: <color=0x77ffffff>Additional <font size=12><color=#ffff454b>23<color=0x77ffffff><font size=10> units depleted from asteroid as residue
+        private readonly Regex _MiningRegexAmounts = new Regex("^<color=.*>\\s*You mined\\s*<font size=..><color=.*>(?<miningAmount>.*)<color=.*><font size=..>\\s*units* of\\s*<color=.*><font size=..>\\s*(?<miningContext>.*)", RegexOptions.Compiled);
+        private readonly Regex _MiningRegexAmountsCritical = new Regex("^^<color=.*>\\s*Critical mining success!\\s*<color=.*><font size=..>\\sYou mined an additional\\s<color=.*><font size=..>(?<miningAmount>.*)<color=.*><font size=..>\\s*units* of\\s*<color=.*><font size=..>\\s*(?<miningContext>.*)", RegexOptions.Compiled);
+        private readonly Regex _MiningRegexAmountsResidue = new Regex("^^<color=.*>\\s*Additional\\s*<font size=..><color=.*>(?<miningResidue>.*)<color=.*><font size=..>\\s*units depleted from asteroid as residue", RegexOptions.Compiled);
+        // normal: <color=0x77ffffff>You mined <font size=12><color=#ff8dc169>40<color=0x77ffffff><font size=10> units of <color=0xffffffff><font size=12>Arkonor
+        // bonus:  <color=#fff0ff45>Critical mining success!<color=0x77ffffff><font size=10> You mined an additional <color=#fff0ff45><font size=12>107<color=0x77ffffff><font size=10> units of <color=0xffffffff><font size=12>Otavite
+        // residue: <color=0x77ffffff>Additional <font size=12><color=#ffff454b>23<color=0x77ffffff><font size=10> units depleted from asteroid as residue
 
-		private readonly Regex _DecloakRegexMobileObservatory = new Regex("cloak deactivates due to a pulse from a Mobile Observatory", RegexOptions.Compiled);
+        private readonly Regex _DecloakRegexMobileObservatory = new Regex("cloak deactivates due to a pulse from a Mobile Observatory", RegexOptions.Compiled);
         private readonly Regex _DecloakRegexProximity = new Regex("Your cloak deactivates due to proximity to (?<decloakProximity>.*)", RegexOptions.Compiled);
 
         private readonly Regex _ISKRegexISKData = new Regex("^<font size=12><b><color=0x........>\\s*(?<iskAmount>.*) ISK\\s*</b><color=0x........> added to next bounty payout", RegexOptions.Compiled);
@@ -110,8 +110,9 @@ namespace Quesadilla
         private int _intelSizeMax = 200;
         private int _intelSizeMin = 48;
         private int _windowExtraHeight = 60;
+		bool _refreshProcessList = false;
 
-        private bool shouldUpdateMinimap = false;
+		private bool shouldUpdateMinimap = false;
         private bool shouldUpdatePlanetInfo = false;
 
         private MenuItem menuConfiguredAlerts = new MenuItem("Configured Alerts");
@@ -146,15 +147,15 @@ namespace Quesadilla
 
         private List<PlanetInfoDisplay> CurrentPlanetInfos = new List<PlanetInfoDisplay>();
 
-        public Dictionary<string, int> TickCounts = new Dictionary<string, int>();
+        public TickManager TickManager;
 
         private Thread splashScreenThread;
         private QuesadillaSplashScreen splashScreen;
-		public QuesadillaDPSGraph DPSGraphWindow = null;
+        public QuesadillaDPSGraph DPSGraphWindow = null;
 
-		public QuesadillaOverlayMap OverlayMapWindow = null;
+        public QuesadillaOverlayMap OverlayMapWindow = null;
 
-		private Color OriginalBackgroundColour;
+        private Color OriginalBackgroundColour;
         private int mapScale = 100;
 
         private List<ProcessInfo> knowProcesses = new List<ProcessInfo>();
@@ -180,35 +181,35 @@ namespace Quesadilla
 
         AnimationState AnimationStateKills;
         AnimationState AnimationStateIntel;
-		AnimationState AnimationStateAlts;
-		AnimationState AnimationStateUniHoles;
-		AnimationState AnimationStateCombat;
+        AnimationState AnimationStateAlts;
+        AnimationState AnimationStateUniHoles;
+        AnimationState AnimationStateCombat;
 
-		private bool ISKPerHourTotal = false;
+        private bool ISKPerHourTotal = false;
         private bool MiningPerHourTotal = false;
 
         private bool NoActiveEveProcess = false;
 
-		[DllImport("user32.dll")]
-		private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
-		private readonly IntPtr HWND_BOTTOM = new IntPtr(1);
-		private readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
-		
-		private const UInt32 SWP_NOSIZE = 0x0001;
-		private const UInt32 SWP_NOMOVE = 0x0002;
+        [DllImport("user32.dll")]
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+        private readonly IntPtr HWND_BOTTOM = new IntPtr(1);
+        private readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
 
-		public void SendWindowBack(IntPtr w)
-		{
-			//var hWnd = new WindowInteropHelper(window).Handle;
-			SetWindowPos(w, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-		}
-		public void SendWindowTop(IntPtr w)
-		{
-			//var hWnd = new WindowInteropHelper(window).Handle;
-			SetWindowPos(w, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-		}
+        private const UInt32 SWP_NOSIZE = 0x0001;
+        private const UInt32 SWP_NOMOVE = 0x0002;
 
-		public Quesadilla()
+        public void SendWindowBack(IntPtr w)
+        {
+            //var hWnd = new WindowInteropHelper(window).Handle;
+            SetWindowPos(w, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+        }
+        public void SendWindowTop(IntPtr w)
+        {
+            //var hWnd = new WindowInteropHelper(window).Handle;
+            SetWindowPos(w, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+        }
+
+        public Quesadilla()
         {
             splashScreenThread = new Thread(new ThreadStart(ShowSplashScreen));
             splashScreenThread.Start();
@@ -221,7 +222,7 @@ namespace Quesadilla
 
             this.TitleIcon.Image = Properties.Resources.q.ToBitmap();
 
-			this.MainMinimap.MouseWheel += pMinimapImage_MouseWheel;
+            this.MainMinimap.MouseWheel += pMinimapImage_MouseWheel;
 
             // Initialize tray
             trayIcon = new NotifyIcon()
@@ -241,24 +242,29 @@ namespace Quesadilla
 
             trayIcon.MouseDoubleClick += trayIconDoubleClick;
 
-            TickCounts["SinceLastCleardown"] = 0;
-            TickCounts["SinceLastAlert"] = 0;
-            TickCounts["SinceLastDPSGraphUpdate"] = 0;
-            TickCounts["LogfileCheck"] = 0;
-            TickCounts["RefreshProcesses"] = 0;
-            TickCounts["AnimationRefresh"] = 0;
-            TickCounts["ISKPerHour"] = 0;
-            TickCounts["MiningPerHour"] = 0;
-			TickCounts["MiningDetail"] = 0;
 
-			TickCounts["IncursionData"] = 0;
-			TickCounts["UpdateEveOLocations"] = 0;
-
-			AnimationStateKills = new AnimationState(state:0, direction:-1, maximum:36, pulse:false);
-            AnimationStateIntel = new AnimationState(state:1, direction:1, maximum:18, pulse:false);
+			AnimationStateKills = new AnimationState(state: 0, direction: -1, maximum: 36, pulse: false);
+			AnimationStateIntel = new AnimationState(state: 1, direction: 1, maximum: 18, pulse: false);
 			AnimationStateAlts = new AnimationState(state: 2, direction: -1, maximum: 12, pulse: false);
 			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 18, pulse: true);
 			AnimationStateCombat = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
+
+            TickManager = new TickManager(Program.MainConfiguration.TickMiliseconds);
+			TickManager.RegisterTick("AnimationRefresh", 0, Program.MainConfiguration.HowManyTicksMapAnimation, RefreshAnimations);
+			TickManager.RegisterTick("UpdateEveOLocations", 500, Program.MainConfiguration.HowManyTicksBeforeEveOLocationUpdate, RefreshEveLocations);
+			TickManager.RegisterTick("IncursionData", 10000, Program.MainConfiguration.HowManyTicksBeforeIncursionData, RefreshIncursionData);
+			TickManager.RegisterTick("MiningDetail",0,Program.MainConfiguration.HowManyTicksMiningCSVOutput,RefreshMiningCSV);
+			TickManager.RegisterTick("MiningPerHour",0,Program.MainConfiguration.HowManyTicksBeforeSwitchMiningPerHour,RefreshMiningPerHour);
+			TickManager.RegisterTick("ISKPerHour", 0, Program.MainConfiguration.HowManyTicksBeforeSwitchISKPerHour, RefreshISKPerHour);
+			TickManager.RegisterTick("SinceLastCleardown",0,Program.MainConfiguration.HowManyTicksBeforeCleardown,PerformCleardown);
+			TickManager.RegisterTick("SinceLastDPSGraphUpdate",0,Program.MainConfiguration.HowManyTicksBeforeDPSGraphUpdate,UpdateDPSGraphWindow);
+			TickManager.RegisterTick("SinceLastAlert", 0, Program.MainConfiguration.HowManyTicksBeforeAlert, ProcessAlertQueue);
+			TickManager.RegisterTick("LogfileCheck", 500, Program.MainConfiguration.HowManyTicksBeforeLogfileCheck, Program.LogfileWatchersProcessing);
+			TickManager.RegisterTick("RefreshProcesses", 0, Program.MainConfiguration.HowManyTicksRefreshProcesses, RefreshProcesses);
+			TickManager.RegisterTick("UpdateProcesses", 0, 2, UpdateProcessesTick);
+			TickManager.RegisterTick("GeneralTick", 0, 2, GeneralTick);
+
+			TickManager.Start();
 
 			menuConfiguration.MenuItems.Add(menuConfigurationWindow = new MenuItem("Edit Configuration", trayIconMenuConfigurationClick));
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
@@ -276,9 +282,6 @@ namespace Quesadilla
             menuConfiguration.MenuItems.Add(menuConfiguredAlerts);
             menuConfiguration.MenuItems.Add(menuLogWatchers);
 
-            // stop main tick timer!
-            mainTimer.Enabled = false;
-
             ReloadConfiguration();
 
             EveScoutProcessor = new EveScoutManager();
@@ -294,26 +297,23 @@ namespace Quesadilla
             RebuildLogfilesMenu();
             Program.StartLogfileWatchers();
 
-            // start main tick timer
-            mainTimer.Enabled = true;
-
-			// Program.ZKillHandler.ZKillFeedRedisQ.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
-			Program.ZKillHandler.ZKillFeedR2Z2.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
-			Program.ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(this.ESI_ProcessNewData);
+            // Program.ZKillHandler.ZKillFeedRedisQ.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
+            Program.ZKillHandler.ZKillFeedR2Z2.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
+            Program.ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(this.ESI_ProcessNewData);
 
             ActivityLineInc = 1;
             ActivityLineMax = Program.MainConfiguration.HeartBeatIndicatorWorkingText.Length - 1;
 
-			foreach (Control c in this.TopbarPanel.Controls)
-			{
-				if (!(c is System.Windows.Forms.Button)) //Change here depending on the Library you use for your contols
-				{
+            foreach (Control c in this.TopbarPanel.Controls)
+            {
+                if (!(c is System.Windows.Forms.Button)) //Change here depending on the Library you use for your contols
+                {
                     c.MouseDown += TopbarPanel_MouseDown;
-				}
-			}
+                }
+            }
 
-			// get processes
-			UpdateEveProcesses(true);
+            // get processes
+            UpdateEveProcesses(true);
 
             GetSkyhookTimers();
             Program.ESIHandler.EnqueueRequestIncursions();
@@ -323,7 +323,7 @@ namespace Quesadilla
                 OverlayMapWindow = new QuesadillaOverlayMap(this);
                 OverlayMapWindow.Show();
             }
-		}
+        }
 
         private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
         {
@@ -396,13 +396,13 @@ namespace Quesadilla
             BackColor = Program.MainConfiguration.MainWindowBackgroundColour;
             ForeColor = Program.MainConfiguration.MainWindowTextColour;
 
-			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.MainWindowItemLocations, TopbarPanel.Height, MiningPerHourTotal, ISKPerHourTotal, false);
+            Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.MainWindowItemLocations, TopbarPanel.Height, MiningPerHourTotal, ISKPerHourTotal, false);
             if (OverlayMapWindow != null)
             {
                 Program.MainConfiguration.ApplyConfiguration(OverlayMapWindow, Program.MainConfiguration.OverlayWindowItemLocations, 0, MiningPerHourTotal, ISKPerHourTotal, false);
             }
 
-			RebuildAlertsMenu();
+            RebuildAlertsMenu();
             RebuildBackgroundsMenu();
             RebuildLatestAlertsMenu();
 
@@ -431,8 +431,6 @@ namespace Quesadilla
             Program.Universe.HomeSolarSystemID = Program.Universe.Names[Program.MainConfiguration.HomeSystem];
 
             RecalculateWindowHeight();
-
-            mainTimer.Interval = Program.MainConfiguration.TickMiliseconds;
 
             mapScale = Program.MainConfiguration.MainWindowMapScale;
             if (mapScale == 0) mapScale = 100;
@@ -463,192 +461,16 @@ namespace Quesadilla
             //this.Text = "Quesadilla v" + Program.version.ToString();
             this.Title.Text = "Quesadilla v" + Program.version.ToString();
 
-			Program.ESIHandler.Resume();
+            Program.ESIHandler.Resume();
         }
 
         private void mainTimer_Tick(object sender, EventArgs e)
         {
 
-            activityLine += ActivityLineInc;
-            if (activityLine > ActivityLineMax)
-            {
-                activityLine = 0;
-            }
-            WorkingIndicator.Text = Program.MainConfiguration.HeartBeatIndicatorWorkingText[activityLine].ToString();
 
-			if (++TickCounts["LogfileCheck"] > Program.MainConfiguration.HowManyTicksBeforeLogfileCheck)
-			{
-				Program.LogfileWatchersProcessing();
-				TickCounts["LogfileCheck"] = 0;
-			}
-
-			if (++TickCounts["IncursionData"] > Program.MainConfiguration.HowManyTicksBeforeIncursionData)
-			{
-                Program.ESIHandler.EnqueueRequestIncursions();
-				TickCounts["IncursionData"] = 0;
-			}
-
-			if (shouldUpdateMinimap)
-            {
-                UpdateMinimap();
-            }
-            if (shouldUpdatePlanetInfo)
-            {
-                UpdatePlanetInfo();
-            }
-
-            // dequeue Alerts
-            if (++TickCounts["SinceLastAlert"] > Program.MainConfiguration.HowManyTicksBeforeAlert && Program.NewAlerts.Count > 0)
-            {
-
-                AlertQueueItem NewAlert = null;
-                Program.NewAlerts.TryDequeue(out NewAlert);
-
-                Program.EnqueueActiveAlert(NewAlert);
-
-                if (NewAlert.ShowAlert)
-                {
-                    Log.Error(NewAlert.AlertText);
-                    shouldUpdateMinimap = true;
-                    shouldUpdatePlanetInfo = true;
-
-                    ShowAlert(NewAlert);
-
-                    SoundPlayer sound = Program.LoadSoundFromFile(NewAlert.SoundFile);
-                    if (sound != null) sound.Play();
-                    RebuildLatestAlertsMenu();
-                }
-
-                TickCounts["SinceLastAlert"] = 0;
-            }
-
-            if (++TickCounts["ISKPerHour"] > Program.MainConfiguration.HowManyTicksBeforeSwitchISKPerHour)
-            {
-                ISKPerHourTotal = !ISKPerHourTotal;
-                TickCounts["ISKPerHour"] = 0;
-
-                // if not configured - then reset to false;
-                if (Program.MainConfiguration.ShowISKTotal == false)
-                {
-                    ISKPerHourTotal = false;
-                }
-                else
-                {
-                    UpdateISK();
-                }
-            }
-
-            if (++TickCounts["MiningDetail"] > Program.MainConfiguration.HowManyTicksMiningCSVOutput)
-            {
-                TickCounts["MiningDetail"] = 0;
-                UpdateMiningCSV();
-            }
-
-            if (++TickCounts["MiningPerHour"] > Program.MainConfiguration.HowManyTicksBeforeSwitchMiningPerHour)
-            {
-                MiningPerHourTotal = !MiningPerHourTotal;
-                TickCounts["MiningPerHour"] = 0;
-
-                // if not configured - then reset to false;
-                if (Program.MainConfiguration.ShowMiningTotal == false)
-                {
-                    MiningPerHourTotal = false;
-                }
-                else
-                {
-                    UpdateMining();
-                }
-            }
-
-            // do cleardown/rebuild of alerts menu - if number of ticks passed
-            if (++TickCounts["SinceLastCleardown"] > Program.MainConfiguration.HowManyTicksBeforeCleardown)
-            {
-
-                int alertsExpired = 0;
-                int zkillsExpired = 0;
-                // Show number of recent alerts
-                if (Program.ActiveAlerts.Count > 0)
-                {
-
-                    alertsExpired = Program.ExpireAlerts();
-                    if (alertsExpired > 0)
-                    {
-                        RebuildLatestAlertsMenu();
-                    }
-                    AlertsOutstanding.Text = Program.ActiveAlerts.Count.ToString();
-                }
-                else
-                {
-                    AlertsOutstanding.Text = "";
-                }
-
-                if (Program.ZKillHandler.ZKillKills.Count > 0)
-                {
-                    AlertsOutstanding.Text += "/" + Program.ZKillHandler.ZKillKills.Count.ToString();
-                }
-
-                Program.ExpireCombat();
-                Program.ExpireISK();
-                Program.ExpireMining();
-
-                zkillsExpired = Program.ZKillHandler.ExpireZKillQueue();
-                if (zkillsExpired + alertsExpired > 0)
-                {
-                    UpdateMinimap();
-                }
-
-                UpdateISK();
-                UpdateMining();
-
-                TickCounts["SinceLastCleardown"] = 0;
-            }
-
-            bool refreshProcessList = false;
-            if (++TickCounts["RefreshProcesses"] > Program.MainConfiguration.HowManyTicksRefreshProcesses)
-            {
-                refreshProcessList = true;
-                TickCounts["RefreshProcesses"] = 0;
-            }
-            UpdateEveProcesses(refreshProcessList);
-
-            //            pCombat.Visible = InCombat;
-
-            if (++TickCounts["SinceLastDPSGraphUpdate"] > Program.MainConfiguration.HowManyTicksBeforeDPSGraphUpdate && CombatAdded)
-            {
-                if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow == null)
-                {
-                    DPSGraphWindow = new QuesadillaDPSGraph(this);
-                    DPSGraphWindow.Show();
-                }
-
-                if (DPSGraphWindow != null)
-                {
-                    DPSGraphWindow.UpdateDPSGraph();
-                }
-                CombatAdded = false;
-                TickCounts["SinceLastDPSGraphUpdate"] = 0;
-            }
-
-            if ( ++TickCounts["UpdateEveOLocations"] > Program.MainConfiguration.HowManyTicksBeforeEveOLocationUpdate) 
-            {
-                foreach (var c in Program.CharacterList) {
-                    EveOClient.UpdateSystem(c.CharacterName, c.Location);
-                }
-				TickCounts["UpdateEveOLocations"] = 0;
-			}
-
-            if (++TickCounts["AnimationRefresh"] > Program.MainConfiguration.HowManyTicksMapAnimation)
-            {
-                AnimationStateKills.Advance();
-                AnimationStateIntel.Advance();
-				AnimationStateAlts.Advance();
-				AnimationStateUniHoles.Advance();
-				AnimationStateCombat.Advance();
-
-				UpdateMinimap();
-                TickCounts["AnimationRefresh"] = 0;
-            }
         }
+
+
 
         private bool checkJumpsRange(AlertConfig alert, PathInfo path)
         {
@@ -1092,7 +914,7 @@ namespace Quesadilla
                     c.Location = foundSystemName;
                     c.InAbyss = false;
                 }
-				else
+                else
                 {
                     c = new Character()
                     {
@@ -1123,33 +945,33 @@ namespace Quesadilla
                 // TODO                if (this._conf.CameraFollowCharacter && this.CentreOnCharacter.Text == key) this.ZoomTo(num1);
             }
 
-			if (!string.IsNullOrEmpty(characterName) && foundSystemId == -1 && !e.SystemName.StartsWith("J"))
-			{
-				var c = Program.CharacterList.Where(o => o.CharacterName == characterName).FirstOrDefault();
-				if (c != null)
-				{
-					c.InAbyss = true;
-				}
-				else
-				{
-					c = new Character()
-					{
-						CharacterName = characterName,
-						LocationId = foundSystemId,
-						Location = foundSystemName,
-						InAbyss = true,
-					};
-					Program.CharacterList.Add(c);
-				}
-			}
+            if (!string.IsNullOrEmpty(characterName) && foundSystemId == -1 && !e.SystemName.StartsWith("J"))
+            {
+                var c = Program.CharacterList.Where(o => o.CharacterName == characterName).FirstOrDefault();
+                if (c != null)
+                {
+                    c.InAbyss = true;
+                }
+                else
+                {
+                    c = new Character()
+                    {
+                        CharacterName = characterName,
+                        LocationId = foundSystemId,
+                        Location = foundSystemName,
+                        InAbyss = true,
+                    };
+                    Program.CharacterList.Add(c);
+                }
+            }
 
-			SetupStatusBar();
+            SetupStatusBar();
 
-			if (foundSystemId == -1 && e.SystemName.StartsWith("J"))
-			{
-				// wormhole ? - get info from http://anoik.is/
-			}
-			Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
+            if (foundSystemId == -1 && e.SystemName.StartsWith("J"))
+            {
+                // wormhole ? - get info from http://anoik.is/
+            }
+            Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
 
             // Should we update system information in system log file ?
             if (Program.MainConfiguration.OutputCharacterLocationsToFile)
@@ -1157,14 +979,14 @@ namespace Quesadilla
                 try
                 {
                     StringBuilder s = new StringBuilder();
-					foreach( var c in Program.CharacterList)
+                    foreach (var c in Program.CharacterList)
                     {
                         s.Append($"{c.CharacterName}:{c.Location}{(c.InAbyss ? " *IN-ABYSS*" : "")}");
-						File.WriteAllText($"Quesadilla.Locations.{c.CharacterName}", $"{c.Location} {(c.InAbyss ? " *IN-ABYSS*" : "")}");
+                        File.WriteAllText($"Quesadilla.Locations.{c.CharacterName}", $"{c.Location} {(c.InAbyss ? " *IN-ABYSS*" : "")}");
                     }
-					File.WriteAllText($"Quesadilla.Locations", s.ToString());
-				}
-				catch (Exception ex)
+                    File.WriteAllText($"Quesadilla.Locations", s.ToString());
+                }
+                catch (Exception ex)
                 {
                     //
                 }
@@ -1374,10 +1196,10 @@ namespace Quesadilla
                 else
                 {
                     InCombat = true;
-					EveOClient.Agression(e.Entry.CharacterName, true);
-				}
+                    EveOClient.Agression(e.Entry.CharacterName, true);
+                }
 
-				if (!Program.Combat.ContainsKey(e.Entry.CharacterName))
+                if (!Program.Combat.ContainsKey(e.Entry.CharacterName))
                 {
                     Program.Combat.Add(e.Entry.CharacterName, new List<CombatLine>());
                 }
@@ -1535,10 +1357,11 @@ namespace Quesadilla
                 {
                     DPSGraphWindow.Close();
                     DPSGraphWindow = null;
-                };
-				//EveOClient.Agression(e.Entry.CharacterName, false);
-			}
-		}
+                }
+                ;
+                //EveOClient.Agression(e.Entry.CharacterName, false);
+            }
+        }
         private void logFile_ProcessISK(object sender, ProcessISKEventArgs e)
         {
             //Log.Information("COMBAT:" + e.CombatEvent);
@@ -1596,48 +1419,48 @@ namespace Quesadilla
                     });
                 }
 
-				// is this critical mining data
-				match = _MiningRegexAmountsCritical.Match(e.Entry.LineContent);
-				if (match.Success)
-				{
-					var minedAmount = match.Groups["miningAmount"].ToString();
-					int mined = Int32.Parse(minedAmount.Trim());
+                // is this critical mining data
+                match = _MiningRegexAmountsCritical.Match(e.Entry.LineContent);
+                if (match.Success)
+                {
+                    var minedAmount = match.Groups["miningAmount"].ToString();
+                    int mined = Int32.Parse(minedAmount.Trim());
 
-					//var minedWasted = match.Groups["miningResidue"].ToString();
-					//int wasted = Int32.Parse(minedWasted.Trim());
+                    //var minedWasted = match.Groups["miningResidue"].ToString();
+                    //int wasted = Int32.Parse(minedWasted.Trim());
 
-					Program.Mining[e.Entry.CharacterName].Add(new MiningLine()
-					{
-						TimeAdded = e.Entry.TimeAdded,
-						MiningItem = match.Groups["miningContext"].ToString(),
-						MiningAmount = mined,
+                    Program.Mining[e.Entry.CharacterName].Add(new MiningLine()
+                    {
+                        TimeAdded = e.Entry.TimeAdded,
+                        MiningItem = match.Groups["miningContext"].ToString(),
+                        MiningAmount = mined,
                         Critical = true,
-						//WastageAmount = wasted,
-					});
-				}
+                        //WastageAmount = wasted,
+                    });
+                }
 
-				// is this residue mining data
-				match = _MiningRegexAmountsResidue.Match(e.Entry.LineContent);
-				if (match.Success)
-				{
-					//var minedAmount = match.Groups["miningAmount"].ToString();
-					//int mined = Int32.Parse(minedAmount.Trim());
+                // is this residue mining data
+                match = _MiningRegexAmountsResidue.Match(e.Entry.LineContent);
+                if (match.Success)
+                {
+                    //var minedAmount = match.Groups["miningAmount"].ToString();
+                    //int mined = Int32.Parse(minedAmount.Trim());
 
-					var minedWasted = match.Groups["miningResidue"].ToString();
-					int wasted = Int32.Parse(minedWasted.Trim());
+                    var minedWasted = match.Groups["miningResidue"].ToString();
+                    int wasted = Int32.Parse(minedWasted.Trim());
 
-					Program.Mining[e.Entry.CharacterName].Add(new MiningLine()
-					{
-						TimeAdded = e.Entry.TimeAdded,
-						MiningItem = "WASTE",
-						//MiningAmount = mined,
-						WastageAmount = wasted,
+                    Program.Mining[e.Entry.CharacterName].Add(new MiningLine()
+                    {
+                        TimeAdded = e.Entry.TimeAdded,
+                        MiningItem = "WASTE",
+                        //MiningAmount = mined,
+                        WastageAmount = wasted,
                         Critical = false,
-					});
-				}
+                    });
+                }
 
-				// is event that roid popped
-				match = _MiningRegexRoidExploded.Match(e.Entry.LineContent);
+                // is event that roid popped
+                match = _MiningRegexRoidExploded.Match(e.Entry.LineContent);
                 if (match.Success)
                 {
 
@@ -1851,7 +1674,7 @@ namespace Quesadilla
                     SetupStatusBar();
 
                     // sort out DPS Graph
-                    if (previousToon == null || previousToon == "" || previousToon != CurrentActiveToon || NoActiveEveProcess == true )
+                    if (previousToon == null || previousToon == "" || previousToon != CurrentActiveToon || NoActiveEveProcess == true)
                     {
                         if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
                         {
@@ -1863,109 +1686,110 @@ namespace Quesadilla
                             {
                                 CombatAdded = true;
                                 DPSGraphWindow.UpdateDPSGraph();
-								DPSGraphWindow.TopMost = Program.MainConfiguration.DPSGraphStayOnTop;
+                                DPSGraphWindow.TopMost = Program.MainConfiguration.DPSGraphStayOnTop;
                                 if (NoActiveEveProcess)
                                 {
                                     SendWindowTop(DPSGraphWindow.Handle);
-								}
-								DPSGraphWindow.Show();
+                                }
+                                DPSGraphWindow.Show();
                             }
                         }
 
-						if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
-						{
-							if (CurrentActiveToon == null || CurrentActiveToon == "")
-							{
-								OverlayMapWindow.Hide();
-							}
-							else
-							{
-								OverlayMapWindow.UpdateMapData();
+                        if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
+                        {
+                            if (CurrentActiveToon == null || CurrentActiveToon == "")
+                            {
+                                OverlayMapWindow.Hide();
+                            }
+                            else
+                            {
+                                OverlayMapWindow.UpdateMapData();
                                 OverlayMapWindow.TopMost = true;
-								if (NoActiveEveProcess)
-								{
-									SendWindowTop(OverlayMapWindow.Handle);
-								}
-								OverlayMapWindow.Show();
-							}
-						}
+                                if (NoActiveEveProcess)
+                                {
+                                    SendWindowTop(OverlayMapWindow.Handle);
+                                }
+                                OverlayMapWindow.Show();
+                            }
+                        }
 
-						UpdateISK();
+                        UpdateISK();
                         shouldUpdateMinimap = true;
                         shouldUpdatePlanetInfo = true;
-					} 
+                    }
 
                     if (
-						PrevRect.Top != currentEveWindowRect.Top || PrevRect.Bottom != currentEveWindowRect.Bottom ||
-						PrevRect.Left != currentEveWindowRect.Left || PrevRect.Right != currentEveWindowRect.Right
-						)
+                        PrevRect.Top != currentEveWindowRect.Top || PrevRect.Bottom != currentEveWindowRect.Bottom ||
+                        PrevRect.Left != currentEveWindowRect.Left || PrevRect.Right != currentEveWindowRect.Right
+                        )
                     {
-						if (DPSGraphWindow != null)
-							DPSGraphWindow.SetScreenPosition();
+                        if (DPSGraphWindow != null)
+                            DPSGraphWindow.SetScreenPosition();
 
-						if (OverlayMapWindow != null)
-							OverlayMapWindow.SetScreenPosition();
-					}
+                        if (OverlayMapWindow != null)
+                            OverlayMapWindow.SetScreenPosition();
+                    }
 
-					if ( NoActiveEveProcess) NoActiveEveProcess = false;
+                    if (NoActiveEveProcess) NoActiveEveProcess = false;
 
-				}
-				else
+                }
+                else
                 {
-					// not eve window 
+                    // not eve window 
 
-					if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
-					{
-						if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
-						{
-							DPSGraphWindow.Hide();
-						}
-						else
-						{
-							if (DPSGraphWindow.TopMost != false)
-							{
-								currentEveWindowRect = PrevRect;
-								DPSGraphWindow.TopMost = false;
-								SendWindowBack(DPSGraphWindow.Handle);
-							}
-						}
-					}
-					if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
-					{
-						if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
-						{
-							OverlayMapWindow.Hide();
-						}
-						else
-						{
-							if (OverlayMapWindow.TopMost != false)
-							{
-								currentEveWindowRect = PrevRect; // smaybe move this out
-								OverlayMapWindow.TopMost = false;
-								SendWindowBack(OverlayMapWindow.Handle);
-							}
-						}
-					}
-				}
-			}
+                    if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
+                    {
+                        if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
+                        {
+                            DPSGraphWindow.Hide();
+                        }
+                        else
+                        {
+                            if (DPSGraphWindow.TopMost != false)
+                            {
+                                currentEveWindowRect = PrevRect;
+                                DPSGraphWindow.TopMost = false;
+                                SendWindowBack(DPSGraphWindow.Handle);
+                            }
+                        }
+                    }
+                    if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
+                    {
+                        if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
+                        {
+                            OverlayMapWindow.Hide();
+                        }
+                        else
+                        {
+                            if (OverlayMapWindow.TopMost != false)
+                            {
+                                currentEveWindowRect = PrevRect; // smaybe move this out
+                                OverlayMapWindow.TopMost = false;
+                                SendWindowBack(OverlayMapWindow.Handle);
+                            }
+                        }
+                    }
+                }
+            }
 
             if (foregroundWindowTitle == null)
             {
-                if (! Program.MainConfiguration.KeepLastToonWhenNotEve)
+                if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
                 {
                     //lblCurrentClient.Visible = false;
                     CurrentActiveToon = "";
                     CurrentClient.Text = CurrentActiveToon;
                     SetupStatusBar();
                     shouldUpdateMinimap = true;
-                } else
+                }
+                else
                 {
                     NoActiveEveProcess = true;
                 }
             }
 
-			// just double check thru charachter list active clients to make sure there is still an active client.
-			foreach (var c in Program.CharacterList)
+            // just double check thru charachter list active clients to make sure there is still an active client.
+            foreach (var c in Program.CharacterList)
             {
                 c.IsClientActive = Program.ProcessMonitorHandler.IsCharStillActive(c.CharacterName);
                 c.IsCurrentlActiveClient = (c.CharacterName == CurrentActiveToon ? true : false);
@@ -2009,7 +1833,7 @@ namespace Quesadilla
                 //GetSystemInfo((int)e.Kill.SolarSystemId);
             }
 
-            Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {Program.Universe.GetCharacterName((e.Kill.VictimCharacterId != null ? (int)e.Kill.VictimCharacterId : 0 ))}");
+            Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {Program.Universe.GetCharacterName((e.Kill.VictimCharacterId != null ? (int)e.Kill.VictimCharacterId : 0))}");
             e.Kill.Context = generateZKillAlertText(e.Kill, null, Program.MainConfiguration.ZKillContextText, "");
 
             // check if zkill system matches any range alerts
@@ -2198,7 +2022,7 @@ namespace Quesadilla
                 var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
                 if (c != null)
                 {
-                    if ( c.InAbyss )
+                    if (c.InAbyss)
                     {
                         status.Append("*IN-ABYSS* ");
                     }
@@ -2231,16 +2055,16 @@ namespace Quesadilla
             }
 
             EveScoutStatus.Text = status.ToString().Trim();
-            if ( OverlayMapWindow != null )
+            if (OverlayMapWindow != null)
             {
                 OverlayMapWindow.EveScoutStatus.Text = EveScoutStatus.Text;
-			}
-		}
+            }
+        }
 
-		private void GetSkyhookTimers()
+        private void GetSkyhookTimers()
         {
             Program.ESIHandler.EnqueueRequestSkyhookData();
-		}
+        }
 
         private void CheckEveScoutConnection(Character c)
         {
@@ -2294,14 +2118,14 @@ namespace Quesadilla
 
         private void EveScoutProcessStormData()
         {
-			Program.Universe.Storms = EveScoutProcessor.Storms;
-			foreach (var storm in EveScoutProcessor.Storms)
+            Program.Universe.Storms = EveScoutProcessor.Storms;
+            foreach (var storm in EveScoutProcessor.Storms)
             {
-				storm.StrongSystemIds = Program.Universe.FindConnections(storm.SystemId, 1);
+                storm.StrongSystemIds = Program.Universe.FindConnections(storm.SystemId, 1);
 
                 storm.WeakSystemIds = Program.Universe.FindConnections(storm.SystemId, 3);
-				if (storm.WeakSystemIds.Contains(storm.SystemId))
-					storm.WeakSystemIds.Remove(storm.SystemId);
+                if (storm.WeakSystemIds.Contains(storm.SystemId))
+                    storm.WeakSystemIds.Remove(storm.SystemId);
                 storm.WeakSystemIds = storm.WeakSystemIds.Except(storm.StrongSystemIds).ToList();
 
                 // we could just leave it there - but ingame some 3 jump systems are not in the storm
@@ -2310,57 +2134,57 @@ namespace Quesadilla
                 // I do not KNOW this for sure
                 // :(
 
-/*
-				var jumps2 = Program.Universe.FindConnections(storm.SystemId, 2);
-				if (jumps2.Contains(storm.SystemId))
-					jumps2.Remove(storm.SystemId);
-				jumps2 = jumps2.Except(storm.StrongSystemIds).ToList();
+                /*
+                                var jumps2 = Program.Universe.FindConnections(storm.SystemId, 2);
+                                if (jumps2.Contains(storm.SystemId))
+                                    jumps2.Remove(storm.SystemId);
+                                jumps2 = jumps2.Except(storm.StrongSystemIds).ToList();
 
-				var jumps3 = Program.Universe.FindConnections(storm.SystemId, 3);
-				if (jumps3.Contains(storm.SystemId))
-					jumps3.Remove(storm.SystemId);
-				jumps3 = jumps3.Except(storm.StrongSystemIds).ToList();
-				jumps3 = jumps3.Except(jumps2).ToList();
+                                var jumps3 = Program.Universe.FindConnections(storm.SystemId, 3);
+                                if (jumps3.Contains(storm.SystemId))
+                                    jumps3.Remove(storm.SystemId);
+                                jumps3 = jumps3.Except(storm.StrongSystemIds).ToList();
+                                jumps3 = jumps3.Except(jumps2).ToList();
 
-                List<int> RemoveSystems = new List<int>();
-                var s1 = Program.Universe.SolarSystems[storm.SystemId];
-                foreach (var system in jumps3)
-                {
-                    var s2 = Program.Universe.SolarSystems[system];
+                                List<int> RemoveSystems = new List<int>();
+                                var s1 = Program.Universe.SolarSystems[storm.SystemId];
+                                foreach (var system in jumps3)
+                                {
+                                    var s2 = Program.Universe.SolarSystems[system];
 
-					double dx = s1.X - s2.X;
-                    double dy = s1.Y - s2.Y;
-                    double dz = s1.Z - s2.Z;
-                    double distance = Math.Sqrt(dx * dx + dy * dy + dz * dz) / Program.Universe.MetersPerLightYear;
-                    Log.Information($"Storm {s1.Name} to {s2.Name} distance LY direct {distance}");
+                                    double dx = s1.X - s2.X;
+                                    double dy = s1.Y - s2.Y;
+                                    double dz = s1.Z - s2.Z;
+                                    double distance = Math.Sqrt(dx * dx + dy * dy + dz * dz) / Program.Universe.MetersPerLightYear;
+                                    Log.Information($"Storm {s1.Name} to {s2.Name} distance LY direct {distance}");
 
-                    var p = Program.Universe.FindAndCachePath(s1.Id, s2.Id);
-                    var lastSystem = Program.Universe.SolarSystems[s1.Id];
-                    double distance2 = 0.0;
-                    foreach(var pathSystem in p.PathSystems)
-                    {
-                        var thisSystem = Program.Universe.SolarSystems[pathSystem];
-						double dx2 = lastSystem.X - thisSystem.X;
-						double dy2 = lastSystem.Y - thisSystem.Y;
-						double dz2 = lastSystem.Z - thisSystem.Z;
-						distance2 += Math.Sqrt(dx2 * dx2 + dy2 * dy2 + dz2 * dz2) / Program.Universe.MetersPerLightYear;
-                        lastSystem = thisSystem;
-					}
-					Log.Information($"Storm {s1.Name} to {s2.Name} distance LY via gates {distance2}");
+                                    var p = Program.Universe.FindAndCachePath(s1.Id, s2.Id);
+                                    var lastSystem = Program.Universe.SolarSystems[s1.Id];
+                                    double distance2 = 0.0;
+                                    foreach(var pathSystem in p.PathSystems)
+                                    {
+                                        var thisSystem = Program.Universe.SolarSystems[pathSystem];
+                                        double dx2 = lastSystem.X - thisSystem.X;
+                                        double dy2 = lastSystem.Y - thisSystem.Y;
+                                        double dz2 = lastSystem.Z - thisSystem.Z;
+                                        distance2 += Math.Sqrt(dx2 * dx2 + dy2 * dy2 + dz2 * dz2) / Program.Universe.MetersPerLightYear;
+                                        lastSystem = thisSystem;
+                                    }
+                                    Log.Information($"Storm {s1.Name} to {s2.Name} distance LY via gates {distance2}");
 
-//					if (distance >= 2.5 || distance2 >= 2.5)
-   				    if (distance >= 2.5 )
-						{
-							RemoveSystems.Add(s2.Id);
-						    Log.Information($"Removing {s2.Name} from storm");
-					    }
-				}
-				storm.WeakSystemIds = storm.WeakSystemIds.Except(RemoveSystems).ToList();
-*/
-			}
-		}
+                //					if (distance >= 2.5 || distance2 >= 2.5)
+                                    if (distance >= 2.5 )
+                                        {
+                                            RemoveSystems.Add(s2.Id);
+                                            Log.Information($"Removing {s2.Name} from storm");
+                                        }
+                                }
+                                storm.WeakSystemIds = storm.WeakSystemIds.Except(RemoveSystems).ToList();
+                */
+            }
+        }
 
-		private void Dotlan_ProcessNewData(object sender, DotlanEventArgs e)
+        private void Dotlan_ProcessNewData(object sender, DotlanEventArgs e)
         {
             Log.Information($"Processing dotlan data for {e.RegionName}");
 
@@ -2376,7 +2200,7 @@ namespace Quesadilla
                 //XmlNodeList dotlanIncursionNodes = null;
                 xmldoc.LoadXml(e.MapContent);
                 dotlanXYNodes = xmldoc.SelectNodes(@"//*[@id='sysuse']/*");
-//                dotlanIncursionNodes = xmldoc.SelectNodes(@"//*[@id='glow']/*");
+                //                dotlanIncursionNodes = xmldoc.SelectNodes(@"//*[@id='glow']/*");
 
                 double dotlanX = 0;
                 double dotlanY = 0;
@@ -2404,15 +2228,15 @@ namespace Quesadilla
                             s.IceField = true;
                         }
 
-/*
-                        // default to no incursion
-                        s.Incursion = false;
-                        XmlNode incursionNode = xmldoc.SelectSingleNode($@"//*[@id='glow']/*[@id='{link.Replace("def", "inc")}']");
-                        if (incursionNode != null)
-                        {
-                            s.Incursion = true;
-                        }
-*/
+                        /*
+                                                // default to no incursion
+                                                s.Incursion = false;
+                                                XmlNode incursionNode = xmldoc.SelectSingleNode($@"//*[@id='glow']/*[@id='{link.Replace("def", "inc")}']");
+                                                if (incursionNode != null)
+                                                {
+                                                    s.Incursion = true;
+                                                }
+                        */
                     }
                 }
             }
@@ -2427,9 +2251,9 @@ namespace Quesadilla
                 {
                     if (kvp.Key.Equals("error"))
                     {
-						Log.Error($"{kvp.Value} Processing dotlan delta data for {e.RegionName}");
-					}
-					else
+                        Log.Error($"{kvp.Value} Processing dotlan delta data for {e.RegionName}");
+                    }
+                    else
                     {
                         int systemId = int.Parse(kvp.Key);
                         int killDelta = int.Parse(kvp.Value);
@@ -2532,12 +2356,12 @@ namespace Quesadilla
             }
 
             UpdateISK();
-			if (OverlayMapWindow != null)
-			{
-				OverlayMapWindow.UpdateMapData();
-			}
+            if (OverlayMapWindow != null)
+            {
+                OverlayMapWindow.UpdateMapData();
+            }
 
-			var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
+            var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
 
             PathInfo _dummyPath = null;
             if (c != null)
@@ -2558,8 +2382,8 @@ namespace Quesadilla
                 string extraInformation = "";
                 Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MainMinimap.Width, MainMinimap.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
                     Program.MainConfiguration.MinimapJumps, mapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation, ref MinimapSystems,
-					Program.MainConfiguration.MinimapShowSystemText, Program.MainConfiguration.MinimapShowAllSystemText, Program.MainConfiguration.MinimapShowConnectingSystemText,
-					Program.MainConfiguration.ShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
+                    Program.MainConfiguration.MinimapShowSystemText, Program.MainConfiguration.MinimapShowAllSystemText, Program.MainConfiguration.MinimapShowConnectingSystemText,
+                    Program.MainConfiguration.ShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
                     Program.MainConfiguration.MinimapLineColourNormal,
                     Program.MainConfiguration.MinimapLineColourOutOfRegion,
                     Program.MainConfiguration.MinimapLineColourRoute,
@@ -2567,33 +2391,33 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapSystemColourRoute,
                     Program.MainConfiguration.MinimapSystemColourFrom,
                     Program.MainConfiguration.MinimapSystemColourTo,
-					Program.MainConfiguration.MinimapSystemColourText, Program.MainConfiguration.MinimapAllSystemColourText, Program.MainConfiguration.MinimapConnectingSystemColourText,
-					Program.MainConfiguration.MinimapZKillColour,
+                    Program.MainConfiguration.MinimapSystemColourText, Program.MainConfiguration.MinimapAllSystemColourText, Program.MainConfiguration.MinimapConnectingSystemColourText,
+                    Program.MainConfiguration.MinimapZKillColour,
                     Program.MainConfiguration.MinimapIntelColour,
-					Program.MainConfiguration.MinimapAltPositionColour,
-					Program.MainConfiguration.MinimapUniHoleColour,
-					Program.MainConfiguration.MinimapIncursionColour,
-					Program.MainConfiguration.MinimapIncursionOutlineColour,
-					Program.MainConfiguration.MinimapSecLimitColour,
-					Program.MainConfiguration.MinimapSecLimitOutlineColour,
-					Program.MainConfiguration.MinimapIceColour,
-					Program.MainConfiguration.MinimapMercoxitColour,
-                    AnimationStateIntel.Value(),
-                    AnimationStateKills.Value(),
-					AnimationStateAlts.Value(),
-                    AnimationStateUniHoles.Value(),
+                    Program.MainConfiguration.MinimapAltPositionColour,
+                    Program.MainConfiguration.MinimapUniHoleColour,
+                    Program.MainConfiguration.MinimapIncursionColour,
+                    Program.MainConfiguration.MinimapIncursionOutlineColour,
+                    Program.MainConfiguration.MinimapSecLimitColour,
+                    Program.MainConfiguration.MinimapSecLimitOutlineColour,
+                    Program.MainConfiguration.MinimapIceColour,
+                    Program.MainConfiguration.MinimapMercoxitColour,
+                    AnimationStateIntel.GetNextValue(),
+                    AnimationStateKills.GetNextValue(),
+                    AnimationStateAlts.GetNextValue(),
+                    AnimationStateUniHoles.GetNextValue(),
                     false,
                     Program.MainConfiguration.MinimapShowOutOfRegion,
-					Program.MainConfiguration.MinimapSecLimit,
-					Program.MainConfiguration.MinimapIncursionAlpha,
-					Program.MainConfiguration.MinimapIncursionCloudSize,
-					Program.MainConfiguration.MinimapSecLimitAlpha,
-					Program.MainConfiguration.MinimapSecLimitCloudSize,
-					Program.MainConfiguration.MinimapConnectionGap,
-				    Program.MainConfiguration.MinimapSecLimitValue
-					);
-//                Bitmap minimapBitmap = new Bitmap(minimapImage);
-//                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
+                    Program.MainConfiguration.MinimapSecLimit,
+                    Program.MainConfiguration.MinimapIncursionAlpha,
+                    Program.MainConfiguration.MinimapIncursionCloudSize,
+                    Program.MainConfiguration.MinimapSecLimitAlpha,
+                    Program.MainConfiguration.MinimapSecLimitCloudSize,
+                    Program.MainConfiguration.MinimapConnectionGap,
+                    Program.MainConfiguration.MinimapSecLimitValue
+                    );
+                //                Bitmap minimapBitmap = new Bitmap(minimapImage);
+                //                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
                 MainMinimap.Image = minimapImage;
                 ExtraInformation.Text = extraInformation;
                 MainMinimap.Visible = true;
@@ -2658,9 +2482,8 @@ namespace Quesadilla
                 //Brush systemBrush = GDICache.GetBrush(Color.Red);
                 //e.Graphics.FillEllipse(systemBrush, combatLeft - CIRCLE_RADIUS, combatTop - CIRCLE_RADIUS, CIRCLE_RADIUS * 2, CIRCLE_RADIUS * 2);
 
-                ImageGenerator.DrawPulseOrb(e.Graphics,new Point(combatLeft, combatTop),Color.Red,CIRCLE_RADIUS, AnimationStateCombat.Value(), glowLayers: 4,pulseSize: 4,maxAlpha: 120);
-
-			}
+                ImageGenerator.DrawPulseOrb(e.Graphics, new Point(combatLeft, combatTop), Color.Red, CIRCLE_RADIUS, AnimationStateCombat.Value(), glowLayers: 4, pulseSize: 4, maxAlpha: 120);
+            }
 
 
             if (Program.MainConfiguration.ShowPlanetInformation && CurrentActiveToon != null && CurrentActiveToon != "")
@@ -2738,7 +2561,8 @@ namespace Quesadilla
                                     mouseOverPlanet.X - (Program.MainConfiguration.PlanetInfoViewSize),
                                     mouseOverPlanet.Y - ((Program.MainConfiguration.PlanetInfoViewSize * 2) + Program.MainConfiguration.PlanetInfoFontSize),
                                     fontColour, font);
-                            };
+                            }
+                            ;
                         }
                     }
                     catch (Exception ex)
@@ -2759,25 +2583,26 @@ namespace Quesadilla
                     RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
                     this.Invalidate();
 
-                    if ( OverlayMapWindow != null)
+                    if (OverlayMapWindow != null)
                     {
-						OverlayMapWindow.RattingData.Text = Program.GetIskLastHour(CurrentActiveToon);
-						OverlayMapWindow.RattingData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
+                        OverlayMapWindow.RattingData.Text = Program.GetIskLastHour(CurrentActiveToon);
+                        OverlayMapWindow.RattingData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
                         OverlayMapWindow.UpdateMapData();
-					}
-					//lblISK.Visible = true;
-				}
+                    }
+                    //lblISK.Visible = true;
+                }
                 else
                 {
                     //lblISK.Visible = false;
                     RattingData.Text = "";
-					if (OverlayMapWindow != null)
-					{
-						OverlayMapWindow.RattingData.Text = "";
-						OverlayMapWindow.UpdateMapData();
-					}
-				}
-			} else
+                    if (OverlayMapWindow != null)
+                    {
+                        OverlayMapWindow.RattingData.Text = "";
+                        OverlayMapWindow.UpdateMapData();
+                    }
+                }
+            }
+            else
             {
                 try
                 {
@@ -2794,8 +2619,8 @@ namespace Quesadilla
                 {
 
                 }
-			}
-		}
+            }
+        }
         private void UpdateMining()
         {
 
@@ -2805,75 +2630,39 @@ namespace Quesadilla
                 {
                     MiningData.Text = Program.GetMiningLastHour(CurrentActiveToon);
                     MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
-					this.Invalidate();
-					//lblISK.Visible = true;
-					if (OverlayMapWindow != null)
-					{
-						OverlayMapWindow.MiningData.Text = Program.GetMiningLastHour(CurrentActiveToon);
-						OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
-						OverlayMapWindow.UpdateMapData();
-					}
-				}
-				else
+                    this.Invalidate();
+                    //lblISK.Visible = true;
+                    if (OverlayMapWindow != null)
+                    {
+                        OverlayMapWindow.MiningData.Text = Program.GetMiningLastHour(CurrentActiveToon);
+                        OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
+                        OverlayMapWindow.UpdateMapData();
+                    }
+                }
+                else
                 {
                     //lblISK.Visible = false;
                     MiningData.Text = "";
-					if (OverlayMapWindow != null)
-					{
-						OverlayMapWindow.MiningData.Text = "";
-						OverlayMapWindow.UpdateMapData();
-					}
-				}
-			}
+                    if (OverlayMapWindow != null)
+                    {
+                        OverlayMapWindow.MiningData.Text = "";
+                        OverlayMapWindow.UpdateMapData();
+                    }
+                }
+            }
             else
             {
                 MiningData.Text = Program.GetMiningLastHour("");
                 MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
-				if (OverlayMapWindow != null)
-				{
-					OverlayMapWindow.MiningData.Text = Program.GetMiningLastHour("");
-					OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
-					OverlayMapWindow.UpdateMapData();
-				}
-			}
-		}
-
-        private void UpdateMiningCSV()
-        {
-            var miningDetail = Program.GetMiningLastHourDetail("",false);
-            var miningSummary = Program.MiningItemSummary(miningDetail);
-
-            try
-            {
-                using (var writer = new StreamWriter("miningdata.csv"))
+                if (OverlayMapWindow != null)
                 {
-                    writer.WriteLine("Character,MinedItem,Amount,Wastage");
-                    foreach (var m in miningDetail)
-                    {
-                        foreach (var md in m.Value)
-                        {
-                            writer.WriteLine($"{m.Key},{md.MiningItem},{md.MiningAmount},{md.WastageAmount}");
-                        }
-                    }
-
-                    writer.WriteLine();
-                    writer.WriteLine("-----------------------------------------------------------------------------------");
-                    writer.WriteLine();
-                    foreach (var m in miningSummary)
-                    {
-                        foreach (var md in m.Value)
-                        {
-                            writer.WriteLine($"{m.Key},{md.MiningItem},{md.MiningAmount},{md.WastageAmount}");
-                        }
-                    }
+                    OverlayMapWindow.MiningData.Text = Program.GetMiningLastHour("");
+                    OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
+                    OverlayMapWindow.UpdateMapData();
                 }
-            } 
-            catch (Exception ex)
-            {
-
             }
-
         }
+
 
         private void lblEtxraInformation_Click(object sender, EventArgs e)
         {
@@ -2902,7 +2691,7 @@ namespace Quesadilla
             if (Program.MainConfiguration.ShowAlertFancyNotification) ShowAlertWindow(alert);
             if (Program.MainConfiguration.ShowAlertWindowsNotification) ShowAlertToast(alert);
             if (sendToEveO) EveOClient.AlertClient(alert);
-		}
+        }
         private void ShowAlertWindow(AlertQueueItem alert)
         {
             // try to prevent new alert stealing focus
@@ -3036,15 +2825,15 @@ namespace Quesadilla
             }
         }
 
-		private void buttonClose_Click(object sender, EventArgs e)
-		{
+        private void buttonClose_Click(object sender, EventArgs e)
+        {
             this.Close();
-		}
+        }
 
-		private void ButtonMinimize_Click(object sender, EventArgs e)
-		{
+        private void ButtonMinimize_Click(object sender, EventArgs e)
+        {
             this.WindowState = FormWindowState.Minimized;
-		}
+        }
 
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
@@ -3053,13 +2842,269 @@ namespace Quesadilla
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         public static extern bool ReleaseCapture();
 
-		private void TopbarPanel_MouseDown(object sender, MouseEventArgs e)
-		{
+        private void TopbarPanel_MouseDown(object sender, MouseEventArgs e)
+        {
             if (e.Button == MouseButtons.Left)
             {
                 ReleaseCapture();
                 SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
             }
+        }
+
+
+		public void UI(Action action)
+		{
+			if (InvokeRequired)
+			{
+				BeginInvoke(action);
+			}
+			else
+			{
+				action();
+			}
 		}
+
+
+        #region Timer Ticks
+        private void RefreshAnimations()
+        {
+			UI(() =>
+			{
+				UpdateMinimap();
+			});
+		}
+
+        private void RefreshEveLocations()
+        {
+			foreach (var c in Program.CharacterList)
+			{
+				EveOClient.UpdateSystem(c.CharacterName, c.Location);
+			}
+		}
+
+        private void RefreshIncursionData()
+        {
+            Program.ESIHandler.EnqueueRequestIncursions();
+		}
+        private void RefreshMiningCSV()
+        {
+            var miningDetail = Program.GetMiningLastHourDetail("", false);
+            var miningSummary = Program.MiningItemSummary(miningDetail);
+
+            try
+            {
+                using (var writer = new StreamWriter("miningdata.csv"))
+                {
+                    writer.WriteLine("Character,MinedItem,Amount,Wastage");
+                    foreach (var m in miningDetail)
+                    {
+                        foreach (var md in m.Value)
+                        {
+                            writer.WriteLine($"{m.Key},{md.MiningItem},{md.MiningAmount},{md.WastageAmount}");
+                        }
+                    }
+
+                    writer.WriteLine();
+                    writer.WriteLine("-----------------------------------------------------------------------------------");
+                    writer.WriteLine();
+                    foreach (var m in miningSummary)
+                    {
+                        foreach (var md in m.Value)
+                        {
+                            writer.WriteLine($"{m.Key},{md.MiningItem},{md.MiningAmount},{md.WastageAmount}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+		private void RefreshMiningPerHour()
+		{
+			MiningPerHourTotal = !MiningPerHourTotal;
+
+			if (!Program.MainConfiguration.ShowMiningTotal)
+			{
+				MiningPerHourTotal = false;
+			}
+			else
+			{
+				UI(() =>
+				{
+					UpdateMining();
+				});
+			}
+		}
+		private void RefreshISKPerHour()
+		{
+			ISKPerHourTotal = !ISKPerHourTotal;
+
+			if (!Program.MainConfiguration.ShowISKTotal)
+			{
+				ISKPerHourTotal = false;
+			}
+			else
+			{
+				UI(() =>
+				{
+					UpdateISK();
+				});
+			}
+		}
+
+		private void ProcessAlertQueue()
+		{
+			if (Program.NewAlerts.Count == 0)
+			{
+				return;
+			}
+
+			AlertQueueItem newAlert;
+
+			if (!Program.NewAlerts.TryDequeue(out newAlert))
+			{
+				return;
+			}
+
+			Program.EnqueueActiveAlert(newAlert);
+
+			if (newAlert.ShowAlert)
+			{
+				Log.Error(newAlert.AlertText);
+
+				shouldUpdateMinimap = true;
+				shouldUpdatePlanetInfo = true;
+
+				ShowAlert(newAlert);
+
+				SoundPlayer sound = Program.LoadSoundFromFile(newAlert.SoundFile);
+
+				if (sound != null)
+				{
+					sound.Play();
+				}
+
+				UI(() =>
+				{
+					RebuildLatestAlertsMenu();
+				});
+			}
+		}
+
+		private void PerformCleardown()
+		{
+			int alertsExpired = 0;
+			int zkillsExpired = 0;
+
+			UI(() =>
+			{
+				if (Program.ActiveAlerts.Count > 0)
+				{
+					alertsExpired = Program.ExpireAlerts();
+
+					if (alertsExpired > 0)
+					{
+						RebuildLatestAlertsMenu();
+					}
+
+					AlertsOutstanding.Text =
+						Program.ActiveAlerts.Count.ToString();
+				}
+				else
+				{
+					AlertsOutstanding.Text = "";
+				}
+
+				if (Program.ZKillHandler.ZKillKills.Count > 0)
+				{
+					AlertsOutstanding.Text += "/" + Program.ZKillHandler.ZKillKills.Count;
+				}
+
+			});
+
+
+			Program.ExpireCombat();
+			Program.ExpireISK();
+			Program.ExpireMining();
+
+			zkillsExpired = Program.ZKillHandler.ExpireZKillQueue();
+
+			UI(() =>
+			{
+				if ((zkillsExpired + alertsExpired) > 0)
+				{
+					UpdateMinimap();
+				}
+
+				UpdateISK();
+				UpdateMining();
+			});
+		}
+
+		private void UpdateDPSGraphWindow()
+		{
+			if (!CombatAdded)
+			{
+				return;
+			}
+
+			if (Program.MainConfiguration.DPSShowWindow &&
+				DPSGraphWindow == null)
+			{
+				DPSGraphWindow = new QuesadillaDPSGraph(this);
+				DPSGraphWindow.Show();
+			}
+
+			if (DPSGraphWindow != null)
+			{
+				UI(() =>
+				{
+					DPSGraphWindow.UpdateDPSGraph();
+				});
+			}
+
+			CombatAdded = false;
+		}
+
+
+        private void GeneralTick()
+        {
+			activityLine += ActivityLineInc;
+			if (activityLine > ActivityLineMax)
+			{
+				activityLine = 0;
+			}
+
+			UI(() =>
+			{
+				WorkingIndicator.Text = Program.MainConfiguration.HeartBeatIndicatorWorkingText[activityLine].ToString();
+
+				if (shouldUpdateMinimap)
+				{
+					UpdateMinimap();
+				}
+				if (shouldUpdatePlanetInfo)
+				{
+					UpdatePlanetInfo();
+				}
+
+			});
+		}
+        private void UpdateProcessesTick()
+        {
+            UI(() =>
+            {
+                UpdateEveProcesses(_refreshProcessList);
+                _refreshProcessList = false;
+            });
+		}
+		private void RefreshProcesses()
+        {
+            _refreshProcessList = true;
+		}
+
+		#endregion
 	}
 }

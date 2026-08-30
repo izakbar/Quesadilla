@@ -631,11 +631,6 @@ namespace Quesadilla
 
 			string extraInformation = "";
 
-			AnimationStateKills.Advance();
-			AnimationStateIntel.Advance();
-			AnimationStateAlts.Advance();
-			AnimationStateUniHoles.Advance();
-
 			Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(Minimap.Width, Minimap.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
 				Program.MainConfiguration.OverlayMinimapJumps, Program.MainConfiguration.OverlayMapMapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation, ref MinimapSystems,
 				Program.MainConfiguration.OverlayMinimapShowSystemText, Program.MainConfiguration.OverlayMinimapShowAllSystemText, Program.MainConfiguration.OverlayMinimapShowConnectingSystemText,
@@ -658,10 +653,10 @@ namespace Quesadilla
 				Program.MainConfiguration.OverlayMinimapSecLimitOutlineColour,
 				Program.MainConfiguration.OverlayMinimapIceColour,
 				Program.MainConfiguration.OverlayMinimapMercoxitColour,
-					AnimationStateIntel.Value(),
-					AnimationStateKills.Value(),
-					AnimationStateAlts.Value(),
-					AnimationStateUniHoles.Value(),
+					AnimationStateIntel.GetNextValue(),
+					AnimationStateKills.GetNextValue(),
+					AnimationStateAlts.GetNextValue(),
+					AnimationStateUniHoles.GetNextValue(),
 				false,
 				Program.MainConfiguration.OverlayMinimapShowOutOfRegion,
 				Program.MainConfiguration.OverlayMinimapSecLimit,

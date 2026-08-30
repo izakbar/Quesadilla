@@ -735,7 +735,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					int uniHoleAdjust = 0;
 					if (currentSystem.solarSystem.UniHole)
 					{
-						DrawPulseIndicator(g,currentPoint,UniHoleColour,blobSize,animationCycleUniHoles,pulseSize: (20 / (float)GUI_SCALING),maxAlpha: 60,glowLayers: 3,ringWidth: 2.0f);
+						DrawPulseIndicator(g,currentPoint,UniHoleColour,blobSize,animationCycleUniHoles,pulseSize: (30 / (float)GUI_SCALING),maxAlpha: 60,glowLayers: 3,ringWidth: 2.0f);
 						uniHoleAdjust = 1;
 					}
 

@@ -1107,35 +1107,35 @@ img.rounded-corners {
         [DisplayName("Milliseconds for main tick")]
         [ReadOnly(true)]
         [Description("How many milliseconds the main tick is - smaller means more occur")]
-        [DefaultValue(typeof(int), "150")]
+        [DefaultValue(typeof(int), "100")]
         public int TickMiliseconds { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeCleardown")]
         [Description("How many ticks will occur between event cleardown checks")]
-        [DefaultValue(typeof(int), "40")]
+        [DefaultValue(typeof(int), "600")]
         public int HowManyTicksBeforeCleardown { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeAlert")]
         [Description("After an alert is put into the new alert queue - how many ticks before display")]
-        [DefaultValue(typeof(int), "2")]
+        [DefaultValue(typeof(int), "4")]
         public int HowManyTicksBeforeAlert { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeDPSGraphUpdate")]
         [Description("How many ticks between DPS graph update")]
-        [DefaultValue(typeof(int), "4")]
+        [DefaultValue(typeof(int), "5")]
         public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
 
 		[Category("Tick Timing")]
 		[ReadOnly(true)]
 		[DisplayName("How often to update EveO Location")]
 		[Description("How many ticks between EveO Location update if no location change")]
-		[DefaultValue(typeof(int), "60")]
+		[DefaultValue(typeof(int), "100")]
 		public int HowManyTicksBeforeEveOLocationUpdate { get; set; }
 
 
@@ -1143,7 +1143,7 @@ img.rounded-corners {
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeLogfileCheck")]
         [Description("How many ticks between logfile checks")]
-        [DefaultValue(typeof(int), "4")]
+        [DefaultValue(typeof(int), "7")]
         public int HowManyTicksBeforeLogfileCheck { get; set; }
 
 		[Category("Tick Timing")]
@@ -1172,21 +1172,21 @@ img.rounded-corners {
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeSwitchISKPerHour")]
         [Description("How many ticks between ISH/Hr and Total ISK/Hr")]
-        [DefaultValue(typeof(int), "20")]
+        [DefaultValue(typeof(int), "41")]
         public int HowManyTicksBeforeSwitchISKPerHour { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeSwitchMiningPerHour")]
         [Description("How many ticks between Mining/Hr and Total Mining/Hr")]
-        [DefaultValue(typeof(int), "21")]
+        [DefaultValue(typeof(int), "39")]
         public int HowManyTicksBeforeSwitchMiningPerHour { get; set; }
 
         [Category("Tick Timing")]
         [ReadOnly(true)]
         [DisplayName("HowManyTicksMiningCSVOutput")]
         [Description("How many ticks between Mining/Hr CSV output")]
-        [DefaultValue(typeof(int), "400")] // 400 - 5 mins
+        [DefaultValue(typeof(int), "500")] 
         public int HowManyTicksMiningCSVOutput { get; set; }
         
         [Category("Main window")]

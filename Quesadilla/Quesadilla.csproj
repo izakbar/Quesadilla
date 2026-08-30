@@ -151,6 +151,8 @@
     <Compile Include="Classes\SolarSystems\SolarSystemBelt.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemMoon.cs" />
     <Compile Include="Classes\SolarSystems\PlanetInfo.cs" />
+    <Compile Include="Classes\Tick\TickItem.cs" />
+    <Compile Include="Classes\Tick\TickManager.cs" />
     <Compile Include="Classes\Windows\TransparentOverlayForm.cs">
       <SubType>Form</SubType>
     </Compile>

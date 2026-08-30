@@ -52,5 +52,12 @@ namespace Quesadilla.Classes
         {
             return _state;
         }
+
+        public int? GetNextValue()
+        {
+            Advance();
+            return Value();
+        }
+
     }
 }

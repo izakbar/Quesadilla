@@ -30,7 +30,6 @@
         {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Quesadilla));
-			this.mainTimer = new System.Windows.Forms.Timer(this.components);
 			this.IntelLog = new Serilog.Sinks.WinForms.RichTextBoxLogControl();
 			this.ChatServerDown = new System.Windows.Forms.Label();
 			this.buttonIntelSize = new System.Windows.Forms.Button();
@@ -52,12 +51,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.TitleIcon)).BeginInit();
 			this.TopbarPanel.SuspendLayout();
 			this.SuspendLayout();
-			// 
-			// mainTimer
-			// 
-			this.mainTimer.Enabled = true;
-			this.mainTimer.Interval = 250;
-			this.mainTimer.Tick += new System.EventHandler(this.mainTimer_Tick);
 			// 
 			// IntelLog
 			// 
@@ -319,7 +312,6 @@
 
         #endregion
 
-        private System.Windows.Forms.Timer mainTimer;
         private Serilog.Sinks.WinForms.RichTextBoxLogControl IntelLog;
         private System.Windows.Forms.Label ChatServerDown;
         private System.Windows.Forms.Button buttonIntelSize;

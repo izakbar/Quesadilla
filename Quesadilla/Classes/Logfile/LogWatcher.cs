@@ -20,8 +20,8 @@ namespace Quesadilla.Classes
         private ILogger logger = Log.ForContext<LogWatcher>();
 
         private int EXPIRE_OLD_INTEL_ = 1800; // 30 mins
-
-        private string _logPath;
+		private readonly object _interestingFilesLock = new object();
+		private string _logPath;
         private string _systemChannelPrefix;
         private Encoding _fileEncoding;
         public LogFileType _logFileType;
@@ -60,7 +60,6 @@ namespace Quesadilla.Classes
 
         public string SystemChannelPrefix => this._systemChannelPrefix;
         public static string RootLogsPath { get; private set; }
-        public LocalInfo InitialLocalInfo { get; set; }
 
         public LogWatcher(string systemChannelPrefix, LogFileType logFileType, string friendlyName, string logPath = "")
         {
@@ -391,55 +390,59 @@ namespace Quesadilla.Classes
             }
             return empty;
         }
-        public void StartWatch()
-        {
-            this._interestingFiles.Clear();
-            List<FileInfo> files = this.InitLogFileInfo();
+		public void StartWatch()
+		{
+			this._interestingFiles.Clear();
+			List<FileInfo> files = this.InitLogFileInfo();
 
-            if (this._logFileType == LogFileType.Local)
-            {
-                if (files.Count > 0)
-                {
-                    lock (this)
-                    {
-                        // only want most recent for each toon
-                        var foundChars = new List<string>();
-                        foreach (var fileInfo in files)
-                        {
-                            long fileLength = this.GetFileLength(fileInfo.FullName);
-                            InitialLocalInfo = InitLocal(fileInfo.FullName);
-                            _interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, InitialLocalInfo.CharName));
-                            if (!foundChars.Contains(InitialLocalInfo.CharName))
-                            {
-                                OnSystemChange(InitialLocalInfo.CurrentSystem == string.Empty ? InitialLocalInfo.InitialSystem.ToString() : InitialLocalInfo.CurrentSystem, InitialLocalInfo.CharName);
-                                foundChars.Add(InitialLocalInfo.CharName);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (files.Count > 0)
-                {
-                    lock (this)
-                    {
-                        // not local - so should only be one file
-                        long fileLength = this.GetFileLength(files.First().FullName);
-                        string logListener = this.GetLogListener(files.First().FullName);
-                        this._interestingFiles.Add(files.First().FullName, new InterestingFile(files.First().FullName, fileLength, DateTime.Now, logListener));
-                        this.OnProcessNewData(new LogEntry()
-                        {
-                            FileName = files.First().Name,
-                            EntryType = this._logFileType == LogFileType.Game ? LogEntryType.OpenGameLogEvent : LogEntryType.OpenChatLogEvent,
-                            LineContent = fileLength.ToString(),
-                            CharacterName = logListener
-                        });
-                    }
-                }
-            }
-        }
-        private LocalInfo InitLocal(string fileName)
+			if (this._logFileType == LogFileType.Local)
+			{
+				if (files.Count > 0)
+				{
+					lock (_interestingFilesLock)
+					{
+						// only want most recent for each toon
+						var foundChars = new HashSet<string>();
+						foreach (var fileInfo in files)
+						{
+							long fileLength = this.GetFileLength(fileInfo.FullName);
+							LocalInfo InitialLocalInfo = InitLocal(fileInfo.FullName);
+							_interestingFiles.Add(fileInfo.FullName, new InterestingFile(fileInfo.FullName, fileLength, DateTime.Now, InitialLocalInfo.CharName));
+							if (foundChars.Add(InitialLocalInfo.CharName))
+							{
+								OnSystemChange(InitialLocalInfo.CurrentSystem == string.Empty ? InitialLocalInfo.InitialSystem.ToString() : InitialLocalInfo.CurrentSystem, InitialLocalInfo.CharName);
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				if (files.Count == 0)
+				{
+					return;
+				}
+				lock (_interestingFilesLock)
+				{
+					// not local - so should only be one file
+					var file = files.First();
+					if (!_interestingFiles.ContainsKey(file.FullName))
+					{
+						long fileLength = this.GetFileLength(file.FullName);
+						string logListener = this.GetLogListener(file.FullName);
+						this._interestingFiles.Add(file.FullName, new InterestingFile(file.FullName, fileLength, DateTime.Now, logListener));
+						this.OnProcessNewData(new LogEntry()
+						{
+							FileName = file.Name,
+							EntryType = this._logFileType == LogFileType.Game ? LogEntryType.OpenGameLogEvent : LogEntryType.OpenChatLogEvent,
+							LineContent = fileLength.ToString(),
+							CharacterName = logListener
+						});
+					}
+				}
+			}
+		}
+		private LocalInfo InitLocal(string fileName)
         {
             LocalInfo localInfo = new LocalInfo();
             using (StreamReader streamReader = new StreamReader((Stream)new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), this._fileEncoding))
