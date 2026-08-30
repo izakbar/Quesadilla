@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Drawing.Text;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -70,6 +71,8 @@ namespace Quesadilla.Classes
 		private const int WS_EX_NOACTIVATE = 0x08000000;
 		private const int WS_EX_TOOLWINDOW = 0x00000080;
 
+
+		private Bitmap _renderBitmap = null;
 
 		public TransparentOverlayForm()
 		{
@@ -143,6 +146,17 @@ namespace Quesadilla.Classes
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize(e);
+
+			if (_renderBitmap != null)
+			{
+				_renderBitmap.Dispose();
+				_renderBitmap = null;
+			}
+
+			if (Width > 0 && Height > 0)
+			{
+				_renderBitmap = new Bitmap(Width,Height,PixelFormat.Format32bppArgb);
+			}
 			RenderAndUpdate();
 		}
 
@@ -155,18 +169,20 @@ namespace Quesadilla.Classes
 			if (DesignMode || !IsHandleCreated) return;
 			if (Width <= 0 || Height <= 0) return;
 
-			using (var bitmap = new Bitmap(Width, Height, PixelFormat.Format32bppArgb))
+			if (_renderBitmap == null)
 			{
-				using (var g = Graphics.FromImage(bitmap))
-				{
-					g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-					g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-					//g.Clear(Color.Transparent); // fully transparent, not colour-keyed
-					RenderOverlay(g);
-				}
-
-				UpdateLayered(bitmap);
+				_renderBitmap = new Bitmap(Width, Height, PixelFormat.Format32bppArgb);
 			}
+
+			using (var g = Graphics.FromImage(_renderBitmap))
+			{
+				g.Clear(Color.Transparent);
+				g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+				g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;             
+				RenderOverlay(g);
+			}
+
+			UpdateLayered(_renderBitmap);
 		}
 
 		// Never steals focus from the EVE client when shown.
@@ -238,13 +254,26 @@ namespace Quesadilla.Classes
 
 		protected override void Dispose(bool disposing)
 		{
-			if (disposing) _mouseTrackTimer.Dispose();
+			if (disposing)
+			{
+				_mouseTrackTimer.Dispose();
+
+				if (_renderBitmap != null)
+				{
+					_renderBitmap.Dispose();
+					_renderBitmap = null;
+				}
+			}
 			base.Dispose(disposing);
 		}
 
 		protected override void OnHandleCreated(EventArgs e)
 		{
 			base.OnHandleCreated(e);
+			if (Width > 0 && Height > 0)
+			{
+				_renderBitmap = new Bitmap(Width,Height,PixelFormat.Format32bppArgb);
+			}
 			if (EnableMouseTracking) _mouseTrackTimer.Enabled = true;
 		}
 
