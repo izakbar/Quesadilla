@@ -150,13 +150,13 @@ namespace Quesadilla
 		public TickManager TickManagerUpdates;
 		public TickManager TickManagerUI;
 
-		private Thread splashScreenThread;
-        private QuesadillaSplashScreen splashScreen;
-        public QuesadillaDPSGraph DPSGraphWindow = null;
+//		private Thread splashScreenThread;
+        public QuesadillaSplashScreen SplashScreen;
 
-        public QuesadillaOverlayMap OverlayMapWindow = null;
+		public QuesadillaOverlayMap OverlayMapWindow = null;
+		public QuesadillaOverlayDPS OverlayDPSWindow = null;
 
-        private Color OriginalBackgroundColour;
+		private Color OriginalBackgroundColour;
         private int mapScale = 100;
 
         private List<ProcessInfo> knowProcesses = new List<ProcessInfo>();
@@ -183,10 +183,16 @@ namespace Quesadilla
         AnimationState AnimationStateKills;
         AnimationState AnimationStateIntel;
         AnimationState AnimationStateAlts;
-        AnimationState AnimationStateUniHoles;
-        AnimationState AnimationStateCombat;
+		AnimationState AnimationStateUniHoles;
+		AnimationState AnimationStateCombat;
+		AnimationState AnimationStateIncursion;
+		AnimationState AnimationStateSeclimit;
+		AnimationState AnimationStateStormElectric;
+		AnimationState AnimationStateStormGamma;
+		AnimationState AnimationStateStormPlasma;
+		AnimationState AnimationStateStormExotic;
 
-        private bool ISKPerHourTotal = false;
+		private bool ISKPerHourTotal = false;
         private bool MiningPerHourTotal = false;
 
         private bool NoActiveEveProcess = false;
@@ -198,24 +204,21 @@ namespace Quesadilla
 
         private const UInt32 SWP_NOSIZE = 0x0001;
         private const UInt32 SWP_NOMOVE = 0x0002;
+		private const UInt32 SWP_NOACTIVATE = 0x0010;
 
-        public void SendWindowBack(IntPtr w)
+		public void SendWindowBack(IntPtr w)
         {
             //var hWnd = new WindowInteropHelper(window).Handle;
-            SetWindowPos(w, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-        }
+            SetWindowPos(w, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+		}
         public void SendWindowTop(IntPtr w)
         {
             //var hWnd = new WindowInteropHelper(window).Handle;
-            SetWindowPos(w, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-        }
+            SetWindowPos(w, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+		}
 
         public Quesadilla()
         {
-            splashScreenThread = new Thread(new ThreadStart(ShowSplashScreen));
-            splashScreenThread.Start();
-            Thread.Sleep(2000);
-
             OriginalBackgroundColour = BackColor;
 
             InitializeComponent();
@@ -243,12 +246,20 @@ namespace Quesadilla
 
             trayIcon.MouseDoubleClick += trayIconDoubleClick;
 
+			AnimationStateCombat = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
 
 			AnimationStateKills = new AnimationState(state: 0, direction: -1, maximum: 36, pulse: false);
 			AnimationStateIntel = new AnimationState(state: 1, direction: 1, maximum: 18, pulse: false);
 			AnimationStateAlts = new AnimationState(state: 2, direction: -1, maximum: 12, pulse: false);
 			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 18, pulse: true);
-			AnimationStateCombat = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
+
+			AnimationStateIncursion = new AnimationState(state: 1, direction: 1, maximum: 8, pulse: true);
+			AnimationStateSeclimit = new AnimationState(state: 3, direction: -1, maximum: 8, pulse: true);
+
+			AnimationStateStormElectric = new AnimationState(state: 3, direction: -1, maximum: 10, pulse: true);
+			AnimationStateStormGamma = new AnimationState(state: 6, direction: -1, maximum: 10, pulse: true);
+			AnimationStateStormPlasma = new AnimationState(state: 9, direction: -1, maximum: 10, pulse: true);
+			AnimationStateStormExotic = new AnimationState(state: 0, direction: -1, maximum: 10, pulse: true);
 
 			TickManagerUpdates = new TickManager(Program.MainConfiguration.TickMiliseconds);
 			TickManagerUpdates.RegisterTick("UpdateEveOLocations", 500, Program.MainConfiguration.HowManyTicksBeforeEveOLocationUpdate, RefreshEveLocations);
@@ -272,11 +283,8 @@ namespace Quesadilla
             menuConfiguration.MenuItems.Add(new MenuItem("-"));
 
             menuConfiguration.MenuItems.Add(menuConfigurationAlwaysOnTop = new MenuItem("Always on top", trayIconMenuAlwaysOnTop) { Checked = Program.MainConfiguration.StayOnTop, });
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSShowDPS = new MenuItem("Show DPS", trayIconMenuDPSShowWindow) { Checked = Program.MainConfiguration.DPSShowWindow, });
+            menuConfiguration.MenuItems.Add(menuConfigurationDPSShowDPS = new MenuItem("Show DPS", trayIconMenuDPSShowWindow) { Checked = Program.MainConfiguration.ShowWindowOverlayDPS, });
             menuConfiguration.MenuItems.Add(menuConfigurationDPSShowZkill = new MenuItem("Show ZKill Alerts", trayIconMenuShowZKillAlerts) { Checked = Program.MainConfiguration.ShowZKillAlerts, });
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSStayOnTop = new MenuItem("DPS Always on top", trayIconMenuDPSAlwaysOnTop) { Checked = Program.MainConfiguration.DPSGraphStayOnTop, });
-            menuConfiguration.MenuItems.Add(menuConfigurationDPSTransparent = new MenuItem("DPS Transparent", trayIconMenuDPSTransparent) { Checked = Program.MainConfiguration.DPSGraphTransparent, });
-            menuConfiguration.MenuItems.Add(menuConfigurationAlertTransparent = new MenuItem("Alert Transparent", trayIconMenuAlertTransparent) { Checked = Program.MainConfiguration.AlertTransparent, });
             menuConfiguration.MenuItems.Add(menuConfigurationDPSSaveCSV = new MenuItem("DPS Save CSV", trayIconMenuDPSSaveCSV) { Checked = Program.MainConfiguration.DPSSaveCSV, });
             menuConfiguration.MenuItems.Add(menuConfigurationDPSShowAll = new MenuItem("DPS Combine", trayIconMenuDPSAllToons) { Checked = Program.MainConfiguration.DPSAllToons, });
 
@@ -320,11 +328,17 @@ namespace Quesadilla
             GetSkyhookTimers();
             Program.ESIHandler.EnqueueRequestIncursions();
 
-            if (Program.MainConfiguration.ShowWindowOverlayMap)
-            {
-                OverlayMapWindow = new QuesadillaOverlayMap(this);
-                OverlayMapWindow.Show();
-            }
+			if (Program.MainConfiguration.ShowWindowOverlayMap)
+			{
+				OverlayMapWindow = new QuesadillaOverlayMap(this);
+				OverlayMapWindow.Show();
+			}
+
+			if (Program.MainConfiguration.ShowWindowOverlayDPS)
+			{
+				OverlayDPSWindow = new QuesadillaOverlayDPS(this);
+				OverlayDPSWindow.Show();
+			}
 
 
 			TickManagerUpdates.Start();
@@ -336,10 +350,6 @@ namespace Quesadilla
             throw new NotImplementedException();
         }
 
-        private void ShowSplashScreen()
-        {
-            Application.Run(splashScreen = new QuesadillaSplashScreen());
-        }
         private void RebuildLogfilesMenu()
         {
             menuLogWatchers.MenuItems.Clear();
@@ -403,12 +413,17 @@ namespace Quesadilla
             ForeColor = Program.MainConfiguration.MainWindowTextColour;
 
             Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.MainWindowItemLocations, TopbarPanel.Height, MiningPerHourTotal, ISKPerHourTotal, false);
-            if (OverlayMapWindow != null)
-            {
-                Program.MainConfiguration.ApplyConfiguration(OverlayMapWindow, Program.MainConfiguration.OverlayWindowItemLocations, 0, MiningPerHourTotal, ISKPerHourTotal, false);
-            }
+			if (OverlayMapWindow != null)
+			{
+				Program.MainConfiguration.ApplyConfiguration(OverlayMapWindow, Program.MainConfiguration.OverlayWindowItemLocations, 0, MiningPerHourTotal, ISKPerHourTotal, false);
+			}
 
-            RebuildAlertsMenu();
+			if (OverlayDPSWindow != null)
+			{
+				Program.MainConfiguration.ApplyConfiguration(OverlayDPSWindow, Program.MainConfiguration.DPSWindowItemLocations, 0, MiningPerHourTotal, ISKPerHourTotal, false);
+			}
+
+			RebuildAlertsMenu();
             RebuildBackgroundsMenu();
             RebuildLatestAlertsMenu();
 
@@ -428,9 +443,7 @@ namespace Quesadilla
 
             TopMost = Program.MainConfiguration.StayOnTop;
             menuConfigurationAlwaysOnTop.Checked = Program.MainConfiguration.StayOnTop;
-            menuConfigurationDPSShowDPS.Checked = Program.MainConfiguration.DPSShowWindow;
-            menuConfigurationDPSStayOnTop.Checked = Program.MainConfiguration.DPSGraphStayOnTop;
-            menuConfigurationDPSTransparent.Checked = Program.MainConfiguration.DPSGraphTransparent;
+            menuConfigurationDPSShowDPS.Checked = Program.MainConfiguration.ShowWindowOverlayDPS;
             menuConfigurationDPSSaveCSV.Checked = Program.MainConfiguration.DPSSaveCSV;
             menuConfigurationDPSShowAll.Checked = Program.MainConfiguration.DPSAllToons;
 
@@ -457,12 +470,6 @@ namespace Quesadilla
 
             ReloadConfiguration();
             buttonIntelSize_Click(null, null);
-
-            splashScreenThread.Interrupt();
-            Thread.Sleep(100);
-            splashScreenThread.Abort();
-            Thread.Sleep(500);
-            splashScreen = null;
 
             //this.Text = "Quesadilla v" + Program.version.ToString();
             this.Title.Text = "Quesadilla v" + Program.version.ToString();
@@ -1031,34 +1038,13 @@ namespace Quesadilla
         }
         private void trayIconMenuDPSShowWindow(object sender, EventArgs e)
         {
-            Program.MainConfiguration.DPSShowWindow = !Program.MainConfiguration.DPSShowWindow;
+            Program.MainConfiguration.ShowWindowOverlayDPS = !Program.MainConfiguration.ShowWindowOverlayDPS;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
-            if (DPSGraphWindow != null)
-            {
-                if (!((MenuItem)sender).Checked)
-                {
-						DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
-						{
-							DPSGraphWindow.Hide();
-						}));
-/*
-                    DPSGraphWindow = null;
-                    DPSGraphWindow = new QuesadillaDPSGraph(this);
-                    DPSGraphWindow.Show();
-*/
-                }
-            }
         }
         private void trayIconMenuShowZKillAlerts(object sender, EventArgs e)
         {
             Program.MainConfiguration.ShowZKillAlerts = !Program.MainConfiguration.ShowZKillAlerts;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
-        }
-        private void trayIconMenuDPSAlwaysOnTop(object sender, EventArgs e)
-        {
-            Program.MainConfiguration.DPSGraphStayOnTop = !Program.MainConfiguration.DPSGraphStayOnTop;
-            ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
-            if (DPSGraphWindow != null) DPSGraphWindow.TopMost = Program.MainConfiguration.DPSGraphStayOnTop;
         }
         private void trayIconMenuDPSSaveCSV(object sender, EventArgs e)
         {
@@ -1069,45 +1055,7 @@ namespace Quesadilla
         {
             Program.MainConfiguration.DPSAllToons = !Program.MainConfiguration.DPSAllToons;
             ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
-
-            if (InCombat && DPSGraphWindow != null && Program.MainConfiguration.DPSShowWindow)
-            {
-				DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
-				{
-					DPSGraphWindow.Hide();
-				}));
-			}
 		}
-
-		private void trayIconMenuDPSTransparent(object sender, EventArgs e)
-        {
-            ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
-            Program.MainConfiguration.DPSGraphTransparent = ((MenuItem)sender).Checked;
-
-            if (DPSGraphWindow != null)
-            {
-                switch (((MenuItem)sender).Checked)
-                {
-                    case true:
-                        DPSGraphWindow.TransparencyKey = DPSGraphWindow.BackColor = DPSGraphWindow.TransparentColour;
-                        DPSGraphWindow.Text = "";
-                        // the color key to transparent, choose a color that you don't use
-                        break;
-                    case false:
-                        DPSGraphWindow.TransparencyKey = DPSGraphWindow.TransparentColour;
-                        DPSGraphWindow.BackColor = OriginalBackgroundColour;
-                        DPSGraphWindow.Text = "Quesadilla DPS";
-                        break;
-                }
-            }
-        }
-        private void trayIconMenuAlertTransparent(object sender, EventArgs e)
-        {
-            ((MenuItem)sender).Checked = !((MenuItem)sender).Checked;
-            Program.MainConfiguration.AlertTransparent = ((MenuItem)sender).Checked;
-        }
-
-
         private void trayIconMenuConfiguration(object sender, EventArgs e)
         {
             //
@@ -1191,13 +1139,15 @@ namespace Quesadilla
             //Log.Information("COMBAT:" + e.CombatEvent);
             if (e.Entry != null)
             {
-                if (InCombat == false && Program.MainConfiguration.DPSShowWindow)
+                if (InCombat == false && Program.MainConfiguration.ShowWindowOverlayDPS)
                 {
+/*
                     if (DPSGraphWindow == null)
                     {
-                        DPSGraphWindow = new QuesadillaDPSGraph(this);
+                        DPSGraphWindow = new QuesadillaOLDDPSGraph(this);
                     }
                     DPSGraphWindow.Show();
+*/
                 }
                 if (InCombat == false)
                 {
@@ -1365,13 +1315,6 @@ namespace Quesadilla
             {
                 InCombat = false;
                 this.Invalidate();
-                if (DPSGraphWindow != null)
-                {
-                    DPSGraphWindow.Close();
-                    DPSGraphWindow = null;
-                }
-                ;
-                //EveOClient.Agression(e.Entry.CharacterName, false);
             }
         }
         private void logFile_ProcessISK(object sender, ProcessISKEventArgs e)
@@ -1659,8 +1602,9 @@ namespace Quesadilla
 
             string foregroundWindowTitle = null;
             var ptr = Program.ProcessMonitorHandler.GetForegroundWindowHandle();
+			foregroundWindowTitle = Program.ProcessMonitorHandler.GetTitleOfKnownProcess(ptr);
 
-            var PrevRect = new Rect()
+			var PrevRect = new Rect()
             {
                 Top = currentEveWindowRect.Top,
                 Bottom = currentEveWindowRect.Bottom,
@@ -1669,11 +1613,9 @@ namespace Quesadilla
             };
 
             var result = Program.ProcessMonitorHandler.GetWindowDimensions(ptr, ref currentEveWindowRect, ref currentEveClientPoint);
-
             if (ptr != null)
             {
-                foregroundWindowTitle = Program.ProcessMonitorHandler.GetTitleOfKnownProcess(ptr);
-                if (foregroundWindowTitle != null)
+                if (foregroundWindowTitle != null && foregroundWindowTitle != String.Empty)
                 {
                     //lblCurrentClient.Visible = true;
                     CurrentActiveToon = foregroundWindowTitle.Replace("EVE - ", "");
@@ -1681,55 +1623,60 @@ namespace Quesadilla
 
                     SetupStatusBar();
 
-                    // sort out DPS Graph
                     if (previousToon == null || previousToon == "" || previousToon != CurrentActiveToon || NoActiveEveProcess == true)
                     {
-                        if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
-                        {
-                            if (CurrentActiveToon == null || CurrentActiveToon == "")
-                            {
-								DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
-								{
-									DPSGraphWindow.Hide();
-								}));
+                       
+						if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
+						{
+							if (CurrentActiveToon == null || CurrentActiveToon == "")
+							{
+								OverlayMapWindow.Hide();
 							}
 							else
-                            {
-                                CombatAdded = true;
-
-									DPSGraphWindow.UpdateDPSGraph();
-									DPSGraphWindow.SetTopMost(Program.MainConfiguration.DPSGraphStayOnTop);
-								DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
+							{
+								OverlayMapWindow.UpdateMapData();
+								if (NoActiveEveProcess)
 								{
-									if (NoActiveEveProcess)
-									{
-										SendWindowTop(DPSGraphWindow.Handle);
-									}
-									DPSGraphWindow.Show();
-								}));
-								
+									SendWindowTop(OverlayMapWindow.Handle);
+                                    OverlayMapWindow.Invalidate();
+									OverlayMapWindow.TopMost = false;
+									OverlayMapWindow.TopMost = true;
+								}
+								else
+                                {
+									OverlayMapWindow.TopMost = false;
+									OverlayMapWindow.TopMost = true;
+								}
+								//OverlayMapWindow.Show();
 							}
+                            OverlayMapWindow.SetScreenPosition();
 						}
 
-                        if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
-                        {
-                            if (CurrentActiveToon == null || CurrentActiveToon == "")
-                            {
-                                OverlayMapWindow.Hide();
-                            }
-                            else
-                            {
-                                OverlayMapWindow.UpdateMapData();
-                                OverlayMapWindow.TopMost = true;
-                                if (NoActiveEveProcess)
-                                {
-                                    SendWindowTop(OverlayMapWindow.Handle);
-                                }
-                                OverlayMapWindow.Show();
-                            }
-                        }
+						if (Program.MainConfiguration.ShowWindowOverlayDPS && OverlayDPSWindow != null)
+						{
+							if (CurrentActiveToon == null || CurrentActiveToon == "")
+							{
+								OverlayDPSWindow.Hide();
+							}
+							else
+							{
+								if (NoActiveEveProcess)
+								{
+									SendWindowTop(OverlayDPSWindow.Handle);
+									OverlayDPSWindow.TopMost = false;
+									OverlayDPSWindow.TopMost = true;
+								}
+								else
+								{
+									OverlayDPSWindow.TopMost = false;
+									OverlayDPSWindow.TopMost = true;
+								}
+								OverlayDPSWindow.Show();
+							}
+							OverlayDPSWindow.SetScreenPosition();
+						}
 
-                        UpdateISK();
+						UpdateISK();
                         shouldUpdateMinimap = true;
                         shouldUpdatePlanetInfo = true;
                     }
@@ -1739,61 +1686,53 @@ namespace Quesadilla
                         PrevRect.Left != currentEveWindowRect.Left || PrevRect.Right != currentEveWindowRect.Right
                         )
                     {
-						if (DPSGraphWindow != null)
-						{
-							DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
-							{
-								DPSGraphWindow.SetScreenPosition();
-							}));
-						}
+						if (OverlayDPSWindow != null)
+							OverlayDPSWindow.SetScreenPosition();
 
-                        if (OverlayMapWindow != null)
-                            OverlayMapWindow.SetScreenPosition();
-                    }
+						if (OverlayMapWindow != null)
+							OverlayMapWindow.SetScreenPosition();
+					}
 
-                    if (NoActiveEveProcess) NoActiveEveProcess = false;
+					if (NoActiveEveProcess) NoActiveEveProcess = false;
 
                 }
                 else
                 {
                     // not eve window 
-
-                    if (Program.MainConfiguration.DPSShowWindow && DPSGraphWindow != null)
+                    if (Program.MainConfiguration.ShowWindowOverlayDPS && OverlayDPSWindow != null)
+                    {
+						if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
+						{
+							OverlayDPSWindow.Hide();
+							OverlayDPSWindow.TopMost = true;
+							OverlayDPSWindow.TopMost = false;
+						}
+						else
+						{
+							if (OverlayDPSWindow.TopMost != false)
+							{
+								currentEveWindowRect = PrevRect; // smaybe move this out
+								OverlayDPSWindow.TopMost = false;
+								SendWindowBack(OverlayDPSWindow.Handle);
+							}
+						}
+					}
+					if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
                     {
                         if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
                         {
-                            DPSGraphWindow.Hide();
-                        }
-                        else
-                        {
-                            if (DPSGraphWindow.TopMost != false)
-                            {
-                                currentEveWindowRect = PrevRect;
-                                DPSGraphWindow.SetTopMost(false);
-
-								if (DPSGraphWindow != null)
-								{
-									DPSGraphWindow.BeginInvoke((MethodInvoker)(() =>
-									{
-										SendWindowBack(DPSGraphWindow.Handle);
-									}));
-								}
-                            }
-                        }
-                    }
-                    if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
-                    {
-                        if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
-                        {
-                            OverlayMapWindow.Hide();
+							OverlayMapWindow.TopMost = true;
+							OverlayMapWindow.TopMost = false;
+							OverlayMapWindow.Hide();
                         }
                         else
                         {
                             if (OverlayMapWindow.TopMost != false)
                             {
                                 currentEveWindowRect = PrevRect; // smaybe move this out
-                                OverlayMapWindow.TopMost = false;
-                                SendWindowBack(OverlayMapWindow.Handle);
+								OverlayMapWindow.TopMost = true;
+								OverlayMapWindow.TopMost = false;
+								SendWindowBack(OverlayMapWindow.Handle);
                             }
                         }
                     }
@@ -2387,7 +2326,16 @@ namespace Quesadilla
             if (OverlayMapWindow != null)
             {
                 OverlayMapWindow.UpdateMapData();
-            }
+/*
+                if (NoActiveEveProcess)
+				{
+					OverlayMapWindow.TopMost = false;
+					OverlayMapWindow.TopMost = true;
+					SendWindowTop(OverlayMapWindow.Handle);
+				}
+				//OverlayMapWindow.Show();
+*/
+			}
 
             var c = Program.CharacterList.Where(o => o.CharacterName == CurrentActiveToon).FirstOrDefault();
 
@@ -2432,8 +2380,10 @@ namespace Quesadilla
                     Program.MainConfiguration.MinimapMercoxitColour,
                     AnimationStateIntel.GetNextValue(),
                     AnimationStateKills.GetNextValue(),
-                    AnimationStateAlts.GetNextValue(),
-                    AnimationStateUniHoles.GetNextValue(),
+					AnimationStateAlts.GetNextValue(),
+					AnimationStateUniHoles.GetNextValue(),
+					AnimationStateIncursion.GetNextValue(),
+					AnimationStateSeclimit.GetNextValue(),
                     false,
                     Program.MainConfiguration.MinimapShowOutOfRegion,
                     Program.MainConfiguration.MinimapSecLimit,
@@ -3085,24 +3035,7 @@ namespace Quesadilla
 				return;
 			}
 
-			UI(() =>
-			{
-				if (Program.MainConfiguration.DPSShowWindow &&
-					DPSGraphWindow == null)
-				{
-					DPSGraphWindow = new QuesadillaDPSGraph(this);
-					DPSGraphWindow.Show();
-				}
 
-				if (DPSGraphWindow != null)
-				{
-                    {
-                        DPSGraphWindow.UpdateDPSGraph();
-					}
-
-					CombatAdded = false;
-				}
-			});
 		}
 
 		private void GeneralTick()
@@ -3133,7 +3066,7 @@ namespace Quesadilla
             UI(() =>
             {
                 UpdateEveProcesses(_refreshProcessList);
-                _refreshProcessList = false;
+				_refreshProcessList = false;
             });
 		}
 		private void RefreshProcesses()
@@ -3142,5 +3075,11 @@ namespace Quesadilla
 		}
 
 		#endregion
+
+		private async void Quesadilla_Shown(object sender, EventArgs e)
+		{
+			await Task.Delay(500);
+            SplashScreen?.FadeOut();
+		}
 	}
 }

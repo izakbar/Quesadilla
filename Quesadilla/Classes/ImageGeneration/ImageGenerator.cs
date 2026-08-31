@@ -65,66 +65,202 @@ namespace Quesadilla.Classes.ImageGeneration
             }
         }
 
-        public static void DrawStorm(string stormType, string location, Graphics g, Point currentPoint, float circleSize, float blobSize, bool outline)
+		public static void DrawStorm(string stormType, string location, Graphics g, Point currentPoint, float circleSize, float blobSize, bool outline)
 		{
-            Pen circlePen = GDICache.GetPen(Color.White, 2);
-            Brush circleBrush = GDICache.GetBrush(Color.White);
-
+			Color stormFillColour;
 			switch (stormType)
 			{
 				case "Electric":
-                    circleBrush = GDICache.GetHatchBrush(HatchStyle.Percent60, Color.DeepSkyBlue);break;
+					stormFillColour = Color.DodgerBlue;
+					break;
+
 				case "Plasma":
-					circleBrush = GDICache.GetHatchBrush(HatchStyle.Percent60, Color.DarkRed);break;
+					stormFillColour = Color.DeepPink;
+					break;
+
 				case "Gamma":
-					circleBrush = GDICache.GetHatchBrush(HatchStyle.Percent60, Color.ForestGreen);break;
+					stormFillColour = Color.MediumOrchid;
+					break;
+
 				case "Exotic":
-					circleBrush = GDICache.GetHatchBrush(HatchStyle.Percent60, Color.BlueViolet);break;
+					stormFillColour = Color.LimeGreen;
+					break;
+
+				default:
+					stormFillColour = Color.White;
+					break;
 			}
 
+			Color severityColour;
+			int baseAlpha;
+
 			switch (location)
-            {
-			    case "CENTRE" : circlePen = GDICache.GetPen(Color.Red, 4); break;
-			    case "STRONG" : circlePen = GDICache.GetPen(Color.Orange, 4); break;
-				case "WEAK" : circlePen = GDICache.GetPen(Color.Yellow, 4); break;
+			{
+				case "CENTRE":
+					severityColour = Color.Crimson;
+					baseAlpha = 255;
+					break;
+
+				case "STRONG":
+					severityColour = Color.DarkOrange;
+					baseAlpha = 160;
+					break;
+
+				case "WEAK":
+					severityColour = Color.Gold;
+					baseAlpha = 80;
+					break;
+
 				default:
-                    {
-                        circlePen = GDICache.GetPen(Color.Black, 4); 
-						circleBrush = GDICache.GetBrush(Color.Black);
-                        break;
-					}
+					severityColour = Color.Black;
+					baseAlpha = 255; // 100%
+					break;
 			}
+
+			Pen circlePen = GDICache.GetPen(severityColour, 4);
 
 			float radius = blobSize + circleSize;
 			float diameter = radius * 2;
 
-			RectangleF rect = new RectangleF(currentPoint.X - radius,currentPoint.Y - radius,diameter,diameter);
+			RectangleF rect = new RectangleF(
+				currentPoint.X - radius,
+				currentPoint.Y - radius,
+				diameter,
+				diameter);
 
 			if (outline)
 			{
-				g.DrawArc(circlePen,rect.X,rect.Y,rect.Width,rect.Height,0,360);
+				//
+				// Glow based on severity
+				//
+				for (int i = 6; i >= 1; i--)
+				{
+					float glowRadius = radius + (i * 3);
+
+					int alpha = 120 / i;
+
+					using (var glowBrush = new SolidBrush(
+						Color.FromArgb(alpha, severityColour)))
+					{
+						g.FillEllipse(
+							glowBrush,
+							currentPoint.X - glowRadius,
+							currentPoint.Y - glowRadius,
+							glowRadius * 2,
+							glowRadius * 2);
+					}
+				}
+
+				g.DrawEllipse(circlePen, rect);
 			}
 			else
 			{
-				g.FillEllipse(circleBrush, rect);
+				using (var circleBrush = 
+					new SolidBrush(Color.FromArgb(baseAlpha, (severityColour == Color.Black ? severityColour : stormFillColour))))
+				{
+					g.FillEllipse(circleBrush, rect);
+				}
 			}
 		}
-		private static void MapCircles(Graphics g,List<MinimapSystem> systems,Point originPoint,float size,Pen outlinePen,Brush fillBrush)
+
+		private static void MapCircles(
+			Graphics g,
+			IReadOnlyList<MinimapSystem> systems,
+			Point originPoint,
+			float size,
+			Pen outlinePen,
+			Brush fillBrush,
+			Color glowColor,
+			int? animationCycle)
 		{
 			Brush eraserBrush = GDICache.GetBrush(Color.Black);
-			float diameter = size * 2;
-			var locations = new List<RectangleF>(systems.Count);
 
-			foreach (var currentSystem in systems)
+			float diameter = size * 2;
+
+			// Pulse value 0 -> 1
+			float pulse = 0f;
+
+			if (animationCycle.HasValue)
 			{
-				locations.Add(new RectangleF(originPoint.X + currentSystem.X - size,originPoint.Y + currentSystem.Y - size,diameter,diameter));
+				pulse = (animationCycle.Value % 30) / 30f;
 			}
 
-			foreach (var rect in locations) g.DrawEllipse(outlinePen, rect);
-			foreach (var rect in locations) g.FillEllipse(eraserBrush, rect);
-			foreach (var rect in locations) g.FillEllipse(fillBrush, rect);
-		}
+			//
+			// PASS 1 - GLOW
+			//
+			foreach (var system in systems)
+			{
+				float centerX = originPoint.X + system.X;
+				float centerY = originPoint.Y + system.Y;
 
+				for (int layer = 8; layer >= 1; layer--)
+				{
+					float layerRadius =
+						size +
+						(layer * 2.0f) +
+						(pulse * 4.0f);
+
+					int alpha = (int)(
+						(80.0f / layer) *
+						(0.75f + (float)Math.Sin(pulse * Math.PI) * 0.25f));
+
+					using (var glowBrush = new SolidBrush(
+						Color.FromArgb(
+							Math.Min(255, Math.Max(1, alpha)),
+							glowColor)))
+					{
+
+						float glowDiameter = layerRadius * 2;
+
+						g.FillEllipse(
+							glowBrush,
+							centerX - layerRadius,
+							centerY - layerRadius,
+							glowDiameter,
+							glowDiameter);
+					}
+				}
+			}
+
+			//
+			// PASS 2 - OUTLINES
+			//
+			foreach (var system in systems)
+			{
+				g.DrawEllipse(
+					outlinePen,
+					originPoint.X + system.X - size,
+					originPoint.Y + system.Y - size,
+					diameter,
+					diameter);
+			}
+
+			//
+			// PASS 3 - PUNCH OUT
+			//
+			foreach (var system in systems)
+			{
+				g.FillEllipse(
+					eraserBrush,
+					originPoint.X + system.X - size,
+					originPoint.Y + system.Y - size,
+					diameter,
+					diameter);
+			}
+
+			//
+			// PASS 4 - FILL
+			//
+			foreach (var system in systems)
+			{
+				g.FillEllipse(
+					fillBrush,
+					originPoint.X + system.X - size,
+					originPoint.Y + system.Y - size,
+					diameter,
+					diameter);
+			}
+		}
 		public static void DrawPulseOrb(Graphics g,Point center,Color colour,float radius,int? animationCycle,int glowLayers = 4,float pulseSize = 3.0f,int maxAlpha = 100)
 		{
 			float pulse = 0;
@@ -213,9 +349,11 @@ namespace Quesadilla.Classes.ImageGeneration
             Color MercoxitColour,
             int? animationCycleIntel,
             int? animationCycleKills,
-            int? animationCycleAlts,
-            int? animationCycleUniHoles,
-            bool defaultTextSize = false,
+			int? animationCycleAlts,
+			int? animationCycleUniHoles,
+			int? animationIncursion,
+			int? animationCycleSecLimit,
+			bool defaultTextSize = false,
             bool showOutOfRegion = false,
             bool showSecLimit = false,
             int incursionAlphaAmount = 50,
@@ -483,13 +621,13 @@ namespace Quesadilla.Classes.ImageGeneration
 					using (Graphics gIncursion = Graphics.FromImage(incursionImage))
 					{
 
-						MapCircles(gIncursion, minimapSystems.Where(o => o.solarSystem.Incursion).ToList(), originPoint, incursionBlobSize, incursionOutlinePen, incursionBrush);
+						MapCircles(gIncursion, minimapSystems.Where(o => o.solarSystem.Incursion).ToList(), originPoint, incursionBlobSize, incursionOutlinePen, incursionBrush, IncursionOutlineColour, animationIncursion);
 						g.DrawImage(
 							incursionImage,
 							new Rectangle(0, 0, incursionImage.Width, incursionImage.Height),
 							0, 0, incursionImage.Width, incursionImage.Height,
 							GraphicsUnit.Pixel,
-							incursionImageAttr
+							incursionImageAttr							
 							);
 					}
 				}
@@ -509,18 +647,18 @@ namespace Quesadilla.Classes.ImageGeneration
 					ColorMatrix secLimitColourMatrix = new ColorMatrix();
 					secLimitColourMatrix.Matrix33 = (float)((float)secLimitAlphaAmount / (float)100);  // alpha !
 					ImageAttributes secLimitImageAttr = new ImageAttributes();
-					secLimitImageAttr.SetColorMatrix(secLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 
+					secLimitImageAttr.SetColorMatrix(secLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 					using (Graphics gSecLimit = Graphics.FromImage(secLimitImage))
 					{
-						MapCircles(gSecLimit, minimapSystems.Where(o => o.solarSystem.Security <= secLimit).ToList(), originPoint, secLimitBlobSize, secLimitOutlinePen, secLimitBrush);
+						MapCircles(gSecLimit, minimapSystems.Where(o => o.solarSystem.Security <= secLimit).ToList(), originPoint, secLimitBlobSize, secLimitOutlinePen, secLimitBrush, SecLimitOutlineColour, animationCycleSecLimit);
 
 						g.DrawImage(
 							secLimitImage,
 							new Rectangle(0, 0, secLimitImage.Width, secLimitImage.Height),
 							0, 0, secLimitImage.Width, secLimitImage.Height,
 							GraphicsUnit.Pixel,
-							secLimitImageAttr
+							secLimitImageAttr							
 							);
 					}
 				}
@@ -542,9 +680,7 @@ namespace Quesadilla.Classes.ImageGeneration
 				Image stormLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
 
 				int stormAlphaAmount = 0;
-
                 // Draw outlines first
-
                 // go through systems used 3 times - draw weak first, then strong then centre
                 for (int stormStrength = 0; stormStrength <= 2; stormStrength++)
                 {
@@ -587,33 +723,27 @@ namespace Quesadilla.Classes.ImageGeneration
 
                 try
                 {
-                    // go through systems used 3 times - draw weak first, then strong then centre
-                    for (int stormStrength = 0; stormStrength <= 2; stormStrength++)
-                    {
-                        // clear background 
-                        foreach (var currentSystem in minimapSystems)
-                        {
-                            Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-                            foreach (var storm in Program.Universe.Storms)
-                            {
-                                if (stormStrength == 0 && storm?.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id))
-                                    DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false);
-                                if (stormStrength == 1 && storm?.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id))
-                                    DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false);
-                                if (stormStrength == 2 && storm?.SystemId == currentSystem.solarSystem.Id)
-                                    DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false);
-                            }
-                        }
+
+					// clear background 
+					foreach (var currentSystem in minimapSystems)
+					{
+						Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+						foreach (var storm in Program.Universe.Storms)
+						{
+							if (
+								(storm?.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id)) ||
+								(storm?.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id)) ||
+								(storm?.SystemId == currentSystem.solarSystem.Id)
+								)
+								DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false);
+						}
+					}
+
 
                         stormLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
                         using (Graphics gStorm = Graphics.FromImage(stormLimitImage))
                         {
-                            switch (stormStrength)
-                            {
-                                case 0: stormAlphaAmount = 90; break;
-                                case 1: stormAlphaAmount = 120; break;
-                                case 2: stormAlphaAmount = 155; break;
-                            }
+                            stormAlphaAmount = 40;
 
                             stormLimitColourMatrix.Matrix33 = (float)((float)stormAlphaAmount / (float)255);  // alpha !
                             stormImageAttr.SetColorMatrix(stormLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
@@ -623,14 +753,15 @@ namespace Quesadilla.Classes.ImageGeneration
                                 Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
                                 foreach (var storm in Program.Universe.Storms)
                                 {
-                                    if (stormStrength == 0 && storm.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id))
-                                        DrawStorm(storm.StormType, "WEAK", gStorm, currentPoint, circleSizeStorm, blobSize, false);
-                                    if (stormStrength == 1 && storm.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id))
-                                        DrawStorm(storm.StormType, "STRONG", gStorm, currentPoint, circleSizeStorm, blobSize, false);
-                                    if (stormStrength == 2 && storm.SystemId == currentSystem.solarSystem.Id)
-                                        DrawStorm(storm.StormType, "CENTRE", gStorm, currentPoint, circleSizeStorm, blobSize, false);
+								if (
+									(storm?.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id)) ||
+									(storm?.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id)) ||
+									(storm?.SystemId == currentSystem.solarSystem.Id)
+									)
+									DrawStorm(storm.StormType, "CENTRE", gStorm, currentPoint, circleSizeStorm, blobSize, false);
                                 }
                             }
+
                             g.DrawImage(
                                stormLimitImage, // target
                                new Rectangle(0, 0, stormLimitImage.Width, stormLimitImage.Height), // source
@@ -639,7 +770,6 @@ namespace Quesadilla.Classes.ImageGeneration
                                stormImageAttr
                                );
                         }
-                    }
                 }
                 catch 
                 {
@@ -735,7 +865,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					int uniHoleAdjust = 0;
 					if (currentSystem.solarSystem.UniHole)
 					{
-						DrawPulseIndicator(g,currentPoint,UniHoleColour,blobSize,animationCycleUniHoles,pulseSize: (30 / (float)GUI_SCALING),maxAlpha: 60,glowLayers: 3,ringWidth: 2.0f);
+						DrawPulseIndicator(g,currentPoint,UniHoleColour,blobSize,animationCycleUniHoles,pulseSize: (25 / (float)GUI_SCALING),maxAlpha: 60,glowLayers: 3,ringWidth: 2.0f);
 						uniHoleAdjust = 1;
 					}
 
@@ -747,7 +877,7 @@ namespace Quesadilla.Classes.ImageGeneration
 						circlesUsed++;
 						float circleSize = CIRCLE_INITIAL_GAP + uniHoleAdjust + ((CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING);
 						if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
-						DrawPulseIndicator(g, currentPoint, AltColour, blobSize + circleSize, animationCycleAlts, pulseSize: (40 / (float)GUI_SCALING), maxAlpha: 100);
+						DrawPulseIndicator(g, currentPoint, AltColour, blobSize + circleSize, animationCycleAlts, pulseSize: (32 / (float)GUI_SCALING), maxAlpha: 100);
 					}
 					
 					// Intel alerts
@@ -757,7 +887,7 @@ namespace Quesadilla.Classes.ImageGeneration
 						float circleSize = CIRCLE_INITIAL_GAP + uniHoleAdjust + ((CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING);
 
 						if (circleSize < MINIMUM_CIRCLE_SIZE ||float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
-						DrawPulseIndicator(g,currentPoint,IntelColour,blobSize + circleSize,animationCycleIntel,pulseSize: (50 / (float)GUI_SCALING),maxAlpha: 120,glowLayers: 4,ringWidth: 2.0f);
+						DrawPulseIndicator(g,currentPoint,IntelColour,blobSize + circleSize,animationCycleIntel,pulseSize: (40 / (float)GUI_SCALING),maxAlpha: 120,glowLayers: 4,ringWidth: 2.0f);
 						foreach (var a in currentSystem.solarSystem.GetAlerts(false, false, false))
 						{
 							sbExtraInformation.AppendLine($"{a.Entry.LogTime} {a.Entry.LineContent}");
@@ -770,7 +900,7 @@ namespace Quesadilla.Classes.ImageGeneration
 						circlesUsed++;
 						float circleSize = CIRCLE_INITIAL_GAP + uniHoleAdjust + ((CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING);
 						if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
-						DrawPulseIndicator(g, currentPoint, ZKillColour, blobSize + circleSize, animationCycleKills, pulseSize: (70 / (float)GUI_SCALING), maxAlpha: 160, glowLayers: 4, ringWidth: 2.0f);
+						DrawPulseIndicator(g, currentPoint, ZKillColour, blobSize + circleSize, animationCycleKills, pulseSize: (50 / (float)GUI_SCALING), maxAlpha: 160, glowLayers: 4, ringWidth: 2.0f);
 						try
 						{
 							foreach (var k in currentSystem.solarSystem.GetKills())

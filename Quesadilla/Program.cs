@@ -28,6 +28,7 @@ using System.Media;
 using System.Net.Http;
 using System.Reflection;
 using System.Resources;
+using System.Threading;
 using System.Web.WebPages;
 using System.Windows.Forms;
 
@@ -88,10 +89,6 @@ namespace Quesadilla
             ESIHandler = new ESIWorker(esiClient, Log.Logger);
             Universe = new UniverseManager(esiClient, Log.Logger);
 
-            Universe.ReadSolarSystems("Quesadilla.Systems.Json");
-            Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
-            Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
-
             CharacterList = new List<Character>();
 
             string listeningPort = MainConfiguration.IntegrationPort.ToString();
@@ -105,12 +102,43 @@ namespace Quesadilla
                 ;
             webhost.Build().RunAsync();
 
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(q = new Quesadilla());
+			var splash = new QuesadillaSplashScreen();
+			splash.Show();
 
-            MainConfiguration.Save(configuration_filename);
+			splash.Show();
+
+			DateTime end = DateTime.Now.AddSeconds(2);
+
+			while (DateTime.Now < end)
+			{
+				Application.DoEvents();
+				System.Threading.Thread.Sleep(50);
+			}
+
+			splash.SetStatus("Loading Universe...");
+			Universe.ReadSolarSystems("Quesadilla.Systems.Json");
+			Application.DoEvents();
+
+			splash.SetStatus("Loading Item Types...");
+			Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
+			Application.DoEvents();
+
+			splash.SetStatus("Loading Character Cache...");
+			Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
+			Application.DoEvents();
+
+			splash.SetStatus("Creating Main Window...");
+			Application.DoEvents();
+
+
+			q = new Quesadilla();
+			q.SplashScreen = splash;
+
+			Application.Run(q);
+			MainConfiguration.Save(configuration_filename);
         }
 
         public static void SaveAndReloadConfiguration(Config c)

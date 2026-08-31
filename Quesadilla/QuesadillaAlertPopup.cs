@@ -28,221 +28,221 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace Quesadilla
 {
-    public partial class QuesadillaAlertPopup : Form
-    {
-        private AlertQueueItem _alert;
-        private int _seconds;
+	public partial class QuesadillaAlertPopup : Form
+	{
+		private AlertQueueItem _alert;
+		private int _seconds;
 
-        private int _opacity;
-        private int _opacitystep;
-        private PopupLocationType _location;
+		private int _opacity;
+		private int _opacitystep;
+		private PopupLocationType _location;
 
-        private bool ShowShipname = false;
+		private bool ShowShipname = false;
 
-        private Quesadilla _main;
+		private Quesadilla _main;
 
-        public bool IsZkill = false;
-        public bool IsAlert = true;
+		public bool IsZkill = false;
+		public bool IsAlert = true;
 
-        private const string ALERT_TEXT = "Alert";
-        private const string FACTION_TEXT = "Faction Spawn";
-        private const string DECLOAK_TEXT = "Pilot decloaked";
+		private const string ALERT_TEXT = "Alert";
+		private const string FACTION_TEXT = "Faction Spawn";
+		private const string DECLOAK_TEXT = "Pilot decloaked";
 
-        private const int ZOOM_SIZE_INCREASE = 1;
+		private const int ZOOM_SIZE_INCREASE = 1;
 
-        private bool _rightMouseDown = false;
-        private Point diffPoint;
+		private bool _rightMouseDown = false;
+		private Point diffPoint;
 
-        private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
-        private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
+		private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
+		private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
 
-        private Config _config;
+		private Config _config;
 
 		public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background, Quesadilla mainForm)
-        {
-            _main = mainForm;
-            InitializeComponent();
+		{
+			_main = mainForm;
+			InitializeComponent();
 
-            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 
-            _alert = alert;
-            _seconds = configuration.AlertPopupSeconds;
-            _opacity = configuration.AlertPopupOpacity;
-            _opacitystep = configuration.AlertPopupOpacityStep;
+			_alert = alert;
+			_seconds = configuration.AlertPopupSeconds;
+			_opacity = configuration.AlertPopupOpacity;
+			_opacitystep = configuration.AlertPopupOpacityStep;
 
-            _config = configuration;
+			_config = configuration;
 
-            Opacity = 0;
+			Opacity = 0;
 
-			configuration.ApplyConfiguration(this, configuration.AlertWindowItemLocations, 0, false,false,true);
+			configuration.ApplyConfiguration(this, configuration.AlertWindowItemLocations, 0, false, false, true);
 
 			Width = configuration.AlertWindowSize.Width;
-            Height = configuration.AlertWindowSize.Height;
+			Height = configuration.AlertWindowSize.Height;
 
-            AlertText.Text = _alert.AlertText;
+			AlertText.Text = _alert.AlertText;
 
-            if (alert.Kill != null)
-            {
-                IsZkill = true;
-                IsAlert = false;
-            }
+			if (alert.Kill != null)
+			{
+				IsZkill = true;
+				IsAlert = false;
+			}
 
-            if (alert.Path != null)
-            {
-                SystemName.Text = _alert.Path.ToSystemName;
-            }
-            else
-            {
-                if (alert.isFaction)
-                {
-                    SystemName.Text = FACTION_TEXT;
-                }
-                else if (alert.isDecloak)
-                {
-                    SystemName.Text = DECLOAK_TEXT;
-                }
-                else
-                {
-                    SystemName.Text = ALERT_TEXT;
-                }
-            }
+			if (alert.Path != null)
+			{
+				SystemName.Text = _alert.Path.ToSystemName;
+			}
+			else
+			{
+				if (alert.isFaction)
+				{
+					SystemName.Text = FACTION_TEXT;
+				}
+				else if (alert.isDecloak)
+				{
+					SystemName.Text = DECLOAK_TEXT;
+				}
+				else
+				{
+					SystemName.Text = ALERT_TEXT;
+				}
+			}
 
-            if (alert.Path != null)
-            {
-                RegionName.Text = _alert.Path.ToSystemRegionName;
-            }
-            else
-            {
-                RegionName.Text = "";
-                if ( alert.isDecloak)
-                {
-                    RegionName.Text = alert.Entry.CharacterName;
-                }
-            }
+			if (alert.Path != null)
+			{
+				RegionName.Text = _alert.Path.ToSystemRegionName;
+			}
+			else
+			{
+				RegionName.Text = "";
+				if (alert.isDecloak)
+				{
+					RegionName.Text = alert.Entry.CharacterName;
+				}
+			}
 
-            if (alert.Path != null && ! (alert.isFaction|| alert.isDecloak))
-            {
-                ContextInfo.Text = _alert.Path.TotalJumps.ToString() + " jump" + (_alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + _alert.Context;
-            }
-            else
-            {
-                if (alert.isFaction)
-                {
-                    ContextInfo.Text = alert.Context;
-                }
-                else if (alert.isDecloak)
-                {
-                    ContextInfo.Text = alert.Context;
-                }
-                else
+			if (alert.Path != null && !(alert.isFaction || alert.isDecloak))
+			{
+				ContextInfo.Text = _alert.Path.TotalJumps.ToString() + " jump" + (_alert.Path.TotalJumps == 1 ? "" : "s") + "-> " + _alert.Context;
+			}
+			else
+			{
+				if (alert.isFaction)
+				{
+					ContextInfo.Text = alert.Context;
+				}
+				else if (alert.isDecloak)
+				{
+					ContextInfo.Text = alert.Context;
+				}
+				else
 
-                {
-                    ContextInfo.Text = alert.FriendlyName;
-                }
-            }
+				{
+					ContextInfo.Text = alert.FriendlyName;
+				}
+			}
 
 			if (alert.isFaction)
-            {
-                IntelLine.Text = FACTION_TEXT;
+			{
+				IntelLine.Text = FACTION_TEXT;
 				AlertImage.Height = AlertImage.Width;
 			}
-			else if ( IsZkill )
-            {
-                IntelLine.Text = alert.Kill.Context;
-                try
-                {
-                    AlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
+			else if (IsZkill)
+			{
+				IntelLine.Text = alert.Kill.Context;
+				try
+				{
+					AlertImage.Load($"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render");
 
 					// Should we show alliance/corp logo ?
 					PictureBox zKillAgressorLogo = null;
 					PictureBox zKillVictimLogo = null;
 					var KillerLogoUrl = "";
-                    if (_config.AlertPopupShowKillerLogo)
-                    {
-                        if ((alert.Kill.KillerAllianceId ?? 0) != 0)
-                        {
-                            KillerLogoUrl = $"https://images.evetech.net/alliances/{alert.Kill.KillerAllianceId}/logo";
-                        }
-                        if (KillerLogoUrl.Length == 0 && (alert.Kill.KillerCorporationId ?? 0) != 0)
-                        {
-                            KillerLogoUrl = $"https://images.evetech.net/corporations/{alert.Kill.KillerCorporationId}/logo";
-                        }
-                        if (KillerLogoUrl.Length > 0)
-                        {
-                            zKillAgressorLogo = new PictureBox();
-                            zKillAgressorLogo.Load($"{KillerLogoUrl}");
-                        }
-                    }
+					if (_config.AlertPopupShowKillerLogo)
+					{
+						if ((alert.Kill.KillerAllianceId ?? 0) != 0)
+						{
+							KillerLogoUrl = $"https://images.evetech.net/alliances/{alert.Kill.KillerAllianceId}/logo";
+						}
+						if (KillerLogoUrl.Length == 0 && (alert.Kill.KillerCorporationId ?? 0) != 0)
+						{
+							KillerLogoUrl = $"https://images.evetech.net/corporations/{alert.Kill.KillerCorporationId}/logo";
+						}
+						if (KillerLogoUrl.Length > 0)
+						{
+							zKillAgressorLogo = new PictureBox();
+							zKillAgressorLogo.Load($"{KillerLogoUrl}");
+						}
+					}
 
 					var VictimLogoUrl = "";
-                    if (_config.AlertPopupShowVictimLogo)
-                    {
-                        if ((alert.Kill.VictimAllianceId ?? 0) != 0)
-                        {
-                            VictimLogoUrl = $"https://images.evetech.net/alliances/{alert.Kill.VictimAllianceId}/logo";
-                        }
-                        if (VictimLogoUrl.Length == 0 && (alert.Kill.VictimCorporationId ?? 0) != 0)
-                        {
-                            VictimLogoUrl = $"https://images.evetech.net/corporations/{alert.Kill.VictimCorporationId}/logo";
-                        }
-                        if (VictimLogoUrl.Length > 0)
-                        {
-                            zKillVictimLogo = new PictureBox();
-                            zKillVictimLogo.Load($"{VictimLogoUrl}");
-                        }
-                    }
+					if (_config.AlertPopupShowVictimLogo)
+					{
+						if ((alert.Kill.VictimAllianceId ?? 0) != 0)
+						{
+							VictimLogoUrl = $"https://images.evetech.net/alliances/{alert.Kill.VictimAllianceId}/logo";
+						}
+						if (VictimLogoUrl.Length == 0 && (alert.Kill.VictimCorporationId ?? 0) != 0)
+						{
+							VictimLogoUrl = $"https://images.evetech.net/corporations/{alert.Kill.VictimCorporationId}/logo";
+						}
+						if (VictimLogoUrl.Length > 0)
+						{
+							zKillVictimLogo = new PictureBox();
+							zKillVictimLogo.Load($"{VictimLogoUrl}");
+						}
+					}
 
 					Image RoundedImage = ImageGenerator.ClipToCircle(AlertImage.Image, new PointF(AlertImage.Image.Width / 2, AlertImage.Image.Height / 2), AlertImage.Image.Width / 2,
-                        Color.Transparent, configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, configuration.ZKillIskColour, configuration.ZKillShowBar, configuration.ZKillBarColour,
-                        zKillAgressorLogo?.Image, zKillVictimLogo?.Image,
-                        _config.AlertPopZkillHeight, _config.AlertPopZkillLogoSize);
-                    Bitmap killBitmap = new Bitmap(RoundedImage);
-                    killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
+						Color.Transparent, configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, configuration.ZKillIskColour, configuration.ZKillShowBar, configuration.ZKillBarColour,
+						zKillAgressorLogo?.Image, zKillVictimLogo?.Image,
+						_config.AlertPopZkillHeight, _config.AlertPopZkillLogoSize);
+					Bitmap killBitmap = new Bitmap(RoundedImage);
+					killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
 					AlertImage.Image = killBitmap;
 				}
 				catch (Exception e)
-                {
+				{
 
-                }
+				}
 				ShipName.Text = alert.Kill.VictimShipName;
-            }
-            else
-            {
-                // Not zKill 
-                AlertImage.Height = AlertImage.Width;
+			}
+			else
+			{
+				// Not zKill 
+				AlertImage.Height = AlertImage.Width;
 
 				IntelLine.Text = _alert.Entry.LineContent;
-                ShipName.Text = "";
-            }
+				ShipName.Text = "";
+			}
 
-            if (configuration.AlertPopupShowMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0) )
-            {
-                string extraInformation = "";
-                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MinimapImage.Width, MinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb) , alert.Path , 0,100, 
-                    configuration.AlertPopupMinimapRawXY, ref extraInformation, ref MinimapSystems,
+			if (configuration.AlertPopupShowMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0))
+			{
+				string extraInformation = "";
+				Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MinimapImage.Width, MinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), alert.Path, 0, 100,
+					configuration.AlertPopupMinimapRawXY, ref extraInformation, ref MinimapSystems,
 					configuration.AlertPopupMinimapShowSystemText, configuration.AlertPopupMinimapShowAllSystemText, configuration.AlertPopupMinimapShowConnectingSystemText,
-                    configuration.AlertPopupShowMinimapBorder, configuration.AlertPopupMinimapBorderColour,
-                    configuration.AlertPopupMinimapLineColourNormal,
-                    configuration.AlertPopupMinimapLineColourOutOfRegion,
-                    configuration.AlertPopupMinimapLineColourRoute,
-                    configuration.AlertPopupMinimapSystemColourNormal,
-                    configuration.AlertPopupMinimapSystemColourRoute,
-                    configuration.AlertPopupMinimapSystemColourFrom,
-                    configuration.AlertPopupMinimapSystemColourTo,
-                    configuration.AlertPopupMinimapSystemColourText, configuration.AlertPopupMinimapAllSystemColourText, configuration.AlertPopupMinimapConnectingSystemColourText,
+					configuration.AlertPopupShowMinimapBorder, configuration.AlertPopupMinimapBorderColour,
+					configuration.AlertPopupMinimapLineColourNormal,
+					configuration.AlertPopupMinimapLineColourOutOfRegion,
+					configuration.AlertPopupMinimapLineColourRoute,
+					configuration.AlertPopupMinimapSystemColourNormal,
+					configuration.AlertPopupMinimapSystemColourRoute,
+					configuration.AlertPopupMinimapSystemColourFrom,
+					configuration.AlertPopupMinimapSystemColourTo,
+					configuration.AlertPopupMinimapSystemColourText, configuration.AlertPopupMinimapAllSystemColourText, configuration.AlertPopupMinimapConnectingSystemColourText,
 					configuration.AlertPopupMinimapZKillColour,
-                    configuration.AlertPopupMinimapIntelColour,
+					configuration.AlertPopupMinimapIntelColour,
 					configuration.AlertPopupMinimapAltPositionColour,
-  				    configuration.AlertPopupMinimapUniHoleColour,
+					configuration.AlertPopupMinimapUniHoleColour,
 					configuration.AlertPopupMinimapIncursionColour,
 					configuration.AlertPopupMinimapIncursionOutlineColour,
 					configuration.AlertPopupMinimapSecLimitColour,
 					configuration.AlertPopupMinimapSecLimitOutlineColour,
 					configuration.AlertPopupMinimapIceColour,
-                    configuration.AlertPopupMinimapMercoxitColour,
-                    null, null, null,null,
-                    true,
-                    true, // show out of region 
+					configuration.AlertPopupMinimapMercoxitColour,
+					null, null, null, null,null, null,
+					true,
+					true, // show out of region 
 					configuration.AlertPopupMinimapSecLimit,
 					configuration.AlertPopupMinimapIncursionAlpha,
 					configuration.AlertPopupMinimapIncursionCloudSize,
@@ -251,336 +251,275 @@ namespace Quesadilla
 					configuration.AlertPopupMinimapConnectionGap,
 					configuration.AlertPopupMinimapSecLimitValue
 					);
-                Bitmap minimapBitmap = new Bitmap(minimapImage);
-                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
-                MinimapImage.Image = minimapBitmap;
-                MinimapImage.Visible = true;
-            }
-            else
-            {
-                MinimapImage.Visible = false;
-            }
+				Bitmap minimapBitmap = new Bitmap(minimapImage);
+				minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
+				MinimapImage.Image = minimapBitmap;
+				MinimapImage.Visible = true;
+			}
+			else
+			{
+				MinimapImage.Visible = false;
+			}
 
-            BackgroundImage = background;
+			BackgroundImage = background;
 
-            // position on screen
-            if (configuration.AlertTransparent)
-            {
-                // use current eve window (for transparent)
-                switch (Program.MainConfiguration.DPSLocation)
-                {
-                    case PopupLocationType.TopLeft:
-                        Location = new Point()
-                        {
-                            X = _main.currentEveWindowRect.Left + configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + configuration.DPSGraphWindowSizeAdjust.Y,
-                        };
-                        break;
-                    case PopupLocationType.TopCenter:
-                        Location = new Point()
-                        {
-                            X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + configuration.DPSGraphWindowSizeAdjust.Y,
-                        };
-                        break;
-                    case PopupLocationType.TopRight:
-                        Location = new Point()
-                        {
-                            X = _main.currentEveWindowRect.Right - Width - configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + configuration.DPSGraphWindowSizeAdjust.Y,
-                        };
-                        break;
-                    case PopupLocationType.BottomLeft:
-                        Location = new Point()
-                        {
-                            X = _main.currentEveWindowRect.Left + configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - configuration.DPSGraphWindowSizeAdjust.Y,
-                        };
-                        break;
-                    case PopupLocationType.BottomCenter:
-                        Location = new Point()
-                        {
-                            X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = _main.currentEveWindowRect.Bottom - Height - configuration.DPSGraphWindowSizeAdjust.Y,
-                        };
-                        break;
-                    case PopupLocationType.BottomRight:
-                        Location = new Point()
-                        {
-                            X = _main.currentEveWindowRect.Right - Width - configuration.DPSGraphWindowSizeAdjust.X,
-                            Y = _main.currentEveWindowRect.Bottom - Height - configuration.DPSGraphWindowSizeAdjust.Y,
-                        };
-                        break;
-                    case PopupLocationType.Center:
-                    default:
-                        Location = new Point()
-                        {
-                            X = ((_main.currentEveWindowRect.Right - _main.currentEveWindowRect.Left) / 2) - (Width / 2) + _main.currentEveWindowRect.Left,
-                            Y = ((_main.currentEveWindowRect.Top - _main.currentEveWindowRect.Bottom) / 2) - (Height / 2) + _main.currentEveWindowRect.Top,
-                        };
-                        break;
-                }
-            }
-            else
-            {
+			// position on screen
+			// position on screen
+			Screen screen = Screen.FromControl(this);
+			switch (configuration.AlertPopupLocation)
+			{
+				case PopupLocationType.TopLeft:
+					Location = new Point()
+					{
+						X = screen.WorkingArea.Left,
+						Y = screen.WorkingArea.Top,
+					};
+					break;
+				case PopupLocationType.TopCenter:
+					Location = new Point()
+					{
+						X = (screen.WorkingArea.Right / 2) - (Width / 2),
+						Y = screen.WorkingArea.Top,
+					};
+					break;
+				case PopupLocationType.TopRight:
+					Location = new Point()
+					{
+						X = screen.WorkingArea.Right - Width,
+						Y = screen.WorkingArea.Top,
+					};
+					break;
+				case PopupLocationType.BottomLeft:
+					Location = new Point()
+					{
+						X = screen.WorkingArea.Left,
+						Y = screen.WorkingArea.Bottom - Height - 1,
+					};
+					break;
+				case PopupLocationType.BottomCenter:
+					Location = new Point()
+					{
+						X = (screen.WorkingArea.Right / 2) - (Width / 2),
+						Y = screen.WorkingArea.Bottom - Height - 1,
+					};
+					break;
+				case PopupLocationType.BottomRight:
+					Location = new Point()
+					{
+						X = screen.WorkingArea.Right - Width,
+						Y = screen.WorkingArea.Bottom - Height - 1,
+					};
+					break;
+				case PopupLocationType.Center:
+				default:
+					Location = new Point()
+					{
+						X = (screen.WorkingArea.Right / 2) - (Width / 2),
+						Y = (screen.WorkingArea.Bottom / 2) - (Height / 2),
+					};
+					break;
+			}
+		}
 
-                // position on screen
-                Screen screen = Screen.FromControl(this);
-                switch (configuration.AlertPopupLocation)
-                {
-                    case PopupLocationType.TopLeft:
-                        Location = new Point()
-                        {
-                            X = screen.WorkingArea.Left,
-                            Y = screen.WorkingArea.Top,
-                        };
-                        break;
-                    case PopupLocationType.TopCenter:
-                        Location = new Point()
-                        {
-                            X = (screen.WorkingArea.Right / 2) - (Width / 2),
-                            Y = screen.WorkingArea.Top,
-                        };
-                        break;
-                    case PopupLocationType.TopRight:
-                        Location = new Point()
-                        {
-                            X = screen.WorkingArea.Right - Width,
-                            Y = screen.WorkingArea.Top,
-                        };
-                        break;
-                    case PopupLocationType.BottomLeft:
-                        Location = new Point()
-                        {
-                            X = screen.WorkingArea.Left,
-                            Y = screen.WorkingArea.Bottom - Height - 1,
-                        };
-                        break;
-                    case PopupLocationType.BottomCenter:
-                        Location = new Point()
-                        {
-                            X = (screen.WorkingArea.Right / 2) - (Width / 2),
-                            Y = screen.WorkingArea.Bottom - Height - 1,
-                        };
-                        break;
-                    case PopupLocationType.BottomRight:
-                        Location = new Point()
-                        {
-                            X = screen.WorkingArea.Right - Width,
-                            Y = screen.WorkingArea.Bottom - Height - 1,
-                        };
-                        break;
-                    case PopupLocationType.Center:
-                    default:
-                        Location = new Point()
-                        {
-                            X = (screen.WorkingArea.Right / 2) - (Width / 2),
-                            Y = (screen.WorkingArea.Bottom / 2) - (Height / 2),
-                        };
-                        break;
-                }
-            }
-        }
+		private void QuesadillaAlertPopup_Load(object sender, EventArgs e)
+		{
+			Visible = true;
+			Opacity = 0;
+			timerAlertWindow.Interval = _seconds * 1000;
+			timerAlertWindow.Enabled = true;
+			timerOpacityOpen.Enabled = true;
+			ShowInTaskbar = false;
+		}
 
-        private void QuesadillaAlertPopup_Load(object sender, EventArgs e)
-        {
-            Visible = true;
-            Opacity = 0;
-            timerAlertWindow.Interval = _seconds*1000;
-            timerAlertWindow.Enabled = true;
-            timerOpacityOpen.Enabled = true;
-            ShowInTaskbar = false;
-        }
+		private void CloseWindow()
+		{
+			timerOpacityClose.Enabled = true;
+		}
 
-        private void CloseWindow()
-        {
-            timerOpacityClose.Enabled = true;
-        }
+		private void timerAlertWindow_Tick(object sender, EventArgs e)
+		{
+			CloseWindow();
+		}
 
-        private void timerAlertWindow_Tick(object sender, EventArgs e)
-        {
-            CloseWindow();
-        }
+		private void timerOpacityOpen_Tick(object sender, EventArgs e)
+		{
+			Opacity += (double)_opacitystep / 100;
+			if (Opacity >= (double)_opacity / 100)
+			{
+				timerOpacityOpen.Enabled = false;
+			}
+		}
 
-        private void timerOpacityOpen_Tick(object sender, EventArgs e)
-        {
-            Opacity += (double)_opacitystep/100;
-            if (Opacity >= (double)_opacity/100)
-            {
-                timerOpacityOpen.Enabled = false;
-            }
-        }
+		private void label1_Click(object sender, EventArgs e)
+		{
 
-        private void label1_Click(object sender, EventArgs e)
-        {
+		}
 
-        }
+		private void QuesadillaAlertPopup_Click(object sender, EventArgs e)
+		{
+			MouseEventArgs e2 = (MouseEventArgs)e;
+			Point clickLocation = new Point(e2.X, e2.Y);
+			Rectangle r = new Rectangle(SystemName.Location.X, SystemName.Location.Y, SystemName.Width, SystemName.Height);
+			if (r.Contains(clickLocation))
+			{
+				SystemName_Click(sender, e);
+			}
+			else
+			{
+				Opacity = 0;
+				CloseWindow();
+			}
+		}
 
-        private void QuesadillaAlertPopup_Click(object sender, EventArgs e)
-        {
-            MouseEventArgs e2 = (MouseEventArgs)e;
-            Point clickLocation = new Point(e2.X, e2.Y);
-            Rectangle r = new Rectangle(SystemName.Location.X, SystemName.Location.Y, SystemName.Width, SystemName.Height);
-            if (r.Contains(clickLocation))
-            {
-                SystemName_Click(sender, e);
-            }
-            else
-            {
-                Opacity = 0;
-                CloseWindow();
-            }
-        }
+		private void timerOpacityClose_Tick(object sender, EventArgs e)
+		{
+			Opacity -= (double)_opacitystep / 100;
+			if (Opacity <= 0)
+			{
+				Close();
+			}
+		}
 
-        private void timerOpacityClose_Tick(object sender, EventArgs e)
-        {
-            Opacity -= (double)_opacitystep / 100;
-            if (Opacity <= 0)
-            {
-                Close();
-            }
-        }
+		private void SystemName_Click(object sender, EventArgs e)
+		{
+			if (SystemName.Text != ALERT_TEXT)
+			{
+				System.Diagnostics.Process.Start("https://evemaps.dotlan.net/map/" + RegionName.Text.Replace(" ", "_") + "/" + SystemName.Text);
+			}
+		}
 
-        private void SystemName_Click(object sender, EventArgs e)
-        {
-            if ( SystemName.Text != ALERT_TEXT )
-            {
-                System.Diagnostics.Process.Start("https://evemaps.dotlan.net/map/" + RegionName.Text.Replace(" ","_") + "/" + SystemName.Text);
-            }
-        }
+		protected override bool ShowWithoutActivation
+		{
+			get { return true; }
+		}
 
-        protected override bool ShowWithoutActivation
-        {
-            get { return true; }
-        }
+		private void pAlertImage_Click(object sender, EventArgs e)
+		{
+			if (IsZkill)
+			{
+				System.Diagnostics.Process.Start($"https://zkillboard.com/kill/{_alert.Kill.ID}/");
+			}
+		}
 
-        private void pAlertImage_Click(object sender, EventArgs e)
-        {
-            if ( IsZkill )
-            {
-                System.Diagnostics.Process.Start($"https://zkillboard.com/kill/{_alert.Kill.ID}/");
-            }
-        }
+		private void Zoom_MouseEnter(object sender, EventArgs e)
+		{
+			System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
+			x.Font = new Font(x.Font.Name, x.Font.Size + ZOOM_SIZE_INCREASE, FontStyle.Bold);
+			x.TextAlign = ContentAlignment.TopLeft;
+		}
 
-        private void Zoom_MouseEnter(object sender, EventArgs e)
-        {
-            System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
-            x.Font = new Font(x.Font.Name, x.Font.Size+ZOOM_SIZE_INCREASE, FontStyle.Bold);
-            x.TextAlign = ContentAlignment.TopLeft;
-        }
+		private void Zoom_MouseLeave(object sender, EventArgs e)
+		{
+			System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
+			x.Font = new Font(x.Font.Name, x.Font.Size - ZOOM_SIZE_INCREASE, FontStyle.Regular);
+			x.TextAlign = ContentAlignment.TopRight;
+		}
 
-        private void Zoom_MouseLeave(object sender, EventArgs e)
-        {
-            System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
-            x.Font = new Font(x.Font.Name, x.Font.Size-ZOOM_SIZE_INCREASE, FontStyle.Regular);
-            x.TextAlign = ContentAlignment.TopRight;
-        }
+		private void IntelLine_Click(object sender, EventArgs e)
+		{
 
-        private void IntelLine_Click(object sender, EventArgs e)
-        {
+		}
 
-        }
+		private void QuesadillaAlertPopup_MouseDown(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MouseButtons.Right)
+			{
+				_rightMouseDown = true;
+				diffPoint.X = System.Windows.Forms.Cursor.Position.X - this.Left;
+				diffPoint.Y = System.Windows.Forms.Cursor.Position.Y - this.Top;
+			}
+		}
 
-        private void QuesadillaAlertPopup_MouseDown(object sender, MouseEventArgs e)
-        {
-            if ( e.Button == MouseButtons.Right)
-            {
-                _rightMouseDown = true;
-                diffPoint.X = System.Windows.Forms.Cursor.Position.X - this.Left;
-                diffPoint.Y = System.Windows.Forms.Cursor.Position.Y - this.Top;
-            }
-        }
+		private void QuesadillaAlertPopup_MouseUp(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MouseButtons.Right)
+			{
+				_rightMouseDown = false;
+			}
+		}
 
-        private void QuesadillaAlertPopup_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                _rightMouseDown = false;
-            }
-        }
+		private void QuesadillaAlertPopup_MouseMove(object sender, MouseEventArgs e)
+		{
+			if (_rightMouseDown)
+			{
+				this.Left = System.Windows.Forms.Cursor.Position.X - diffPoint.X;
+				this.Top = System.Windows.Forms.Cursor.Position.Y - diffPoint.Y;
+			}
+		}
 
-        private void QuesadillaAlertPopup_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (_rightMouseDown)
-            {
-                this.Left = System.Windows.Forms.Cursor.Position.X - diffPoint.X;
-                this.Top = System.Windows.Forms.Cursor.Position.Y - diffPoint.Y;
-            }
-        }
+		private void pAlertImage_MouseEnter(object sender, EventArgs e)
+		{
+			if (IsZkill)
+			{
+				//ShipName.Visible = true;
+				ShowShipname = true;
+				this.Invalidate();
+			}
+		}
 
-        private void pAlertImage_MouseEnter(object sender, EventArgs e)
-        {
-            if (IsZkill)
-            {
-                //ShipName.Visible = true;
-                ShowShipname = true;
-                this.Invalidate();
-            }
-        }
+		private void pAlertImage_MouseLeave(object sender, EventArgs e)
+		{
+			//ShipName.Visible = false;
+			ShowShipname = false;
+			this.Invalidate();
+		}
 
-        private void pAlertImage_MouseLeave(object sender, EventArgs e)
-        {
-            //ShipName.Visible = false;
-            ShowShipname = false;
-            this.Invalidate();  
-        }
+		private void pMinimap_Click(object sender, EventArgs e)
+		{
 
-        private void pMinimap_Click(object sender, EventArgs e)
-        {
+		}
 
-        }
-
-        private void QuesadillaAlertPopup_Paint(object sender, PaintEventArgs e)
-        {
-            if ( _config.GetConfiguration("AlertText" , _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, AlertText);
+		private void QuesadillaAlertPopup_Paint(object sender, PaintEventArgs e)
+		{
+			if (_config.GetConfiguration("AlertText", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, AlertText);
 			if (_config.GetConfiguration("SystemName", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, SystemName);
-			if (_config.GetConfiguration("RegionName", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics,RegionName);
-			if (_config.GetConfiguration("ContextInfo", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics,ContextInfo);
-            if (_config.GetConfiguration("ShipName", _config.AlertWindowItemLocations).IsVisible && ShowShipname)
-            {
-                ImageGenerator.PaintDrawText(e.Graphics, ShipName);
-            }
+			if (_config.GetConfiguration("RegionName", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, RegionName);
+			if (_config.GetConfiguration("ContextInfo", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, ContextInfo);
+			if (_config.GetConfiguration("ShipName", _config.AlertWindowItemLocations).IsVisible && ShowShipname)
+			{
+				ImageGenerator.PaintDrawText(e.Graphics, ShipName);
+			}
 			if (_config.GetConfiguration("ContextInfo", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, ContextInfo);
 			if (_config.GetConfiguration("IntelLine", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, IntelLine);
 
-            if (MinimapImage.Visible)
-            {
-                if (mouseOverMinimapSystems.Count() > 0)
-                {
-                    foreach (var m in mouseOverMinimapSystems)
-                    {
-                        ImageGenerator.DrawSystemName(e.Graphics, m.X+ MinimapImage.Left, m.Y+ MinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.AlertPopupMinimapMouseoverSystemColour);
-                    }
-                }
-            }
-        }
+			if (MinimapImage.Visible)
+			{
+				if (mouseOverMinimapSystems.Count() > 0)
+				{
+					foreach (var m in mouseOverMinimapSystems)
+					{
+						ImageGenerator.DrawSystemName(e.Graphics, m.X + MinimapImage.Left, m.Y + MinimapImage.Top, m.solarSystem.Name, Program.MainConfiguration.AlertPopupMinimapMouseoverSystemColour);
+					}
+				}
+			}
+		}
 
-        private void ShipName_Click(object sender, EventArgs e)
-        {
+		private void ShipName_Click(object sender, EventArgs e)
+		{
 
-        }
+		}
 
-        private void QuesadillaAlertPopup_Shown(object sender, EventArgs e)
-        {
-            _main.latestAlertBitmap = new Bitmap(this.Width, this.Height);
-            this.DrawToBitmap(_main.latestAlertBitmap, new Rectangle(Point.Empty, _main.latestAlertBitmap.Size));
-            _main.latestAlertTimestamp = DateTime.Now;
-            // _main.latestAlertBitmap.Save("QuesadillaLatestAlert.png");
-        }
+		private void QuesadillaAlertPopup_Shown(object sender, EventArgs e)
+		{
+			_main.latestAlertBitmap = new Bitmap(this.Width, this.Height);
+			this.DrawToBitmap(_main.latestAlertBitmap, new Rectangle(Point.Empty, _main.latestAlertBitmap.Size));
+			_main.latestAlertTimestamp = DateTime.Now;
+			// _main.latestAlertBitmap.Save("QuesadillaLatestAlert.png");
+		}
 
-        private void ContextInfo_Click(object sender, EventArgs e)
-        {
+		private void ContextInfo_Click(object sender, EventArgs e)
+		{
 
-        }
+		}
 
-        private void pMinimapImage_MouseMove(object sender, MouseEventArgs e)
-        {
-            mouseOverMinimapSystems = Program.Universe.MouseOverSystem(e.X, e.Y, MinimapSystems);
-            if (mouseOverMinimapSystems.Count() > 0)
-            {
-                this.Invalidate();
-            }
-        }
+		private void pMinimapImage_MouseMove(object sender, MouseEventArgs e)
+		{
+			mouseOverMinimapSystems = Program.Universe.MouseOverSystem(e.X, e.Y, MinimapSystems);
+			if (mouseOverMinimapSystems.Count() > 0)
+			{
+				this.Invalidate();
+			}
+		}
 
 		private void RegionName_Click(object sender, EventArgs e)
 		{

@@ -30,6 +30,13 @@ namespace Quesadilla
 		private AnimationState AnimationStateAlts;
 		private AnimationState AnimationStateUniHoles;
 
+		AnimationState AnimationStateIncursion;
+		AnimationState AnimationStateSeclimit;
+		AnimationState AnimationStateStormElectric;
+		AnimationState AnimationStateStormGamma;
+		AnimationState AnimationStateStormPlasma;
+		AnimationState AnimationStateStormExotic;
+
 		private Image _sourceMapImage = null;
 		private Bitmap _sourceIskPerMinuteImage = null;
 		private Bitmap _sourceMinedPerMinuteImage = null;
@@ -66,7 +73,15 @@ namespace Quesadilla
 			AnimationStateKills = new AnimationState(state: 0, direction: -1, maximum: 36, pulse: false);
 			AnimationStateIntel = new AnimationState(state: 1, direction: 1, maximum: 18, pulse: false);
 			AnimationStateAlts = new AnimationState(state: 2, direction: -1, maximum: 12, pulse: false);
-			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 36, pulse: true);
+			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 18, pulse: true);
+
+			AnimationStateIncursion = new AnimationState(state: 1, direction: 1, maximum: 8, pulse: true);
+			AnimationStateSeclimit = new AnimationState(state: 3, direction: -1, maximum: 8, pulse: true);
+
+			AnimationStateStormElectric = new AnimationState(state: 3, direction: -1, maximum: 10, pulse: true);
+			AnimationStateStormGamma = new AnimationState(state: 6, direction: -1, maximum: 10, pulse: true);
+			AnimationStateStormPlasma = new AnimationState(state: 9, direction: -1, maximum: 10, pulse: true);
+			AnimationStateStormExotic = new AnimationState(state: 0, direction: -1, maximum: 10, pulse: true);
 
 			EnableMouseTracking = true;
 			SetScreenPosition();
@@ -610,7 +625,7 @@ namespace Quesadilla
 			{
 				//				OverlayMinimap.Visible = true;
 				// Set position based on eve window ?
-				SetScreenPosition();
+				//SetScreenPosition();
 			}
 
 			var c = Program.CharacterList.Where(o => o.CharacterName == Toon).FirstOrDefault();
@@ -657,6 +672,8 @@ namespace Quesadilla
 					AnimationStateKills.GetNextValue(),
 					AnimationStateAlts.GetNextValue(),
 					AnimationStateUniHoles.GetNextValue(),
+					AnimationStateIncursion.GetNextValue(),
+					AnimationStateSeclimit.GetNextValue(),
 				false,
 				Program.MainConfiguration.OverlayMinimapShowOutOfRegion,
 				Program.MainConfiguration.OverlayMinimapSecLimit,

@@ -172,6 +172,12 @@
     <Compile Include="Classes\ZKill\ZKillSequence.cs" />
     <Compile Include="Controllers\OBSController.cs" />
     <Compile Include="Extensions\StringExtentions.cs" />
+    <Compile Include="QuesadillaOverlayDPS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuesadillaOverlayDPS.Designer.cs">
+      <DependentUpon>QuesadillaOverlayDPS.cs</DependentUpon>
+    </Compile>
     <Compile Include="QuesadillaAlertPopup.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -227,12 +233,6 @@
     <Compile Include="QuesadillaOverlayMap.Designer.cs">
       <DependentUpon>QuesadillaOverlayMap.cs</DependentUpon>
     </Compile>
-    <Compile Include="QuesadillaDPSGraph.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="QuesadillaDPSGraph.Designer.cs">
-      <DependentUpon>QuesadillaDPSGraph.cs</DependentUpon>
-    </Compile>
     <Compile Include="QuesadillaSplashScreen.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -266,9 +266,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="QuesadillaOverlayMap.resx">
       <DependentUpon>QuesadillaOverlayMap.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="QuesadillaDPSGraph.resx">
-      <DependentUpon>QuesadillaDPSGraph.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="QuesadillaSplashScreen.resx">
       <DependentUpon>QuesadillaSplashScreen.cs</DependentUpon>

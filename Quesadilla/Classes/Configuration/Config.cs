@@ -150,13 +150,12 @@ namespace Quesadilla.Classes
 
             c.MainWindowItemLocations = DuplicateLocations(MainWindowItemLocations);
 			c.AlertWindowItemLocations = DuplicateLocations(AlertWindowItemLocations);
-            c.OverlayWindowItemLocations = DuplicateLocations(OverlayWindowItemLocations);
+			c.OverlayWindowItemLocations = DuplicateLocations(OverlayWindowItemLocations);
+			c.DPSWindowItemLocations = DuplicateLocations(DPSWindowItemLocations);
 
 			c.InitialPosition = new Point(InitialPosition.X, InitialPosition.Y);
 			c.MainWindowSize = new Size(MainWindowSize.Width, MainWindowSize.Height);
 			c.AlertWindowSize = new Size(AlertWindowSize.Width, AlertWindowSize.Height);
-			c.DPSGraphWindowSize = new Size(DPSGraphWindowSize.Width, DPSGraphWindowSize.Height);
-            c.DPSGraphWindowSizeAdjust = new Point(DPSGraphWindowSizeAdjust.X, DPSGraphWindowSizeAdjust.Y);
 
             return (c);
         }
@@ -195,11 +194,12 @@ namespace Quesadilla.Classes
                 c.InitialPosition = new Point(0, 0);
 				c.MainWindowSize = new Size(760, 404);
 				c.AlertWindowSize = new Size(400, 180);
-				c.DPSGraphWindowSize = new Size(250, 100);
-                c.DPSGraphWindowSizeAdjust = new Point(10, 15);
 
 				c.OverlayMapWindowSize = new Size(600, 350);
 				c.OverlayMapWindowPosition = new Point(275, 1);
+
+				c.OverlayDPSWindowPosition = new Point(1000, 10);
+				c.OverlayDPSWindowSize = new Size(250, 100);
 
 				c.AlertPopupLocation = PopupLocationType.BottomLeft;
                 c.DPSLocation = PopupLocationType.TopRight;
@@ -1071,12 +1071,26 @@ img.rounded-corners {
 					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
 				});
 
+				if (c.DPSWindowItemLocations == null)
+				{
+					c.DPSWindowItemLocations = new List<ConfigurationItemLocationInformation>();
+					c.DPSWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+					{
+						Name = "DPSChart",
+						Color = Color.Aqua,
+						AlternateColor = Color.Orange,
+						BackColor = Color.Transparent,
+						IsVisible = true,
+						Location = new Point(5, 5),
+						Size = new Size(300, 200),
+						Font = new Font("Impact", 10f, FontStyle.Regular),
+					});
+				}
 
 
+				}
 
-			}
-
-			return (c);
+				return (c);
         }
 
         public void Save(string filename)
@@ -1119,7 +1133,7 @@ img.rounded-corners {
         [DisplayName("Milliseconds for main tick")]
         [ReadOnly(true)]
         [Description("How many milliseconds the main tick is - smaller means more occur")]
-        [DefaultValue(typeof(int), "100")]
+        [DefaultValue(typeof(int), "125")]
         public int TickMiliseconds { get; set; }
 
         [Category("Tick Timing")]
@@ -1140,7 +1154,7 @@ img.rounded-corners {
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeDPSGraphUpdate")]
         [Description("How many ticks between DPS graph update")]
-        [DefaultValue(typeof(int), "5")]
+        [DefaultValue(typeof(int), "4")]
         public int HowManyTicksBeforeDPSGraphUpdate { get; set; }
 
 		[Category("Tick Timing")]
@@ -1155,7 +1169,7 @@ img.rounded-corners {
         [ReadOnly(true)]
         [DisplayName("HowManyTicksBeforeLogfileCheck")]
         [Description("How many ticks between logfile checks")]
-        [DefaultValue(typeof(int), "7")]
+        [DefaultValue(typeof(int), "6")]
         public int HowManyTicksBeforeLogfileCheck { get; set; }
 
 		[Category("Tick Timing")]
@@ -1361,13 +1375,6 @@ img.rounded-corners {
         [DefaultValue(typeof(Color), "OrangeRed")]
         public Color AlertPopupMinimapMouseoverSystemColour { get; set; }
 
-        [Category("Alert")]
-        [DisplayName("Transparent")]
-        [Description("Sill the alert show as transparent window - this does not currently work amazingly")]
-        [DefaultValue(typeof(bool), "false")]
-        [ReadOnly(true)]
-        public bool AlertTransparent { get; set; }
-
 		[Category("Main window")]
 		[DisplayName("Minimap Alt Indicator colour")]
 		[Description("Colour to use for the logged in alt indicators on the minimap")]
@@ -1514,38 +1521,16 @@ img.rounded-corners {
         public PopupLocationType DPSLocation { get; set; }
 
         [Category("DPS")]
-        [DisplayName("DPS Graph Window size")]
-        [Description("Size of the DPS graph")]
-        public Size DPSGraphWindowSize { get; set; }
-
-        [Category("DPS")]
-        [DisplayName("DPS Graph Window size adjustment")]
-        [Description("Adjustment pixels to the DPS graph window size")]
-        public Point DPSGraphWindowSizeAdjust { get; set; }
-
-        [Category("DPS")]
-        [DisplayName("Stay On Top")]
-        [Description("Should the DPS Graph stay on top")]
-        [DefaultValue(typeof(bool), "true")]
-        public bool DPSGraphStayOnTop { get; set; }
-
-        [Category("DPS")]
         [DisplayName("Legends")]
         [Description("Show legends on the DPS graph")]
         [DefaultValue(typeof(bool), "false")]
         public bool DPSGraphLegends { get; set; }
 
         [Category("DPS")]
-        [DisplayName("Transparent")]
-        [Description("Should the DPS graph be transparent. If so it will overlay the current eveonline window and be unclickable (clickthrough!)")]
-        [DefaultValue(typeof(bool), "true")]
-        public bool DPSGraphTransparent { get; set; }
-
-        [Category("DPS")]
         [DisplayName("Show DPS")]
         [Description("")]
         [DefaultValue(typeof(bool), "true")]
-        public bool DPSShowWindow { get; set; }
+        public bool ShowWindowOverlayDPS { get; set; }
 
         [Category("DPS")]
         [DisplayName("Combine DPS")]
@@ -2150,8 +2135,6 @@ img.rounded-corners {
         [DefaultValue(typeof(bool), "true")]
         public bool ShowAlertFancyNotification { get; set; }
 
-
-
 		[Category("OverlayMap")]
 		[DisplayName("Overlay map Window size")]
 		[Description("Size of the Overlay map")]
@@ -2536,6 +2519,27 @@ img.rounded-corners {
 		[Category("OverlayMap")]
 		[DisplayName("Item Locations")]
 		public List<ConfigurationItemLocationInformation> OverlayWindowItemLocations { get; set; }
+
+		[Category("DPS")]
+		[DisplayName("DPS Graph alpha")]
+		[Description("Alpha to use for DPS graph")]
+		[DefaultValue(typeof(int), "60")]
+		[Range(0, 100)]
+		public int OverlayDPSGraphAlpha { get; set; }
+
+		[Category("DPS")]
+		[DisplayName("Overlay DPS position inside client")]
+		[Description("Overlay DPS position inside client")]
+		public Point OverlayDPSWindowPosition { get; set; }
+
+		[Category("DPS")]
+		[DisplayName("Overlay DPS Window size")]
+		[Description("Size of the Overlay DPS")]
+		public Size OverlayDPSWindowSize { get; set; }
+
+		[Category("DPS")]
+		[DisplayName("Item Locations")]
+		public List<ConfigurationItemLocationInformation> DPSWindowItemLocations { get; set; }
 
 	}
 }
