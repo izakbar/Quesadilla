@@ -5,7 +5,7 @@ namespace Quesadilla.Classes.Tick
 {
 	public class TickItem
 	{
-		public string _name { get; private set; }
+		public string Name { get; }
 
 		private int _value;
 		private readonly int _maxValue;
@@ -19,7 +19,7 @@ namespace Quesadilla.Classes.Tick
 			int maxValue,
 			Action callback)
 		{
-			_name = name;
+			Name = name;
 			_value = initialValue;
 			_maxValue = maxValue;
 			_callback = callback;
@@ -29,17 +29,23 @@ namespace Quesadilla.Classes.Tick
 
 		public void Increment()
 		{
-			_value++;
+			Interlocked.Increment(ref _value);
 		}
 
 		public bool IsTriggered()
 		{
-			if (_value < _maxValue)
-				return false;
+			while (true)
+			{
+				int current = Volatile.Read(ref _value);
 
-			_value = 0;
-			return true;
+				if (current < _maxValue)
+					return false;
+
+				if (Interlocked.CompareExchange(ref _value, 0, current) == current)
+					return true;
+			}
 		}
+
 
 		public bool TryBeginExecution()
 		{
@@ -48,7 +54,7 @@ namespace Quesadilla.Classes.Tick
 
 		public void EndExecution()
 		{
-			Interlocked.Exchange(ref _running, 0);
+			Volatile.Write(ref _running, 0);
 		}
 
 		public void Execute()

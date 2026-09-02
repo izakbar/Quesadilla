@@ -5,65 +5,53 @@ using System.Drawing.Text;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using System.Diagnostics.Metrics;
-using System.ComponentModel;
 using System.Data;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
-using EVEStandard.Models;
-using System.Collections.Immutable;
-using EVEStandard.API;
 using System.Drawing.Imaging;
-using System.Windows.Media;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
 using Quesadilla.Classes.Configuration;
-using Windows.UI.Composition.Effects;
-using System.Windows.Forms.DataVisualization.Charting;
-using Windows.Devices.Display;
 
 namespace Quesadilla.Classes.ImageGeneration
 {
-    public class ImageGenerator
-    {
-        private const int TRANSPARENT_BORDER_WIDTH = 1;
-        private const int BORDER_WIDTH = 1;
-        private const int TEXT_SIZE = 20;
+	public class ImageGenerator
+	{
+		private const int TRANSPARENT_BORDER_WIDTH = 1;
+		private const int BORDER_WIDTH = 1;
+		private const int TEXT_SIZE = 20;
 
-        private const double MERCOXIT_SECURITY = -0.75;
+		private const double MERCOXIT_SECURITY = -0.75;
 
 		private const int CIRCLE_INITIAL_GAP = 3;
 		private const int CIRCLE_INCREASE_GAP = 7;
 
 		private const double LY_SCALING = 9460000000000;
 
-        private const int CIRCLE_RADIUS = 3;
-        private const int SYSTEM_CIRCLE_SIZE = 6;
-        private const int STORM_CIRCLE_SIZE = 40;
+		private const int CIRCLE_RADIUS = 3;
+		private const int SYSTEM_CIRCLE_SIZE = 6;
+		private const int STORM_CIRCLE_SIZE = 40;
 
 		private const float MINIMUM_TEXT_SIZE = 9;
-        private const int MINIMUM_BLOB_SIZE = 3;
-        private const float MINIMUM_CIRCLE_SIZE = 2.3f;
+		private const int MINIMUM_BLOB_SIZE = 3;
+		private const float MINIMUM_CIRCLE_SIZE = 2.3f;
 
-        public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c, float textSize = MINIMUM_TEXT_SIZE, bool enforceMinimumSize = true )
-        {
-            // ensure we do not go too small
-            if ( enforceMinimumSize && (textSize < MINIMUM_TEXT_SIZE || float.IsInfinity(textSize) ) ) textSize = MINIMUM_TEXT_SIZE;
-            if (float.IsInfinity(textSize)) return;
-            using (Font myfont = new Font("Verdana", textSize, FontStyle.Regular))
-            {
-                g.TextRenderingHint = TextRenderingHint.AntiAlias;
+		public static void DrawSystemName(Graphics g, int X, int Y, string text, Color c, float textSize = MINIMUM_TEXT_SIZE, bool enforceMinimumSize = true)
+		{
+			// ensure we do not go too small
+			if (enforceMinimumSize && (textSize < MINIMUM_TEXT_SIZE || float.IsInfinity(textSize))) textSize = MINIMUM_TEXT_SIZE;
+			if (float.IsInfinity(textSize)) return;
+			using (Font myfont = new Font("Verdana", textSize, FontStyle.Regular))
+			{
+				g.TextRenderingHint = TextRenderingHint.AntiAlias;
 
-                var stringSize = g.MeasureString(text, myfont);
+				var stringSize = g.MeasureString(text, myfont);
 
-                g.DrawString(text, myfont, GDICache.GetBrush(c),
-                    X - (stringSize.Width / 2),
-                    Y + CIRCLE_RADIUS + 2
-                    );
-            }
-        }
+				g.DrawString(text, myfont, GDICache.GetBrush(c),
+					X - (stringSize.Width / 2),
+					Y + CIRCLE_RADIUS + 2
+					);
+			}
+		}
 
 		public static void DrawStorm(string stormType, string location, Graphics g, Point currentPoint, float circleSize, float blobSize, bool outline)
 		{
@@ -155,7 +143,7 @@ namespace Quesadilla.Classes.ImageGeneration
 			}
 			else
 			{
-				using (var circleBrush = 
+				using (var circleBrush =
 					new SolidBrush(Color.FromArgb(baseAlpha, (severityColour == Color.Black ? severityColour : stormFillColour))))
 				{
 					g.FillEllipse(circleBrush, rect);
@@ -261,7 +249,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					diameter);
 			}
 		}
-		public static void DrawPulseOrb(Graphics g,Point center,Color colour,float radius,int? animationCycle,int glowLayers = 4,float pulseSize = 3.0f,int maxAlpha = 100)
+		public static void DrawPulseOrb(Graphics g, Point center, Color colour, float radius, int? animationCycle, int glowLayers = 4, float pulseSize = 3.0f, int maxAlpha = 100)
 		{
 			float pulse = 0;
 			if (animationCycle.HasValue)
@@ -276,20 +264,20 @@ namespace Quesadilla.Classes.ImageGeneration
 			for (int i = glowLayers; i >= 1; i--)
 			{
 				using (Brush glowBrush =
-					new SolidBrush(Color.FromArgb(Math.Max(1, alpha / (i * 2)),colour)))
+					new SolidBrush(Color.FromArgb(Math.Max(1, alpha / (i * 2)), colour)))
 				{
-					float glowRadius =radius + expansion + (i * 2);
+					float glowRadius = radius + expansion + (i * 2);
 					float glowDiameter = glowRadius * 2;
-					g.FillEllipse(glowBrush,center.X - glowRadius,center.Y - glowRadius,glowDiameter,glowDiameter);
+					g.FillEllipse(glowBrush, center.X - glowRadius, center.Y - glowRadius, glowDiameter, glowDiameter);
 				}
 			}
 
 			// core orb
 			float diameter = radius * 2;
-			g.FillEllipse(GDICache.GetBrush(colour),center.X - radius,center.Y - radius,diameter,diameter);
+			g.FillEllipse(GDICache.GetBrush(colour), center.X - radius, center.Y - radius, diameter, diameter);
 		}
 
-		private static void DrawPulseIndicator(Graphics g,Point center,Color colour,float baseRadius,int? animationCycle,float pulseSize = 10.0f,int maxAlpha = 100,int glowLayers = 3,float ringWidth = 2.0f)
+		private static void DrawPulseIndicator(Graphics g, Point center, Color colour, float baseRadius, int? animationCycle, float pulseSize = 10.0f, int maxAlpha = 100, int glowLayers = 3, float ringWidth = 2.0f)
 		{
 			RectangleF rect = new RectangleF(
 				center.X - baseRadius,
@@ -300,7 +288,7 @@ namespace Quesadilla.Classes.ImageGeneration
 			// Static ring if animation disabled
 			if (animationCycle == null)
 			{
-				Pen ringPen = GDICache.GetPen(colour,ringWidth,DashStyle.Solid);
+				Pen ringPen = GDICache.GetPen(colour, ringWidth, DashStyle.Solid);
 				g.DrawEllipse(ringPen, rect);
 				return;
 			}
@@ -314,116 +302,114 @@ namespace Quesadilla.Classes.ImageGeneration
 			// Glow
 			for (int i = glowLayers; i >= 1; i--)
 			{
-				using (Pen glowPen = new Pen(Color.FromArgb(Math.Max(1, alpha / (i * 2)),colour),ringWidth + (i * 2)))
+				using (Pen glowPen = new Pen(Color.FromArgb(Math.Max(1, alpha / (i * 2)), colour), ringWidth + (i * 2)))
 				{
 					glowPen.LineJoin = LineJoin.Round;
-					g.DrawEllipse(glowPen,rect.X - expansion,rect.Y - expansion,rect.Width + (expansion * 2),rect.Height + (expansion * 2));
+					g.DrawEllipse(glowPen, rect.X - expansion, rect.Y - expansion, rect.Width + (expansion * 2), rect.Height + (expansion * 2));
 				}
 			}
 
 			// Permanent ring
-			Pen mainPen =GDICache.GetPen(colour,ringWidth,DashStyle.Solid);
+			Pen mainPen = GDICache.GetPen(colour, ringWidth, DashStyle.Solid);
 			g.DrawEllipse(mainPen, rect);
 		}
 
 
-		public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale, 
-            MapType whichMap, ref string extraInformation, ref List<MinimapSystem> returnMinimapSystems,
-            bool showSystemText,bool showAllSystemsText, bool showConnectingSystemsText,
-            bool Border, Color BorderColor,
-            Color LineColourNormal,
-            Color LineColourOutOfRegion,
-            Color LineColourRoute,
-            Color SystemColourNormal,
-            Color SystemColourRoute,
-            Color SystemColourFrom,
-            Color SystemColourTo,
+		public static Image ClipMiniMap(Image srcImage, PathInfo path, int closeSystems, int mapScale,
+			MapType whichMap, ref string extraInformation, ref List<MinimapSystem> returnMinimapSystems,
+			bool showSystemText, bool showAllSystemsText, bool showConnectingSystemsText,
+			bool Border, Color BorderColor,
+			Color LineColourNormal,
+			Color LineColourOutOfRegion,
+			Color LineColourRoute,
+			Color SystemColourNormal,
+			Color SystemColourRoute,
+			Color SystemColourFrom,
+			Color SystemColourTo,
 			Color SystemColourText, Color SystemColourAllText, Color SystemColourConnectingText,
 			Color ZKillColour,
-            Color IntelColour,
-            Color AltColour,
-            Color UniHoleColour,
-            Color IncursionColour,Color IncursionOutlineColour,
-			Color SecLimitColour,Color SecLimitOutlineColour,
+			Color IntelColour,
+			Color AltColour,
+			Color UniHoleColour,
+			Color IncursionColour, Color IncursionOutlineColour,
+			Color SecLimitColour, Color SecLimitOutlineColour,
 			Color IceColour,
-            Color MercoxitColour,
-            int? animationCycleIntel,
-            int? animationCycleKills,
+			Color MercoxitColour,
+			int? animationCycleIntel,
+			int? animationCycleKills,
 			int? animationCycleAlts,
 			int? animationCycleUniHoles,
 			int? animationIncursion,
 			int? animationCycleSecLimit,
 			bool defaultTextSize = false,
-            bool showOutOfRegion = false,
-            bool showSecLimit = false,
-            int incursionAlphaAmount = 50,
+			bool showOutOfRegion = false,
+			bool showSecLimit = false,
+			int incursionAlphaAmount = 50,
 			int incursionCloudSize = 60,
 			int secLimitAlphaAmount = 50,
 			int secLimitCloudSize = 20,
 			int connectingLineGap = 10,
-            float secLimit = 0.0f
-            )
-        {
+			float secLimit = 0.0f
+			)
+		{
 			double GUI_SCALING = 30;
 
-            Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
 
-            int combinedBorder = TRANSPARENT_BORDER_WIDTH + BORDER_WIDTH;
+			int combinedBorder = TRANSPARENT_BORDER_WIDTH + BORDER_WIDTH;
 
-            StringBuilder sbExtraInformation = new StringBuilder();
+			StringBuilder sbExtraInformation = new StringBuilder();
 
-            Point center = new Point((srcImage.Width / 2) - 1, (srcImage.Height / 2) - 1);
-
-			Brush eraserBrush = GDICache.GetBrush(Color.Black);
+			Point center = new Point((srcImage.Width / 2) - 1, (srcImage.Height / 2) - 1);
 
 			// quick note on x/y coord calcs
 			// dotlan calcs need to be inverted to make sure map displays correctly - not an error
 
-			using (Graphics g = Graphics.FromImage(dstImage))
-            {
+			Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
 
-                Brush backgroundBrush = GDICache.GetBrush(Color.FromArgb(0, Color.PaleGoldenrod));
+			using (Graphics g = Graphics.FromImage(dstImage))
+			{
+
+				Brush backgroundBrush = GDICache.GetBrush(Color.FromArgb(0, Color.PaleGoldenrod));
 				// main background
 				//g.FillRectangle(backgroundBrush, 0, 0, dstImage.Width, dstImage.Height);
 
 				// Border ?
 				if (Border)
-                {
+				{
 					Brush br = GDICache.GetBrush(BorderColor);
-                    g.FillRectangle(br, TRANSPARENT_BORDER_WIDTH, TRANSPARENT_BORDER_WIDTH, dstImage.Width - (TRANSPARENT_BORDER_WIDTH * 2), dstImage.Height - (TRANSPARENT_BORDER_WIDTH * 2));
-                    g.FillRectangle(backgroundBrush, combinedBorder, combinedBorder, dstImage.Width - (combinedBorder * 2), dstImage.Height - (combinedBorder * 2));
-                }
-                else
-                {
-                    g.FillRectangle(backgroundBrush, TRANSPARENT_BORDER_WIDTH, TRANSPARENT_BORDER_WIDTH, dstImage.Width - (TRANSPARENT_BORDER_WIDTH * 2), dstImage.Height - (TRANSPARENT_BORDER_WIDTH * 2));
-                }
+					g.FillRectangle(br, TRANSPARENT_BORDER_WIDTH, TRANSPARENT_BORDER_WIDTH, dstImage.Width - (TRANSPARENT_BORDER_WIDTH * 2), dstImage.Height - (TRANSPARENT_BORDER_WIDTH * 2));
+					g.FillRectangle(backgroundBrush, combinedBorder, combinedBorder, dstImage.Width - (combinedBorder * 2), dstImage.Height - (combinedBorder * 2));
+				}
+				else
+				{
+					g.FillRectangle(backgroundBrush, TRANSPARENT_BORDER_WIDTH, TRANSPARENT_BORDER_WIDTH, dstImage.Width - (TRANSPARENT_BORDER_WIDTH * 2), dstImage.Height - (TRANSPARENT_BORDER_WIDTH * 2));
+				}
 
-                if (path is null || path.FromSystemId == 0 || path.FromSystemId == -1) return dstImage;
-                var FromSystem = Program.Universe.SolarSystems[path.FromSystemId];
+				if (path is null || path.FromSystemId == 0 || path.FromSystemId == -1) return dstImage;
+				var FromSystem = Program.Universe.SolarSystems[path.FromSystemId];
 
-                // add route systems
-                List<MinimapSystem> minimapSystems = new List<MinimapSystem>();
-                List<MinimapConnection> minimapConnectingSystems = new List<MinimapConnection>();
+				// add route systems
+				List<MinimapSystem> minimapSystems = new List<MinimapSystem>();
+				List<MinimapConnection> minimapConnectingSystems = new List<MinimapConnection>();
 
-                SolarSystem previousSystem = FromSystem;
-                foreach (var pathSystem in path.PathSystems)
-                {
-                    var nextSolarSystem = Program.Universe.SolarSystems[pathSystem];
+				SolarSystem previousSystem = FromSystem;
+				foreach (var pathSystem in path.PathSystems)
+				{
+					var nextSolarSystem = Program.Universe.SolarSystems[pathSystem];
 
-                    if (minimapSystems.Where(o => o.solarSystem.Name == nextSolarSystem.Name).Count() == 0)
-                    {
-						
+					if (!minimapSystems.Any(o => o.solarSystem.Name == nextSolarSystem.Name))
+					{
 						minimapSystems.Add(new MinimapSystem()
-                        {
-                            solarSystem = nextSolarSystem,
-                            fromSystem = pathSystem == path.FromSystemId ? true : false,
-                            toSystem = pathSystem == path.ToSystemId ? true : false,
-                            route = true,
-                            textDisplay = (pathSystem == path.FromSystemId || pathSystem == path.ToSystemId) ? true : false,
-                            textDisplayConnecting = false,
-							X = ( 
-                            whichMap == MapType.SDE ? (int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING) :
-                            ( whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.X2D - nextSolarSystem.X2D) / LY_SCALING) :
+						{
+							solarSystem = nextSolarSystem,
+							fromSystem = pathSystem == path.FromSystemId ? true : false,
+							toSystem = pathSystem == path.ToSystemId ? true : false,
+							route = true,
+							textDisplay = (pathSystem == path.FromSystemId || pathSystem == path.ToSystemId) ? true : false,
+							textDisplayConnecting = false,
+							X = (
+							whichMap == MapType.SDE ? (int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING) :
+							(whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.X2D - nextSolarSystem.X2D) / LY_SCALING) :
 							(int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX)))
 							),
 							Y = (
@@ -433,119 +419,118 @@ namespace Quesadilla.Classes.ImageGeneration
 							),
 						});
 
-                        // add connection
-                        if (nextSolarSystem != FromSystem)
-                        {
-                            minimapConnectingSystems.Add(new MinimapConnection()
-                            {
-                                FromSystem = previousSystem,
-                                ToSystem = nextSolarSystem,
-                                route = true,
+						// add connection
+						if (nextSolarSystem != FromSystem)
+						{
+							minimapConnectingSystems.Add(new MinimapConnection()
+							{
+								FromSystem = previousSystem,
+								ToSystem = nextSolarSystem,
+								route = true,
 								P1 = (
-							        whichMap == MapType.SDE ? new Point((int)Math.Round((FromSystem.X - previousSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - previousSystem.Y) / LY_SCALING)) :
-							        (whichMap == MapType.SDE2D ? new Point((int)Math.Round((FromSystem.X2D - previousSystem.X2D) / LY_SCALING), (int)Math.Round((FromSystem.Y2D - previousSystem.Y2D) / LY_SCALING)) :
-							        new Point((int)Math.Round((previousSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((previousSystem.DotlanY - FromSystem.DotlanY))))
-							    ),
+									whichMap == MapType.SDE ? new Point((int)Math.Round((FromSystem.X - previousSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - previousSystem.Y) / LY_SCALING)) :
+									(whichMap == MapType.SDE2D ? new Point((int)Math.Round((FromSystem.X2D - previousSystem.X2D) / LY_SCALING), (int)Math.Round((FromSystem.Y2D - previousSystem.Y2D) / LY_SCALING)) :
+									new Point((int)Math.Round((previousSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((previousSystem.DotlanY - FromSystem.DotlanY))))
+								),
 								P2 = (
 									whichMap == MapType.SDE ? new Point((int)Math.Round((FromSystem.X - nextSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - nextSolarSystem.Y) / LY_SCALING)) :
 									(whichMap == MapType.SDE2D ? new Point((int)Math.Round((FromSystem.X2D - previousSystem.X2D) / LY_SCALING), (int)Math.Round((FromSystem.Y2D - previousSystem.Y2D) / LY_SCALING)) :
 									new Point((int)Math.Round((nextSolarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((nextSolarSystem.DotlanY - FromSystem.DotlanY))))
 								),
-                            });
-                        }
-                        previousSystem = nextSolarSystem;
+							});
+						}
+						previousSystem = nextSolarSystem;
 
-                    }
-                }
+					}
+				}
 
-                // should we use connecting systems too ?
-                if (closeSystems > 0)
-                {
-                    List<MinimapSystem> minimapSystemsAdditional = new List<MinimapSystem>();
-                    for (int Counter = 0; Counter < closeSystems; Counter++)
-                    {
-                        foreach (var mapSystem in minimapSystems)
-                        {
-                            foreach (var connection in mapSystem.solarSystem.ConnectedTo)
-                            {
-                                var linkedSolarSystem = Program.Universe.SolarSystems[connection.ToSystemId];
+				// should we use connecting systems too ?
+				if (closeSystems > 0)
+				{
+					List<MinimapSystem> minimapSystemsAdditional = new List<MinimapSystem>();
+					for (int Counter = 0; Counter < closeSystems; Counter++)
+					{
+						foreach (var mapSystem in minimapSystems)
+						{
+							foreach (var connection in mapSystem.solarSystem.ConnectedTo)
+							{
+								var linkedSolarSystem = Program.Universe.SolarSystems[connection.ToSystemId];
 
-                                if (showOutOfRegion == false && linkedSolarSystem.RegionName != FromSystem.RegionName) continue; // do not add to systems
+								if (showOutOfRegion == false && linkedSolarSystem.RegionName != FromSystem.RegionName) continue; // do not add to systems
 
-                                var linkedMinimapSystem = minimapSystems.Where(o => o.solarSystem.Id == linkedSolarSystem.Id).FirstOrDefault();
-                                if (minimapSystems.Where(o => o.solarSystem.Name == linkedSolarSystem.Name).Count() == 0 &&
-                                    minimapSystemsAdditional.Where(o => o.solarSystem.Name == linkedSolarSystem.Name).Count() == 0)
-                                {
-                                    minimapSystemsAdditional.Add(new MinimapSystem()
-                                    {
-                                        solarSystem = linkedSolarSystem,
-                                        fromSystem = false,
-                                        toSystem = false,
-                                        route = false,
-                                        textDisplay = false,
-										textDisplayConnecting = (linkedSolarSystem.ConnectedTo.Where(o => o.ToSystemId == FromSystem.Id).Count() > 0),
+								var linkedMinimapSystem = minimapSystems.FirstOrDefault(o => o.solarSystem.Id == linkedSolarSystem.Id);
+
+								if (!minimapSystems.Any(o => o.solarSystem.Name == linkedSolarSystem.Name) &&
+									!minimapSystemsAdditional.Any(o => o.solarSystem.Name == linkedSolarSystem.Name))
+								{
+									minimapSystemsAdditional.Add(new MinimapSystem()
+									{
+										solarSystem = linkedSolarSystem,
+										fromSystem = false,
+										toSystem = false,
+										route = false,
+										textDisplay = false,
+										textDisplayConnecting = (linkedSolarSystem.ConnectedTo.Any(o => o.ToSystemId == FromSystem.Id)),
 										X = (
-							                whichMap == MapType.SDE ? (int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING) :
-							                (whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.X2D - linkedSolarSystem.X2D) / LY_SCALING) :
-							                (int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX)))
-							            ),
+											whichMap == MapType.SDE ? (int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING) :
+											(whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.X2D - linkedSolarSystem.X2D) / LY_SCALING) :
+											(int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX)))
+										),
 										Y = (
-							                whichMap == MapType.SDE ? (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING) :
-							                (whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.Y2D - linkedSolarSystem.Y2D) / LY_SCALING) :
+											whichMap == MapType.SDE ? (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING) :
+											(whichMap == MapType.SDE2D ? (int)Math.Round((FromSystem.Y2D - linkedSolarSystem.Y2D) / LY_SCALING) :
 											(int)Math.Round((linkedSolarSystem.DotlanY - FromSystem.DotlanY)))
 										),
 									});
-                                }
+								}
 
-                                // check if connection already saved
-                                if (
-                                    (minimapConnectingSystems.Where(o =>
-                                      (o.FromSystem.Id == mapSystem.solarSystem.Id && o.ToSystem.Id == connection.ToSystemId) ||
-                                      (o.ToSystem.Id == mapSystem.solarSystem.Id && o.FromSystem.Id == connection.ToSystemId)).Count() == 0)
-                                    )
-                                {
-                                    minimapConnectingSystems.Add(new MinimapConnection()
-                                    {
-                                        FromSystem = mapSystem.solarSystem,
-                                        ToSystem = linkedSolarSystem,
-                                        route = (mapSystem.route == true & (linkedMinimapSystem != null && linkedMinimapSystem.route == true)),
-
+								// check if connection already saved
+								if (
+									(!minimapConnectingSystems.Any(o =>
+									  (o.FromSystem.Id == mapSystem.solarSystem.Id && o.ToSystem.Id == connection.ToSystemId) ||
+									  (o.ToSystem.Id == mapSystem.solarSystem.Id && o.FromSystem.Id == connection.ToSystemId)) )
+									)
+								{
+									minimapConnectingSystems.Add(new MinimapConnection()
+									{
+										FromSystem = mapSystem.solarSystem,
+										ToSystem = linkedSolarSystem,
+										route = mapSystem.route && linkedMinimapSystem?.route == true,
 										P1 = (
-									        whichMap == MapType.SDE ? new Point((int)Math.Round((FromSystem.X - mapSystem.solarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - mapSystem.solarSystem.Y) / LY_SCALING)) :
-									        (whichMap == MapType.SDE2D ? new Point((int)Math.Round((FromSystem.X2D - mapSystem.solarSystem.X2D) / LY_SCALING), (int)Math.Round((FromSystem.Y2D - mapSystem.solarSystem.Y2D) / LY_SCALING)) :
+											whichMap == MapType.SDE ? new Point((int)Math.Round((FromSystem.X - mapSystem.solarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - mapSystem.solarSystem.Y) / LY_SCALING)) :
+											(whichMap == MapType.SDE2D ? new Point((int)Math.Round((FromSystem.X2D - mapSystem.solarSystem.X2D) / LY_SCALING), (int)Math.Round((FromSystem.Y2D - mapSystem.solarSystem.Y2D) / LY_SCALING)) :
 											new Point((int)Math.Round((mapSystem.solarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((mapSystem.solarSystem.DotlanY - FromSystem.DotlanY))))
 										),
 
 										P2 = (
-									        whichMap == MapType.SDE ? new Point((int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING)) :
-									        (whichMap == MapType.SDE2D ? new Point((int)Math.Round((FromSystem.X2D - linkedSolarSystem.X2D) / LY_SCALING), (int)Math.Round((FromSystem.Y2D - linkedSolarSystem.Y2D) / LY_SCALING)) :
+											whichMap == MapType.SDE ? new Point((int)Math.Round((FromSystem.X - linkedSolarSystem.X) / LY_SCALING), (int)Math.Round((FromSystem.Y - linkedSolarSystem.Y) / LY_SCALING)) :
+											(whichMap == MapType.SDE2D ? new Point((int)Math.Round((FromSystem.X2D - linkedSolarSystem.X2D) / LY_SCALING), (int)Math.Round((FromSystem.Y2D - linkedSolarSystem.Y2D) / LY_SCALING)) :
 											new Point((int)Math.Round((linkedSolarSystem.DotlanX - FromSystem.DotlanX)), (int)Math.Round((linkedSolarSystem.DotlanY - FromSystem.DotlanY))))
-								        ),
-
+										),
 									});
-                                }
-                            }
-                        }
-                        minimapSystems.AddRange(minimapSystemsAdditional);
-                        minimapSystemsAdditional.Clear();
-                    }
-                }
+								}
+							}
+						}
+						minimapSystems.AddRange(minimapSystemsAdditional);
+						minimapSystemsAdditional.Clear();
+					}
+				}
 
-                // work out scale 
-                int maxX = 0;
-                int maxY = 0;
-                int minX = 0;
-                int minY = 0;
+				// work out scale 
+				int maxX = 0;
+				int maxY = 0;
+				int minX = 0;
+				int minY = 0;
 
-                int sizeAdjust = (int)SYSTEM_CIRCLE_SIZE + (Math.Max(Math.Max(STORM_CIRCLE_SIZE, secLimitCloudSize), incursionCloudSize));
+				int sizeAdjust = (int)SYSTEM_CIRCLE_SIZE + (Math.Max(Math.Max(STORM_CIRCLE_SIZE, secLimitCloudSize), incursionCloudSize));
 
 				foreach (var currentSystem in minimapSystems)
-                {
-                    maxX = Math.Max(maxX, currentSystem.X );
-                    maxY = Math.Max(maxY, currentSystem.Y );
-                    minX = Math.Min(minX, currentSystem.X );
-                    minY = Math.Min(minY, currentSystem.Y );
-                }
+				{
+					maxX = Math.Max(maxX, currentSystem.X);
+					maxY = Math.Max(maxY, currentSystem.Y);
+					minX = Math.Min(minX, currentSystem.X);
+					minY = Math.Min(minY, currentSystem.Y);
+				}
 
 				maxX += sizeAdjust; maxY += sizeAdjust;
 				minX -= sizeAdjust; minY -= sizeAdjust;
@@ -553,71 +538,70 @@ namespace Quesadilla.Classes.ImageGeneration
 				if (minY < 0) { maxY += Math.Abs(minY); minY = 0; }
 
 				//int maxSize = Math.Max((int)(maxX - minX), (int)(maxY - minY));
-                //int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (8);
+				//int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (8);
 
 				double GUI_SCALINGx = (double)(maxX - minX) / (srcImage.Width * (whichMap == MapType.SDE ? .9 : (whichMap == MapType.SDE2D ? .9 : .9)));
-				double GUI_SCALINGy = (double)(maxY - minY)/ (srcImage.Height * (whichMap == MapType.SDE ? .9 : (whichMap == MapType.SDE2D ? .9 : .9)));
+				double GUI_SCALINGy = (double)(maxY - minY) / (srcImage.Height * (whichMap == MapType.SDE ? .9 : (whichMap == MapType.SDE2D ? .9 : .9)));
 				GUI_SCALING = Math.Max(GUI_SCALINGx, GUI_SCALINGy);
 
 				//GUI_SCALING = (int)Math.Round((double)(maxSize) / ((pictureSize * (whichMap == MapType.SDE ? .9 : (whichMap == MapType.SDE2D ? .9 : .9 )) )));
 				GUI_SCALING = GUI_SCALING * (((double)mapScale / 100));
-                // Apply scale
-                maxX = 0; maxY = 0; minX = 0; minY = 0;
-                if (GUI_SCALING > 0)
-                {
-                    foreach (var currentSystem in minimapSystems)
-                    {
-                        currentSystem.X = (int)Math.Round(currentSystem.X / GUI_SCALING);
-                        currentSystem.Y = (int)Math.Round(currentSystem.Y / GUI_SCALING);
+				// Apply scale
+				maxX = 0; maxY = 0; minX = 0; minY = 0;
+				if (GUI_SCALING > 0)
+				{
+					foreach (var currentSystem in minimapSystems)
+					{
+						currentSystem.X = (int)Math.Round(currentSystem.X / GUI_SCALING);
+						currentSystem.Y = (int)Math.Round(currentSystem.Y / GUI_SCALING);
 
-                        maxX = Math.Max(maxX, currentSystem.X);
-                        maxY = Math.Max(maxY, currentSystem.Y);
-                        minX = Math.Min(minX, currentSystem.X);
-                        minY = Math.Min(minY, currentSystem.Y);
-                    }
+						maxX = Math.Max(maxX, currentSystem.X);
+						maxY = Math.Max(maxY, currentSystem.Y);
+						minX = Math.Min(minX, currentSystem.X);
+						minY = Math.Min(minY, currentSystem.Y);
+					}
 
-                    foreach (var connection in minimapConnectingSystems)
-                    {
-                        connection.P1 = new Point((int)Math.Round(connection.P1.X / GUI_SCALING), (int)Math.Round(connection.P1.Y / GUI_SCALING));
-                        connection.P2 = new Point((int)Math.Round(connection.P2.X / GUI_SCALING), (int)Math.Round(connection.P2.Y / GUI_SCALING));
-                    }
-                }
+					foreach (var connection in minimapConnectingSystems)
+					{
+						connection.P1 = new Point((int)Math.Round(connection.P1.X / GUI_SCALING), (int)Math.Round(connection.P1.Y / GUI_SCALING));
+						connection.P2 = new Point((int)Math.Round(connection.P2.X / GUI_SCALING), (int)Math.Round(connection.P2.Y / GUI_SCALING));
+					}
+				}
 
-                int ox = center.X;
-                int oy = center.Y;
+				int ox = center.X;
+				int oy = center.Y;
 
-                if (minimapSystems.Count > 1)
-                {
-                    ox = ((srcImage.Width - (maxX - minX)) / 2) - BORDER_WIDTH - CIRCLE_RADIUS - TRANSPARENT_BORDER_WIDTH - 1;
-                    oy = ((srcImage.Height - (maxY - minY)) / 2) - BORDER_WIDTH - CIRCLE_RADIUS - TRANSPARENT_BORDER_WIDTH - 1;
-                    if (minX < 0) ox = ox + Math.Abs(minX);
-                    if (minY < 0) oy = oy + Math.Abs(minY);
-                }
+				if (minimapSystems.Count > 1)
+				{
+					ox = ((srcImage.Width - (maxX - minX)) / 2) - BORDER_WIDTH - CIRCLE_RADIUS - TRANSPARENT_BORDER_WIDTH - 1;
+					oy = ((srcImage.Height - (maxY - minY)) / 2) - BORDER_WIDTH - CIRCLE_RADIUS - TRANSPARENT_BORDER_WIDTH - 1;
+					if (minX < 0) ox = ox + Math.Abs(minX);
+					if (minY < 0) oy = oy + Math.Abs(minY);
+				}
 
-                // adjust origin
-                Point originPoint = new Point(ox, oy);
+				// adjust origin
+				Point originPoint = new Point(ox, oy);
 
-                float textSize = defaultTextSize == false ? (TEXT_SIZE / (float)GUI_SCALING) : MINIMUM_TEXT_SIZE;
-                if (textSize < MINIMUM_TEXT_SIZE) textSize = MINIMUM_TEXT_SIZE;
+				float textSize = defaultTextSize == false ? (TEXT_SIZE / (float)GUI_SCALING) : MINIMUM_TEXT_SIZE;
+				if (textSize < MINIMUM_TEXT_SIZE) textSize = MINIMUM_TEXT_SIZE;
 
 
-			// draw incursion base if required
-			if (minimapSystems.Where(o => o.solarSystem.Incursion).Count() > 0)
+				// draw incursion base if required
+				if (minimapSystems.Any(o => o.solarSystem.Incursion))
 				{
 					g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 					Brush incursionBrush = GDICache.GetHatchBrush(HatchStyle.Percent50, IncursionColour);
 
 					Brush incursionOutlineBrush = GDICache.GetBrush(IncursionOutlineColour);
-                    Pen incursionOutlinePen = GDICache.GetPen(IncursionOutlineColour, 3);
-					float incursionBlobSize = ((float) incursionCloudSize / (float)GUI_SCALING);
+					Pen incursionOutlinePen = GDICache.GetPen(IncursionOutlineColour, 3);
+					float incursionBlobSize = ((float)incursionCloudSize / (float)GUI_SCALING);
 
-					Image incursionImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
 
-                    ColorMatrix incursionColourMatrix = new ColorMatrix();
-					incursionColourMatrix.Matrix33 = (float)((float)incursionAlphaAmount / (float)100);  // alpha !
 					ImageAttributes incursionImageAttr = new ImageAttributes();
-                    incursionImageAttr.SetColorMatrix(incursionColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+					SetImageAlpha(incursionImageAttr, incursionAlphaAmount);
+				
 
+					using (Image incursionImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb))
 					using (Graphics gIncursion = Graphics.FromImage(incursionImage))
 					{
 
@@ -627,28 +611,26 @@ namespace Quesadilla.Classes.ImageGeneration
 							new Rectangle(0, 0, incursionImage.Width, incursionImage.Height),
 							0, 0, incursionImage.Width, incursionImage.Height,
 							GraphicsUnit.Pixel,
-							incursionImageAttr							
+							incursionImageAttr
 							);
 					}
 				}
 
 				//Seclimit ?
-				if (showSecLimit && minimapSystems.Where(o => o.solarSystem.Security <= secLimit).Count() > 0)
+				if (showSecLimit && minimapSystems.Any(o => o.solarSystem.Security <= secLimit))
 				{
 					g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 					//Brush secLimitBrush = GDICache.GetBrush(SecLimitColour);
 					Brush secLimitBrush = GDICache.GetHatchBrush(HatchStyle.Percent30, SecLimitColour);
 
-					Brush secLimitOutlineBrush = GDICache.GetBrush(SecLimitOutlineColour);
 					Pen secLimitOutlinePen = GDICache.GetPen(SecLimitOutlineColour, 3);
 					float secLimitBlobSize = ((float)secLimitCloudSize / (float)GUI_SCALING);
-					Image secLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
 
-					ColorMatrix secLimitColourMatrix = new ColorMatrix();
-					secLimitColourMatrix.Matrix33 = (float)((float)secLimitAlphaAmount / (float)100);  // alpha !
+				
 					ImageAttributes secLimitImageAttr = new ImageAttributes();
+					SetImageAlpha(secLimitImageAttr, secLimitAlphaAmount);
 
-					secLimitImageAttr.SetColorMatrix(secLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+					using (Image secLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb))
 					using (Graphics gSecLimit = Graphics.FromImage(secLimitImage))
 					{
 						MapCircles(gSecLimit, minimapSystems.Where(o => o.solarSystem.Security <= secLimit).ToList(), originPoint, secLimitBlobSize, secLimitOutlinePen, secLimitBrush, SecLimitOutlineColour, animationCycleSecLimit);
@@ -658,7 +640,7 @@ namespace Quesadilla.Classes.ImageGeneration
 							new Rectangle(0, 0, secLimitImage.Width, secLimitImage.Height),
 							0, 0, secLimitImage.Width, secLimitImage.Height,
 							GraphicsUnit.Pixel,
-							secLimitImageAttr							
+							secLimitImageAttr
 							);
 					}
 				}
@@ -673,18 +655,14 @@ namespace Quesadilla.Classes.ImageGeneration
 				}
 				g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
-				ColorMatrix stormLimitColourMatrix = new ColorMatrix();
 				ImageAttributes stormImageAttr = new ImageAttributes();
 
-
-				Image stormLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
-
 				int stormAlphaAmount = 0;
-                // Draw outlines first
-                // go through systems used 3 times - draw weak first, then strong then centre
-                for (int stormStrength = 0; stormStrength <= 2; stormStrength++)
-                {
-					stormLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
+				// Draw outlines first
+				// go through systems used 3 times - draw weak first, then strong then centre
+				for (int stormStrength = 0; stormStrength <= 2; stormStrength++)
+				{
+					using (Image stormLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb))
 					using (Graphics gStorm = Graphics.FromImage(stormLimitImage))
 					{
 						switch (stormStrength)
@@ -693,38 +671,38 @@ namespace Quesadilla.Classes.ImageGeneration
 							case 1: stormAlphaAmount = 120; break;
 							case 2: stormAlphaAmount = 155; break;
 						}
-						stormLimitColourMatrix.Matrix33 = (float)((float)stormAlphaAmount / (float)255);  // alpha !
-                        stormImageAttr.SetColorMatrix(stormLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                        foreach (var currentSystem in minimapSystems)
-                        {
-                            Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-                            lock (Program.Universe.Storms)
-                            {
-                                foreach (var storm in Program.Universe.Storms)
-                                {
-                                    if (stormStrength == 0 && storm.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id))
-                                        DrawStorm(storm.StormType, "WEAK", gStorm, currentPoint, circleSizeStorm, blobSize, true);
-                                    if (stormStrength == 1 && storm.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id))
-                                        DrawStorm(storm.StormType, "STRONG", gStorm, currentPoint, circleSizeStorm, blobSize, true);
-                                    if (stormStrength == 2 && storm.SystemId == currentSystem.solarSystem.Id)
-                                        DrawStorm(storm.StormType, "CENTRE", gStorm, currentPoint, circleSizeStorm, blobSize, true);
-                                }
-                            }
+						SetImageAlpha(stormImageAttr, stormAlphaAmount);
+
+						foreach (var currentSystem in minimapSystems)
+						{
+							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+							lock (Program.Universe.Storms)
+							{
+								foreach (var storm in Program.Universe.Storms)
+								{
+									if (stormStrength == 0 && storm.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id))
+										DrawStorm(storm.StormType, "WEAK", gStorm, currentPoint, circleSizeStorm, blobSize, true);
+									if (stormStrength == 1 && storm.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id))
+										DrawStorm(storm.StormType, "STRONG", gStorm, currentPoint, circleSizeStorm, blobSize, true);
+									if (stormStrength == 2 && storm.SystemId == currentSystem.solarSystem.Id)
+										DrawStorm(storm.StormType, "CENTRE", gStorm, currentPoint, circleSizeStorm, blobSize, true);
+								}
+							}
 						}
-                        g.DrawImage(
-                            stormLimitImage, // target
-                            new Rectangle(0, 0, stormLimitImage.Width, stormLimitImage.Height), // source
-                            0, 0, stormLimitImage.Width, stormLimitImage.Height,
-                            GraphicsUnit.Pixel,
-                            stormImageAttr
-                            );
-                    }
-                }
+						g.DrawImage(
+							stormLimitImage, // target
+							new Rectangle(0, 0, stormLimitImage.Width, stormLimitImage.Height), // source
+							0, 0, stormLimitImage.Width, stormLimitImage.Height,
+							GraphicsUnit.Pixel,
+							stormImageAttr
+							);
+					}
+				}
 
-                try
-                {
+				try
+				{
 
-					// clear background 
+					// clear background - direct to main graphic
 					foreach (var currentSystem in minimapSystems)
 					{
 						Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
@@ -740,41 +718,39 @@ namespace Quesadilla.Classes.ImageGeneration
 					}
 
 
-                        stormLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
-                        using (Graphics gStorm = Graphics.FromImage(stormLimitImage))
-                        {
-                            stormAlphaAmount = 40;
+					using (Image stormLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb))
+					using (Graphics gStorm = Graphics.FromImage(stormLimitImage))
+					{
+						stormAlphaAmount = 40;
+						SetImageAlpha(stormImageAttr, stormAlphaAmount);
 
-                            stormLimitColourMatrix.Matrix33 = (float)((float)stormAlphaAmount / (float)255);  // alpha !
-                            stormImageAttr.SetColorMatrix(stormLimitColourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-
-                            foreach (var currentSystem in minimapSystems)
-                            {
-                                Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
-                                foreach (var storm in Program.Universe.Storms)
-                                {
+						foreach (var currentSystem in minimapSystems)
+						{
+							Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+							foreach (var storm in Program.Universe.Storms)
+							{
 								if (
 									(storm?.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id)) ||
 									(storm?.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id)) ||
 									(storm?.SystemId == currentSystem.solarSystem.Id)
 									)
 									DrawStorm(storm.StormType, "CENTRE", gStorm, currentPoint, circleSizeStorm, blobSize, false);
-                                }
-                            }
+							}
+						}
 
-                            g.DrawImage(
-                               stormLimitImage, // target
-                               new Rectangle(0, 0, stormLimitImage.Width, stormLimitImage.Height), // source
-                               0, 0, stormLimitImage.Width, stormLimitImage.Height,
-                               GraphicsUnit.Pixel,
-                               stormImageAttr
-                               );
-                        }
-                }
-                catch 
-                {
+						g.DrawImage(
+						   stormLimitImage, // target
+						   new Rectangle(0, 0, stormLimitImage.Width, stormLimitImage.Height), // source
+						   0, 0, stormLimitImage.Width, stormLimitImage.Height,
+						   GraphicsUnit.Pixel,
+						   stormImageAttr
+						   );
+					}
+				}
+				catch
+				{
 
-                }
+				}
 
 				// draw connections
 				foreach (var connection in minimapConnectingSystems)
@@ -803,53 +779,53 @@ namespace Quesadilla.Classes.ImageGeneration
 
 				// draw system blobs
 				foreach (var currentSystem in minimapSystems)
-                {
-                    int circlesUsed = -1;
+				{
+					int circlesUsed = -1;
 
-                    Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
+					Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
 
-                    Color systemBrushColour = SystemColourNormal;
-                    if (currentSystem.route) systemBrushColour = SystemColourRoute;
-                    if (currentSystem.fromSystem) systemBrushColour = SystemColourFrom;
-                    if (currentSystem.toSystem) systemBrushColour = SystemColourTo;
-                    Brush systemBrush = GDICache.GetBrush(systemBrushColour);
-                    g.FillEllipse(systemBrush, currentPoint.X - blobSize, currentPoint.Y - blobSize, blobSize * 2, blobSize * 2);
+					Color systemBrushColour = SystemColourNormal;
+					if (currentSystem.route) systemBrushColour = SystemColourRoute;
+					if (currentSystem.fromSystem) systemBrushColour = SystemColourFrom;
+					if (currentSystem.toSystem) systemBrushColour = SystemColourTo;
+					Brush systemBrush = GDICache.GetBrush(systemBrushColour);
+					g.FillEllipse(systemBrush, currentPoint.X - blobSize, currentPoint.Y - blobSize, blobSize * 2, blobSize * 2);
 
 					// How about mercoxit ?
 					if (currentSystem.solarSystem.Security < MERCOXIT_SECURITY)
 					{
 						DrawSystemName(g, currentPoint.X - 10, currentPoint.Y - 3, "✦", Color.FromArgb(50, MercoxitColour), textSize + 2);
-						DrawSystemName(g, currentPoint.X-10, currentPoint.Y-3, "✦", MercoxitColour, textSize);
+						DrawSystemName(g, currentPoint.X - 10, currentPoint.Y - 3, "✦", MercoxitColour, textSize);
 					}
 
 					// do we have ice !
 					if (currentSystem.solarSystem.IceField == true)
 					{
-						DrawSystemName(g,currentPoint.X + 10,currentPoint.Y - 3,"❅",Color.FromArgb(50, IceColour),textSize + 2);
+						DrawSystemName(g, currentPoint.X + 10, currentPoint.Y - 3, "❅", Color.FromArgb(50, IceColour), textSize + 2);
 						DrawSystemName(g, currentPoint.X + 10, currentPoint.Y - 3, "❅", IceColour, textSize);
 					}
 
 
-                    // Check skyhooks
-                    bool skyhooksVulnerable = false;
-                    bool skyhooksVulnerableSoon = false;
+					// Check skyhooks
+					bool skyhooksVulnerable = false;
+					bool skyhooksVulnerableSoon = false;
 
 					float addX = (float)(6 + (blobSize / 2) / GUI_SCALING);
 					float addY = (float)(20 + (blobSize / 2) / GUI_SCALING);
 
-                    float skyhookTextSize = (float)(10 / GUI_SCALING);
+					float skyhookTextSize = (float)(10 / GUI_SCALING);
 
 					//uint animationCycleSkyhooks = 10;
 
 					DateTime utcNow = DateTime.UtcNow;
-                    if (currentSystem.solarSystem.Planets != null)
-                    {
-                        foreach (var p in currentSystem.solarSystem?.Planets.Where(o => o.SkyhookVulneralbilityStart != null && o.SkyhookVulneralbilityEnd >= utcNow))
-                        {
-                            if (p.SkyhookVulneralbilityStart > utcNow) skyhooksVulnerableSoon = true;
-                            if (p.SkyhookVulneralbilityStart <= utcNow) skyhooksVulnerable = true;
-                        }
-                    }
+					if (currentSystem.solarSystem.Planets != null)
+					{
+						foreach (var p in currentSystem.solarSystem?.Planets.Where(o => o.SkyhookVulneralbilityStart != null && o.SkyhookVulneralbilityEnd >= utcNow))
+						{
+							if (p.SkyhookVulneralbilityStart > utcNow) skyhooksVulnerableSoon = true;
+							if (p.SkyhookVulneralbilityStart <= utcNow) skyhooksVulnerable = true;
+						}
+					}
 
 					if (skyhooksVulnerableSoon)
 					{
@@ -857,7 +833,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					}
 
 					if (skyhooksVulnerable)
-                    {
+					{
 						DrawSystemName(g, currentPoint.X + (int)addX, currentPoint.Y - (int)addY - (int)skyhookTextSize, "◉", Color.LimeGreen, skyhookTextSize);
 					}
 
@@ -865,7 +841,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					int uniHoleAdjust = 0;
 					if (currentSystem.solarSystem.UniHole)
 					{
-						DrawPulseIndicator(g,currentPoint,UniHoleColour,blobSize,animationCycleUniHoles,pulseSize: (25 / (float)GUI_SCALING),maxAlpha: 60,glowLayers: 3,ringWidth: 2.0f);
+						DrawPulseIndicator(g, currentPoint, UniHoleColour, blobSize, animationCycleUniHoles, pulseSize: (25 / (float)GUI_SCALING), maxAlpha: 60, glowLayers: 3, ringWidth: 2.0f);
 						uniHoleAdjust = 1;
 					}
 
@@ -879,15 +855,15 @@ namespace Quesadilla.Classes.ImageGeneration
 						if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
 						DrawPulseIndicator(g, currentPoint, AltColour, blobSize + circleSize, animationCycleAlts, pulseSize: (32 / (float)GUI_SCALING), maxAlpha: 100);
 					}
-					
+
 					// Intel alerts
 					if (currentSystem.solarSystem.CountAlerts(false, false, false) > 0)
 					{
 						circlesUsed++;
 						float circleSize = CIRCLE_INITIAL_GAP + uniHoleAdjust + ((CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING);
 
-						if (circleSize < MINIMUM_CIRCLE_SIZE ||float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
-						DrawPulseIndicator(g,currentPoint,IntelColour,blobSize + circleSize,animationCycleIntel,pulseSize: (40 / (float)GUI_SCALING),maxAlpha: 120,glowLayers: 4,ringWidth: 2.0f);
+						if (circleSize < MINIMUM_CIRCLE_SIZE || float.IsInfinity(circleSize)) circleSize = MINIMUM_CIRCLE_SIZE;
+						DrawPulseIndicator(g, currentPoint, IntelColour, blobSize + circleSize, animationCycleIntel, pulseSize: (40 / (float)GUI_SCALING), maxAlpha: 120, glowLayers: 4, ringWidth: 2.0f);
 						foreach (var a in currentSystem.solarSystem.GetAlerts(false, false, false))
 						{
 							sbExtraInformation.AppendLine($"{a.Entry.LogTime} {a.Entry.LineContent}");
@@ -917,10 +893,10 @@ namespace Quesadilla.Classes.ImageGeneration
 
 				// show all systems names ?
 				if (showAllSystemsText)
-                {
-                    foreach (var currentSystem in minimapSystems.Where(o => ! o.textDisplayConnecting && ! o.textDisplay))
-                    {
-                        DrawSystemName(g, originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y, currentSystem.solarSystem.Name, SystemColourAllText, textSize / 3 * 2, false);
+				{
+					foreach (var currentSystem in minimapSystems.Where(o => !o.textDisplayConnecting && !o.textDisplay))
+					{
+						DrawSystemName(g, originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y, currentSystem.solarSystem.Name, SystemColourAllText, textSize / 3 * 2, false);
 					}
 				}
 
@@ -961,35 +937,37 @@ namespace Quesadilla.Classes.ImageGeneration
 				}
 
 				return dstImage;
-            }
-        }
+			}
+		}
 
-        private static void AddLogoImage(Graphics g, Image srcLogo, RectangleF Outside, RectangleF Inside, Color FillColour, Color LineColour, bool drawBox)
-        {
-            if (drawBox)
-            {
-                Brush brFill = GDICache.GetBrush(FillColour);
-                Pen penLine = GDICache.GetPen(LineColour,1);
-                g.FillRectangle(brFill, Outside);
-                g.DrawRectangle(penLine, Outside.Left, Outside.Top, Outside.Width, Outside.Height);
-            }
+		private static void AddLogoImage(Graphics g, Image srcLogo, RectangleF Outside, RectangleF Inside, Color FillColour, Color LineColour, bool drawBox)
+		{
+			if (drawBox)
+			{
+				Brush brFill = GDICache.GetBrush(FillColour);
+				Pen penLine = GDICache.GetPen(LineColour, 1);
+				g.FillRectangle(brFill, Outside);
+				g.DrawRectangle(penLine, Outside.Left, Outside.Top, Outside.Width, Outside.Height);
+			}
 
 			g.DrawImage(srcLogo, Inside);
 		}
 
 		// makes nice round ellipse/circle images from rectangle images
 		public static Image ClipToCircle(Image srcImage, PointF center, float radius, Color backGround, Color circleColour, int circleWidth, string isk, Color iskColour, bool showBar, Color barColor, Image srcAgressorLogo, Image srcVictimLogo, int iskSize, int logoSize)
-        {
-            Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
+		{
 			float diameter = radius * 2;
 
+			Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
 			using (Graphics g = Graphics.FromImage(dstImage))
 			{
+				int adj = 3;
+
 				// Border
-				RectangleF r2 = new RectangleF(center.X - radius, center.Y - radius, diameter, diameter);
+				RectangleF r2 = new RectangleF(center.X - radius+adj, center.Y - radius+adj, diameter, diameter);
 
 				// Main picture
-				RectangleF r = new RectangleF(center.X - radius + circleWidth, center.Y - radius + circleWidth, diameter - (circleWidth * 2), diameter - (circleWidth * 2));
+				RectangleF r = new RectangleF(center.X - radius + circleWidth, center.Y - radius + circleWidth+adj, diameter - (circleWidth * 2), diameter - ((circleWidth+adj) * 2));
 
 				RectangleF rVictimLogoOutside = new RectangleF(dstImage.Width - logoSize, 1, logoSize, logoSize);
 				RectangleF rVictimLogoInside = new RectangleF(dstImage.Width - logoSize + 2, 3, logoSize - 2, logoSize - 2);
@@ -1003,21 +981,23 @@ namespace Quesadilla.Classes.ImageGeneration
 				if (backGround != Color.Transparent)
 				{
 					// fills background color
-					Brush br = GDICache.GetBrush(backGround);
-					g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
+					//Brush br = GDICache.GetBrush(backGround);
+					//g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
+					g.Clear(backGround);
 				}
 
 				if (circleWidth > 0)
 				{
-					using (GraphicsPath pathborder = new GraphicsPath())
-					{
-						pathborder.AddEllipse(r2);
-						g.SetClip(pathborder);
-					}
+					// Draw glow first
+					Color glowColour = circleColour;
 
-					Brush br = GDICache.GetBrush(circleColour);
-					// Using WIDTH for both makes image square/equal - thus allowing greater height to make isk clearer
-					g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Width);
+					for (int i = 12; i >= 1; i--)
+					{
+						using (Pen glowPen = new Pen(Color.FromArgb(20, glowColour),circleWidth + (i * 4)))
+						{
+							g.DrawEllipse(glowPen, r);
+						}
+					}
 				}
 
 				// adds the new ellipse & draws the image again 
@@ -1029,17 +1009,23 @@ namespace Quesadilla.Classes.ImageGeneration
 					g.ResetClip();
 				}
 
-                using (Font myfont = new Font("Arial", iskSize - 20, FontStyle.Bold))
-                {
-                    var format = new StringFormat
-                    {
-                        Alignment = StringAlignment.Far,
-                        LineAlignment = StringAlignment.Center,
-                        Trimming = StringTrimming.None,
-                    };
-                    if (showBar) g.FillRectangle(GDICache.GetBrush(barColor), 0, dstImage.Height - iskSize, dstImage.Width, iskSize);
-                    g.DrawString(isk, myfont, GDICache.GetBrush(iskColour), new RectangleF(0, (dstImage.Height - iskSize), dstImage.Width, iskSize), format);
-                }
+				using (Pen borderPen = new Pen(Color.White, 2))
+				{
+					g.DrawEllipse(borderPen, r);
+				}
+
+
+				using (Font myfont = new Font("Arial", iskSize - 20, FontStyle.Bold))
+				{
+					var format = new StringFormat
+					{
+						Alignment = StringAlignment.Far,
+						LineAlignment = StringAlignment.Center,
+						Trimming = StringTrimming.None,
+					};
+					if (showBar) g.FillRectangle(GDICache.GetBrush(barColor), 0, dstImage.Height - iskSize, dstImage.Width, iskSize);
+					g.DrawString(isk, myfont, GDICache.GetBrush(iskColour), new RectangleF(0, (dstImage.Height - iskSize), dstImage.Width, iskSize), format);
+				}
 
 				if (srcAgressorLogo != null)
 				{
@@ -1051,12 +1037,12 @@ namespace Quesadilla.Classes.ImageGeneration
 				}
 
 				return dstImage;
-            }
-        }
+			}
+		}
 
 		public static void PaintDrawText(Graphics g, System.Windows.Forms.Label l)
 		{
-            //if (l.Visible == false) return; 
+			//if (l.Visible == false) return; 
 			var flags = TextFormatFlags.Right;
 			if (l.TextAlign == ContentAlignment.TopLeft || l.TextAlign == ContentAlignment.BottomLeft || l.TextAlign == ContentAlignment.MiddleLeft) flags = TextFormatFlags.Left;
 			flags = flags | TextFormatFlags.WordBreak;
@@ -1067,15 +1053,27 @@ namespace Quesadilla.Classes.ImageGeneration
 		}
 
 		public static Size PaintDrawText(PaintEventArgs e, string s, int x, int y, Color c, Font f)
-        {
-            var flags = TextFormatFlags.Left;
-            // if (l.TextAlign == ContentAlignment.TopLeft || l.TextAlign == ContentAlignment.BottomLeft || l.TextAlign == ContentAlignment.MiddleLeft) flags = TextFormatFlags.Left;
-            flags = flags | TextFormatFlags.WordBreak;
-            e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-            Size size = TextRenderer.MeasureText(s, f);
-            TextRenderer.DrawText(e.Graphics, s, f, new Point(x, y), c, flags);
-            return size;
-        }
+		{
+			var flags = TextFormatFlags.Left;
+			// if (l.TextAlign == ContentAlignment.TopLeft || l.TextAlign == ContentAlignment.BottomLeft || l.TextAlign == ContentAlignment.MiddleLeft) flags = TextFormatFlags.Left;
+			flags = flags | TextFormatFlags.WordBreak;
+			e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+			Size size = TextRenderer.MeasureText(s, f);
+			TextRenderer.DrawText(e.Graphics, s, f, new Point(x, y), c, flags);
+			return size;
+		}
 
-    }
+		public static void SetImageAlpha(ImageAttributes attributes, int alphaPercent)
+		{
+			var matrix = new ColorMatrix
+			{
+				Matrix33 = alphaPercent / 100f
+			};
+
+			attributes.SetColorMatrix(
+				matrix,
+				ColorMatrixFlag.Default,
+				ColorAdjustType.Bitmap);
+		}
+	}
 }

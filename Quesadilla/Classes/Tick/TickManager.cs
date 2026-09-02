@@ -11,8 +11,7 @@ namespace Quesadilla.Classes
 		private readonly List<TickItem> _registeredTicks = new List<TickItem>();
 
 		private Thread _workerThread;
-		private bool _running;
-
+		private volatile bool _running;
 		private readonly int TICK_INTERVAL_MS;
 
 		public TickManager(int timer = 200)
@@ -56,7 +55,7 @@ namespace Quesadilla.Classes
 		{
 			lock (_registeredTicks)
 			{
-				if (_registeredTicks.Any(t => t._name == name))
+				if (_registeredTicks.Any(t => t.Name == name))
 					return;
 
 				_registeredTicks.Add(
@@ -72,8 +71,7 @@ namespace Quesadilla.Classes
 		{
 			lock (_registeredTicks)
 			{
-				var tick = _registeredTicks
-					.FirstOrDefault(t => t._name == name);
+				var tick = _registeredTicks.FirstOrDefault(t => t.Name == name);
 
 				if (tick != null)
 				{

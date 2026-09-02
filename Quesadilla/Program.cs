@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
+using Quesadilla.Classes.Alerts;
 using Quesadilla.Classes.ESIData;
 using Quesadilla.Classes.Events;
+using Quesadilla.Classes.EveScout;
+using Quesadilla.Classes.ImageGeneration;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Processes;
 using Quesadilla.Classes.Queues;
@@ -44,26 +47,25 @@ namespace Quesadilla
 
         private static EVEStandardAPI esiClient;
 
-        public static ZKill ZKillHandler = new ZKill();
+        public static ZKill ZKillHandler;
         public static Config MainConfiguration = new Config();
         public static ESIWorker ESIHandler;
-
-        public static UniverseManager Universe;
+		public static EveScoutManager EveScoutProcessor;
+		public static UniverseManager Universe;
 
         public static List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
         public static List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
 
-        public static ConcurrentQueue<AlertQueueItem> NewAlerts = new ConcurrentQueue<AlertQueueItem>();
-        public static ConcurrentQueue<AlertQueueItem> ActiveAlerts = new ConcurrentQueue<AlertQueueItem>();
+        public static AlertQueueManager AlertQueueManager;
 
-        public static  List<LogWatcher> logfileWatchers = new List<LogWatcher>();
-        public static List<Character> CharacterList { get; set; }
+		public static LogWatcherManager LogWatcherManager;
+		public static List<Character> CharacterList { get; set; }
 
         public static ProcessMonitor ProcessMonitorHandler = new ProcessMonitor();
 
-        public static Dictionary<string, List<CombatLine>> Combat = new Dictionary<string, List<CombatLine>>();
-        public static Dictionary<string, List<IskLine>> ISK = new Dictionary<string, List<IskLine>>();
-        public static Dictionary<string, List<MiningLine>> Mining = new Dictionary<string, List<MiningLine>>();
+        public static ConcurrentDictionary<string, List<CombatLine>> Combat = new ConcurrentDictionary<string, List<CombatLine>>();
+        public static ConcurrentDictionary<string, List<IskLine>> ISK = new ConcurrentDictionary<string, List<IskLine>>();
+        public static ConcurrentDictionary<string, List<MiningLine>> Mining = new ConcurrentDictionary<string, List<MiningLine>>();
 
         public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
@@ -78,18 +80,18 @@ namespace Quesadilla
 
             MainConfiguration = Config.Load(configuration_filename);
 
-
-
 			esiClient = new EVEStandardAPI(
                     "Quesadilla",                  // User agent
                     DataSource.Tranquility,         // Server [Tranquility/Singularity]
 					CompatibilityDate.v2026_06_09,
 					TimeSpan.FromSeconds(30));       // Timeout
 
+
             ESIHandler = new ESIWorker(esiClient, Log.Logger);
             Universe = new UniverseManager(esiClient, Log.Logger);
+			EveScoutProcessor = new EveScoutManager(Log.Logger);
 
-            CharacterList = new List<Character>();
+			CharacterList = new List<Character>();
 
             string listeningPort = MainConfiguration.IntegrationPort.ToString();
 
@@ -130,15 +132,31 @@ namespace Quesadilla
 			Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
 			Application.DoEvents();
 
-			splash.SetStatus("Creating Main Window...");
+			splash.SetStatus("Creating Zkill Handler");
+			ZKillHandler = new ZKill();
 			Application.DoEvents();
 
 
+			splash.SetStatus("Creating Logfile Watchers...");
+			Application.DoEvents();
+			LogWatcherManager = new LogWatcherManager(MainConfiguration.HowManyTicksBeforeLogfileCheck * MainConfiguration.TickMiliseconds);
+			Program.SetupLogfileWatchers();
+
+			splash.SetStatus("Creating Alert Queue Manager...");
+			Application.DoEvents();
+			AlertQueueManager = new AlertQueueManager();
+
+			splash.SetStatus("Creating Main Window...");
+			Application.DoEvents();
 			q = new Quesadilla();
 			q.SplashScreen = splash;
 
+			splash.SetStatus("Done.");
+			Application.DoEvents();
+
 			Application.Run(q);
 			MainConfiguration.Save(configuration_filename);
+            GDICache.Clear();
         }
 
         public static void SaveAndReloadConfiguration(Config c)
@@ -155,21 +173,12 @@ namespace Quesadilla
             // load from config
             foreach(var l in MainConfiguration.Logfiles.Where(o => o.Enabled == true))
             {
-                logfileWatchers.Add(new LogWatcher(l.Logfile, l.LogType, l.FriendlyName));
+                LogWatcherManager.AddWatcher(l.Logfile, l.LogType, l.FriendlyName);
             }
 
-            // always add gamelogs and local !
-            logfileWatchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
-            logfileWatchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
-        }
-
-        public static void StartLogfileWatchers()
-        {
-            // start watchers
-            foreach (LogWatcher watcher in logfileWatchers)
-            {
-                watcher.StartWatch();
-            }
+			// always add gamelogs and local !
+			LogWatcherManager.AddWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat");
+			LogWatcherManager.AddWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs");
         }
 
         public static void AddNewCharacter(string characterName)
@@ -218,103 +227,6 @@ namespace Quesadilla
                 }
             }
         }
-
-        public static int ExpireAlerts()
-        {
-            int Expired = 0;
-
-            lock (ActiveAlerts)
-            {
-                bool removedAlert = true;
-                while (ActiveAlerts.Count > 0 && removedAlert)
-                {
-                    var alert = ActiveAlerts.First();
-                    DateTime timeAdded = alert.Entry != null ? alert.Entry.TimeAdded : alert.Kill.TimeAdded;
-                    var diffInSeconds = (DateTime.Now - timeAdded).TotalSeconds;
-                    if (diffInSeconds > Program.MainConfiguration.ExpireAlertSeconds)
-                    {
-
-                        Program.ActiveAlerts.TryDequeue(out alert);
-                        Expired++;
-
-                        // expired so dequeue
-                        if (!alert.isFaction && !alert.isDecloak && alert.Kill == null && alert.Path != null)
-                        {
-                            // remove alert to solarsystem info
-                            var solarSystem = Universe.SolarSystems[alert.Path.ToSystemId];
-                            solarSystem.RemoveAlert(alert);
-						}
-						removedAlert = true;
-                    }
-                    else
-                    {
-                        removedAlert = false;
-                    }
-                }
-            }
-            return Expired;
-        }
-
-        public static void EnqueueNewAlert(AlertQueueItem alert, ConcurrentQueue<AlertQueueItem> q)
-        {
-            // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
-            lock (q)
-            {
-                try
-                {
-                    var checkZkillAlerts = 0;
-                    // check if zkill already exists
-                    if (alert.Kill != null)
-                    {
-                        checkZkillAlerts =
-                            ActiveAlerts.Where(o => (o.Kill != null && o.Kill.ID == alert.Kill.ID)).ToList().Count() +
-                            q.Where(o => (o.Kill != null && o.Kill.ID == alert.Kill.ID)).ToList().Count();
-                    }
-                    var foundAlerts = NewAlerts.Where(
-                        o => (
-                        (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId) || (o.AlertText == alert.AlertText)
-                        || (o.Kill != null && alert.Kill != null && o.Kill.ID == alert.Kill.ID)
-                        )).ToList();
-
-                    if ( (foundAlerts.Count == 0 || q.Count == 0) && checkZkillAlerts == 0)
-                    {
-                        alert.RouteText = Program.Universe.PathToString(alert.Path);
-                        q.Enqueue(alert);
-                    }
-                    if (foundAlerts.Count != 0)
-                    {
-                        if (foundAlerts.First().Path != null && alert.Path != null && alert.Path.TotalJumps < foundAlerts.First().Path.TotalJumps)
-                        {
-                            foundAlerts.First().Path = alert.Path;
-                            foundAlerts.First().AlertText = alert.AlertText;
-                            foundAlerts.First().Entry = alert.Entry;
-                            foundAlerts.First().Context = alert.Context;
-                            foundAlerts.First().RouteText = alert.RouteText;
-                            foundAlerts.First().SoundFile = alert.SoundFile;
-                            foundAlerts.First().ShowAlert = alert.ShowAlert;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex.Message);
-                    if (ex.InnerException != null)
-                    {
-                        Log.Debug(ex.InnerException.Message);
-                    }
-                }
-            }
-        }
-
-        public static void EnqueueActiveAlert(AlertQueueItem alert)
-        {
-            ActiveAlerts.Enqueue(alert);
-            if ( alert.Path != null && alert.Path.ToSystemId != null )
-            {
-                Program.Universe.AddAlert(alert.Path.ToSystemId, alert);
-            }
-        }
-
         public static string GetIskLastHour(string toon)
         {
             var ret = "";
@@ -491,7 +403,7 @@ namespace Quesadilla
             {
 
                 bool removedEntry = true;
-                while (removedEntry && Combat[k].Count > 0)
+                while (removedEntry && Combat[k].Any())
                 {
                     removedEntry = false;
                     lock (Combat[k])
@@ -553,16 +465,6 @@ namespace Quesadilla
                 return imageFile;
             }
             return (Image)null;
-        }
-
-        public static void LogfileWatchersProcessing()
-        {
-            // progress logfiles
-            foreach (LogWatcher watcher in logfileWatchers)
-            {
-                watcher.Tick();
-            }
-
         }
         private static void ConfigureSerilog()
         {

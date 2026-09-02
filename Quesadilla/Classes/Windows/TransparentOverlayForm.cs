@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Quesadilla.Classes.InterOp;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
@@ -17,44 +19,6 @@ namespace Quesadilla.Classes
 		/// through them). Set this BEFORE calling ApplyTransparentOverlayStyle().
 		/// </summary>
 
-		[DllImport("user32.dll", SetLastError = true)]
-		private static extern bool UpdateLayeredWindow(
-			IntPtr hwnd, IntPtr hdcDst, ref POINT pptDst, ref SIZE psize,
-			IntPtr hdcSrc, ref POINT pprSrc, int crKey, ref BLENDFUNCTION pblend, int dwFlags);
-
-		[DllImport("user32.dll")]
-		private static extern IntPtr GetDC(IntPtr hWnd);
-
-		[DllImport("user32.dll")]
-		private static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
-
-		[DllImport("gdi32.dll")]
-		private static extern IntPtr CreateCompatibleDC(IntPtr hdc);
-
-		[DllImport("gdi32.dll")]
-		private static extern bool DeleteDC(IntPtr hdc);
-
-		[DllImport("gdi32.dll")]
-		private static extern IntPtr SelectObject(IntPtr hdc, IntPtr hbitmap);
-
-		[DllImport("gdi32.dll")]
-		private static extern bool DeleteObject(IntPtr hObject);
-
-		[DllImport("user32.dll")]
-		private static extern bool GetCursorPos(out POINT lpPoint);
-
-		[StructLayout(LayoutKind.Sequential)]
-		private struct POINT { public int X, Y; public POINT(int x, int y) { X = x; Y = y; } }
-
-		[StructLayout(LayoutKind.Sequential)]
-		private struct SIZE { public int cx, cy; public SIZE(int cx, int cy) { this.cx = cx; this.cy = cy; } }
-
-
-		[StructLayout(LayoutKind.Sequential)]
-		private struct BLENDFUNCTION
-		{
-			public byte BlendOp, BlendFlags, SourceConstantAlpha, AlphaFormat;
-		}
 
 		// mouse tracking
 		private readonly Timer _mouseTrackTimer = new Timer();
@@ -62,17 +26,11 @@ namespace Quesadilla.Classes
 		private bool _mouseWasInside = false;
 		private bool _enableMouseTracking = false;
 
-		private const int ULW_ALPHA = 0x02;
-		private const byte AC_SRC_OVER = 0x00;
-		private const byte AC_SRC_ALPHA = 0x01;
-
-		private const int WS_EX_LAYERED = 0x80000;
-		private const int WS_EX_TRANSPARENT = 0x20;
-		private const int WS_EX_NOACTIVATE = 0x08000000;
-		private const int WS_EX_TOOLWINDOW = 0x00000080;
-
-
-		private Bitmap _renderBitmap = null;
+		private IntPtr _memDc;
+		private IntPtr _dibBitmap;
+		private IntPtr _dibBits;
+		private Bitmap _bitmap;
+		private IntPtr _oldBitmap;
 
 		public TransparentOverlayForm()
 		{
@@ -98,42 +56,39 @@ namespace Quesadilla.Classes
 			SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque, true);
 			if (IsHandleCreated) RecreateHandle();
 
-
 		}
 
 		protected virtual void RenderOverlay(Graphics g) { }
-		private void UpdateLayered(Bitmap bitmap)
-		{
-			IntPtr screenDc = GetDC(IntPtr.Zero);
-			IntPtr memDc = CreateCompatibleDC(screenDc);
-			IntPtr hBitmap = IntPtr.Zero;
-			IntPtr oldBitmap = IntPtr.Zero;
+		public void UpdateLayered(
+				IntPtr hwnd,
+				int left,
+				int top)
+			{
+			IntPtr screenDc = User32NativeMethods.GetDC(IntPtr.Zero);
 
 			try
 			{
-				hBitmap = bitmap.GetHbitmap(Color.FromArgb(0)); // preserve per-pixel alpha
-				oldBitmap = SelectObject(memDc, hBitmap);
+				var dst = new User32NativeMethods.POINT(left, top);
+				var src = new User32NativeMethods.POINT(0, 0);
+				
+				var size = new User32NativeMethods.SIZE(_bitmap.Width, _bitmap.Height);
 
-				var size = new SIZE(bitmap.Width, bitmap.Height);
-				var pointSrc = new POINT(0, 0);
-				var topPos = new POINT(Left, Top);
-
-				var blend = new BLENDFUNCTION
+				var blend = new User32NativeMethods.BLENDFUNCTION
 				{
-					BlendOp = AC_SRC_OVER,
+					BlendOp = User32NativeMethods.AC_SRC_OVER,
 					BlendFlags = 0,
 					SourceConstantAlpha = 255, // per-pixel alpha drives blending, not a global fade
-					AlphaFormat = AC_SRC_ALPHA
+					AlphaFormat = User32NativeMethods.AC_SRC_ALPHA
 				};
 
-				UpdateLayeredWindow(Handle, screenDc, ref topPos, ref size, memDc, ref pointSrc, 0, ref blend, ULW_ALPHA);
+				if (!User32NativeMethods.UpdateLayeredWindow(hwnd, screenDc, ref dst, ref size, _memDc, ref src, 0, ref blend, User32NativeMethods.ULW_ALPHA))
+				{
+					
+				}
 			}
 			finally
 			{
-				SelectObject(memDc, oldBitmap);
-				if (hBitmap != IntPtr.Zero) DeleteObject(hBitmap);
-				DeleteDC(memDc);
-				ReleaseDC(IntPtr.Zero, screenDc);
+				User32NativeMethods.ReleaseDC(IntPtr.Zero, screenDc);
 			}
 		}
 
@@ -143,20 +98,38 @@ namespace Quesadilla.Classes
 			RenderAndUpdate();
 		}
 
+		private void DestroySurface()
+		{
+			_bitmap?.Dispose();
+			_bitmap = null;
+
+			if (_oldBitmap != IntPtr.Zero)
+			{
+				User32NativeMethods.SelectObject(_memDc, _oldBitmap);
+				_oldBitmap = IntPtr.Zero;
+			}
+
+			if (_dibBitmap != IntPtr.Zero)
+			{
+				User32NativeMethods.DeleteObject(_dibBitmap);
+				_dibBitmap = IntPtr.Zero;
+			}
+
+			_dibBits = IntPtr.Zero;
+		}
+
+
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize(e);
 
-			if (_renderBitmap != null)
+			if (_memDc != IntPtr.Zero &&
+				Width > 0 &&
+				Height > 0)
 			{
-				_renderBitmap.Dispose();
-				_renderBitmap = null;
+				CreateSurface(Width, Height);
 			}
 
-			if (Width > 0 && Height > 0)
-			{
-				_renderBitmap = new Bitmap(Width,Height,PixelFormat.Format32bppArgb);
-			}
 			RenderAndUpdate();
 		}
 
@@ -166,15 +139,18 @@ namespace Quesadilla.Classes
 
 		public void RenderAndUpdate()
 		{
-			if (DesignMode || !IsHandleCreated) return;
-			if (Width <= 0 || Height <= 0) return;
-
-			if (_renderBitmap == null)
+			if (InvokeRequired)
 			{
-				_renderBitmap = new Bitmap(Width, Height, PixelFormat.Format32bppArgb);
+				BeginInvoke(new Action(RenderAndUpdate));
+				return;
 			}
 
-			using (var g = Graphics.FromImage(_renderBitmap))
+			if (DesignMode || !IsHandleCreated) return;
+			if (Width <= 0 || Height <= 0) return;
+			if (_bitmap == null) return;
+
+
+			using (var g = Graphics.FromImage(_bitmap))
 			{
 				g.Clear(Color.Transparent);
 				g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -182,7 +158,7 @@ namespace Quesadilla.Classes
 				RenderOverlay(g);
 			}
 
-			UpdateLayered(_renderBitmap);
+			UpdateLayered(Handle, Left, Top);
 		}
 
 		// Never steals focus from the EVE client when shown.
@@ -197,8 +173,8 @@ namespace Quesadilla.Classes
 				if (!DesignMode)
 				{
 
-					cp.ExStyle |= WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW;
-						cp.ExStyle |= WS_EX_TRANSPARENT;
+					cp.ExStyle |= User32NativeMethods.WS_EX_LAYERED | User32NativeMethods.WS_EX_NOACTIVATE | User32NativeMethods.WS_EX_TOOLWINDOW;
+						cp.ExStyle |= User32NativeMethods.WS_EX_TRANSPARENT;
 				}
 
 				return cp;
@@ -230,7 +206,7 @@ namespace Quesadilla.Classes
 		private void MouseTrackTimer_Tick(object sender, EventArgs e)
 		{
 			if (!IsHandleCreated || !Visible) return;
-			if (!GetCursorPos(out POINT screenPt)) return;
+			if (!User32NativeMethods.GetCursorPos(out User32NativeMethods.POINT screenPt)) return;
 
 			Point clientPt = PointToClient(new Point(screenPt.X, screenPt.Y));
 			bool inside = ClientRectangle.Contains(clientPt);
@@ -256,13 +232,16 @@ namespace Quesadilla.Classes
 		{
 			if (disposing)
 			{
-				_mouseTrackTimer.Dispose();
+				DestroySurface();
 
-				if (_renderBitmap != null)
-				{
-					_renderBitmap.Dispose();
-					_renderBitmap = null;
-				}
+				_mouseTrackTimer.Tick -= MouseTrackTimer_Tick;
+				_mouseTrackTimer.Dispose();
+			}
+
+			if (_memDc != IntPtr.Zero)
+			{
+				User32NativeMethods.DeleteDC(_memDc);
+				_memDc = IntPtr.Zero;
 			}
 			base.Dispose(disposing);
 		}
@@ -270,11 +249,80 @@ namespace Quesadilla.Classes
 		protected override void OnHandleCreated(EventArgs e)
 		{
 			base.OnHandleCreated(e);
+
+			DestroySurface();
+
+				if (_memDc != IntPtr.Zero)
+				{
+					User32NativeMethods.DeleteDC(_memDc);
+					_memDc = IntPtr.Zero;
+				}
+				_memDc = User32NativeMethods.CreateCompatibleDC(IntPtr.Zero);
 			if (Width > 0 && Height > 0)
 			{
-				_renderBitmap = new Bitmap(Width,Height,PixelFormat.Format32bppArgb);
+
+				CreateSurface(Width, Height);
 			}
+
 			if (EnableMouseTracking) _mouseTrackTimer.Enabled = true;
+		}
+
+		protected override void OnHandleDestroyed(EventArgs e)
+		{
+			DestroySurface();
+
+			if (_memDc != IntPtr.Zero)
+			{
+				User32NativeMethods.DeleteDC(_memDc);
+				_memDc = IntPtr.Zero;
+			}
+
+			base.OnHandleDestroyed(e);
+		}
+
+		public void Resize(int width, int height)
+		{
+			CreateSurface(width, height);
+		}
+
+
+		private void CreateSurface(int width, int height)
+		{
+			DestroySurface();
+
+			var bmi = new User32NativeMethods.BITMAPINFO();
+
+			bmi.bmiHeader.biSize =
+				(uint)Marshal.SizeOf(typeof(User32NativeMethods.BITMAPINFOHEADER));
+
+			bmi.bmiHeader.biWidth = width;
+
+			// top-down bitmap
+			bmi.bmiHeader.biHeight = -height;
+
+			bmi.bmiHeader.biPlanes = 1;
+			bmi.bmiHeader.biBitCount = 32;
+			bmi.bmiHeader.biCompression = User32NativeMethods.BI_RGB;
+
+			_dibBitmap = User32NativeMethods.CreateDIBSection(
+				IntPtr.Zero,
+				ref bmi,
+				User32NativeMethods.DIB_RGB_COLORS,
+				out _dibBits,
+				IntPtr.Zero,
+				0);
+
+			if (_dibBitmap == IntPtr.Zero)
+				throw new Win32Exception(Marshal.GetLastWin32Error());
+
+			_oldBitmap = User32NativeMethods.SelectObject(_memDc,_dibBitmap);
+
+			_bitmap = new Bitmap(
+				width,
+				height,
+				width * 4,
+				PixelFormat.Format32bppPArgb,
+				_dibBits);
 		}
 
 		protected virtual void OnOverlayMouseMove(Point clientLocation) { }

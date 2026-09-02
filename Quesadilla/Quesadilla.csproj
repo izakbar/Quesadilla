@@ -101,13 +101,16 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\AnimationState.cs" />
+    <Compile Include="Classes\Alerts\AlertQueueManager.cs" />
+    <Compile Include="Classes\Alerts\AlertTextType.cs" />
+    <Compile Include="Classes\ImageGeneration\Animation\AnimationManager.cs" />
+    <Compile Include="Classes\ImageGeneration\Animation\AnimationState.cs" />
     <Compile Include="Classes\Attributes\IsColourAttribute.cs" />
-    <Compile Include="Classes\EVEOPreview\EveOAgression.cs" />
-    <Compile Include="Classes\EVEOPreview\EveOAlertClient.cs" />
-    <Compile Include="Classes\EVEOPreview\EveOClient.cs" />
-    <Compile Include="Classes\EVEOPreview\EveOEnvelope.cs" />
-    <Compile Include="Classes\EVEOPreview\EveOSystemUpdate.cs" />
+    <Compile Include="Classes\InterOp\EVEOPreview\EveOAgression.cs" />
+    <Compile Include="Classes\InterOp\EVEOPreview\EveOAlertClient.cs" />
+    <Compile Include="Classes\InterOp\EVEOPreview\EveOClient.cs" />
+    <Compile Include="Classes\InterOp\EVEOPreview\EveOEnvelope.cs" />
+    <Compile Include="Classes\InterOp\EVEOPreview\EveOSystemUpdate.cs" />
     <Compile Include="Classes\Extensions\DateTimeExtensions.cs" />
     <Compile Include="Classes\GraphData\CombatGraphData.cs" />
     <Compile Include="Classes\Configuration\ConfigurationItemLocationInformation.cs" />
@@ -119,7 +122,9 @@
     <Compile Include="Classes\EveScout\EveScoutStorm.cs" />
     <Compile Include="Classes\GraphData\IskGraphData.cs" />
     <Compile Include="Classes\GraphData\MinedGraphData.cs" />
+    <Compile Include="Classes\ImageGeneration\Animation\AnimationTypes.cs" />
     <Compile Include="Classes\ImageGeneration\GDICache.cs" />
+    <Compile Include="Classes\InterOp\User32NativeMethods.cs" />
     <Compile Include="Classes\Logfile\CombatLine.cs" />
     <Compile Include="Classes\Configuration\CSSData.cs" />
     <Compile Include="Classes\Configuration\LogfileConfig.cs" />
@@ -138,10 +143,11 @@
     <Compile Include="Classes\Extensions\PropertyGridExtensions.cs" />
     <Compile Include="Classes\ImageGeneration\ImageGenerator.cs" />
     <Compile Include="Classes\Logfile\IskLine.cs" />
+    <Compile Include="Classes\Logfile\LogWatcherManager.cs" />
     <Compile Include="Classes\Logfile\MiningLine.cs" />
     <Compile Include="Classes\MiningDetails.cs" />
-    <Compile Include="Classes\Processes\ProcessInfo.cs" />
-    <Compile Include="Classes\Processes\ProcessMonitor.cs" />
+    <Compile Include="Classes\InterOp\Processes\ProcessInfo.cs" />
+    <Compile Include="Classes\InterOp\Processes\ProcessMonitor.cs" />
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
     <Compile Include="Classes\Resources\QuesadillaSound.cs" />
     <Compile Include="Classes\ItemType.cs" />
@@ -162,13 +168,9 @@
     <Compile Include="Classes\ZKill\ZKillR2Z2.cs" />
     <Compile Include="Classes\ZKill\ZKillR2Z2Data.cs" />
     <Compile Include="Classes\ZKill\ZKillR2Z2ESI.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedisQ.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedisQAttacker.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedisQKillmail.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedisQVictim.cs" />
-    <Compile Include="Classes\ZKill\ZkillRedisQZkb.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedistQData.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedistQPackage.cs" />
+    <Compile Include="Classes\ZKill\ZKillAttacker.cs" />
+    <Compile Include="Classes\ZKill\ZKillVictim.cs" />
+    <Compile Include="Classes\ZKill\ZkillZkb.cs" />
     <Compile Include="Classes\ZKill\ZKillSequence.cs" />
     <Compile Include="Controllers\OBSController.cs" />
     <Compile Include="Extensions\StringExtentions.cs" />
@@ -195,7 +197,7 @@
     <Compile Include="Classes\Events\ProcessCombatEventArgs.cs" />
     <Compile Include="Classes\Events\ProcessNewDataEventArgs.cs" />
     <Compile Include="Classes\Events\ProcessSystemChangeEventArgs.cs" />
-    <Compile Include="Classes\Queues\AlertQueueItem.cs" />
+    <Compile Include="Classes\Alerts\AlertQueueItem.cs" />
     <Compile Include="Classes\Queues\HeapPriorityQueue.cs" />
     <Compile Include="Classes\InterestingFile.cs" />
     <Compile Include="Classes\Queues\IPriorityQueue.cs" />
@@ -507,6 +509,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\Wormholes\" />
+    <Folder Include="External Files\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

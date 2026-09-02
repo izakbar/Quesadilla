@@ -2,15 +2,11 @@
 using Quesadilla.Classes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Quesadilla.Classes.SolarSystems;
-using System.Xml.Xsl;
 using Cyotek.Windows.Forms;
 using Quesadilla.Classes.Extensions;
 
@@ -25,7 +21,7 @@ namespace Quesadilla
         private QuesadillaAlertPopup _alertPopup;
         private AlertQueueItem _dummyAlert;
 
-        private bool formLoaded = false;
+        private bool _formLoaded = false;
 
 
         public QuesadillaConfiguration(Config configuration, MenuItem configWindowMenu, Quesadilla mainForm)
@@ -95,7 +91,7 @@ namespace Quesadilla
             lblDPSGraphLineSize.Text = _configuration.DPSGraphLineSize.ToString();
             lblShowLastUnexpiredAlerts.Text = _configuration.ShowLastUnexpiredAlerts.ToString();
 
-            formLoaded = true;
+            _formLoaded = true;
             ShowAlertBitmap();
 
             ConfigurationProperties.SelectedObject = new CustomPropertyExtractorWrapper(_configuration);
@@ -135,22 +131,26 @@ namespace Quesadilla
 
         private void ShowAlertBitmap()
         {
-            if (!formLoaded) return;
+            if (!_formLoaded) return;
 
-            if ( _alertPopup != null )
-            {
-                _alertPopup.Close();
-            }
-            _alertPopup = new QuesadillaAlertPopup(_dummyAlert, _configuration, Program.LoadImageFromFile(_configuration.AlertPopupBackground), _mainForm);
+			_alertPopup?.Close();
+			_alertPopup?.Dispose();
+
+			_alertPopup = new QuesadillaAlertPopup(_dummyAlert, _configuration, Program.LoadImageFromFile(_configuration.AlertPopupBackground), _mainForm);
             _alertPopup.Show();
             _alertPopup.Hide();
-            alertDemo.Image = GetFormImageWithoutBorders(_alertPopup);
-        }
+            var _oldBitmap = alertDemo.Image;
+			alertDemo.Image = GetFormImageWithoutBorders(_alertPopup);
+            _oldBitmap?.Dispose();
+		}
 
         private void QuesadillaConfiguration_FormClosing(object sender, FormClosingEventArgs e)
         {
             _configMenu.Enabled = true;
-        }
+
+			_alertPopup?.Dispose();
+			alertDemo.Image?.Dispose();
+		}
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {

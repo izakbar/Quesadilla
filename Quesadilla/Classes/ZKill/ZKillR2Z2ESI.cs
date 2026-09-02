@@ -10,7 +10,7 @@ namespace Quesadilla.Classes.ZKill
 	public class ZKillR2Z2ESI
 	{
 		[JsonPropertyName("attackers")]
-		public List<ZKillRedisQAttacker> Attackers { get; set; }
+		public List<ZKillAttacker> Attackers { get; set; }
 		[JsonPropertyName("killmail_id")]
 		public long ID { get; set; }
 
@@ -21,7 +21,7 @@ namespace Quesadilla.Classes.ZKill
 		public long SolarSystemId { get; set; }
 
 		[JsonPropertyName("victim")]
-		public ZKillRedisQVictim Victim { get; set; }
+		public ZKillVictim Victim { get; set; }
 
 	}
 }

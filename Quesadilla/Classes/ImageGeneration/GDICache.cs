@@ -1,79 +1,78 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Helpers;
 
 namespace Quesadilla.Classes.ImageGeneration
 {
-	public class GDICache
+	public static class GDICache
 	{
-		private static readonly Dictionary<PenCacheKey, Pen> _penCache = new Dictionary<PenCacheKey, Pen>();
-		private static readonly Dictionary<int, Brush> BrushCache = new Dictionary<int, Brush>();
-		private static readonly Dictionary<BrushCacheKey, HatchBrush> HatchBrushCache = new Dictionary<BrushCacheKey, HatchBrush>();
+		private static readonly ConcurrentDictionary<PenCacheKey, Pen> _penCache = new ConcurrentDictionary<PenCacheKey, Pen>();
+		private static readonly ConcurrentDictionary<int, SolidBrush> _brushCache = new ConcurrentDictionary<int, SolidBrush>();
+		private static readonly ConcurrentDictionary<BrushCacheKey, HatchBrush> _hatchBrushCache = new ConcurrentDictionary<BrushCacheKey, HatchBrush>();
 
-		public static Brush GetBrush(Color color)
+		public static void Clear()
+		{
+			foreach (var pen in _penCache.Values)
+				pen.Dispose();
+
+			foreach (var brush in _brushCache.Values)
+				brush.Dispose();
+
+			foreach (var brush in _hatchBrushCache.Values)
+				brush.Dispose();
+
+			_penCache.Clear();
+			_brushCache.Clear();
+			_hatchBrushCache.Clear();
+		}
+
+		public static SolidBrush GetBrush(Color color)
 		{
 			int key = color.ToArgb();
 
-			if (!BrushCache.TryGetValue(key, out Brush brush))
-			{
-				brush = new SolidBrush(color);
-				BrushCache[key] = brush;
-			}
-
-			return brush;
+			return _brushCache.GetOrAdd(
+				key,
+				_ => new SolidBrush(color));
 		}
-
-		public static HatchBrush GetHatchBrush(HatchStyle hatchStyle,Color foreColor,Color backColor)
+		public static HatchBrush GetHatchBrush(
+			HatchStyle hatchStyle,
+			Color foreColor,
+			Color backColor)
 		{
 			var key = new BrushCacheKey(
 				hatchStyle,
 				foreColor,
 				backColor);
 
-			if (!HatchBrushCache.TryGetValue(key, out HatchBrush brush))
-			{
-				brush = new HatchBrush(
+			return _hatchBrushCache.GetOrAdd(
+				key,
+				_ => new HatchBrush(
 					hatchStyle,
 					foreColor,
-					backColor);
-
-				HatchBrushCache[key] = brush;
-			}
-
-			return brush;
+					backColor));
 		}
-		public static HatchBrush GetHatchBrush(HatchStyle hatchStyle,Color foreColor)
+		public static HatchBrush GetHatchBrush(HatchStyle hatchStyle, Color foreColor)
 		{
 			return GetHatchBrush(
 				hatchStyle,
 				foreColor,
 				Color.Black);
 		}
-
-		public static Pen GetPen(
-			Color color,
-			float width,
-			DashStyle dashStyle)
+		public static Pen GetPen(Color color, float width, DashStyle dashStyle)
 		{
 			var key = new PenCacheKey(
 				color,
 				width,
 				dashStyle);
 
-			if (!_penCache.TryGetValue(key, out Pen pen))
+			return _penCache.GetOrAdd(key, _ =>
 			{
-				pen = new Pen(color, width);
-				pen.DashStyle = dashStyle;
-
-				_penCache[key] = pen;
-			}
-
-			return pen;
+				return new Pen(color, width)
+				{
+					DashStyle = dashStyle
+				};
+			});
 		}
 		public static Pen GetPen(
 			Color color,
@@ -82,10 +81,9 @@ namespace Quesadilla.Classes.ImageGeneration
 		{
 			return GetPen(color, width, DashStyle.Solid);
 		}
+	}
 
-		}
-
-		public struct PenCacheKey : IEquatable<PenCacheKey>
+	public readonly struct PenCacheKey : IEquatable<PenCacheKey>
 	{
 		public readonly int Argb;
 		public readonly int WidthX10;
@@ -121,7 +119,7 @@ namespace Quesadilla.Classes.ImageGeneration
 			}
 		}
 	}
-	public struct BrushCacheKey : IEquatable<BrushCacheKey>
+	public readonly struct BrushCacheKey : IEquatable<BrushCacheKey>
 	{
 		public readonly HatchStyle HatchStyle;
 		public readonly int ForeColor;

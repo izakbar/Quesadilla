@@ -152,10 +152,11 @@ namespace Quesadilla.Classes.Dotlan
 					hc.DefaultRequestHeaders.Add("User-Agent", Program.UserAgent);
                     hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
 
-                    var response = hc.GetAsync(URL).Result;
-                    if (response.IsSuccessStatusCode)
+                    var response = hc.GetAsync(URL).GetAwaiter().GetResult();
+
+					if (response.IsSuccessStatusCode)
                     {
-                        strContent = response.Content.ReadAsStringAsync().Result;
+                        strContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     }
                     else
                     {
@@ -238,10 +239,10 @@ namespace Quesadilla.Classes.Dotlan
                         hc.DefaultRequestHeaders.IfNoneMatch.Add(new EntityTagHeaderValue(LastDotlanDeltaETAG));
                     }
 
-                    var response = hc.GetAsync(URL).Result;
+                    var response = hc.GetAsync(URL).GetAwaiter().GetResult();
                     if (response.IsSuccessStatusCode)
                     {
-                        strContent = response.Content.ReadAsStringAsync().Result;
+                        strContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
                         // if Last Modified set - then set expiry of data
                         if (response.Content.Headers.LastModified.HasValue)

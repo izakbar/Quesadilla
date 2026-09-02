@@ -7,6 +7,7 @@ using Quesadilla.Classes.Queues;
 using Serilog;
 using Serilog.Core;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Drawing.Drawing2D;
@@ -32,9 +33,9 @@ namespace Quesadilla.Classes.SolarSystems
 		public Dictionary<string, int> Names = new Dictionary<string, int>();
         public Dictionary<int, ItemType> ItemTypes = new Dictionary<int, ItemType>();
 
-        public Dictionary<int, ESICharacter> ESICharacters = new Dictionary<int, ESICharacter>();
+        public ConcurrentDictionary<int, ESICharacter> ESICharacters = new ConcurrentDictionary<int, ESICharacter>();
 
-        private Dictionary<string, PathInfo> _pathfindingCache = new Dictionary<string, PathInfo>();
+        private ConcurrentDictionary<string, PathInfo> _pathfindingCache = new ConcurrentDictionary<string, PathInfo>();
 
         public Dictionary<string, DateTime> DotlanMapRegions = new Dictionary<string, DateTime>();
         public DateTime DotlanDeltaRegions;
@@ -51,41 +52,40 @@ namespace Quesadilla.Classes.SolarSystems
 
         public void ReadSolarSystems(string jsonFile)
         {
-            StreamReader reader = new StreamReader(jsonFile);
-            var json = reader.ReadToEnd();
-
-            SolarSystems = JsonSerializer.Deserialize<Dictionary<int, SolarSystem>>(json);
-            DotlanDeltaRegions = DateTime.Now.AddDays(-10);
-            foreach (var s in SolarSystems)
+            using (StreamReader reader = new StreamReader(jsonFile))
             {
-                Names.Add(s.Value.Name, s.Key);
-                s.Value.SetNameRegex();
+                var json = reader.ReadToEnd();
 
-                if ( ! DotlanMapRegions.ContainsKey(s.Value.RegionName) )
+                SolarSystems = JsonSerializer.Deserialize<Dictionary<int, SolarSystem>>(json);
+                DotlanDeltaRegions = DateTime.Now.AddDays(-10);
+                foreach (var s in SolarSystems)
                 {
-                    DotlanMapRegions.Add(s.Value.RegionName, DateTime.Now.AddDays(-10));
+                    Names.Add(s.Value.Name, s.Key);
+                    s.Value.SetNameRegex();
+
+                    if (!DotlanMapRegions.ContainsKey(s.Value.RegionName))
+                    {
+                        DotlanMapRegions.Add(s.Value.RegionName, DateTime.Now.AddDays(-10));
+                    }
                 }
             }
-            reader.Close();
         }
         public void ReadItemTypes(string jsonFile)
         {
-            StreamReader reader = new StreamReader(jsonFile);
-            var json = reader.ReadToEnd();
-
-            ItemTypes = JsonSerializer.Deserialize<Dictionary<int, ItemType>>(json);
-        }
-        public void ReadESICharacters(string jsonFile)
+			var json = File.ReadAllText(jsonFile);
+			ItemTypes = JsonSerializer.Deserialize<Dictionary<int, ItemType>>(json);
+		}
+		public void ReadESICharacters(string jsonFile)
         {
             try
             {
                 if (File.Exists(jsonFile))
                 {
-                    StreamReader reader = new StreamReader(jsonFile);
-                    var json = reader.ReadToEnd();
-                    ESICharacters = JsonSerializer.Deserialize<Dictionary<int, ESICharacter>>(json);
-                    reader.Close() ;
-                }
+                    using (StreamReader reader = new StreamReader(jsonFile))
+                    {
+                        var json = reader.ReadToEnd();
+                        ESICharacters = JsonSerializer.Deserialize<ConcurrentDictionary<int, ESICharacter>>(json);
+                    }                }
             }
             catch (Exception ex)
             {
@@ -115,14 +115,12 @@ namespace Quesadilla.Classes.SolarSystems
                 FromSystemId = fromSystemId,
                 ToSystemId = toSystemId
             };
-            // don't do any work if path already exists.
-            if (_pathfindingCache.ContainsKey(pathInfo.PathId))
-            {
-                _log.Debug("Pathid " + pathInfo.PathId + " already exists");
-                return (_pathfindingCache[pathInfo.PathId]);
-            }
-
-            _log.Debug("Pathid " + pathInfo.PathId + " does not exist - building");
+			// don't do any work if path already exists.
+			if (_pathfindingCache.TryGetValue(pathInfo.PathId, out var cachedPath))
+			{
+				return cachedPath;
+			}
+			_log.Debug("Pathid " + pathInfo.PathId + " does not exist - building");
             if (fromSystemId == 0) return (null); 
             SolarSystem fromSystem = SolarSystems[fromSystemId];
             SolarSystem toSystem = SolarSystems[toSystemId];
@@ -205,49 +203,32 @@ namespace Quesadilla.Classes.SolarSystems
                 return null;
             }
 
-            _log.Debug("Found path");
-            try
-            {
-                _pathfindingCache.Add(FoundPath.PathId, FoundPath);
-            }
-            catch
-            {
+			_log.Debug("Found path");
+			_pathfindingCache.TryAdd(FoundPath.PathId, FoundPath);
 
-            }
-            return (FoundPath);
-        }
+			return (FoundPath);
+		}
 
-        public string GetCharacterName(int characterId)
-        {
-            if ( ESICharacters.ContainsKey(characterId) ) 
-            {
-                return ESICharacters[characterId].CharacterName;
-            }
-            if ( characterId == 0 )
-            {
-                return "*NO ONE*";
-            }
-            try
-            {
-                var characterInfo = _esiClient.Character.GetCharacterPublicInfoAsync(characterId).Result;
-                ESICharacters.Add(characterId, new ESICharacter()
-                {
-                    CharacterId = characterId,
-                    CharacterName = characterInfo.Model.Name,
-                });
-                return characterInfo.Model.Name;
-            }
-            catch ( Exception ex) { 
-                _log.Error(ex.Message); 
-                if ( ex.InnerException != null )
-                {
-                    _log.Error(ex.InnerException.Message);
-                }
-                return "**ESIERROR**";
-            }
-        }
+		public string GetCharacterName(int characterId)
+		{
+			if (characterId == 0) return "*NO ONE*";
 
-        public string PathToString(PathInfo path)
+			ESICharacter character;
+			if (ESICharacters.TryGetValue(characterId, out character))
+			{
+				return character.CharacterName;
+			}
+
+			var characterInfo = _esiClient.Character.GetCharacterPublicInfoAsync(characterId).GetAwaiter().GetResult();
+			ESICharacters.TryAdd(characterId, new ESICharacter
+			{
+				CharacterId = characterId,
+				CharacterName = characterInfo.Model.Name
+			});
+			return characterInfo.Model.Name;
+		}
+
+		public string PathToString(PathInfo path)
         {
             string route = "";
             if (path != null)
@@ -290,22 +271,36 @@ namespace Quesadilla.Classes.SolarSystems
             return returnSystems;
         }
 
-        public List<int> FindConnections(int systemId, int jumps)
-        {
+		public List<int> FindConnections(int systemId, int jumps)
+		{
+			return FindConnections(systemId, jumps, new HashSet<int> { systemId });
+		}
+
+		private List<int> FindConnections(int systemId, int jumps, HashSet<int> visited)
+		{
 			HashSet<int> data = new HashSet<int>();
 
-			foreach (var system in Program.Universe.SolarSystems[systemId].ConnectedTo)
+			foreach (var system in SolarSystems[systemId].ConnectedTo)
 			{
-                data.Add(system.ToSystemId);
+				if (!visited.Add(system.ToSystemId))
+				{
+					continue;
+				}
+
+				data.Add(system.ToSystemId);
+
 				if (jumps > 1)
 				{
-					foreach( var sys in FindConnections(system.ToSystemId, jumps-1) ) {
+					foreach (var sys in FindConnections(system.ToSystemId, jumps - 1, visited))
+					{
 						data.Add(sys);
 					}
 				}
 			}
+
 			return data.ToList();
-        }
+		}
+
 		public void GetSystemInfo(int systemid)
 		{
 			// check if we need to pull data from ESI for system (planets/moons/belts)

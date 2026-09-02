@@ -1,6 +1,9 @@
-﻿using EVEStandard.Models;
-using HtmlAgilityPack;
+﻿using EVEStandard;
+using EVEStandard.Models;
+using Microsoft.IdentityModel.Tokens;
+using Quesadilla.Classes.Dotlan;
 using Quesadilla.Classes.Events;
+using Quesadilla.Classes.EveScout;
 using Quesadilla.Classes.SolarSystems;
 using Quesadilla.Classes.ZKill;
 using Serilog;
@@ -9,19 +12,18 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Policy;
+using System.Net.Http.Headers;
+using System.Numerics;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Forms;
 
 namespace Quesadilla.Classes.EveScout
 {
     public class EveScoutManager
     {
-        private ILogger log = Log.ForContext<EveScoutManager>();
+		private readonly ILogger _log;
 		public List<EveScoutWH> Signatures = new List<EveScoutWH>();
 		public List<EveScoutStorm> Storms = new List<EveScoutStorm>();
 
@@ -35,11 +37,13 @@ namespace Quesadilla.Classes.EveScout
         public const int SYSTEMID_THERA = 31000005;
         public const int SYSTEMID_TURNUR = 30002086;
 
-        //        public event EventHandler<ZKillEventArgs> ZKillEventHandler;
+		//        public event EventHandler<ZKillEventArgs> ZKillEventHandler;
 
-        public EveScoutManager()
-        {
-            Worker = new BackgroundWorker();
+		public EveScoutManager(ILogger Log)
+		{
+			_log = Log;
+
+			Worker = new BackgroundWorker();
             Worker.WorkerSupportsCancellation = true;
             Worker.WorkerReportsProgress = false;
             Worker.DoWork += this.DoWork;
@@ -68,19 +72,19 @@ namespace Quesadilla.Classes.EveScout
 
         public void Pause()
         {
-            Log.Error("EveScout processing PAUSED");
+            _log.Error("EveScout processing PAUSED");
             FeedPaused = true;
         }
         public void Resume()
         {
-            Log.Error("EveScout processing RESUMED");
+            _log.Error("EveScout processing RESUMED");
             FeedPaused = false;
         }
 
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //            log.Information("zkill done");
+            //            _log.Information("zkill done");
         }
 
         private void DoWork(object sender, DoWorkEventArgs e)
@@ -109,7 +113,7 @@ namespace Quesadilla.Classes.EveScout
 			string strContent = string.Empty;
 			try
 			{
-				Log.Information($"Getting Weather Data from EveScout");
+				_log.Information($"Getting Weather Data from EveScout");
 				HttpClient hc = new HttpClient();
 				string URL = $"https://evescoutrescue.com/home/stormtrack.php";
 				var response = hc.GetAsync(URL).Result;
@@ -124,14 +128,14 @@ namespace Quesadilla.Classes.EveScout
 			}
 			catch
 			{
-				log.Error($"EveScout for Weather request failed");
+				_log.Error($"EveScout for Weather request failed");
 				return;
 			}
 
 			// if we have an error - sleep a long time - consider pause
 			if (strContent == "Error")
 			{
-				log.Error("Getting error back from EveScout Weather - sleeping worker");
+				_log.Error("Getting error back from EveScout Weather - sleeping worker");
 				Thread.Sleep(500000);
 				return;
 			}
@@ -156,8 +160,7 @@ namespace Quesadilla.Classes.EveScout
                         if (weatherCells == null || weatherCells.Count < 3)
                             continue;
 
-
-                        var parsedSystemId = (long)Program.Universe.SolarSystems.Values.Where(o => o.Name == weatherCells[1].InnerText.Trim()).FirstOrDefault()?.Id;
+						var parsedSystemId = Program.Universe.SolarSystems.Values.FirstOrDefault(o => o.Name == weatherCells[1].InnerText.Trim())?.Id ?? 0;
 						Storms.Add(new EveScoutStorm()
                         {
 							RegionName = weatherCells[1].InnerText.Trim(),
@@ -171,7 +174,7 @@ namespace Quesadilla.Classes.EveScout
             }
             catch (Exception ex)
             {
-                log.Error($"EveScout Weather request failed");
+                _log.Error(ex, $"EveScout Weather request failed");
                 return;
             }
 		}
@@ -181,7 +184,7 @@ namespace Quesadilla.Classes.EveScout
             string strContent = string.Empty;
             try
             {
-                Log.Information($"Getting WH Data from EveScout for {whConnector}");
+                _log.Information($"Getting WH Data from EveScout for {whConnector}");
                 HttpClient hc = new HttpClient();
                 string URL = $"https://api.eve-scout.com/v2/public/signatures?system_name={whConnector}";
                 var response = hc.GetAsync(URL).Result;
@@ -196,14 +199,14 @@ namespace Quesadilla.Classes.EveScout
             }
             catch
             {
-                log.Error($"EveScout for {whConnector} request failed");
+                _log.Error($"EveScout for {whConnector} request failed");
                 return;
             }
 
             // if we have an error - sleep a long time - consider pause
             if (strContent == "Error")
             {
-                log.Error("Getting error back from EveScout - sleeping worker");
+                _log.Error("Getting error back from EveScout - sleeping worker");
                 Thread.Sleep(500000);
                 return;
             }
@@ -227,7 +230,7 @@ namespace Quesadilla.Classes.EveScout
             }
             catch (Exception ex)
             {
-                log.Error($"EveScout for {whConnector} request failed");
+                _log.Error(ex, $"EveScout for {whConnector} request failed");
                 return;
             }
         }

@@ -25,18 +25,7 @@ namespace Quesadilla
 	public partial class QuesadillaOverlayMap : TransparentOverlayForm
 	{
 		private Quesadilla _main;
-		private AnimationState AnimationStateKills;
-		private AnimationState AnimationStateIntel;
-		private AnimationState AnimationStateAlts;
-		private AnimationState AnimationStateUniHoles;
-
-		AnimationState AnimationStateIncursion;
-		AnimationState AnimationStateSeclimit;
-		AnimationState AnimationStateStormElectric;
-		AnimationState AnimationStateStormGamma;
-		AnimationState AnimationStateStormPlasma;
-		AnimationState AnimationStateStormExotic;
-
+		private AnimationManager _animationManager = new AnimationManager();
 		private Image _sourceMapImage = null;
 		private Bitmap _sourceIskPerMinuteImage = null;
 		private Bitmap _sourceMinedPerMinuteImage = null;
@@ -44,7 +33,6 @@ namespace Quesadilla
 		private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
 		private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
 		private Point mouseOverPoint;
-		private int mapScale = 100;
 
 		public Label RattingData = new Label() { Name = "RattingData" };
 		public Label MiningData = new Label() { Name = "MiningData" };
@@ -67,103 +55,80 @@ namespace Quesadilla
 			_main = mainForm;
 			InitializeComponent();
 
-			Width = Program.MainConfiguration.OverlayMapWindowSize.Width <= 100 ? 100 : Program.MainConfiguration.OverlayMapWindowSize.Width;
-			Height = Program.MainConfiguration.OverlayMapWindowSize.Height <= 50 ? 50 : Program.MainConfiguration.OverlayMapWindowSize.Height;
-
-			AnimationStateKills = new AnimationState(state: 0, direction: -1, maximum: 36, pulse: false);
-			AnimationStateIntel = new AnimationState(state: 1, direction: 1, maximum: 18, pulse: false);
-			AnimationStateAlts = new AnimationState(state: 2, direction: -1, maximum: 12, pulse: false);
-			AnimationStateUniHoles = new AnimationState(state: 3, direction: -1, maximum: 18, pulse: true);
-
-			AnimationStateIncursion = new AnimationState(state: 1, direction: 1, maximum: 8, pulse: true);
-			AnimationStateSeclimit = new AnimationState(state: 3, direction: -1, maximum: 8, pulse: true);
-
-			AnimationStateStormElectric = new AnimationState(state: 3, direction: -1, maximum: 10, pulse: true);
-			AnimationStateStormGamma = new AnimationState(state: 6, direction: -1, maximum: 10, pulse: true);
-			AnimationStateStormPlasma = new AnimationState(state: 9, direction: -1, maximum: 10, pulse: true);
-			AnimationStateStormExotic = new AnimationState(state: 0, direction: -1, maximum: 10, pulse: true);
+			Width = Math.Max(Program.MainConfiguration.OverlayMapWindowSize.Width, 100);
+			Height = Math.Max(Program.MainConfiguration.OverlayMapWindowSize.Height, 50);
 
 			EnableMouseTracking = true;
 			SetScreenPosition();
 
-			this.Controls.Add(RattingData);
-			this.Controls.Add(MiningData);
-			this.Controls.Add(EveScoutStatus);
-			this.Controls.Add(Minimap);
-
-			this.Controls.Add(iskPerMinuteChart);
-			this.Controls.Add(minedPerMinuteChart);
+			Controls.AddRange(new Control[] {
+				RattingData,
+				MiningData,
+				EveScoutStatus,
+				Minimap,
+				iskPerMinuteChart,
+				minedPerMinuteChart
+			});
 
 			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.OverlayWindowItemLocations, 0, false, false, true);
 
-			mapScale = Program.MainConfiguration.OverlayMapMapScale;
-			if (mapScale == 0) mapScale = 100;
-
-
-			// need these alpha values to be configurable
-			ColorMatrix colourMatrix = new ColorMatrix();
-			colourMatrix.Matrix33 = (float)((float)Program.MainConfiguration.OverlayMinimapAlpha / (float)100);  // alpha !
-			ImageAttrMainMap.SetColorMatrix(colourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-
-			colourMatrix = new ColorMatrix();
-			colourMatrix.Matrix33 = (float)((float)Program.MainConfiguration.OverlayISKGraphAlpha / (float)100);  // alpha !
-			ImageAttrISKGraph.SetColorMatrix(colourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-
-			colourMatrix = new ColorMatrix();
-			colourMatrix.Matrix33 = (float)((float)Program.MainConfiguration.OverlayMinedGraphAlpha / (float)100);  // alpha !
-			ImageAttrMinedGraph.SetColorMatrix(colourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+			ImageGenerator.SetImageAlpha(ImageAttrMainMap, Program.MainConfiguration.OverlayMinimapAlpha);
+			ImageGenerator.SetImageAlpha(ImageAttrISKGraph, Program.MainConfiguration.OverlayISKGraphAlpha);
+			ImageGenerator.SetImageAlpha(ImageAttrMinedGraph, Program.MainConfiguration.OverlayMinedGraphAlpha);
 
 			SetupPerMinuteCharts();
+		}
+		private void ConfigureChart(Chart chart, string areaName)
+		{
+			var chartArea = new ChartArea(areaName)
+			{
+				BackColor = Color.Transparent
+			};
+
+			chart.ChartAreas.Add(chartArea);
+			chart.BackColor = Color.Transparent;
+
+			chart.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
+			chart.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
+			chart.ChartAreas[0].AxisX.IsMarginVisible = false;
 		}
 
 		private void SetupPerMinuteCharts()
 		{
-			ChartArea chartArea = new ChartArea("ISK");
-			chartArea.BackColor = Color.Transparent;
-			iskPerMinuteChart.ChartAreas.Add(chartArea);
-			iskPerMinuteChart.BackColor = Color.Transparent;
+			ConfigureChart(iskPerMinuteChart, "ISK");
+			ConfigureChart(minedPerMinuteChart, "Mining");
 
-			iskPerMinuteChart.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
-			iskPerMinuteChart.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
+			_sourceIskPerMinuteImage = new Bitmap(
+				iskPerMinuteChart.Width,
+				iskPerMinuteChart.Height,
+				PixelFormat.Format32bppPArgb);
 
-			iskPerMinuteChart.ChartAreas[0].AxisX.IsMarginVisible = false;
+			_sourceMinedPerMinuteImage = new Bitmap(
+				minedPerMinuteChart.Width,
+				minedPerMinuteChart.Height,
+				PixelFormat.Format32bppPArgb);
 
-			_sourceIskPerMinuteImage = new Bitmap(iskPerMinuteChart.Width, iskPerMinuteChart.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-
-
-			chartArea = new ChartArea("Mining");
-			chartArea.BackColor = Color.Transparent;
-			minedPerMinuteChart.ChartAreas.Add(chartArea);
-			minedPerMinuteChart.BackColor = Color.Transparent;
-
-			minedPerMinuteChart.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
-			minedPerMinuteChart.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
-
-			minedPerMinuteChart.ChartAreas[0].AxisX.IsMarginVisible = false;
-
-			_sourceMinedPerMinuteImage = new Bitmap(minedPerMinuteChart.Width, minedPerMinuteChart.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-
-
-			xPerMinuteTimer = new Timer()
+			xPerMinuteTimer = new Timer
 			{
-				Interval = 5000,
-				Enabled = false,
+				Interval = 5000
 			};
+
 			xPerMinuteTimer.Tick += (s, e) => UpdatePerMinuteChart();
 			xPerMinuteTimer.Start();
 		}
+
 
 		private void UpdateIskPerMinuteChart()
 		{
 			iskPerMinuteChart.Series.Clear();
 			string Toon = "";
 
-			if (_main.CurrentActiveToon != null && _main.CurrentActiveToon != "")
+			if (!string.IsNullOrEmpty(_main.CurrentActiveToon))
 			{
 				Toon = _main.CurrentActiveToon;
 			}
 
-			if (Toon == null || Toon == "" || !Program.ISK.ContainsKey(Toon))
+			if (string.IsNullOrEmpty(Toon) || !Program.ISK.ContainsKey(Toon))
 			{
 				iskPerMinuteChart.Visible = false;
 				return;
@@ -202,19 +167,18 @@ namespace Quesadilla
 			DateTime end = start;
 
 			// work out start/end times of combat - for cuirrent/all toons
-			foreach (var currToon in Program.ISK.Keys)
+			lock(Program.ISK.Keys)
+				foreach(var currToon in Program.ISK.Keys)
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
-					if (Program.ISK[currToon].Count > 0)
+					if (Program.ISK[currToon].Any())
 					{
 						if (Program.ISK[currToon].First().TimeAdded < start) start = Program.ISK[currToon].First().TimeAdded;
 						if (Program.ISK[currToon].Last().TimeAdded > end) end = Program.ISK[currToon].Last().TimeAdded;
 					}
 				}
 			}
-			TimeSpan totalTime = end - start;
-
 			var span = 60;
 
 			DateTime curr = start;
@@ -222,12 +186,12 @@ namespace Quesadilla
 			start = curr;
 
 
-			foreach (var currToon in Program.ISK.Keys)
+			foreach (var currToon in Program.ISK.Keys.ToArray())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
 					// setup second slots
-					foreach (var c in Program.ISK[currToon].OrderBy(o => o.TimeAdded).ToList())
+					foreach (var c in Program.ISK[currToon].ToArray()  /*.OrderBy(o => o.TimeAdded).ToList()*/ )
 					{
 						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds / span);
 						if (!_iskGraphData.ContainsKey(slot))
@@ -328,7 +292,18 @@ namespace Quesadilla
 
 
 			// Store graph to image
-			if (_sourceIskPerMinuteImage != null) _sourceIskPerMinuteImage.Dispose();
+			if (_sourceIskPerMinuteImage == null ||
+				_sourceIskPerMinuteImage.Width != iskPerMinuteChart.Width || _sourceIskPerMinuteImage.Height != iskPerMinuteChart.Height)
+			{
+				_sourceIskPerMinuteImage?.Dispose();
+
+				_sourceIskPerMinuteImage = new Bitmap(iskPerMinuteChart.Width,iskPerMinuteChart.Height);
+			}
+			using (var g = Graphics.FromImage(_sourceIskPerMinuteImage))
+			{
+				g.Clear(Color.Transparent);
+			}
+
 			if (totalIsk > 0)
 			{
 				_sourceIskPerMinuteImage = new Bitmap(iskPerMinuteChart.Width, iskPerMinuteChart.Height);
@@ -345,12 +320,12 @@ namespace Quesadilla
 			minedPerMinuteChart.Series.Clear();
 			string Toon = "";
 
-			if (_main.CurrentActiveToon != null && _main.CurrentActiveToon != "")
+			if (!string.IsNullOrEmpty(_main.CurrentActiveToon))
 			{
 				Toon = _main.CurrentActiveToon;
 			}
 
-			if (Toon == null || Toon == "" || !Program.Mining.ContainsKey(Toon))
+			if (string.IsNullOrEmpty(Toon) || !Program.Mining.ContainsKey(Toon))
 			{
 				minedPerMinuteChart.Visible = false;
 				return;
@@ -399,18 +374,18 @@ namespace Quesadilla
 			DateTime end = start;
 
 			// work out start/end times of combat - for cuirrent/all toons
+			lock(Program.Mining)
 			foreach (var currToon in Program.Mining.Keys)
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
-					if (Program.Mining[currToon].Count > 0)
+					if (Program.Mining[currToon].Any())
 					{
 						if (Program.Mining[currToon].First().TimeAdded < start) start = Program.Mining[currToon].First().TimeAdded;
 						if (Program.Mining[currToon].Last().TimeAdded > end) end = Program.Mining[currToon].Last().TimeAdded;
 					}
 				}
 			}
-			TimeSpan totalTime = end - start;
 
 			var span = 60;
 
@@ -419,14 +394,12 @@ namespace Quesadilla
 			start = curr;
 
 
-			Random r  = new Random();
-
-			foreach (var currToon in Program.Mining.Keys)
+			foreach (var currToon in Program.Mining.Keys.ToArray())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
 					// setup second slots
-					foreach (var c in Program.Mining[currToon].OrderBy(o => o.TimeAdded).ToList())
+					foreach (var c in Program.Mining[currToon].ToArray() /*.OrderBy(o => o.TimeAdded).ToList() */ )
 					{
 						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds / span);
 						if (!_minedGraphData.ContainsKey(slot))
@@ -455,7 +428,7 @@ namespace Quesadilla
 			{
 				var minutes = (int)Math.Truncate((curr - start).TotalSeconds / span);
 				int mined = 0; int wasted = 0;
-				if (_iskGraphData.ContainsKey(minutes))
+				if (_minedGraphData.ContainsKey(minutes))
 				{
 					mined += _minedGraphData[minutes].MinedAmount;
 					wasted += _minedGraphData[minutes].WastageAmount;
@@ -516,9 +489,19 @@ namespace Quesadilla
 				minedPerMinuteChart.ChartAreas[0].Axes[axis].LabelStyle.Format = "";
 			}
 
-
 			// Store graph to image
-			if (_sourceMinedPerMinuteImage != null) _sourceMinedPerMinuteImage.Dispose();
+			if (_sourceMinedPerMinuteImage == null ||
+				_sourceMinedPerMinuteImage.Width != minedPerMinuteChart.Width || _sourceMinedPerMinuteImage.Height != minedPerMinuteChart.Height)
+			{
+				_sourceMinedPerMinuteImage?.Dispose();
+
+				_sourceMinedPerMinuteImage = new Bitmap(minedPerMinuteChart.Width, minedPerMinuteChart.Height);
+			}
+			using (var g = Graphics.FromImage(_sourceMinedPerMinuteImage))
+			{
+				g.Clear(Color.Transparent);
+			}
+
 			if (totalMined > 0)
 			{
 				_sourceMinedPerMinuteImage = new Bitmap(minedPerMinuteChart.Width, minedPerMinuteChart.Height);
@@ -565,12 +548,8 @@ namespace Quesadilla
 			{
 				//var brushBackground = new SolidBrush(Color.Navy);
 				var brush = GDICache.GetBrush(Program.MainConfiguration.OverlayMinimapMouseoverSystemColour);
-				var font = new Font("Segoe UI", 12f, FontStyle.Regular);
-
-				//Size size = TextRenderer.MeasureText($"{mouseOverMinimapSystems[0].solarSystem.Name}", font);
-				//g.FillRectangle(brushBackground, mouseOverPoint.X - 1, mouseOverPoint.Y, size.Width + 1, size.Height);
-
-				g.DrawString($"{mouseOverMinimapSystems[0].solarSystem.Name}", font, brush, mouseOverPoint);
+				using (var font = new Font("Segoe UI", 12f, FontStyle.Regular))
+					g.DrawString($"{mouseOverMinimapSystems[0].solarSystem.Name}", font, brush, mouseOverPoint);
 			}
 
 			ImageGenerator.PaintDrawText(g, RattingData);
@@ -611,12 +590,12 @@ namespace Quesadilla
 		public void UpdateMapData()
 		{
 			string Toon = "";
-			if (_main.CurrentActiveToon != null && _main.CurrentActiveToon != "")
-			{
+			if (!string.IsNullOrEmpty(_main.CurrentActiveToon))
+				{
 				Toon = _main.CurrentActiveToon;
 			}
 
-			if (Toon == null || Toon == "")
+			if (string.IsNullOrEmpty(Toon))
 			{
 				//				OverlayMinimap.Visible = false;
 				return;
@@ -628,7 +607,7 @@ namespace Quesadilla
 				//SetScreenPosition();
 			}
 
-			var c = Program.CharacterList.Where(o => o.CharacterName == Toon).FirstOrDefault();
+			var c = Program.CharacterList.FirstOrDefault(o => o.CharacterName == Toon);
 
 			PathInfo _dummyPath = null;
 			if (c != null)
@@ -668,12 +647,12 @@ namespace Quesadilla
 				Program.MainConfiguration.OverlayMinimapSecLimitOutlineColour,
 				Program.MainConfiguration.OverlayMinimapIceColour,
 				Program.MainConfiguration.OverlayMinimapMercoxitColour,
-					AnimationStateIntel.GetNextValue(),
-					AnimationStateKills.GetNextValue(),
-					AnimationStateAlts.GetNextValue(),
-					AnimationStateUniHoles.GetNextValue(),
-					AnimationStateIncursion.GetNextValue(),
-					AnimationStateSeclimit.GetNextValue(),
+					_animationManager[AnimationType.Intel].GetNextValue(),
+					_animationManager[AnimationType.Kills].GetNextValue(),
+					_animationManager[AnimationType.Alts].GetNextValue(),
+					_animationManager[AnimationType.UniHoles].GetNextValue(),
+					_animationManager[AnimationType.Incursion].GetNextValue(),
+					_animationManager[AnimationType.SecLimit].GetNextValue(),
 				false,
 				Program.MainConfiguration.OverlayMinimapShowOutOfRegion,
 				Program.MainConfiguration.OverlayMinimapSecLimit,
@@ -686,7 +665,10 @@ namespace Quesadilla
 				);
 			//                Bitmap minimapBitmap = new Bitmap(minimapImage);
 			//                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
+
+			var oldImage = _sourceMapImage;
 			_sourceMapImage = minimapImage;
+			oldImage?.Dispose();
 			RenderAndUpdate();
 		}
 

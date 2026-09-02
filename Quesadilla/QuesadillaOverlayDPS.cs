@@ -1,23 +1,13 @@
-﻿using EVEStandard.Models;
-using Microsoft.Extensions.Configuration;
-using Quesadilla.Classes;
-using Quesadilla.Classes.Configuration;
+﻿using Quesadilla.Classes;
 using Quesadilla.Classes.Extensions;
 using Quesadilla.Classes.GraphData;
 using Quesadilla.Classes.ImageGeneration;
-using Quesadilla.Classes.SolarSystems;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Drawing.Text;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
@@ -31,6 +21,7 @@ namespace Quesadilla
 		private Dictionary<int, CombatGraphData> _combatGraphData = new Dictionary<int, CombatGraphData>();
 		private ImageAttributes ImageAttrDPS = new ImageAttributes();
 		private Timer chartTimer = null;
+		private readonly Font axisFont = new Font("Consolas", 10F, FontStyle.Bold);
 
 		public QuesadillaOverlayDPS(Quesadilla mainForm) : base()
 		{
@@ -38,21 +29,17 @@ namespace Quesadilla
 			InitializeComponent();
 			TopMost = true;
 
-			this.Text = "DPS";
-			Width = Program.MainConfiguration.OverlayDPSWindowSize.Width <= 100 ? 100 : Program.MainConfiguration.OverlayDPSWindowSize.Width;
-			Height = Program.MainConfiguration.OverlayDPSWindowSize.Height <= 50 ? 50 : Program.MainConfiguration.OverlayDPSWindowSize.Height;
+			Text = "DPS";
+			Width = Math.Max(100, Program.MainConfiguration.OverlayDPSWindowSize.Width);
+			Height = Math.Max(50, Program.MainConfiguration.OverlayDPSWindowSize.Height); 
 			SetScreenPosition();
 
-			this.Controls.Add(dpsChart);
+			Controls.Add(dpsChart);
 
-			//Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.DPSWindowItemLocations, 0, false, false, true);
-			dpsChart.Width = Program.MainConfiguration.OverlayDPSWindowSize.Width <= 100 ? 100 : Program.MainConfiguration.OverlayDPSWindowSize.Width;
-			dpsChart.Height = Program.MainConfiguration.OverlayDPSWindowSize.Height <= 50 ? 50 : Program.MainConfiguration.OverlayDPSWindowSize.Height;
+			dpsChart.Width = Math.Max(Program.MainConfiguration.OverlayDPSWindowSize.Width, 100);
+			dpsChart.Height = Math.Max(Program.MainConfiguration.OverlayDPSWindowSize.Height, 50);
 
-			ColorMatrix colourMatrix = new ColorMatrix();
-			colourMatrix.Matrix33 = (float)((float)Program.MainConfiguration.OverlayDPSGraphAlpha / (float)100);  // alpha !
-			ImageAttrDPS.SetColorMatrix(colourMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-
+			ImageGenerator.SetImageAlpha(ImageAttrDPS,Program.MainConfiguration.OverlayDPSGraphAlpha);
 			_sourceDPSImage = new Bitmap(dpsChart.Width, dpsChart.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
 
 			SetupDPSChart();
@@ -121,12 +108,12 @@ namespace Quesadilla
 			dpsChart.Series.Clear();
 			string Toon = "";
 
-			if (_main.CurrentActiveToon != null && _main.CurrentActiveToon != "")
+			if (!string.IsNullOrEmpty(_main.CurrentActiveToon))
 			{
 				Toon = _main.CurrentActiveToon;
 			}
 
-			if (Toon == null || Toon == "" || !Program.Combat.ContainsKey(Toon))
+			if (string.IsNullOrEmpty(Toon) || !Program.Combat.ContainsKey(Toon))
 			{
 				dpsChart.Visible = false;
 				return;
@@ -146,118 +133,22 @@ namespace Quesadilla
 
 			int LineSize = Program.MainConfiguration.DPSGraphLineSize;
 
-			var toon1Received = AddChartSeries(
-				dpsChart,
-				$"{Toon} IN",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphDPSInColour,
-				AxisType.Primary,
-				LineSize,
-				ChartDashStyle.Solid);
-
-			var toon1Given = AddChartSeries(
-				dpsChart,
-				"OUT",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphDPSOutColour,
-				AxisType.Primary,
-				LineSize,
-				ChartDashStyle.Solid);
-
-			var toon1NeutReceived = AddChartSeries(
-				dpsChart,
-				"NeutIN",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphNeutInColour,
-				AxisType.Secondary,
-				LineSize,
-				ChartDashStyle.Solid);
-
-			var toon1NeutGiven = AddChartSeries(
-				dpsChart,
-				"NeutOUT",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphNeutOutColour,
-				AxisType.Secondary,
-				LineSize,
-				ChartDashStyle.Solid);
-
-			var toon1ShieldReceived = AddChartSeries(
-				dpsChart,
-				"LogiS IN",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphLogiShieldsInColour,
-				AxisType.Secondary,
-				LineSize,
-				ChartDashStyle.Solid);
-
-			var toon1ShieldGiven = AddChartSeries(
-				dpsChart,
-				"LogiS OUT",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphLogiShieldsOutColour,
-				AxisType.Secondary,
-				LineSize,
-				ChartDashStyle.Solid);
-
-			var toon1ArmorReceived = AddChartSeries(
-				dpsChart,
-				"LogiA IN",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphLogiArmorInColour,
-				AxisType.Secondary,
-				LineSize,
-				ChartDashStyle.Solid);
-
-			var toon1ArmorGiven = AddChartSeries(
-				dpsChart,
-				"LogiA OUT",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphLogiArmorOutColour,
-				AxisType.Secondary,
-				LineSize,
-				ChartDashStyle.Solid);
-
-			var toon1HullReceived = AddChartSeries(
-				dpsChart,
-				"LogiH IN",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphLogiHullInColour,
-				AxisType.Secondary,
-				LineSize,
-				ChartDashStyle.Solid);
-
-			var toon1HullGiven = AddChartSeries(
-				dpsChart,
-				"LogiH OUT",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphLogiHullOutColour,
-				AxisType.Secondary,
-				LineSize,
-				ChartDashStyle.Solid);
-
-			var toon1CapReceived = AddChartSeries(
-				dpsChart,
-				"LogiC IN",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphLogiCapacitorInColour,
-				AxisType.Secondary,
-				LineSize,
-				ChartDashStyle.Solid);
-
-			var toon1CapGiven = AddChartSeries(
-				dpsChart,
-				"LogiC OUT",
-				SeriesChartType.Spline,
-				Program.MainConfiguration.DPSGraphLogiCapacitorOutColour,
-				AxisType.Secondary,
-				LineSize,
-				ChartDashStyle.Solid);
-
+			var toon1Received = AddChartSeries(dpsChart,$"{Toon} IN",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphDPSInColour,AxisType.Primary,LineSize,ChartDashStyle.Solid);
+			var toon1Given = AddChartSeries(dpsChart,"OUT",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphDPSOutColour,AxisType.Primary,LineSize,ChartDashStyle.Solid);
+			var toon1NeutReceived = AddChartSeries(dpsChart,"NeutIN",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphNeutInColour,AxisType.Secondary,LineSize,ChartDashStyle.Solid);
+			var toon1NeutGiven = AddChartSeries(dpsChart,"NeutOUT",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphNeutOutColour,AxisType.Secondary,LineSize,ChartDashStyle.Solid);
+			var toon1ShieldReceived = AddChartSeries(dpsChart,"LogiS IN",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphLogiShieldsInColour,AxisType.Secondary,LineSize,ChartDashStyle.Solid);
+			var toon1ShieldGiven = AddChartSeries(dpsChart,"LogiS OUT",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphLogiShieldsOutColour,AxisType.Secondary,LineSize,ChartDashStyle.Solid);
+			var toon1ArmorReceived = AddChartSeries(dpsChart,"LogiA IN",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphLogiArmorInColour,AxisType.Secondary,LineSize,ChartDashStyle.Solid);
+			var toon1ArmorGiven = AddChartSeries(dpsChart,"LogiA OUT",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphLogiArmorOutColour,AxisType.Secondary,LineSize,ChartDashStyle.Solid);
+			var toon1HullReceived = AddChartSeries(dpsChart,"LogiH IN",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphLogiHullInColour,AxisType.Secondary,LineSize,ChartDashStyle.Solid);
+			var toon1HullGiven = AddChartSeries(dpsChart,"LogiH OUT",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphLogiHullOutColour,AxisType.Secondary,LineSize,ChartDashStyle.Solid);
+			var toon1CapReceived = AddChartSeries(dpsChart,"LogiC IN",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphLogiCapacitorInColour,AxisType.Secondary,LineSize,ChartDashStyle.Solid);
+			var toon1CapGiven = AddChartSeries(dpsChart,"LogiC OUT",SeriesChartType.Spline,Program.MainConfiguration.DPSGraphLogiCapacitorOutColour,AxisType.Secondary,LineSize,ChartDashStyle.Solid);
 
 			dpsChart.ChartAreas[0].AxisX.LabelStyle.ForeColor = System.Drawing.Color.Tomato;
 			dpsChart.ChartAreas[0].AxisX.InterlacedColor = System.Drawing.Color.Lime;
-			dpsChart.ChartAreas[0].AxisX.LabelStyle.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			//dpsChart.ChartAreas[0].AxisX.LabelStyle.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			dpsChart.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
 			dpsChart.ChartAreas[0].AxisY2.MajorGrid.Enabled = false;
 			dpsChart.ChartAreas[0].AxisX2.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
@@ -273,8 +164,6 @@ namespace Quesadilla
 			dpsChart.ChartAreas[0].AxisY.IsLabelAutoFit = false;
 			dpsChart.ChartAreas[0].AxisY2.IsLabelAutoFit = false;
 
-			var axisFont = new Font("Consolas", 10F, FontStyle.Bold);
-
 			dpsChart.ChartAreas[0].AxisY.LabelStyle.Font = axisFont;
 			dpsChart.ChartAreas[0].AxisY2.LabelStyle.Font = axisFont;
 
@@ -284,6 +173,7 @@ namespace Quesadilla
 			DateTime end = start;
 
 			// work out start/end times of combat - for cuirrent/all toons
+			lock(Program.Combat)
 			foreach (var currToon in Program.Combat.Keys)
 			{
 				if (currToon == Toon || Toon == "*ALL*")
@@ -308,12 +198,12 @@ namespace Quesadilla
 			var span = Math.Truncate(totalTime.TotalSeconds > maxPoints ? totalTime.TotalSeconds / maxPoints : 1);
 			if (span < minSpanSize) span = minSpanSize;
 
-			foreach (var currToon in Program.Combat.Keys)
+			foreach (var currToon in Program.Combat.Keys.ToArray())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
 					// setup second slots
-					foreach (var c in Program.Combat[currToon].OrderBy(o => o.TimeAdded).ToList())
+					foreach (var c in Program.Combat[currToon].ToArray() /*.OrderBy(o => o.TimeAdded).ToList() */ )
 					{
 						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds);
 
@@ -471,9 +361,9 @@ namespace Quesadilla
 			else
 			{
 				dpsChart.ChartAreas[0].Axes[1].LabelStyle.Format = "";
-				dpsChart.ChartAreas[0].AxisY.Interval =
-					Math.Ceiling((dpsChart.ChartAreas[0].AxisY.Maximum / 3.0) / 100.0) * 100.0;
 
+				var interval = Math.Max(100,Math.Ceiling((dpsChart.ChartAreas[0].AxisY.Maximum / 3.0) / 100.0) * 100.0);
+				dpsChart.ChartAreas[0].AxisY.Interval = interval;
 			}
 
 			if (secondY)

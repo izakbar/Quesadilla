@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Quesadilla.Classes.ZKill
 {
-    public class ZkillRedisQZkb
+    public class ZkillZkb
     {
         [JsonPropertyName("awox")]
         public bool Awox { get; set; }

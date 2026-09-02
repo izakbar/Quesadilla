@@ -15,7 +15,7 @@ namespace Quesadilla.Classes.ZKill
 		public string hash {  get; set; }
 		
 		[JsonPropertyName("zkb")]
-		public ZkillRedisQZkb zkb { get; set; }
+		public ZkillZkb zkb { get; set; }
 
 
 	}

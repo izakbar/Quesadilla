@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Quesadilla.Classes.ZKill
 {
-    public class ZKillRedisQVictim
+    public class ZKillVictim
     {
         [JsonPropertyName("alliance_id")]
         public long AllianceId { get; set; }

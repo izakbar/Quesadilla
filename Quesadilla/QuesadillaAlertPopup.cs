@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -20,6 +21,7 @@ using System.Media;
 using System.Numerics;
 using System.Reflection.Emit;
 using System.Security.Permissions;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
@@ -196,9 +198,15 @@ namespace Quesadilla
 						Color.Transparent, configuration.ZKillCircleColour, 10, alert.Kill.TotalValue, configuration.ZKillIskColour, configuration.ZKillShowBar, configuration.ZKillBarColour,
 						zKillAgressorLogo?.Image, zKillVictimLogo?.Image,
 						_config.AlertPopZkillHeight, _config.AlertPopZkillLogoSize);
+
+					zKillAgressorLogo?.Dispose();
+					zKillVictimLogo?.Dispose();
+
 					Bitmap killBitmap = new Bitmap(RoundedImage);
 					killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
+					var _oldImage = AlertImage.Image;
 					AlertImage.Image = killBitmap;
+					_oldImage?.Dispose();
 				}
 				catch (Exception e)
 				{
@@ -253,7 +261,9 @@ namespace Quesadilla
 					);
 				Bitmap minimapBitmap = new Bitmap(minimapImage);
 				minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
+				var _oldImage = MinimapImage.Image;
 				MinimapImage.Image = minimapBitmap;
+				_oldImage?.Dispose();
 				MinimapImage.Visible = true;
 			}
 			else
@@ -343,7 +353,10 @@ namespace Quesadilla
 
 		private void timerOpacityOpen_Tick(object sender, EventArgs e)
 		{
-			Opacity += (double)_opacitystep / 100;
+			Opacity = Math.Min(
+				(double)_opacity / 100,
+				Opacity + ((double)_opacitystep / 100));
+
 			if (Opacity >= (double)_opacity / 100)
 			{
 				timerOpacityOpen.Enabled = false;
@@ -374,6 +387,7 @@ namespace Quesadilla
 		private void timerOpacityClose_Tick(object sender, EventArgs e)
 		{
 			Opacity -= (double)_opacitystep / 100;
+
 			if (Opacity <= 0)
 			{
 				Close();
@@ -384,7 +398,11 @@ namespace Quesadilla
 		{
 			if (SystemName.Text != ALERT_TEXT)
 			{
-				System.Diagnostics.Process.Start("https://evemaps.dotlan.net/map/" + RegionName.Text.Replace(" ", "_") + "/" + SystemName.Text);
+				Process.Start(new ProcessStartInfo
+				{
+					FileName = "https://evemaps.dotlan.net/map/" + RegionName.Text.Replace(" ", "_") + "/" + SystemName.Text,
+					UseShellExecute = true
+				});
 			}
 		}
 
@@ -397,7 +415,11 @@ namespace Quesadilla
 		{
 			if (IsZkill)
 			{
-				System.Diagnostics.Process.Start($"https://zkillboard.com/kill/{_alert.Kill.ID}/");
+				Process.Start(new ProcessStartInfo
+				{
+					FileName = $"https://zkillboard.com/kill/{_alert.Kill.ID}/",
+					UseShellExecute = true
+				});
 			}
 		}
 
@@ -474,7 +496,6 @@ namespace Quesadilla
 			if (_config.GetConfiguration("AlertText", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, AlertText);
 			if (_config.GetConfiguration("SystemName", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, SystemName);
 			if (_config.GetConfiguration("RegionName", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, RegionName);
-			if (_config.GetConfiguration("ContextInfo", _config.AlertWindowItemLocations).IsVisible) ImageGenerator.PaintDrawText(e.Graphics, ContextInfo);
 			if (_config.GetConfiguration("ShipName", _config.AlertWindowItemLocations).IsVisible && ShowShipname)
 			{
 				ImageGenerator.PaintDrawText(e.Graphics, ShipName);
@@ -501,9 +522,11 @@ namespace Quesadilla
 
 		private void QuesadillaAlertPopup_Shown(object sender, EventArgs e)
 		{
+			var _oldBitmap = _main.latestAlertBitmap;
 			_main.latestAlertBitmap = new Bitmap(this.Width, this.Height);
 			this.DrawToBitmap(_main.latestAlertBitmap, new Rectangle(Point.Empty, _main.latestAlertBitmap.Size));
 			_main.latestAlertTimestamp = DateTime.Now;
+			_oldBitmap?.Dispose();
 			// _main.latestAlertBitmap.Save("QuesadillaLatestAlert.png");
 		}
 

@@ -18,6 +18,7 @@ namespace Quesadilla.Classes.ZKill
 	{
 		private ILogger log = Log.ForContext<ZKillR2Z2>();
 
+		private static readonly HttpClient _httpClient = new HttpClient();
 		private BackgroundWorker Worker;
 
 		private bool FeedPaused = false;
@@ -28,6 +29,11 @@ namespace Quesadilla.Classes.ZKill
 		private int ZkillErrorCount = 0;
 
 		public event EventHandler<ZKillEventArgs> ZKillEventHandler;
+
+		static ZKillR2Z2()
+		{
+			_httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", Program.UserAgent);
+		}
 
 		public ZKillR2Z2()
 		{
@@ -78,10 +84,8 @@ namespace Quesadilla.Classes.ZKill
 			try
 			{
 				string URL = "https://r2z2.zkillboard.com/ephemeral/sequence.json";
-				HttpClient hc = new HttpClient();
-				hc.DefaultRequestHeaders.Add("User-Agent", Program.UserAgent);
-
-				var response = hc.GetAsync(URL).Result;
+				
+				var response = _httpClient.GetAsync(URL).Result;
 				string strContent = string.Empty;
 
 				if (response.IsSuccessStatusCode)
@@ -119,9 +123,7 @@ namespace Quesadilla.Classes.ZKill
 
 				try
 				{
-					HttpClient hc = new HttpClient();
-					hc.DefaultRequestHeaders.Add("User-Agent", Program.UserAgent);
-					var response = hc.GetAsync(URL).Result;
+					var response = _httpClient.GetAsync(URL).Result;
 					if (response.IsSuccessStatusCode)
 					{
 						//Log.Information("R2Z2 worked");
@@ -130,7 +132,8 @@ namespace Quesadilla.Classes.ZKill
 
 						if (ZKillEventHandler != null)
 						{
-							var mainAttacker = zkill?.esi?.Attackers?.Where(o => o.FinalBlow).First();
+							var mainAttacker = zkill?.esi?.Attackers?.FirstOrDefault(o => o.FinalBlow);
+
 							string isk = "";
 							if (zkill.zkb.TotalValue < 1000000)
 							{
@@ -161,11 +164,11 @@ namespace Quesadilla.Classes.ZKill
 									VictimCorporationId = zkill.esi.Victim.CorporationId,
 									VictimShipTypeId = zkill.esi.Victim.ShipTypeId,
 
-									KillerAllianceId = mainAttacker.AllianceId,
-									KillerCharacterId = mainAttacker.CharacterId,
-									KillerCorporationId = mainAttacker.CorporationId,
-									KillerShipTypeId = mainAttacker.ShipTypeId,
-									KillerWeaponTypeId = mainAttacker.WeaponTypeId,
+									KillerAllianceId = mainAttacker?.AllianceId,
+									KillerCharacterId = mainAttacker?.CharacterId,
+									KillerCorporationId = mainAttacker?.CorporationId,
+									KillerShipTypeId = mainAttacker?.ShipTypeId,
+									KillerWeaponTypeId = mainAttacker?.WeaponTypeId,
 
 									href = zkill.zkb.Href,
 
@@ -175,7 +178,7 @@ namespace Quesadilla.Classes.ZKill
 									Expired = false,
 
 								};
-								ZKillEventHandler((object)this, new ZKillEventArgs(z));
+								ZKillEventHandler?.Invoke((object)this, new ZKillEventArgs(z));
 							}
 							catch (Exception ex)
 							{

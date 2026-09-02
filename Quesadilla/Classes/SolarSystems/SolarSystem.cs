@@ -41,8 +41,11 @@ namespace Quesadilla.Classes.SolarSystems
 		{
 			int count = 0;
 			if (Alerts == null) { return count; }
-			count = Alerts.Where(o => o.isFaction == faction && o.isDecloak == decloak && (o.Kill is null && !kill || (!(o.Kill is null) && kill))).Count();
-			return count;
+			count = Alerts.Count(o =>
+				o.isFaction == faction &&
+				o.isDecloak == decloak &&
+				((o.Kill == null && !kill) || (o.Kill != null && kill))); 
+            return count;
 		}
 		public List<AlertQueueItem> GetAlerts(bool faction, bool decloak, bool kill)
 		{

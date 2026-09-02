@@ -1535,7 +1535,7 @@ img.rounded-corners {
         [Category("DPS")]
         [DisplayName("Combine DPS")]
         [Description("Should all DPS values be combined for the graph")]
-        [DefaultValue(typeof(bool), "false")]
+        [DefaultValue(typeof(bool), "true")]
         public bool DPSAllToons { get; set; }
 
         [Category("DPS")]
@@ -1565,7 +1565,7 @@ img.rounded-corners {
         [Category("DPS")]
         [DisplayName("Line size")]
         [Description("Width of the graph lines")]
-        [DefaultValue(typeof(int), "2")]
+        [DefaultValue(typeof(int), "3")]
         public int DPSGraphLineSize { get; set; }
 
 

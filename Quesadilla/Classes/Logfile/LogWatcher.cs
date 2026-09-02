@@ -16,10 +16,8 @@ namespace Quesadilla.Classes
 {
     public class LogWatcher
     {
-
-        private ILogger logger = Log.ForContext<LogWatcher>();
-
-        private int EXPIRE_OLD_INTEL_ = 1800; // 30 mins
+		private ILogger logger = Log.ForContext<LogWatcher>();
+		private const int EXPIRE_OLD_INTEL = 1800;
 		private readonly object _interestingFilesLock = new object();
 		private string _logPath;
         private string _systemChannelPrefix;
@@ -51,8 +49,8 @@ namespace Quesadilla.Classes
         public event EventHandler<ProcessMiningEventArgs> ProcessMining;
 
         public event EventHandler<ProcessDecloakEventArgs> ProcessDecloak;
-        public event EventHandler<ProcessSystemChangeEventArgs> SystemChange;
-        public event EventHandler<ProcessChatServerChangeEventArgs> ChatServerChange;
+        public event EventHandler<ProcessSystemChangeEventArgs> ProcessSystemChange;
+        public event EventHandler<ProcessChatServerChangeEventArgs> ProcessChatServerChange;
 
         public bool Connection = true;
         public bool Enabled = true;
@@ -105,7 +103,7 @@ namespace Quesadilla.Classes
 
                     if (this._logFileType == LogFileType.ChatIntel || this._logFileType == LogFileType.Game)
                     {
-                        lock (this)
+                        lock (_interestingFilesLock)
                         {
                             long fileLength = this.GetFileLength(changedLogFile.FullName);
                             string logListener = this.GetLogListener(changedLogFile.FullName);
@@ -122,7 +120,7 @@ namespace Quesadilla.Classes
                     }
                     if (this._logFileType == LogFileType.Local)
                     {
-                        lock (this)
+                        lock (_interestingFilesLock)
                         {
                             long fileLength = this.GetFileLength(changedLogFile.FullName);
                             LocalInfo localInfo = this.InitLocal(changedLogFile.FullName);
@@ -143,11 +141,11 @@ namespace Quesadilla.Classes
             }
             foreach (string key in this._interestingFiles.Where<KeyValuePair<string, InterestingFile>>((Func<KeyValuePair<string, InterestingFile>, bool>)(interestingFile => interestingFile.Value.LastUpdate < DateTime.Now.AddMinutes(-120.0))).Select<KeyValuePair<string, InterestingFile>, string>((Func<KeyValuePair<string, InterestingFile>, string>)(interestingFile => interestingFile.Key)).ToList<string>())
             {
-                lock (this)
+                lock (_interestingFilesLock)
                     this._interestingFiles.Remove(key);
             }
             List<LogEntry> logEntryList = new List<LogEntry>();
-            lock (this)
+            lock (_interestingFilesLock)
             {
                 try 
                 { 
@@ -157,7 +155,7 @@ namespace Quesadilla.Classes
                     if (this.GetFileLength(fileInfo.FullName) != interestingFile.Value.LastPosition)
                     {
                         LogfileData newData;
-                        lock (this)
+                        lock (_interestingFilesLock)
                         {
                             newData = this.ReadLogFile(interestingFile.Key, interestingFile.Value.LastPosition);
                             this._interestingFiles[interestingFile.Key].LastPosition = newData.FileLength;
@@ -284,7 +282,7 @@ namespace Quesadilla.Classes
                 // check if we should expire first entry
                 var a = _previousLogEntries.First();
                 var diffInSeconds = (DateTime.Now - a.TimeAdded).TotalSeconds;
-                if (diffInSeconds > EXPIRE_OLD_INTEL_)
+                if (diffInSeconds > EXPIRE_OLD_INTEL)
                 {
                     // expired so dequeue
                     _previousLogEntries.Remove(a);
@@ -356,11 +354,20 @@ namespace Quesadilla.Classes
             long fileLength = -1;
             try
             {
-                using (StreamReader streamReader = new StreamReader((Stream)new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), this._fileEncoding))
-                {
-                    fileLength = streamReader.BaseStream.Length;
-                }
-            }
+                /*
+								using (StreamReader streamReader = new StreamReader((Stream)new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), this._fileEncoding))
+									fileLength = streamReader.BaseStream.Length;
+				*/
+
+                using (FileStream fs =
+                    new FileStream(
+                        fileName,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.ReadWrite)
+                    )
+                    return fs.Length;
+			}
             catch (Exception ex)
             {
             }
@@ -539,54 +546,80 @@ namespace Quesadilla.Classes
         {
             return line.Replace(Convert.ToChar(65279).ToString(), "").Replace(Convert.ToChar(65534).ToString(), "").Replace("\r", "").Trim();
         }
-        private void OnProcessNewData(LogEntry entry)
-        {
-            logger.Debug(entry.ToString());
-            if (this.ProcessNewData == null)
-                return;
-            this.ProcessNewData((object)this, new ProcessNewDataEventArgs(entry, this._systemChannelPrefix));
-        }
-        private void OnCombat(string logFileName, string characterName, CombatEventType combatEvent, LogEntry entry)
-        {
-            logger.Debug(combatEvent.ToString() + "-" + (entry != null ? entry.LineContent: "") );
-            if (this.ProcessCombat == null)
-                return;
-            this.ProcessCombat((object)this, new ProcessCombatEventArgs(logFileName, characterName, combatEvent, entry));
-        }
-        private void OnISK(string logFileName, string characterName, LogEntry entry)
-        {
-            logger.Debug((entry != null ? entry.LineContent : ""));
-            if (this.ProcessISK == null)
-                return;
-            this.ProcessISK((object)this, new ProcessISKEventArgs(logFileName, characterName, entry));
-        }
-        private void OnMining(string logFileName, string characterName, LogEntry entry)
-        {
-            logger.Debug((entry != null ? entry.LineContent : ""));
-            if (this.ProcessISK == null)
-                return;
-            this.ProcessMining((object)this, new ProcessMiningEventArgs(logFileName, characterName, entry));
-        }
-        private void OnDecloak(string logFileName, string characterName, LogEntry entry)
-        {
-            logger.Debug((entry != null ? entry.LineContent : ""));
-            if (this.ProcessDecloak == null)
-                return;
-            this.ProcessDecloak((object)this, new ProcessDecloakEventArgs(logFileName, characterName, entry));
-        }
-        private void OnSystemChange(string systemName, string charName)
-        {
-            logger.Debug(charName + "->" +systemName);
-            if (this.SystemChange == null)
-                return;
-            this.SystemChange((object)this, new ProcessSystemChangeEventArgs(systemName, charName));
-        }
-        private void OnChatServerChange(bool chatServerUp, string charName)
-        {
-            logger.Debug(charName + "-> Chat Server " + (chatServerUp == true ? "Up" : "Down"));
-            if (this.ChatServerChange == null)
-                return;
-            this.ChatServerChange((object)this, new ProcessChatServerChangeEventArgs(chatServerUp, charName));
-        }
-    }
+		private void OnProcessNewData(LogEntry entry)
+		{
+			logger.Debug(
+				"{Character}: {Line}",
+				entry.CharacterName,
+				entry.LineContent);
+
+			ProcessNewData?.Invoke(
+				this,
+				new ProcessNewDataEventArgs(entry, _systemChannelPrefix));
+		}
+		private void OnCombat(string logFileName,string characterName,CombatEventType combatEvent,LogEntry entry)
+		{
+			logger.Debug("{CombatEvent} - {Line}",combatEvent,entry?.LineContent);
+
+			ProcessCombat?.Invoke(this,
+                new ProcessCombatEventArgs(
+					logFileName,
+					characterName,
+					combatEvent,
+					entry));
+		}
+		private void OnISK(string logFileName,string characterName,LogEntry entry)
+		{
+			logger.Debug("{Line}", entry?.LineContent);
+
+			ProcessISK?.Invoke(
+				this,
+				new ProcessISKEventArgs(
+					logFileName,
+					characterName,
+					entry));
+		}
+		private void OnMining(string logFileName,string characterName,LogEntry entry)
+		{
+			logger.Debug("{Line}", entry?.LineContent);
+
+			ProcessMining?.Invoke(
+				this,
+				new ProcessMiningEventArgs(
+					logFileName,
+					characterName,
+					entry));
+		}
+		private void OnDecloak(string logFileName,string characterName,LogEntry entry)
+		{
+			logger.Debug("{Line}", entry?.LineContent);
+
+			ProcessDecloak?.Invoke(
+				this,
+				new ProcessDecloakEventArgs(
+					logFileName,
+					characterName,
+					entry));
+		}
+		private void OnSystemChange(string systemName,string charName)
+		{
+			logger.Debug("{Character} -> {System}",charName,systemName);
+
+			ProcessSystemChange?.Invoke(
+				this,
+				new ProcessSystemChangeEventArgs(
+					systemName,
+					charName));
+		}
+		private void OnChatServerChange(bool chatServerUp,string charName)
+		{
+			logger.Debug("{Character} -> Chat Server {Status}",charName,chatServerUp ? "Up" : "Down");
+
+			ProcessChatServerChange?.Invoke(
+				this,
+				new ProcessChatServerChangeEventArgs(
+					chatServerUp,
+					charName));
+		}
+	}
 }

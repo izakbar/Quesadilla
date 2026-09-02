@@ -12,9 +12,7 @@ namespace Quesadilla.Classes.GraphData
 
 		public string ToCSV()
 		{
-			StringBuilder sb = new StringBuilder();
-			sb.Append(IskAmount);
-			return sb.ToString();
+			return IskAmount.ToString();
 		}
 	}
 }

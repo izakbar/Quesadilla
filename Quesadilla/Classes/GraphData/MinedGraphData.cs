@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace Quesadilla.Classes.GraphData
 {
@@ -14,13 +10,7 @@ namespace Quesadilla.Classes.GraphData
 
 		public string ToCSV()
 		{
-			StringBuilder sb = new StringBuilder();
-			sb.Append(RockType);
-			sb.Append(",");
-			sb.Append(MinedAmount);
-			sb.Append(",");
-			sb.Append(WastageAmount);
-			return sb.ToString();
+			return $"{RockType},{MinedAmount},{WastageAmount}";
 		}
 	}
 }
