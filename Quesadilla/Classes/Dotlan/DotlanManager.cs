@@ -17,154 +17,154 @@ using System.Threading.Tasks;
 
 namespace Quesadilla.Classes.Dotlan
 {
-    public class DotlanManager
-    {
-        private ILogger log = Log.ForContext<DotlanManager>();
+	public class DotlanManager
+	{
+		private ILogger log = Log.ForContext<DotlanManager>();
 
-        private BackgroundWorker Worker;
+		private BackgroundWorker Worker;
 
-        private bool FeedPaused = false;
-        private System.Timers.Timer t;
+		private bool FeedPaused = false;
+		private System.Timers.Timer t;
 
-        public event EventHandler<DotlanEventArgs> DotlanEventHandler;
+		public event EventHandler<DotlanEventArgs> DotlanEventHandler;
 
-        public List<string> RegionsToCheck = new List<string>();
+		private readonly object _lock = new object();
+		public List<string> RegionsToCheck = new List<string>();
 
-        private string LastDotlanDeltaETAG = "";
+		private string LastDotlanDeltaETAG = "";
 
-        public DotlanManager()
-        {
-            Worker = new BackgroundWorker();
-            Worker.WorkerSupportsCancellation = true;
-            Worker.WorkerReportsProgress = false;
-            Worker.DoWork += this.DoWork;
-            Worker.RunWorkerCompleted += this.RunWorkerCompleted;
+		public DotlanManager()
+		{
+			Worker = new BackgroundWorker();
+			Worker.WorkerSupportsCancellation = true;
+			Worker.WorkerReportsProgress = false;
+			Worker.DoWork += this.DoWork;
+			Worker.RunWorkerCompleted += this.RunWorkerCompleted;
 
-            t = new System.Timers.Timer()
-            {
-                Interval = 30000,
-                AutoReset = true,
-                Enabled = true,
-            };
-            t.Elapsed += this.Tick;
+			t = new System.Timers.Timer()
+			{
+				Interval = 30000,
+				AutoReset = true,
+				Enabled = true,
+			};
+			t.Elapsed += this.Tick;
 
-            // Start on init too 
-            Worker.RunWorkerAsync();
-        }
+			// Start on init too 
+			Worker.RunWorkerAsync();
+		}
 
-        private void Tick(object sender, EventArgs e)
-        {
-            RunWorkerIfPossible();
-        }
+		private void Tick(object sender, EventArgs e)
+		{
+			RunWorkerIfPossible();
+		}
 
-        public void RunWorkerIfPossible()
-        {
-            if (!Worker.IsBusy && !FeedPaused)
-            {
-                Worker.RunWorkerAsync();
-            }
-        }
+		public void RunWorkerIfPossible()
+		{
+			if (!Worker.IsBusy && !FeedPaused)
+			{
+				Worker.RunWorkerAsync();
+			}
+		}
 
-        public void Pause()
-        {
-            Log.Error("Dotlan processing PAUSED");
-            FeedPaused = true;
-        }
-        public void Resume()
-        {
-            Log.Error("Dotlan processing RESUMED");
-            FeedPaused = false;
-        }
-
-
-        private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            //            log.Information("zkill done");
-        }
-
-        private void DoWork(object sender, DoWorkEventArgs e)
-        {
-            string regionToProcess = "";
-            DateTime NowCheck = DateTime.Now;
+		public void Pause()
+		{
+			Log.Error("Dotlan processing PAUSED");
+			FeedPaused = true;
+		}
+		public void Resume()
+		{
+			Log.Error("Dotlan processing RESUMED");
+			FeedPaused = false;
+		}
 
 
-            foreach(var region in Program.Universe.DotlanMapRegions.Keys)
-            {
-                if (regionToProcess == "" &&
-                    RegionsToCheck.Contains(region) &&
-                    (
-                    (Program.MainConfiguration.DotlanMapPull && Program.Universe.DotlanMapRegions[region].AddMinutes(Program.MainConfiguration.DotlanMapExpiresMinutes) < NowCheck) ||
-                    (Program.MainConfiguration.DotlanDeltaPull && Program.Universe.DotlanDeltaRegions.AddMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes) < NowCheck) 
-                    )
-                    )
-                {
-                    regionToProcess = region;
-                }
-            }
+		private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+		{
+			//            log.Information("zkill done");
+		}
 
-            if (!string.IsNullOrEmpty(regionToProcess))
-            {
-                // get region map data if required
-                string dotlanMapContent = "";
-                string dotlanDeltaContent = "";
-                if (
-                    Program.MainConfiguration.DotlanMapPull &&
-                    (Program.Universe.DotlanMapRegions[regionToProcess].AddMinutes(Program.MainConfiguration.DotlanMapExpiresMinutes) < NowCheck)
-                    )
-                {
-                    Program.Universe.DotlanMapRegions[regionToProcess] = NowCheck;
-                    dotlanMapContent = GetDotlanMapData(regionToProcess, Program.Universe.DotlanMapRegions[regionToProcess]);
-                }
+		private void DoWork(object sender, DoWorkEventArgs e)
+		{
+			string regionToProcess = "";
+			DateTime NowCheck = DateTime.Now;
 
-                if (
-                    Program.MainConfiguration.DotlanDeltaPull &&
-                    (Program.Universe.DotlanDeltaRegions.AddMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes) < NowCheck)
-                    )
-                {
-                    Program.Universe.DotlanDeltaRegions = NowCheck;
-                    dotlanDeltaContent = GetDotlanDeltaData(Program.Universe.DotlanDeltaRegions);
-                }
+			foreach (var region in Program.Universe.DotlanMapRegions.Keys)
+			{
+				if (regionToProcess == "" &&
+					RegionsToCheck.Contains(region) &&
+					(
+					(Program.MainConfiguration.DotlanMapPull && Program.Universe.DotlanMapRegions[region].AddMinutes(Program.MainConfiguration.DotlanMapExpiresMinutes) < NowCheck) ||
+					(Program.MainConfiguration.DotlanDeltaPull && Program.Universe.DotlanDeltaRegions.AddMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes) < NowCheck)
+					)
+					)
+				{
+					regionToProcess = region;
+				}
+			}
 
-                if (DotlanEventHandler != null)
-                {
-                    DotlanEventHandler((object)this, new DotlanEventArgs()
-                    {
-                        RegionName = regionToProcess,
-                        MapContent = dotlanMapContent,
-                        DeltaContent = dotlanDeltaContent,
-                    });
-                }
-            }
-        }
+			if (!string.IsNullOrEmpty(regionToProcess))
+			{
+				// get region map data if required
+				string dotlanMapContent = "";
+				string dotlanDeltaContent = "";
+				if (
+					Program.MainConfiguration.DotlanMapPull &&
+					(Program.Universe.DotlanMapRegions[regionToProcess].AddMinutes(Program.MainConfiguration.DotlanMapExpiresMinutes) < NowCheck)
+					)
+				{
+					Program.Universe.DotlanMapRegions[regionToProcess] = NowCheck;
+					dotlanMapContent = GetDotlanMapData(regionToProcess, Program.Universe.DotlanMapRegions[regionToProcess]);
+				}
 
-        private string GetDotlanMapData(string regionName, DateTime LastDotlanUpdate)
-        {
-            string strContent = string.Empty;
-            try
-            {
-                log.Information($"Getting Data from Dotlan for {regionName}");
+				if (
+					Program.MainConfiguration.DotlanDeltaPull &&
+					(Program.Universe.DotlanDeltaRegions.AddMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes) < NowCheck)
+					)
+				{
+					Program.Universe.DotlanDeltaRegions = NowCheck;
+					dotlanDeltaContent = GetDotlanDeltaData(Program.Universe.DotlanDeltaRegions);
+				}
 
-                string URL = $"http://evemaps.dotlan.net/svg/{regionName.Replace(" ","_")}.svg";
+				if (DotlanEventHandler != null)
+				{
+					DotlanEventHandler((object)this, new DotlanEventArgs()
+					{
+						RegionName = regionToProcess,
+						MapContent = dotlanMapContent,
+						DeltaContent = dotlanDeltaContent,
+					});
+				}
+			}
+		}
 
-                using (var hc = new HttpClient())
-                {
+		private string GetDotlanMapData(string regionName, DateTime LastDotlanUpdate)
+		{
+			string strContent = string.Empty;
+			try
+			{
+				log.Information($"Getting Data from Dotlan for {regionName}");
+
+				string URL = $"http://evemaps.dotlan.net/svg/{regionName.Replace(" ", "_")}.svg";
+
+				using (var hc = new HttpClient())
+				{
 
 					hc.DefaultRequestHeaders.Add("User-Agent", Program.UserAgent);
-                    hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
+					hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
 
-                    var response = hc.GetAsync(URL).GetAwaiter().GetResult();
+					var response = hc.GetAsync(URL).GetAwaiter().GetResult();
 
 					if (response.IsSuccessStatusCode)
-                    {
-                        strContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                    }
-                    else
-                    {
-                        strContent = "Error";
-                    }
-                }
+					{
+						strContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+					}
+					else
+					{
+						strContent = "Error";
+					}
+				}
 
-                /*
+				/*
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -176,26 +176,26 @@ namespace Quesadilla.Classes.Dotlan
                 }
                 */
 
-            }
-            catch
-            {
-                log.Error($"Dotlan for {regionName} request failed");
-                return null;
-            }
+			}
+			catch
+			{
+				log.Error($"Dotlan for {regionName} request failed");
+				return null;
+			}
 
-            // if we have an error - sleep a long time - consider pause
-            if (strContent == "Error")
-            {
-                log.Error("Getting error back from Dotlan - sleeping worker");
-                Thread.Sleep(500000);
-                return null;
-            }
+			// if we have an error - sleep a long time - consider pause
+			if (strContent == "Error")
+			{
+				log.Error("Getting error back from Dotlan - sleeping worker");
+				Thread.Sleep(500000);
+				return null;
+			}
 
-            // Parse Dotlan
-            try
-            {
+			// Parse Dotlan
+			try
+			{
 
-                /*
+				/*
                 var whData = JsonConvert.DeserializeObject<List<EveScoutWH>>(strContent);
 
                 lock (Signatures)
@@ -210,84 +210,96 @@ namespace Quesadilla.Classes.Dotlan
                 }
                 */
 
-                return strContent;
+				return strContent;
 
-            }
-            catch (Exception ex)
-            {
-                log.Error($"Dotlan for {regionName} request failed");
-                return null;
-            }
-        }
-        private string GetDotlanDeltaData(DateTime LastDotlanUpdate)
-        {
-            string strContent = string.Empty;
-            try
-            {
-                log.Information($"Getting Delta from Dotlan");
+			}
+			catch (Exception ex)
+			{
+				log.Error($"Dotlan for {regionName} request failed");
+				return null;
+			}
+		}
+		private string GetDotlanDeltaData(DateTime LastDotlanUpdate)
+		{
+			string strContent = string.Empty;
+			try
+			{
+				log.Information($"Getting Delta from Dotlan");
 
-                string URL = "https://evemaps.dotlan.net/ajax/npcdelta";
+				string URL = "https://evemaps.dotlan.net/ajax/npcdelta";
 
-                using (var hc = new HttpClient())
-                {
+				using (var hc = new HttpClient())
+				{
 
-                    hc.DefaultRequestHeaders.Add("User-Agent", Program.UserAgent);
-                    hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
+					hc.DefaultRequestHeaders.Add("User-Agent", Program.UserAgent);
+					hc.DefaultRequestHeaders.IfModifiedSince = LastDotlanUpdate;
 
-                    if (LastDotlanDeltaETAG != "")
-                    {
-                        hc.DefaultRequestHeaders.IfNoneMatch.Add(new EntityTagHeaderValue(LastDotlanDeltaETAG));
-                    }
+					if (LastDotlanDeltaETAG != "")
+					{
+						hc.DefaultRequestHeaders.IfNoneMatch.Add(new EntityTagHeaderValue(LastDotlanDeltaETAG));
+					}
 
-                    var response = hc.GetAsync(URL).GetAwaiter().GetResult();
-                    if (response.IsSuccessStatusCode)
-                    {
-                        strContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+					var response = hc.GetAsync(URL).GetAwaiter().GetResult();
+					if (response.IsSuccessStatusCode)
+					{
+						strContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-                        // if Last Modified set - then set expiry of data
-                        if (response.Content.Headers.LastModified.HasValue)
-                        {
-                            Random rndUpdateOffset = new Random();
-                            Program.Universe.DotlanDeltaRegions = response.Content.Headers.LastModified.Value.DateTime.ToLocalTime() + TimeSpan.FromMinutes(60) 
-                                + TimeSpan.FromSeconds(rndUpdateOffset.Next(1, 300)) 
-                                - TimeSpan.FromMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes);
-                            log.Information($"dotlan delta - lastmodied {response.Content.Headers.LastModified} setting DotlanDeltaRegions {Program.Universe.DotlanDeltaRegions}");
-                        }
+						// if Last Modified set - then set expiry of data
+						if (response.Content.Headers.LastModified.HasValue)
+						{
+							Random rndUpdateOffset = new Random();
+							Program.Universe.DotlanDeltaRegions = response.Content.Headers.LastModified.Value.DateTime.ToLocalTime() + TimeSpan.FromMinutes(60)
+								+ TimeSpan.FromSeconds(rndUpdateOffset.Next(1, 300))
+								- TimeSpan.FromMinutes(Program.MainConfiguration.DotlanDeltaExpiresMinutes);
+							log.Information($"dotlan delta - lastmodied {response.Content.Headers.LastModified} setting DotlanDeltaRegions {Program.Universe.DotlanDeltaRegions}");
+						}
 
-                        if (response.Headers.ETag != null)
-                        {
-                            LastDotlanDeltaETAG = response.Headers.ETag.Tag;
-                        }
-                    }
-                    else
-                    {
-                        strContent = "Error";
-                    }
-                }
-            }
-            catch
-            {
-                log.Error($"Dotlan delta request failed");
-                return null;
-            }
+						if (response.Headers.ETag != null)
+						{
+							LastDotlanDeltaETAG = response.Headers.ETag.Tag;
+						}
+					}
+					else
+					{
+						strContent = "Error";
+					}
+				}
+			}
+			catch
+			{
+				log.Error($"Dotlan delta request failed");
+				return null;
+			}
 
-            // if we have an error - sleep a long time - consider pause
-            if (strContent == "Error")
-            {
-                log.Error("Getting error back from Dotlan - sleeping worker");
-                Thread.Sleep(500000);
-                return null;
-            }
+			// if we have an error - sleep a long time - consider pause
+			if (strContent == "Error")
+			{
+				log.Error("Getting error back from Dotlan - sleeping worker");
+				Thread.Sleep(500000);
+				return null;
+			}
 
-            try
-            {
-                return strContent;
-            }
-            catch (Exception ex)
-            {
-                log.Error($"Dotlan delta request failed");
-                return null;
-            }
-        }
-    }
+			try
+			{
+				return strContent;
+			}
+			catch (Exception ex)
+			{
+				log.Error($"Dotlan delta request failed");
+				return null;
+			}
+		}
+
+		public void AddRegionToCheck(string regionName)
+		{
+			lock (_lock)
+			{
+				if (!RegionsToCheck.Contains(regionName))
+				{
+					RegionsToCheck.Add(regionName);
+					RunWorkerIfPossible();
+				}
+			}
+		}
+	}
 }

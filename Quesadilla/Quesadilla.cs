@@ -850,13 +850,7 @@ namespace Quesadilla
                 Program.CharacterManager.UpdateLocation(characterName, foundSystem.Id, foundSystem.Name);
                 EveOClient.UpdateSystem(characterName, foundSystem?.Name);
 			
-
-			    // add to list of regions to check on dotlan
-                if (!DotlanProcessor.RegionsToCheck.Contains(foundSystem?.RegionName))
-                {
-                    DotlanProcessor.RegionsToCheck.Add(foundSystem?.RegionName);
-                    DotlanProcessor.RunWorkerIfPossible();
-                }
+                DotlanProcessor.AddRegionToCheck(foundSystem?.RegionName);
 
                 CheckEveScoutConnection(characterName);
 
@@ -865,7 +859,7 @@ namespace Quesadilla
                 GetSkyhookTimers();
             }
 
-            // System not ound and not WH space... so Abyss
+            // System not found and not WH space... so Abyss
             if (!string.IsNullOrEmpty(characterName) && foundSystem == null && !e.SystemName.StartsWith("J"))
             {
                 Program.CharacterManager.UpdateLocation(characterName, 0, e.SystemName);
@@ -889,7 +883,7 @@ namespace Quesadilla
                     StringBuilder s = new StringBuilder();
 					foreach (var c in Program.CharacterManager.Characters)
 					{
-						s.Append($"{c.CharacterName}:{c.Location}{(c.InAbyss ? " *IN-ABYSS*" : "")}");
+						s.AppendLine($"{c.CharacterName}:{c.Location}{(c.InAbyss ? " *IN-ABYSS*" : "")}");
                         File.WriteAllText($"Quesadilla.Locations.{c.CharacterName}", $"{c.Location} {(c.InAbyss ? " *IN-ABYSS*" : "")}");
                     }
                     File.WriteAllText($"Quesadilla.Locations", s.ToString());
@@ -1566,7 +1560,7 @@ namespace Quesadilla
                 }
             }
 
-			// just double check thru charachter list active clients to make sure there is still an active client.
+			// just double check thru character list active clients to make sure there is still an active client.
 			Program.CharacterManager.SetCurrentlyActiveClient(CurrentActiveToon);
 			foreach (var c in Program.CharacterManager.Characters)
             {
@@ -1592,25 +1586,44 @@ namespace Quesadilla
 
 		private void ZKill_ProcessNewData(object sender, ZKillEventArgs e)
         {
-            string systemName = "---";
-            string regionName = "---";
+			void QueueZKillAlert(ZKillKill kill, PathInfo path, string context, string menuTextCharacter, string friendlyName)
+			{
+				kill.Alert = true;
+				var alertText = generateZKillAlertText(kill, path, Program.MainConfiguration.ZKillAlertText, menuTextCharacter);
 
-            ConcurrentQueue<AlertQueueItem> ZKillAlerts = new ConcurrentQueue<AlertQueueItem>();
+				Program.AlertQueueManager.EnqueueNewAlert(
+					new AlertQueueItem
+					{
+						AlertText = alertText,
+						MenuText = generateZKillAlertText(kill, path, Program.MainConfiguration.ZKillMenuText, menuTextCharacter),
+						Kill = kill,
+						Path = path,
+						Context = context,
+						SoundFile = Program.MainConfiguration.ZKillSound,
+						FriendlyName = friendlyName,
+						ShowAlert = true
+					});
+
+				Log.Information($"ALERT - {alertText}");
+			}
+
+			string systemName = "---";
+            string regionName = "---";
 
             var victimShipName = Program.Universe.ItemTypes.ContainsKey((int)e.Kill.VictimShipTypeId) ? Program.Universe.ItemTypes[(int)e.Kill.VictimShipTypeId].Name : "Unknown:" + e.Kill.VictimShipTypeId.ToString();
             e.Kill.VictimShipName = victimShipName;
 
-            if (Program.Universe.SolarSystems.ContainsKey((int)e.Kill.SolarSystemId))
-            {
-                systemName = Program.Universe.SolarSystems[(int)e.Kill.SolarSystemId].Name;
-                regionName = Program.Universe.SolarSystems[(int)e.Kill.SolarSystemId].RegionName;
-                e.Kill.SolarSystemName = systemName;
-                e.Kill.RegionName = regionName;
 
-                Program.ZKillHandler.EnqueueZKillAlert(e.Kill, Program.Universe.SolarSystems[(int)e.Kill.SolarSystemId]);
+			if (Program.Universe.SolarSystems.TryGetValue((int)e.Kill.SolarSystemId,out var system))
+			{
+				systemName = system.Name;
+				regionName = system.RegionName;
 
-                //GetSystemInfo((int)e.Kill.SolarSystemId);
-            }
+				e.Kill.SolarSystemName = systemName;
+				e.Kill.RegionName = regionName;
+
+				Program.ZKillHandler.EnqueueZKillAlert(e.Kill,system);
+			}
 
             Log.Information($"ZKILL Event handler {e.Kill.ID} {regionName}:{systemName} {victimShipName} {Program.Universe.GetCharacterName((e.Kill.VictimCharacterId != null ? (int)e.Kill.VictimCharacterId : 0))}");
             e.Kill.Context = generateZKillAlertText(e.Kill, null, Program.MainConfiguration.ZKillContextText, "");
@@ -1625,24 +1638,19 @@ namespace Quesadilla
             var homeSystemPathInfo = Program.Universe.FindAndCachePath(homeSystemId, toSystemId);
             if (homeSystemPathInfo != null)
             {
-                Log.Debug("Jumps from HOME:" + Program.Universe.SolarSystems[homeSystemId].Name + " to " + Program.Universe.SolarSystems[toSystemId].Name + " is " + homeSystemPathInfo.TotalJumps);
+                Log.Debug("Jumps from HOME:" + Program.Universe.SolarSystems[homeSystemId].Name + " to " + system?.Name + " is " + homeSystemPathInfo.TotalJumps);
             }
             foreach (var c in Program.CharacterManager.CharactersWithLocation())
             {
-                var CurrectLocationPathInfo = Program.Universe.FindAndCachePath(c.LocationId, toSystemId);
-                if (CurrectLocationPathInfo != null)
+                var currentLocationPathInfo = Program.Universe.FindAndCachePath(c.LocationId, toSystemId);
+                if (currentLocationPathInfo != null)
                 {
-                    Log.Debug("Jumps from " + c.CharacterName + ":" + Program.Universe.SolarSystems[c.LocationId].Name + " to " + Program.Universe.SolarSystems[toSystemId].Name + " is " + CurrectLocationPathInfo.TotalJumps);
+                    Log.Debug("Jumps from " + c.CharacterName + ":" + Program.Universe.SolarSystems[c.LocationId].Name + " to " + system?.Name + " is " + currentLocationPathInfo.TotalJumps);
                 }
             }
 
             // Range alerts
-            foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
-            {
-                if (!tempTrigger.Enabled)
-                    return false;
-                return tempTrigger.AlertType == AlertConfigType.Range;
-            })))
+            foreach (AlertConfig alert in GetEnabledAlerts(AlertConfigType.Range))
             {
                 bool sendAlert = false;
                 PathInfo path = new PathInfo();
@@ -1653,140 +1661,50 @@ namespace Quesadilla
                     case AlertConfigRangeType.Home:
                         path = homeSystemPathInfo;
                         sendAlert = CheckJumpsRange(alert, path);
-                        if (sendAlert)
-                        {
-                            alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText, "");
-                            Log.Information("ALERT - " + alertText);
-                            e.Kill.Alert = true;
-                            Program.AlertQueueManager.EnqueueNewAlert(
-                                new AlertQueueItem()
-                                {
-                                    AlertText = alertText,
-                                    MenuText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillMenuText, ""),
-                                    Kill = e.Kill,
-                                    Path = path,
-                                    Context = homeSystemPathInfo.FromSystemName,
-                                    SoundFile = Program.MainConfiguration.ZKillSound,
-                                    FriendlyName = "zkill",
-                                    ShowAlert = true,
-                                }); //ZKillAlerts
-						}
+                        if (sendAlert) QueueZKillAlert(e.Kill,path,homeSystemPathInfo.FromSystemName,"","zkill");
                         break;
 
                     case AlertConfigRangeType.System:
                         // check against specific system
-                        path = Program.Universe.FindAndCachePath(Program.Universe.Names[alert.TriggerText], toSystemId);
-                        sendAlert = CheckJumpsRange(alert, path);
-                        if (sendAlert)
-                        {
-                            alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText, "");
-                            Log.Information("ALERT - " + alertText);
-                            e.Kill.Alert = true;
-                            Program.AlertQueueManager.EnqueueNewAlert(
-                                new AlertQueueItem()
-                                {
-                                    AlertText = alertText,
-                                    MenuText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillMenuText, ""),
-                                    Kill = e.Kill,
-                                    Path = path,
-                                    Context = path.FromSystemName,
-                                    SoundFile = Program.MainConfiguration.ZKillSound,
-                                    FriendlyName = "zkill",
-                                    ShowAlert = true,
-                                });//ZKillAlerts
-						}
+						if (!Program.Universe.Names.TryGetValue(alert.TriggerText,out var sourceSystemId)) continue;
+						path = Program.Universe.FindAndCachePath(sourceSystemId,toSystemId);
+						sendAlert = CheckJumpsRange(alert, path);
+                        if (sendAlert) QueueZKillAlert(e.Kill,path,path.FromSystemName,"","zkill");
                         break;
                     case AlertConfigRangeType.OneCharacter:
                     case AlertConfigRangeType.OneOnlineCharacter:
-                        // check against one specific character
-                        foreach (var x in Program.CharacterManager.CharactersNamed(alert.TriggerText))
-                        {
-                            if (x.LocationId != 0)
-                            {
-                                path = Program.Universe.FindAndCachePath(x.LocationId, toSystemId);
-                                sendAlert = CheckJumpsRange(alert, path);
-                                if (sendAlert)
-                                {
-                                    alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText, x.CharacterName);
-                                    Log.Information("ALERT - " + alertText);
-                                    if (
-                                        alert.AlertRangeType == AlertConfigRangeType.OneCharacter ||
-                                        alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
-                                        )
-                                    {
-                                        e.Kill.Alert = true;
-                                        Program.AlertQueueManager.EnqueueNewAlert(
-                                        new AlertQueueItem()
-                                        {
-                                            AlertText = alertText,
-                                            MenuText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillMenuText, x.CharacterName),
-                                            Kill = e.Kill,
-                                            Path = path,
-                                            Context = x.CharacterName,
-                                            SoundFile = Program.MainConfiguration.ZKillSound,
-                                            FriendlyName = alert.FriendlyName,
-                                            ShowAlert = true,
-                                        });//ZKillAlerts
-									}
-                                }
-                            }
-                        }
-                        break;
+						// check against one specific character
+						foreach (var x in Program.CharacterManager.CharactersNamed(alert.TriggerText))
+						{
+							if (x.LocationId == 0) continue;
+							path = Program.Universe.FindAndCachePath(x.LocationId, toSystemId);
+							sendAlert = CheckJumpsRange(alert, path);
+							if (!sendAlert) continue;
+							bool alertAllowed = alert.AlertRangeType == AlertConfigRangeType.OneCharacter || (alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive);
+							if (!alertAllowed) continue;
+							QueueZKillAlert(e.Kill, path, x.CharacterName, x.CharacterName, alert.FriendlyName);
+						}
+						break;
                     case AlertConfigRangeType.AllCharacters:
                     case AlertConfigRangeType.AllOnlineCharacters:
                         // check against all characters
                         foreach (var x in Program.CharacterManager.Characters)
                         {
-                            if (x.LocationId != 0)
-                            {
-                                path = Program.Universe.FindAndCachePath(x.LocationId, toSystemId);
-                                sendAlert = CheckJumpsRange(alert, path);
-                                if (sendAlert)
-                                {
-                                    alertText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillAlertText, x.CharacterName);
-                                    Log.Information("ALERT - " + alertText);
-                                    if (
-                                        alert.AlertRangeType == AlertConfigRangeType.AllCharacters ||
-                                        alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive
-                                        )
-                                    {
-                                        e.Kill.Alert = true;
-                                        Program.AlertQueueManager.EnqueueNewAlert(
-                                        new AlertQueueItem()
-                                        {
-                                            AlertText = alertText,
-                                            MenuText = generateZKillAlertText(e.Kill, path, Program.MainConfiguration.ZKillMenuText, x.CharacterName),
-                                            Kill = e.Kill,
-                                            Path = path,
-                                            Context = x.CharacterName,
-                                            SoundFile = Program.MainConfiguration.ZKillSound,
-                                            FriendlyName = "zkill",
-                                            ShowAlert = true,
-                                        }); //ZKillAlerts
-									}
-                                }
-                            }
-                        }
+							if (x.LocationId == 0) continue;
+                            path = Program.Universe.FindAndCachePath(x.LocationId,toSystemId);
+                            sendAlert = CheckJumpsRange(alert, path);
+                            if (!sendAlert) continue;
+                            bool alertAllowed = alert.AlertRangeType == AlertConfigRangeType.AllCharacters || (alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive);
+                            if (!alertAllowed) continue;
+                            QueueZKillAlert(e.Kill,path,x.CharacterName,x.CharacterName,"zkill");
+						}
                         break;
                     default:
                         break;
                 }
 
-                if (ZKillAlerts.Count > 0)
-                {
-                    // Add new alert(s) to NewAlerts
-                    while (ZKillAlerts.Count > 0)
-                    {
-                        AlertQueueItem item = null;
-                        ZKillAlerts.TryDequeue(out item);
-                        if (item != null)
-                        {
-                            Program.AlertQueueManager.EnqueueNewAlert(item);
-                        }
-                    }
-                }
-                shouldUpdateMinimap = sendAlert;
-            }
+				if (sendAlert) shouldUpdateMinimap = true;
+			}
         }
         public void SetupStatusBar()
         {
