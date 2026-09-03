@@ -550,27 +550,23 @@ namespace Quesadilla
                 switch (entry.EntryType)
                 {
                     case LogEntryType.OpenChatLogEvent:
-                        //if (!this._conf.DisplayOpenFileAlerts) break;
                         Log.Debug(e.LogPrefix + " > Chat log opened: (" + entry.CharacterName + ") " + entry.FileName);
                         break;
                     case LogEntryType.NewChatLogEvent:
-                        //if (!this._conf.DisplayNewFileAlerts) break;
                         Log.Debug(e.LogPrefix + " > New chat log detected: (" + entry.CharacterName + ") " + entry.FileName);
                         break;
                     case LogEntryType.OpenGameLogEvent:
-                        //if (!this._conf.DisplayOpenFileAlerts) break;
                         Log.Debug(e.LogPrefix + " > Game log opened: (" + entry.CharacterName + ") " + entry.FileName);
                         break;
                     case LogEntryType.NewGameLogEvent:
-                        //if (!this._conf.DisplayNewFileAlerts) break;
                         Log.Debug(e.LogPrefix + " > New game log detected: (" + entry.CharacterName + ") " + entry.FileName);
                         break;
                 }
             }
             else
             {
-                if (!entry.ParseSuccess)
-                    return;
+                if (!entry.ParseSuccess) return;
+
                 HashSet<int> intSet = new HashSet<int>();
                 if (!Program.MainConfiguration.ignoreStrings.Any<Regex>((Func<Regex, bool>)(ignoreString => ignoreString.IsMatch(entry.LineContent))) && entry.LogType == LogFileType.ChatIntel)
                 {
@@ -608,13 +604,8 @@ namespace Quesadilla
                             }
                         }
 
-                        // Range alerts
-                        foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
-                        {
-                            if (!tempTrigger.Enabled)
-                                return false;
-                            return tempTrigger.AlertType == AlertConfigType.Range;
-                        })))
+						// Range alerts
+						foreach (var alert in GetEnabledAlerts(AlertConfigType.Range))
                         {
                             bool sendAlert = false;
                             PathInfo path = new PathInfo();
@@ -799,16 +790,10 @@ namespace Quesadilla
                 // check against custom alerts (no system name needed) - only if no alerts generated
                 if (alertCount == 0)
                 {
-                    foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
-                    {
-                        if (!tempTrigger.Enabled)
-                            return false;
-                        return tempTrigger.AlertType == AlertConfigType.Text;
-                    })))
+					foreach (var alert in GetEnabledAlerts(AlertConfigType.Text))
                     {
                         if (entry.LineContent.Contains(alert.TriggerText, StringComparison.OrdinalIgnoreCase))
                         {
-
                             string alertText = GenerateAlertText(entry, null, alert, alert.TriggerText, AlertTextType.Alert, alert.TriggerText);
                             Log.Debug("ALERT - " + alertText);
                             Program.AlertQueueManager.EnqueueNewAlert(
@@ -1033,164 +1018,145 @@ namespace Quesadilla
             m.Checked = true;
             Program.MainConfiguration.AlertPopupBackground = m.Text;
         }
-        private void logFile_ProcessCombat(object sender, ProcessCombatEventArgs e)
-        {
-            string combatEntity = "";
+		private void logFile_ProcessCombat(object sender, ProcessCombatEventArgs e)
+		{
+			void AddCombatEntry(string entity, string text, int damage, int neut, int cap, int shield, int armor, int hull, bool received)
+			{
+				Program.GraphDataManager.AddCombat(
+					e.Entry.CharacterName,
+					new CombatLine
+					{
+						TimeAdded = e.Entry.TimeAdded,
+						Entity = entity,
+						Text = text,
+						DamageAmount = damage,
+						NeutAmount = neut,
+						CapAmount = cap,
+						ShieldAmount = shield,
+						ArmorAmount = armor,
+						HullAmount = hull,
+						Received = received
+					});
+			}
 
-            //Log.Information("COMBAT:" + e.CombatEvent);
-            if (e.Entry != null)
-            {
-                if (InCombat == false && Program.MainConfiguration.ShowWindowOverlayDPS)
-                {
-                }
-                if (InCombat == false)
-                {
-                    InCombat = true;
-                    this.Invalidate();
-                    EveOClient.Agression(e.Entry.CharacterName, true);
-                }
-                else
-                {
-                    InCombat = true;
-                    EveOClient.Agression(e.Entry.CharacterName, true);
-                }
+			if (e.Entry == null)
+			{
+				InCombat = false;
+				Invalidate();
+				return;
+			}
 
-                Match match = _CombatRegexMissesYouCompletely.Match(e.Entry.LineContent);
-				if (match.Success)
+			if (!InCombat)
+			{
+				InCombat = true;
+				Invalidate();
+			}
+
+			EveOClient.Agression(e.Entry.CharacterName, true);
+
+			// Misses you completly
+			Match match = _CombatRegexMissesYouCompletely.Match(e.Entry.LineContent);
+			if (match.Success) AddCombatEntry(match.Groups["combatEntity"].Value, "", 0, 0, 0, 0, 0, 0, true);
+
+			match = _CombatRegexCombatData.Match(e.Entry.LineContent);
+			if (match.Success)
+			{
+				int dmgAmount = 0;
+				int neutAmount = 0;
+				int capAmount = 0;
+				int shieldAmount = 0;
+				int armorAmount = 0;
+				int hullAmount = 0;
+
+				var amount = match.Groups["combatAmount"].Value.Trim();
+				bool received = true;
+
+				var combatEntity = match.Groups["combatEntity"].Value;
+				var combatContext = match.Groups["combatContext"].Value;
+				var combatText = match.Groups["combatText"].Value; 
+                
+                if (amount.Contains("GJ"))
 				{
-					Program.GraphDataManager.AddCombat(
-						e.Entry.CharacterName,
-						new CombatLine()
-						{
-							TimeAdded = e.Entry.TimeAdded,
-							Entity = match.Groups["combatEntity"].ToString(),
-						});
+					int.TryParse(amount.Replace(" GJ", "").Trim(), out neutAmount);
+					if (match.Groups["combatColour"].Value.Equals(combatNeutOut)) received = false;
 				}
-				match = _CombatRegexCombatData.Match(e.Entry.LineContent);
-                if (match.Success)
-                {
-                    int dmgAmount = 0;
-                    int neutAmount = 0;
-                    int capAmount = 0;
-                    int shieldAmount = 0;
-                    int armorAmount = 0;
-                    int hullAmount = 0;
+				else
+				{
+					int.TryParse(amount.Trim(), out var parsedAmount);
 
-                    var amount = match.Groups["combatAmount"].ToString();
-                    bool received = true;
-                    if (amount.Contains("GJ"))
-                    {
-                        neutAmount = Int32.Parse(amount.Replace(" GJ", "").Trim());
-                        if (match.Groups["combatColour"].ToString().Equals(combatNeutOut))
-                        {
-                            received = false;
-                        }
-                    }
-                    else
-                    {
+					if (combatContext == "to") received = false;
+					if (combatContext == "to" || combatContext == "from")
+					{
+                        dmgAmount = parsedAmount;
+					}
+					else
+					{
+                        if (combatContext.StartsWith("remote shield boosted ")) shieldAmount = parsedAmount;
+						if (combatContext.StartsWith("remote armor boosted ")) armorAmount = parsedAmount;
+						if (combatContext.StartsWith("remote hull boosted ")) hullAmount = parsedAmount;
+						if (combatContext.StartsWith("remote capacitor transmitted ")) capAmount = parsedAmount;
+						if (combatContext.Trim().EndsWith("to")) received = false;
+					}
+				}
 
-                        if (match.Groups["combatContext"].ToString() == "to")
-                        {
-                            received = false;
-                        }
+				AddCombatEntry(combatEntity, combatText, dmgAmount, neutAmount, capAmount, shieldAmount, armorAmount, hullAmount, received);
 
-                        if (match.Groups["combatContext"].ToString() == "to" || match.Groups["combatContext"].ToString() == "from")
-                        {
-                            dmgAmount = Int32.Parse(amount.Trim());
-                        }
-                        else
-                        {
-                            if (match.Groups["combatContext"].ToString().StartsWith("remote shield boosted ")) shieldAmount = Int32.Parse(amount.Trim());
-                            if (match.Groups["combatContext"].ToString().StartsWith("remote armor boosted ")) armorAmount = Int32.Parse(amount.Trim());
-                            if (match.Groups["combatContext"].ToString().StartsWith("remote hull boosted ")) hullAmount = Int32.Parse(amount.Trim());
-                            if (match.Groups["combatContext"].ToString().StartsWith("remote capacitor transmitted ")) capAmount = Int32.Parse(amount.Trim());
-                            if (match.Groups["combatContext"].ToString().Trim().EndsWith("to")) received = false;
-                        }
-                    }
+				// check if faction 
+				foreach (var alert in GetEnabledAlerts(AlertConfigType.FactionSpawn))
+				{
+					// active alert config for faction spawn
+					if (_FactionRats.Any(s => combatEntity.Contains(s)))
+					{
+						string alertText = GenerateAlertText(e.Entry, null, alert, "Faction Spawn", AlertTextType.Alert, combatEntity);
 
-                    Program.GraphDataManager.AddCombat(e.Entry.CharacterName, new CombatLine()
-                    {
-                        TimeAdded = e.Entry.TimeAdded,
-                        Entity = match.Groups["combatEntity"].ToString(),
-                        Text = match.Groups["combatText"].ToString(),
-                        NeutAmount = neutAmount,
-                        DamageAmount = dmgAmount,
-                        CapAmount = capAmount,
-                        ShieldAmount = shieldAmount,
-                        ArmorAmount = armorAmount,
-                        HullAmount = hullAmount,
-                        Received = received,
-                    });
+						PathInfo path = null;
+						var c = Program.CharacterManager.Get(e.CharacterName);
+						bool sendAlert = true;
 
-                    // check if faction 
-                    foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
-                    {
-                        if (!tempTrigger.Enabled)
-                            return false;
-                        return tempTrigger.AlertType == AlertConfigType.FactionSpawn;
-                    })))
-                    {
-                        // active alert config for faction spawn
+						if (c != null)
+						{
+							path = new PathInfo()
+							{
+								FromSystemId = c.LocationId,
+								ToSystemId = c.LocationId,
+								FromSystemName = c.Location,
+								ToSystemName = c.Location,
+								ToSystemRegionName = Program.Universe.SolarSystems[c.LocationId].RegionName,
+								PathSystems = new List<int>() { c.LocationId },
+							};
 
+							if (c.LastFactionAlert.AddSeconds(alert.CustomTriggerEverySeconds == null ? 0 : (double)alert.CustomTriggerEverySeconds) > DateTime.Now) { sendAlert = false; }
+						}
+						else
+						{
+							if (LastFactionAlert.AddSeconds(alert.CustomTriggerEverySeconds == null ? 0 : (double)alert.CustomTriggerEverySeconds) > DateTime.Now) { sendAlert = false; }
+						}
 
-                        if (_FactionRats.Any(s => match.Groups["combatEntity"].ToString().Contains(s)))
-                        {
-                            string alertText = GenerateAlertText(e.Entry, null, alert, "Faction Spawn", AlertTextType.Alert, match.Groups["combatEntity"].ToString());
-
-                            PathInfo path = null;
-                            var c = Program.CharacterManager.Get(e.CharacterName);
-                            bool sendAlert = true;
-
-                            if (c != null)
-                            {
-                                path = new PathInfo()
-                                {
-                                    FromSystemId = c.LocationId,
-                                    ToSystemId = c.LocationId,
-                                    FromSystemName = c.Location,
-                                    ToSystemName = c.Location,
-                                    ToSystemRegionName = Program.Universe.SolarSystems[c.LocationId].RegionName,
-                                    PathSystems = new List<int>() { c.LocationId },
-                                };
-
-                                if (c.LastFactionAlert.AddSeconds(alert.CustomTriggerEverySeconds == null ? 0 : (double)alert.CustomTriggerEverySeconds) > DateTime.Now) { sendAlert = false; }
-                            }
-                            else
-                            {
-                                if (LastFactionAlert.AddSeconds(alert.CustomTriggerEverySeconds == null ? 0 : (double)alert.CustomTriggerEverySeconds) > DateTime.Now) { sendAlert = false; }
-                            }
-
-                            if (sendAlert)
-                            {
-                                LastFactionAlert = DateTime.Now;
-                                if (c != null) { Program.CharacterManager.SetLastFactionAlert(c.CharacterName, LastFactionAlert); }
-                                Log.Debug("ALERT - " + alertText);
-                                Program.AlertQueueManager.EnqueueNewAlert(
-                                    new AlertQueueItem()
-                                    {
-                                        AlertText = alertText,
-                                        MenuText = GenerateAlertText(e.Entry, null, alert, "Faction spawn", AlertTextType.Menu, match.Groups["combatEntity"].ToString()),
-                                        Entry = e.Entry,
-                                        Path = path,
-                                        Context = match.Groups["combatEntity"].ToString(),
-                                        SoundFile = alert.SoundFile,
-                                        FriendlyName = alert.FriendlyName,
-                                        isFaction = true,
-                                        ShowAlert = true,
-                                    });
-                            }
-                        }
-                    }
-                }
-                CombatAdded = true;
-            }
-            else
-            {
-                InCombat = false;
-                this.Invalidate();
-            }
-        }
-        private void logFile_ProcessISK(object sender, ProcessISKEventArgs e)
+						if (sendAlert)
+						{
+							LastFactionAlert = DateTime.Now;
+							if (c != null) { Program.CharacterManager.SetLastFactionAlert(c.CharacterName, LastFactionAlert); }
+							Log.Debug("ALERT - " + alertText);
+							Program.AlertQueueManager.EnqueueNewAlert(
+								new AlertQueueItem()
+								{
+									AlertText = alertText,
+									MenuText = GenerateAlertText(e.Entry, null, alert, "Faction spawn", AlertTextType.Menu, combatEntity),
+									Entry = e.Entry,
+									Path = path,
+									Context = combatEntity,
+									SoundFile = alert.SoundFile,
+									FriendlyName = alert.FriendlyName,
+									isFaction = true,
+									ShowAlert = true,
+								});
+						}
+					}
+				}
+			}
+			CombatAdded = true;
+		}
+		private void logFile_ProcessISK(object sender, ProcessISKEventArgs e)
         {
             //Log.Information("COMBAT:" + e.CombatEvent);
             if (e.Entry != null)
@@ -1198,10 +1164,7 @@ namespace Quesadilla
                 Match match = _ISKRegexISKData.Match(e.Entry.LineContent);
                 if (match.Success)
                 {
-
-
-					var amount = match.Groups["iskAmount"].Value;
-
+                    var amount = match.Groups["iskAmount"].Value;
 					if (double.TryParse(amount.Trim(), out var iskAmount))
 					{
 						Program.GraphDataManager.AddISK(e.Entry.CharacterName,
@@ -1650,7 +1613,7 @@ namespace Quesadilla
             }
 
             // Range alerts
-            foreach (AlertConfig alert in GetEnabledAlerts(AlertConfigType.Range))
+            foreach (var alert in GetEnabledAlerts(AlertConfigType.Range))
             {
                 bool sendAlert = false;
                 PathInfo path = new PathInfo();
