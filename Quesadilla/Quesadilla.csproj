@@ -105,6 +105,7 @@
     <Compile Include="Classes\Alerts\AlertTextType.cs" />
     <Compile Include="Classes\Characters\Character.cs" />
     <Compile Include="Classes\Characters\CharacterManager.cs" />
+    <Compile Include="Classes\GraphData\GraphDataManager.cs" />
     <Compile Include="Classes\ImageGeneration\Animation\AnimationManager.cs" />
     <Compile Include="Classes\ImageGeneration\Animation\AnimationState.cs" />
     <Compile Include="Classes\Attributes\IsColourAttribute.cs" />

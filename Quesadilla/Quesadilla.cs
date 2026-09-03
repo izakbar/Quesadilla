@@ -1012,13 +1012,6 @@ namespace Quesadilla
             {
                 if (InCombat == false && Program.MainConfiguration.ShowWindowOverlayDPS)
                 {
-/*
-                    if (DPSGraphWindow == null)
-                    {
-                        DPSGraphWindow = new QuesadillaOLDDPSGraph(this);
-                    }
-                    DPSGraphWindow.Show();
-*/
                 }
                 if (InCombat == false)
                 {
@@ -1032,16 +1025,10 @@ namespace Quesadilla
                     EveOClient.Agression(e.Entry.CharacterName, true);
                 }
 
-                if (!Program.CombatDataKeys().Contains(e.Entry.CharacterName))
-                {
-                    Program.Combat.TryAdd(e.Entry.CharacterName, new List<CombatLine>());
-                }
-                //Log.Information(e.Entry.LineContent);
-
                 Match match = _CombatRegexMissesYouCompletely.Match(e.Entry.LineContent);
 				if (match.Success)
 				{
-					Program.AddCombat(
+					Program.GraphDataManager.AddCombat(
 						e.Entry.CharacterName,
 						new CombatLine()
 						{
@@ -1083,31 +1070,15 @@ namespace Quesadilla
                         }
                         else
                         {
-                            if (match.Groups["combatContext"].ToString().StartsWith("remote shield boosted "))
-                            {
-                                shieldAmount = Int32.Parse(amount.Trim());
-                            }
-                            if (match.Groups["combatContext"].ToString().StartsWith("remote armor boosted "))
-                            {
-                                armorAmount = Int32.Parse(amount.Trim());
-                            }
-                            if (match.Groups["combatContext"].ToString().StartsWith("remote hull boosted "))
-                            {
-                                hullAmount = Int32.Parse(amount.Trim());
-                            }
-                            if (match.Groups["combatContext"].ToString().StartsWith("remote capacitor transmitted "))
-                            {
-                                capAmount = Int32.Parse(amount.Trim());
-                            }
-
-                            if (match.Groups["combatContext"].ToString().Trim().EndsWith("to"))
-                            {
-                                received = false;
-                            }
+                            if (match.Groups["combatContext"].ToString().StartsWith("remote shield boosted ")) shieldAmount = Int32.Parse(amount.Trim());
+                            if (match.Groups["combatContext"].ToString().StartsWith("remote armor boosted ")) armorAmount = Int32.Parse(amount.Trim());
+                            if (match.Groups["combatContext"].ToString().StartsWith("remote hull boosted ")) hullAmount = Int32.Parse(amount.Trim());
+                            if (match.Groups["combatContext"].ToString().StartsWith("remote capacitor transmitted ")) capAmount = Int32.Parse(amount.Trim());
+                            if (match.Groups["combatContext"].ToString().Trim().EndsWith("to")) received = false;
                         }
                     }
 
-                    Program.Combat[e.Entry.CharacterName].Add(new CombatLine()
+                    Program.GraphDataManager.AddCombat(e.Entry.CharacterName, new CombatLine()
                     {
                         TimeAdded = e.Entry.TimeAdded,
                         Entity = match.Groups["combatEntity"].ToString(),
@@ -1194,11 +1165,6 @@ namespace Quesadilla
             //Log.Information("COMBAT:" + e.CombatEvent);
             if (e.Entry != null)
             {
-                if (!Program.IskDataKeys().Contains(e.Entry.CharacterName))
-                {
-                    Program.ISK.TryAdd(e.Entry.CharacterName, new List<IskLine>());
-                }
-
                 Match match = _ISKRegexISKData.Match(e.Entry.LineContent);
                 if (match.Success)
                 {
@@ -1207,7 +1173,7 @@ namespace Quesadilla
                     var amount = match.Groups["iskAmount"].ToString();
                     iskAmount = Double.Parse(amount.Trim());
 
-					Program.AddISK(e.Entry.CharacterName,
+					Program.GraphDataManager.AddISK(e.Entry.CharacterName,
 						new IskLine()
 						{
 							TimeAdded = e.Entry.TimeAdded,
@@ -1228,7 +1194,7 @@ namespace Quesadilla
                     var minedAmount = match.Groups["miningAmount"].ToString();
                     int mined = Int32.Parse(minedAmount.Trim());
 
-                    Program.AddMining(e.Entry.CharacterName, new MiningLine()
+                    Program.GraphDataManager.AddMining(e.Entry.CharacterName, new MiningLine()
                     {
                         TimeAdded = e.Entry.TimeAdded,
                         MiningItem = match.Groups["miningContext"].ToString(),
@@ -1244,7 +1210,7 @@ namespace Quesadilla
                     var minedAmount = match.Groups["miningAmount"].ToString();
                     int mined = Int32.Parse(minedAmount.Trim());
 
-					Program.AddMining(e.Entry.CharacterName, new MiningLine()
+					Program.GraphDataManager.AddMining(e.Entry.CharacterName, new MiningLine()
 					{
 						TimeAdded = e.Entry.TimeAdded,
                         MiningItem = match.Groups["miningContext"].ToString(),
@@ -1261,7 +1227,7 @@ namespace Quesadilla
                     var minedWasted = match.Groups["miningResidue"].ToString();
                     int wasted = Int32.Parse(minedWasted.Trim());
 
-					Program.AddMining(e.Entry.CharacterName, new MiningLine()
+					Program.GraphDataManager.AddMining(e.Entry.CharacterName, new MiningLine()
 					{
 						TimeAdded = e.Entry.TimeAdded,
                         MiningItem = "WASTE",
@@ -1865,7 +1831,19 @@ namespace Quesadilla
             EveScoutStatus.Text = status.ToString().Trim();
 
 			if (OverlayMapWindow != null)
-				OverlayMapWindow.EveScoutStatus.Text = EveScoutStatus.Text;
+			{
+				if (OverlayMapWindow.InvokeRequired)
+				{
+					OverlayMapWindow.BeginInvoke(new Action(() =>
+					{
+						OverlayMapWindow.EveScoutStatus.Text = EveScoutStatus.Text;
+					}));
+				}
+				else
+				{
+					OverlayMapWindow.EveScoutStatus.Text = EveScoutStatus.Text;
+				}
+			}
 		}
 
         private void GetSkyhookTimers()
@@ -2361,18 +2339,18 @@ namespace Quesadilla
 
         private void UpdateISK()
         {
-
+                
             if (ISKPerHourTotal == false)
             {
-                if (CurrentActiveToon != null && Program.IskDataKeys().Contains(CurrentActiveToon))
+                if (CurrentActiveToon != null && Program.GraphDataManager.GetIskDataKeys().Contains(CurrentActiveToon))
                 {
-                    RattingData.Text = Program.GetIskLastHour(CurrentActiveToon);
+                    RattingData.Text = Program.GraphDataManager.GetIskLastHour(CurrentActiveToon);
                     RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
                     this.Invalidate();
 
                     if (OverlayMapWindow != null)
                     {
-                        OverlayMapWindow.RattingData.Text = Program.GetIskLastHour(CurrentActiveToon);
+                        OverlayMapWindow.RattingData.Text = Program.GraphDataManager.GetIskLastHour(CurrentActiveToon);
                         OverlayMapWindow.RattingData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
                         OverlayMapWindow.UpdateMapData();
                     }
@@ -2391,11 +2369,11 @@ namespace Quesadilla
             {
                 try
                 {
-                    RattingData.Text = Program.GetIskLastHour("");
+                    RattingData.Text = Program.GraphDataManager.GetIskLastHour("");
                     RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).AlternateColor;
                     if (OverlayMapWindow != null)
                     {
-                        OverlayMapWindow.RattingData.Text = Program.GetIskLastHour("");
+                        OverlayMapWindow.RattingData.Text = Program.GraphDataManager.GetIskLastHour("");
                         OverlayMapWindow.RattingData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData")).AlternateColor;
                         OverlayMapWindow.UpdateMapData();
                     }
@@ -2411,9 +2389,9 @@ namespace Quesadilla
 
             if (MiningPerHourTotal == false)
             {
-                if (CurrentActiveToon != null && Program.MiningDataKeys().Contains(CurrentActiveToon))
+                if (CurrentActiveToon != null && Program.GraphDataManager.GetMiningDataKeys().Contains(CurrentActiveToon))
                 {
-                    MiningData.Text = Program.GetMiningLastHour(CurrentActiveToon);
+                    MiningData.Text = Program.GraphDataManager.GetMiningLastHour(CurrentActiveToon);
                     MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
                     this.Invalidate();
                     //lblISK.Visible = true;
@@ -2437,7 +2415,7 @@ namespace Quesadilla
             }
             else
             {
-                MiningData.Text = Program.GetMiningLastHour("");
+                MiningData.Text = Program.GraphDataManager.GetMiningLastHour("");
                 MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
                 if (OverlayMapWindow != null)
                 {
@@ -2697,8 +2675,8 @@ namespace Quesadilla
 		}
         private void RefreshMiningCSV()
         {
-            var miningDetail = Program.GetMiningLastHourDetail("", false);
-            var miningSummary = Program.MiningItemSummary(miningDetail);
+            var miningDetail = Program.GraphDataManager.GetMiningLastHourDetail("", false);
+            var miningSummary = Program.GraphDataManager.GetMiningItemSummary(miningDetail);
 
             try
             {
@@ -2817,9 +2795,9 @@ namespace Quesadilla
                 UpdateAlertsOutstanding();
 			});
 
-			Program.ExpireCombat();
-			Program.ExpireISK();
-			Program.ExpireMining();
+			Program.GraphDataManager.ExpireCombat();
+			Program.GraphDataManager.ExpireISK();
+			Program.GraphDataManager.ExpireMining();
 
 			zkillsExpired = Program.ZKillHandler.ExpireZKillQueue();
 

@@ -128,7 +128,7 @@ namespace Quesadilla
 				Toon = _main.CurrentActiveToon;
 			}
 
-			if (string.IsNullOrEmpty(Toon) || !Program.IskDataKeys().Contains(Toon))
+			if (string.IsNullOrEmpty(Toon) || !Program.GraphDataManager.GetIskDataKeys().Contains(Toon))
 			{
 				iskPerMinuteChart.Visible = false;
 				return;
@@ -167,11 +167,11 @@ namespace Quesadilla
 			DateTime end = start;
 
 			// work out start/end times of combat - for cuirrent/all toons
-			foreach(var currToon in Program.IskDataKeys())
+			foreach(var currToon in Program.GraphDataManager.GetIskDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
-					var isk = Program.IskDataLines(currToon);
+					var isk = Program.GraphDataManager.GetIskDataLines(currToon);
 					if (isk.Any())
 					{
 						if (isk.First().TimeAdded < start) start = isk.First().TimeAdded;
@@ -185,12 +185,12 @@ namespace Quesadilla
 			curr = DateTime.Now.AddSeconds(-1 * span * 30);
 			start = curr;
 
-			foreach (var currToon in Program.IskDataKeys())
+			foreach (var currToon in Program.GraphDataManager.GetIskDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
 					// setup second slots
-					foreach (var c in Program.IskDataLines(currToon)  /*.OrderBy(o => o.TimeAdded).ToList()*/ )
+					foreach (var c in Program.GraphDataManager.GetIskDataLines(currToon)  /*.OrderBy(o => o.TimeAdded).ToList()*/ )
 					{
 						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds / span);
 						if (!_iskGraphData.ContainsKey(slot))
@@ -324,7 +324,7 @@ namespace Quesadilla
 				Toon = _main.CurrentActiveToon;
 			}
 
-			if (string.IsNullOrEmpty(Toon) || !Program.MiningDataKeys().Contains(Toon))
+			if (string.IsNullOrEmpty(Toon) || !Program.GraphDataManager.GetMiningDataKeys().Contains(Toon))
 			{
 				minedPerMinuteChart.Visible = false;
 				return;
@@ -373,11 +373,11 @@ namespace Quesadilla
 			DateTime end = start;
 
 			// work out start/end times of combat - for cuirrent/all toons
-			foreach (var currToon in Program.MiningDataKeys())
+			foreach (var currToon in Program.GraphDataManager.GetMiningDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
-					var md = Program.MiningDataLines(currToon);
+					var md = Program.GraphDataManager.GetMiningDataLines(currToon);
 					if (md.Any())
 					{
 						if (md.First().TimeAdded < start) start = md.First().TimeAdded;
@@ -393,12 +393,12 @@ namespace Quesadilla
 			start = curr;
 
 
-			foreach (var currToon in Program.MiningDataKeys())
+			foreach (var currToon in Program.GraphDataManager.GetMiningDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
 					// setup second slots
-					foreach (var c in Program.MiningDataLines(currToon) /*.OrderBy(o => o.TimeAdded).ToList() */ )
+					foreach (var c in Program.GraphDataManager.GetMiningDataLines(currToon) /*.OrderBy(o => o.TimeAdded).ToList() */ )
 					{
 						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds / span);
 						if (!_minedGraphData.ContainsKey(slot))

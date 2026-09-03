@@ -113,7 +113,7 @@ namespace Quesadilla
 				Toon = _main.CurrentActiveToon;
 			}
 
-			if (string.IsNullOrEmpty(Toon) || !Program.CombatDataKeys().Contains(Toon))
+			if (string.IsNullOrEmpty(Toon) || !Program.GraphDataManager.GetCombatDataKeys().Contains(Toon))
 			{
 				dpsChart.Visible = false;
 				return;
@@ -173,12 +173,11 @@ namespace Quesadilla
 			DateTime end = start;
 
 			// work out start/end times of combat - for cuirrent/all toons
-			lock(Program.Combat)
-			foreach (var currToon in Program.CombatDataKeys())
+			foreach (var currToon in Program.GraphDataManager.GetCombatDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
-					var combat = Program.CombatDataLines(currToon);
+					var combat = Program.GraphDataManager.GetCombatDataLines(currToon);
 					if (combat.Any())
 					{
 						if (combat.First().TimeAdded < start) start = combat.First().TimeAdded;
@@ -199,12 +198,12 @@ namespace Quesadilla
 			var span = Math.Truncate(totalTime.TotalSeconds > maxPoints ? totalTime.TotalSeconds / maxPoints : 1);
 			if (span < minSpanSize) span = minSpanSize;
 
-			foreach (var currToon in Program.CombatDataKeys())
+			foreach (var currToon in Program.GraphDataManager.GetCombatDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
 					// setup second slots
-					foreach (var c in Program.CombatDataLines(currToon) /*.OrderBy(o => o.TimeAdded).ToList() */ )
+					foreach (var c in Program.GraphDataManager.GetCombatDataLines(currToon) /*.OrderBy(o => o.TimeAdded).ToList() */ )
 					{
 						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds);
 

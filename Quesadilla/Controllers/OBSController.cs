@@ -158,7 +158,7 @@ namespace Quesadilla.Controllers
             string output = "<meta http-equiv=\"refresh\" content=\"10\">\r\n";
             if (Program.q != null)
             {
-                string isk = Program.GetIskLastHour(toon);
+                string isk = Program.GraphDataManager.GetIskLastHour(toon);
                 if (!string.IsNullOrEmpty(isk))
                 {
                     output += $"<div class=iskcontainer><div class=iskperhour>{isk}</div></div>";
@@ -179,7 +179,7 @@ namespace Quesadilla.Controllers
             string output = "<meta http-equiv=\"refresh\" content=\"10\">\r\n";
             if (Program.q != null)
             {
-                string mining = Program.GetMiningLastHour(toon);
+                string mining = Program.GraphDataManager.GetMiningLastHour(toon);
                 if (!string.IsNullOrEmpty(mining))
                 {
                     output += $"<div class=miningcontainer><div class=miningperhour>{mining}</div></div>";
@@ -200,7 +200,7 @@ namespace Quesadilla.Controllers
             string output = "<meta http-equiv=\"refresh\" content=\"10\">\r\n";
             if (Program.q != null)
             {
-                var mining = Program.GetMiningLastHourDetail(toon, totalsOnly);
+                var mining = Program.GraphDataManager.GetMiningLastHourDetail(toon, totalsOnly);
                 if (mining != null)
                 {
                     output += $"<div class=miningcontainer><div class=miningperhour>";
