@@ -64,6 +64,7 @@ namespace Quesadilla
 
         public static Version version = Assembly.GetEntryAssembly().GetName().Version;
         public static String UserAgent = $"Mozilla/5.0 (Quesadilla version {version.ToString()} )";
+        public static Image CachedBackground;
 
 		[STAThread]
         static void Main()

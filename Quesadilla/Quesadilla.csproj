@@ -157,6 +157,7 @@
     <Compile Include="Classes\SolarSystems\PlanetInfoDisplay.cs" />
     <Compile Include="Classes\SolarSystems\MinimapConnection.cs" />
     <Compile Include="Classes\SolarSystems\MinimapSystem.cs" />
+    <Compile Include="Classes\SolarSystems\PlanetSummary.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemBelt.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemMoon.cs" />
     <Compile Include="Classes\SolarSystems\PlanetInfo.cs" />

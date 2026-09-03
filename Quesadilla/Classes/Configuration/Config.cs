@@ -96,7 +96,11 @@ namespace Quesadilla.Classes
                 ZKillSound = ZKillSound,
                 AlertPopupMinimapRawXY = AlertPopupMinimapRawXY,
                 MinimapRawXY = MinimapRawXY,
-            };
+				OverlayDPSWindowPosition = OverlayDPSWindowPosition,
+				OverlayDPSWindowSize = OverlayDPSWindowSize,
+				OverlayMapWindowPosition = OverlayMapWindowPosition,
+				OverlayMapWindowSize	= OverlayMapWindowSize,
+			};
 
             // copy as many config items as possible
             foreach(var p in typeof(Config).GetProperties().Where(o => o.PropertyType == typeof(Color) || o.PropertyType == typeof(int) || o.PropertyType == typeof(string) || o.PropertyType == typeof(bool)))

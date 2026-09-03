@@ -89,7 +89,6 @@ namespace Quesadilla
         private int _windowExtraHeight = 60;
 		private const int _maxTrayTooltipLength = 63;
         bool _refreshProcessList = false;
-
 		private bool shouldUpdateMinimap = false;
         private bool shouldUpdatePlanetInfo = false;
 
@@ -154,9 +153,10 @@ namespace Quesadilla
         private bool MiningPerHourTotal = false;
 
         private bool NoActiveEveProcess = false;
-
-
-        public Quesadilla()
+		private Font _planetInfoFont = new Font("Verdana", 10, FontStyle.Regular);
+		private int _cachedPlanetSystemId = -1;
+        private List<PlanetSummary> _cachedPlanetInfo;
+		public Quesadilla()
         {
             OriginalBackgroundColour = BackColor;
 
@@ -387,9 +387,13 @@ namespace Quesadilla
             RecalculateWindowHeight();
 
 			mapScale =Program.MainConfiguration.MainWindowMapScale == 0 ? 100 : Program.MainConfiguration.MainWindowMapScale;
+
+            Program.CachedBackground = Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground);
+
+			_planetInfoFont = new Font("Verdana", Program.MainConfiguration.PlanetInfoFontSize, FontStyle.Regular);
 		}
 
-        private void Quesadilla_Load(object sender, EventArgs e)
+		private void Quesadilla_Load(object sender, EventArgs e)
         {
             DoubleBuffered = true;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
@@ -455,7 +459,29 @@ namespace Quesadilla
 				CheckJumpsRangeComparison(path.TotalJumps,alert.Jumps2Comparison,alert.Jumps2Number) &&
 				path.TotalJumps < Program.MainConfiguration.IgnoreAsTooManyJumps;
 		}
+		private List<PlanetSummary> GetPlanetInfo(int systemId)
+		{
+			if (_cachedPlanetSystemId == systemId)
+			{
+				return _cachedPlanetInfo;
+			}
 
+			_cachedPlanetSystemId = systemId;
+
+			_cachedPlanetInfo = Program.Universe.SolarSystems[systemId]
+				.Planets
+				.GroupBy(p => p.PlanetTypeName.Replace("Planet ", ""))
+				.Select(group => new PlanetSummary
+				{
+					Type = group.Key,
+					Count = group.Count(),
+					PlanetNames = string.Join(",", group.Select(p => p.PlanetName.Substring(p.PlanetName.LastIndexOf(' ') + 1)))
+				})
+				.OrderBy(x => x.Type)
+				.ToList();
+
+			return _cachedPlanetInfo;
+		}
 		private string ReplacePathTokens(string text, PathInfo path)
 		{
 			if (path == null)
@@ -806,16 +832,12 @@ namespace Quesadilla
 
 		private SolarSystem FindSystem(string systemName)
 		{
-			int nativeId;
-
-			if (int.TryParse(systemName, out nativeId))
+			if (int.TryParse(systemName, out var nativeId))
 			{
-				return Program.Universe.SolarSystems.Values
-					.FirstOrDefault(s => s.Id == nativeId);
+				return Program.Universe.SolarSystems.Values.FirstOrDefault(s => s.Id == nativeId);
 			}
 
-			return Program.Universe.SolarSystems.Values
-				.FirstOrDefault(s => s.MatchNameRegex(systemName));
+			return Program.Universe.SolarSystems.Values.FirstOrDefault(s => s.MatchNameRegex(systemName));
 		}
 
 		private void _localWatcher_SystemChange(object sender, ProcessSystemChangeEventArgs e)
@@ -883,17 +905,33 @@ namespace Quesadilla
         }
 
 
-        private void _localWatcher_ChatServerChange(object sender, ProcessChatServerChangeEventArgs e)
-        {
-            Log.Information("Chat Server: " + (e.ChatServerUp == true ? "Up" : "Down"));
-            ChatServerStatus = e.ChatServerUp;
-            ChatServerDown.Visible = !e.ChatServerUp;
-        }
+		private void _localWatcher_ChatServerChange(object sender,ProcessChatServerChangeEventArgs e)
+		{
+			if (InvokeRequired)
+			{
+				BeginInvoke(new Action(() => _localWatcher_ChatServerChange(sender, e)));
+				return;
+			}
 
-        private void Quesadilla_FormClosing(object sender, FormClosingEventArgs e)
+			Log.Information($"Chat Server: {(e.ChatServerUp ? "Up" : "Down")}");
+
+			ChatServerStatus = e.ChatServerUp;
+			ChatServerDown.Visible = !e.ChatServerUp;
+		}
+
+		private void Quesadilla_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Program.MainConfiguration.InitialPosition = Location;
-            Program.MainConfiguration.MainWindowSize = new Size(Width, Height);
+			if (WindowState == FormWindowState.Normal)
+			{
+				Program.MainConfiguration.InitialPosition = Location;
+				Program.MainConfiguration.MainWindowSize = Size;
+			}
+			else
+			{
+				Program.MainConfiguration.InitialPosition = RestoreBounds.Location;
+				Program.MainConfiguration.MainWindowSize = RestoreBounds.Size;
+			}
+			
             Program.MainConfiguration.StayOnTop = TopMost;
             Program.Universe.WriteESICharacters(Program.CHARACTER_CACHE_FILE);
             ClearEveLocations();
@@ -951,33 +989,32 @@ namespace Quesadilla
             var configAlert = Program.MainConfiguration.AlertConfiguration.Find(o => o.FriendlyName == m.Text);
             if (configAlert != null)
             {
-                m.Checked = !m.Checked;
-                configAlert.Enabled = !configAlert.Enabled;
+				configAlert.Enabled = !configAlert.Enabled;
+				m.Checked = configAlert.Enabled;
             }
         }
 
         private void trayIconDoubleClick(object sender, EventArgs e)
         {
-            if (Program.AlertQueueManager.HasActiveAlerts())
-            {
-                var alert = Program.AlertQueueManager.GetLastActiveAlerts(1).FirstOrDefault();
-                ShowAlert(alert, false);
-            }
-        }
+			var alert = Program.AlertQueueManager
+				.GetLastActiveAlerts(1)
+				.FirstOrDefault();
+
+			if (alert != null)
+			{
+				ShowAlert(alert, false);
+			}
+		}
 
         private void trayIconMenuConfigurationClick(object sender, EventArgs e)
         {
-            if (!ConfigurationWindowOpen)
-            {
+            Program.MainConfiguration.InitialPosition = Location;
+            Program.MainConfiguration.MainWindowSize = new Size(Width, Height);
+            Program.MainConfiguration.StayOnTop = TopMost;
 
-                Program.MainConfiguration.InitialPosition = Location;
-                Program.MainConfiguration.MainWindowSize = new Size(Width, Height);
-                Program.MainConfiguration.StayOnTop = TopMost;
-
-                var ConfigurationWindow = new QuesadillaConfiguration(Program.MainConfiguration, menuConfigurationWindow, this);
-                ((MenuItem)sender).Enabled = !((MenuItem)sender).Enabled;
-                ConfigurationWindow.Show(this);
-            }
+            var ConfigurationWindow = new QuesadillaConfiguration(Program.MainConfiguration, menuConfigurationWindow, this);
+            ((MenuItem)sender).Enabled = false;
+            ConfigurationWindow.Show(this);
         }
 
         private void trayIconMenuLogfileClick(object sender, EventArgs e)
@@ -987,10 +1024,10 @@ namespace Quesadilla
             var watcher = Program.LogWatcherManager.GetWatcherByFriendlyName(m.Text);
             if (watcher != null)
             {
-                m.Checked = !m.Checked;
                 watcher.Enabled = !watcher.Enabled;
-            }
-        }
+				m.Checked = watcher.Enabled;
+			}
+		}
         private void trayIconMenuBackgroundClick(object sender, EventArgs e)
         {
             // enable clicked background
@@ -1004,7 +1041,6 @@ namespace Quesadilla
         }
         private void logFile_ProcessCombat(object sender, ProcessCombatEventArgs e)
         {
-
             string combatEntity = "";
 
             //Log.Information("COMBAT:" + e.CombatEvent);
@@ -1168,144 +1204,121 @@ namespace Quesadilla
                 Match match = _ISKRegexISKData.Match(e.Entry.LineContent);
                 if (match.Success)
                 {
-                    double iskAmount = 0;
 
-                    var amount = match.Groups["iskAmount"].ToString();
-                    iskAmount = Double.Parse(amount.Trim());
 
-					Program.GraphDataManager.AddISK(e.Entry.CharacterName,
-						new IskLine()
-						{
-							TimeAdded = e.Entry.TimeAdded,
-							IskAmount = iskAmount,
-						});
+					var amount = match.Groups["iskAmount"].Value;
+
+					if (double.TryParse(amount.Trim(), out var iskAmount))
+					{
+						Program.GraphDataManager.AddISK(e.Entry.CharacterName,
+							new IskLine
+							{
+								TimeAdded = e.Entry.TimeAdded,
+								IskAmount = iskAmount
+							});
+					}
 				}
 			}
 		}
-        private void logFile_ProcessMining(object sender, ProcessMiningEventArgs e)
-        {
-            if (e.Entry != null)
-            {
-
-                // is this actual mining data
-                Match match = _MiningRegexAmounts.Match(e.Entry.LineContent);
-                if (match.Success)
-                {
-                    var minedAmount = match.Groups["miningAmount"].ToString();
-                    int mined = Int32.Parse(minedAmount.Trim());
-
-                    Program.GraphDataManager.AddMining(e.Entry.CharacterName, new MiningLine()
-                    {
-                        TimeAdded = e.Entry.TimeAdded,
-                        MiningItem = match.Groups["miningContext"].ToString(),
-                        MiningAmount = mined,
-                        Critical = false,
-                    });
-                }
-
-                // is this critical mining data
-                match = _MiningRegexAmountsCritical.Match(e.Entry.LineContent);
-                if (match.Success)
-                {
-                    var minedAmount = match.Groups["miningAmount"].ToString();
-                    int mined = Int32.Parse(minedAmount.Trim());
-
-					Program.GraphDataManager.AddMining(e.Entry.CharacterName, new MiningLine()
+		private void logFile_ProcessMining(object sender, ProcessMiningEventArgs e)
+		{
+			void AddMiningEntry(LogEntry entry, string item, int amount, int wastage, bool critical)
+			{
+				Program.GraphDataManager.AddMining(
+					entry.CharacterName,
+					new MiningLine
 					{
-						TimeAdded = e.Entry.TimeAdded,
-                        MiningItem = match.Groups["miningContext"].ToString(),
-                        MiningAmount = mined,
-                        Critical = true,
-                        //WastageAmount = wasted,
-                    });
-                }
+						TimeAdded = entry.TimeAdded,
+						MiningItem = item,
+						MiningAmount = amount,
+						WastageAmount = wastage,
+						Critical = critical
+					});
+			}
 
-                // is this residue mining data
-                match = _MiningRegexAmountsResidue.Match(e.Entry.LineContent);
-                if (match.Success)
-                {
-                    var minedWasted = match.Groups["miningResidue"].ToString();
-                    int wasted = Int32.Parse(minedWasted.Trim());
+			if (e.Entry == null) return;
 
-					Program.GraphDataManager.AddMining(e.Entry.CharacterName, new MiningLine()
-					{
-						TimeAdded = e.Entry.TimeAdded,
-                        MiningItem = "WASTE",
-                        //MiningAmount = mined,
-                        WastageAmount = wasted,
-                        Critical = false,
-                    });
-                }
+			// is this actual mining data
+			Match match = _MiningRegexAmounts.Match(e.Entry.LineContent);
+			if (match.Success)
+			{
+				var minedAmount = match.Groups["miningAmount"].Value;
+				if (int.TryParse(minedAmount.Trim(), out var mined)) AddMiningEntry(e.Entry, match.Groups["miningContext"].Value, mined, 0, false);
+			}
 
-                // is event that roid popped
-                match = _MiningRegexRoidExploded.Match(e.Entry.LineContent);
-                if (match.Success)
-                {
+			// is this critical mining data
+			match = _MiningRegexAmountsCritical.Match(e.Entry.LineContent);
+			if (match.Success)
+			{
+				var minedAmount = match.Groups["miningAmount"].Value;
+				if (int.TryParse(minedAmount.Trim(), out var mined)) AddMiningEntry(e.Entry, match.Groups["miningContext"].Value, mined, 0, true);
+			}
 
-                    foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
-                    {
-                        if (!tempTrigger.Enabled)
-                            return false;
-                        return tempTrigger.AlertType == AlertConfigType.MiningEndedRoidPopped;
-                    })))
-                    {
+			// is this residue mining data
+			match = _MiningRegexAmountsResidue.Match(e.Entry.LineContent);
+			if (match.Success)
+			{
+				var wastedAmount = match.Groups["miningResidue"].Value;
+				if (int.TryParse(wastedAmount.Trim(), out var wasted)) AddMiningEntry(e.Entry, "WASTE", 0, wasted, false);
+			}
 
-                        Log.Information("Mining: Rock expired");
-                        var alertText = GenerateAlertText(e.Entry, null, alert, e.Entry.CharacterName, AlertTextType.Alert, match.Groups["miningHowItEnded"].ToString());
-                        PathInfo path = null;
+			// is event that roid popped
+			match = _MiningRegexRoidExploded.Match(e.Entry.LineContent);
+			if (match.Success)
+			{
 
-                        Program.AlertQueueManager.EnqueueNewAlert(
-                            new AlertQueueItem()
-                            {
-                                AlertText = alertText,
-                                MenuText = alertText,
-                                Entry = e.Entry,
-                                Path = path,
-                                Context = alertText,
-                                SoundFile = alert.SoundFile,
-                                FriendlyName = alert.FriendlyName + " - " + e.Entry.CharacterName,
-                                isMiningOver = true,
-                                ShowAlert = true,
-                            });
-                    }
-                }
+				foreach (var alert in GetEnabledAlerts(AlertConfigType.MiningEndedRoidPopped))
+				{
 
-                // is event cargo full ?
-                match = _MiningRegexCargoFull.Match(e.Entry.LineContent);
-                if (match.Success)
-                {
+					Log.Information("Mining: Rock expired");
+					var alertText = GenerateAlertText(e.Entry, null, alert, e.Entry.CharacterName, AlertTextType.Alert, match.Groups["miningHowItEnded"].Value);
+					PathInfo path = null;
 
-                    foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
-                    {
-                        if (!tempTrigger.Enabled)
-                            return false;
-                        return tempTrigger.AlertType == AlertConfigType.MiningEndedFull;
-                    })))
-                    {
-                        Log.Information("Mining: cargo full");
-                        var alertText = GenerateAlertText(e.Entry, null, alert, e.Entry.CharacterName, AlertTextType.Alert, match.Groups["miningDevice"].ToString() + " stopped - Cargo full");
-                        PathInfo path = null;
+					Program.AlertQueueManager.EnqueueNewAlert(
+						new AlertQueueItem()
+						{
+							AlertText = alertText,
+							MenuText = alertText,
+							Entry = e.Entry,
+							Path = path,
+							Context = alertText,
+							SoundFile = alert.SoundFile,
+							FriendlyName = alert.FriendlyName + " - " + e.Entry.CharacterName,
+							isMiningOver = true,
+							ShowAlert = true,
+						});
+				}
+			}
 
-                        Program.AlertQueueManager.EnqueueNewAlert(
-                            new AlertQueueItem()
-                            {
-                                AlertText = alertText,
-                                MenuText = e.Entry.CharacterName + alertText,
-                                Entry = e.Entry,
-                                Path = path,
-                                Context = alertText,
-                                SoundFile = alert.SoundFile,
-                                FriendlyName = alert.FriendlyName + " - " + e.Entry.CharacterName,
-                                isMiningOver = true,
-                                ShowAlert = true,
-                            });
-                    }
-                }
+			// is event cargo full ?
+			match = _MiningRegexCargoFull.Match(e.Entry.LineContent);
+			if (match.Success)
+			{
+                foreach (var alert in GetEnabledAlerts(AlertConfigType.MiningEndedFull))
+				{
+					Log.Information("Mining: cargo full");
+					var alertText = GenerateAlertText(e.Entry, null, alert, e.Entry.CharacterName, AlertTextType.Alert, match.Groups["miningDevice"].Value + " stopped - Cargo full");
+					PathInfo path = null;
 
-            }
-        }
+					Program.AlertQueueManager.EnqueueNewAlert(
+						new AlertQueueItem()
+						{
+							AlertText = alertText,
+							MenuText = e.Entry.CharacterName + alertText,
+							Entry = e.Entry,
+							Path = path,
+							Context = alertText,
+							SoundFile = alert.SoundFile,
+							FriendlyName = alert.FriendlyName + " - " + e.Entry.CharacterName,
+							isMiningOver = true,
+							ShowAlert = true,
+						});
+				}
+			}
 
-        private void logFile_ProcessDecloak(object sender, ProcessDecloakEventArgs e)
+		}
+
+		private void logFile_ProcessDecloak(object sender, ProcessDecloakEventArgs e)
         {
             //Log.Information("COMBAT:" + e.CombatEvent);
             if (e.Entry != null)
@@ -1314,12 +1327,7 @@ namespace Quesadilla
                 PathInfo path = null;
                 string alertText = "";
 
-                foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
-                {
-                    if (!tempTrigger.Enabled)
-                        return false;
-                    return tempTrigger.AlertType == AlertConfigType.Decloak;
-                })))
+                foreach (var alert in GetEnabledAlerts(AlertConfigType.Decloak))
                 {
 
                     Match match = _DecloakRegexMobileObservatory.Match(e.Entry.LineContent);
@@ -1407,7 +1415,20 @@ namespace Quesadilla
 
         }
 
-        private void UpdateEveProcesses(bool refreshProcesses)
+		private void ActivateOverlay(Form overlay)
+		{
+			User32NativeMethods.SendWindowTop(overlay.Handle);
+			overlay.Invalidate();
+			overlay.TopMost = false;
+			overlay.TopMost = true;
+		}
+		private void DeactivateOverlay(Form overlay)
+		{
+			overlay.TopMost = true;
+			overlay.TopMost = false;
+		}
+
+		private void UpdateEveProcesses(bool refreshProcesses)
         {
             if (refreshProcesses)
             {
@@ -1420,16 +1441,10 @@ namespace Quesadilla
             var ptr = User32NativeMethods.GetForegroundWindowHandle();
 			foregroundWindowTitle = Program.ProcessMonitorHandler.GetTitleOfKnownProcess(ptr);
 
-			var PrevRect = new User32NativeMethods.Rect()
-            {
-                Top = currentEveWindowRect.Top,
-                Bottom = currentEveWindowRect.Bottom,
-                Left = currentEveWindowRect.Left,
-                Right = currentEveWindowRect.Right,
-            };
+            var PrevRect = currentEveWindowRect;
 
-            var result = User32NativeMethods.GetWindowDimensions(ptr, ref currentEveWindowRect);
-            if (ptr != null)
+			var result = User32NativeMethods.GetWindowDimensions(ptr, ref currentEveWindowRect);
+            if (ptr != IntPtr.Zero)
             {
                 if (foregroundWindowTitle != null && foregroundWindowTitle != String.Empty)
                 {
@@ -1439,12 +1454,12 @@ namespace Quesadilla
 
                     SetupStatusBar();
 
-                    if (previousToon == null || previousToon == "" || previousToon != CurrentActiveToon || NoActiveEveProcess == true)
+                    if (string.IsNullOrEmpty(previousToon) || previousToon != CurrentActiveToon || NoActiveEveProcess == true)
                     {
                        
 						if (Program.MainConfiguration.ShowWindowOverlayMap && OverlayMapWindow != null)
 						{
-							if (CurrentActiveToon == null || CurrentActiveToon == "")
+							if (string.IsNullOrEmpty(CurrentActiveToon))
 							{
 								OverlayMapWindow.Hide();
 							}
@@ -1452,41 +1467,27 @@ namespace Quesadilla
 							{
 								OverlayMapWindow.UpdateMapData();
 								if (NoActiveEveProcess)
-								{
-									User32NativeMethods.SendWindowTop(OverlayMapWindow.Handle);
-                                    OverlayMapWindow.Invalidate();
-									OverlayMapWindow.TopMost = false;
-									OverlayMapWindow.TopMost = true;
-								}
+									ActivateOverlay(OverlayMapWindow);
 								else
-                                {
-									OverlayMapWindow.TopMost = false;
-									OverlayMapWindow.TopMost = true;
-								}
-								//OverlayMapWindow.Show();
+									DeactivateOverlay(OverlayMapWindow);
 							}
                             OverlayMapWindow.SetScreenPosition();
 						}
 
 						if (Program.MainConfiguration.ShowWindowOverlayDPS && OverlayDPSWindow != null)
 						{
-							if (CurrentActiveToon == null || CurrentActiveToon == "")
+							if (string.IsNullOrEmpty(CurrentActiveToon))
 							{
 								OverlayDPSWindow.Hide();
 							}
 							else
 							{
-								if (NoActiveEveProcess)
-								{
-									User32NativeMethods.SendWindowTop(OverlayDPSWindow.Handle);
-									OverlayDPSWindow.TopMost = false;
-									OverlayDPSWindow.TopMost = true;
-								}
-								else
-								{
-									OverlayDPSWindow.TopMost = false;
-									OverlayDPSWindow.TopMost = true;
-								}
+                                if (NoActiveEveProcess)
+                                    ActivateOverlay(OverlayDPSWindow);
+                                else
+                                    DeactivateOverlay(OverlayDPSWindow);
+
+
 								OverlayDPSWindow.Show();
 							}
 							OverlayDPSWindow.SetScreenPosition();
@@ -1502,11 +1503,8 @@ namespace Quesadilla
                         PrevRect.Left != currentEveWindowRect.Left || PrevRect.Right != currentEveWindowRect.Right
                         )
                     {
-						if (OverlayDPSWindow != null)
-							OverlayDPSWindow.SetScreenPosition();
-
-						if (OverlayMapWindow != null)
-							OverlayMapWindow.SetScreenPosition();
+						if (OverlayDPSWindow != null) OverlayDPSWindow.SetScreenPosition();
+						if (OverlayMapWindow != null) OverlayMapWindow.SetScreenPosition();
 					}
 
 					if (NoActiveEveProcess) NoActiveEveProcess = false;
@@ -1520,8 +1518,7 @@ namespace Quesadilla
 						if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
 						{
 							OverlayDPSWindow.Hide();
-							OverlayDPSWindow.TopMost = true;
-							OverlayDPSWindow.TopMost = false;
+							DeactivateOverlay(OverlayDPSWindow);
 						}
 						else
 						{
@@ -1537,8 +1534,7 @@ namespace Quesadilla
                     {
                         if (!Program.MainConfiguration.KeepLastToonWhenNotEve)
                         {
-							OverlayMapWindow.TopMost = true;
-							OverlayMapWindow.TopMost = false;
+                            DeactivateOverlay(OverlayMapWindow);
 							OverlayMapWindow.Hide();
                         }
                         else
@@ -1546,8 +1542,7 @@ namespace Quesadilla
                             if (OverlayMapWindow.TopMost != false)
                             {
                                 currentEveWindowRect = PrevRect; // smaybe move this out
-								OverlayMapWindow.TopMost = true;
-								OverlayMapWindow.TopMost = false;
+                                DeactivateOverlay(OverlayMapWindow);
 								User32NativeMethods.SendWindowBack(OverlayMapWindow.Handle);
                             }
                         }
@@ -1579,22 +1574,23 @@ namespace Quesadilla
             }
         }
 
-        private void ESI_ProcessNewData(object sender, ESIEventArgs e)
-        {
-            if (e.RequestType == ESIRequestType.System)
-            {
-                try
-                {
-                    Invalidate();
-                }
-                catch (Exception ex)
-                {
-                }
-                shouldUpdatePlanetInfo = true;
-            }
-        }
+		private void ESI_ProcessNewData(object sender, ESIEventArgs e)
+		{
+			if (e.RequestType != ESIRequestType.System)
+				return;
 
-        private void ZKill_ProcessNewData(object sender, ZKillEventArgs e)
+			if (InvokeRequired)
+			{
+				BeginInvoke(new Action(() =>
+					ESI_ProcessNewData(sender, e)));
+				return;
+			}
+
+			shouldUpdatePlanetInfo = true;
+			Invalidate();
+		}
+
+		private void ZKill_ProcessNewData(object sender, ZKillEventArgs e)
         {
             string systemName = "---";
             string regionName = "---";
@@ -1821,8 +1817,8 @@ namespace Quesadilla
 						status.Append($" ({c.ClosestTurnurPath.TotalJumps}) SIG:");
                         status.Append((c.ClosestTurnur.FromSystemId == c.ClosestTurnurPath.ToSystemId) ? c.ClosestTurnur.FromSignature : c.ClosestTurnur.ToSignature);
                     }
-                }
-            }
+				}
+			}
             else
             {
                 status.Append("No active Character");
@@ -1846,7 +1842,7 @@ namespace Quesadilla
 			}
 		}
 
-        private void GetSkyhookTimers()
+		private void GetSkyhookTimers()
         {
             Program.ESIHandler.EnqueueRequestSkyhookData();
         }
@@ -1883,14 +1879,12 @@ namespace Quesadilla
 
         private void EveScoutProcessStormData()
         {
-            Program.Universe.Storms = Program.EveScoutProcessor.Storms;
+            Program.Universe.Storms = Program.EveScoutProcessor.Storms.ToList(); // copy storms
             foreach (var storm in Program.EveScoutProcessor.Storms)
             {
                 storm.StrongSystemIds = Program.Universe.FindConnections(storm.SystemId, 1);
-
                 storm.WeakSystemIds = Program.Universe.FindConnections(storm.SystemId, 3);
-                if (storm.WeakSystemIds.Contains(storm.SystemId))
-                    storm.WeakSystemIds.Remove(storm.SystemId);
+                storm.WeakSystemIds.Remove(storm.SystemId);
                 storm.WeakSystemIds = storm.WeakSystemIds.Except(storm.StrongSystemIds).ToList();
 
                 // we could just leave it there - but ingame some 3 jump systems are not in the storm
@@ -1977,7 +1971,7 @@ namespace Quesadilla
                     float y = float.Parse(xn.Attributes["y"].Value);
 
                     string link = xn.Attributes["xlink:href"].Value.Replace("#", "");
-                    XmlNode dotlanDEFNodes = xmldoc.SelectSingleNode($@"//*[@id='{link}']/*");
+                    // XmlNode dotlanDEFNodes = xmldoc.SelectSingleNode($@"//*[@id='{link}']/*");
 
                     var s = Program.Universe.SolarSystems[(int)systemID];
 
@@ -2010,9 +2004,21 @@ namespace Quesadilla
             if (!string.IsNullOrEmpty(e.DeltaContent))
             {
                 Log.Information($"Processing dotlan delta data for {e.RegionName}");
-                Dictionary<string, string> killdDeltadata = JsonSerializer.Deserialize<Dictionary<string, string>>(e.DeltaContent);
 
-                foreach (var kvp in killdDeltadata)
+				Dictionary<string, string> killDeltaData;
+
+				try
+				{
+					killDeltaData = JsonSerializer.Deserialize<Dictionary<string, string>>(e.DeltaContent);
+				}
+				catch (Exception ex)
+				{
+					Log.Error(ex, $"Failed to parse dotlan delta data {e.RegionName}");
+					return;
+				}
+
+
+                foreach (var kvp in killDeltaData)
                 {
                     if (kvp.Key.Equals("error"))
                     {
@@ -2020,20 +2026,16 @@ namespace Quesadilla
                     }
                     else
                     {
-                        int systemId = int.Parse(kvp.Key);
-                        int killDelta = int.Parse(kvp.Value);
+						if (!int.TryParse(kvp.Key, out var systemId))continue;
+						if (!int.TryParse(kvp.Value, out var killDelta)) continue;
 
-                        if (Program.Universe.SolarSystems.ContainsKey(systemId))
-                        {
-                            Program.Universe.SolarSystems[systemId].SetNPCKillsDeltaLastHour(killDelta);
-                        }
-                    }
+						if (Program.Universe.SolarSystems.TryGetValue(systemId,out var system)) system.SetNPCKillsDeltaLastHour(killDelta);
+					}
                 }
             }
 
             // pull more information from dotlan data
             // save Solarsystem data ?
-
         }
 
         private void trayIconMenuShowHistoricAlert(object sender, EventArgs e)
@@ -2055,59 +2057,41 @@ namespace Quesadilla
 			Program.LogWatcherManager.ProcessNewData += new EventHandler<ProcessNewDataEventArgs>(this.logFile_ProcessNewData);
 			Program.LogWatcherManager.SetupEvents();
         }
-        private void UpdatePlanetInfo()
-        {
-            shouldUpdatePlanetInfo = false;
+		private void UpdatePlanetInfo()
+		{
+			shouldUpdatePlanetInfo = false;
 
-            var c = Program.CharacterManager.Get(CurrentActiveToon);
-            if (c != null)
-            {
-                try
-                {
-                    if (Program.Universe.SolarSystems[c.LocationId].Planets != null)
-                    {
-                        var planetInfo = Program.Universe.SolarSystems[c.LocationId].Planets
-                            .GroupBy(o => o.PlanetTypeName.Replace("Planet ", ""))
-                            .Select(group => new
-                            {
-                                type = group.Key,
-                                Count = group.Count()
-                            })
-                            .OrderBy(x => x.type);
-                        CurrentPlanetInfos.Clear();
-                        foreach (var p in planetInfo)
-                        {
-                            CurrentPlanetInfos.Add(new PlanetInfoDisplay()
-                            {
-                                PlanetType = p.type,
-                                CurrentMouseOver = false,
-                                Planets = string.Join(",",
-                                    Program.Universe.SolarSystems[c.LocationId].Planets
-                                    .Where(o => o.PlanetTypeName == $"Planet {p.type}")
-                                    .Select(o => o.PlanetName.Substring(o.PlanetName.LastIndexOf(' ') + 1))
-                                    .ToList()),
-                            });
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                }
-            }
-        }
+			var c = Program.CharacterManager.Get(CurrentActiveToon);
+			if (c != null)
+			{
+				if (!Program.Universe.SolarSystems.TryGetValue(c.LocationId, out var solarSystem)) return;
+				if (solarSystem.Planets == null) return;
+				if (Program.Universe.SolarSystems[c.LocationId].Planets != null)
+				{
+					CurrentPlanetInfos = GetPlanetInfo(c.LocationId)
+						.Select(p => new PlanetInfoDisplay
+						{
+							PlanetType = p.Type,
+							CurrentMouseOver = false,
+							Planets = p.PlanetNames
+						})
+						.ToList();
+				}
+			}
+		}
 
-        private void UpdateMinimap()
+		private void UpdateMinimap()
         {
             shouldUpdateMinimap = false;
 
             if (string.IsNullOrEmpty(CurrentActiveToon))
             {
                 MainMinimap.Visible = false;
-                this.Invalidate();
+                //this.Invalidate();
                 return;
             }
 
-            UpdateISK();
+            //UpdateISK();
             if (OverlayMapWindow != null)
             {
                 OverlayMapWindow.UpdateMapData();
@@ -2186,25 +2170,25 @@ namespace Quesadilla
                 _oldImage?.Dispose();
                 ExtraInformation.Text = extraInformation;
                 MainMinimap.Visible = true;
-                this.Invalidate();
+                //this.Invalidate();
             }
             else
             {
                 ExtraInformation.Text = "";
                 MainMinimap.Visible = false;
-                this.Invalidate();
+                //this.Invalidate();
             }
         }
         private void pMinimapImage_MouseWheel(object sender, MouseEventArgs e)
         {
             if (e.Delta > 0) mapScale += Program.MainConfiguration.MainWindowMouseScrollAmount;
             if (e.Delta < 0) mapScale -= Program.MainConfiguration.MainWindowMouseScrollAmount;
-            UpdateMinimap();
-        }
+            //UpdateMinimap();
+			shouldUpdateMinimap = true;
+		}
 
         private void Quesadilla_Paint(object sender, PaintEventArgs e)
         {
-
             ImageGenerator.PaintDrawText(e.Graphics, CurrentClient);
             ImageGenerator.PaintDrawText(e.Graphics, RattingData);
             ImageGenerator.PaintDrawText(e.Graphics, MiningData);
@@ -2213,16 +2197,8 @@ namespace Quesadilla
             if (MainMinimap.Visible)
             {
                 if (Program.MainConfiguration.MainWindowShowExtraInformation) ImageGenerator.PaintDrawText(e.Graphics, ExtraInformation);
-                if (mouseOverMinimapSystems.Count() > 0)
-                {
-                    MouseoverSystemName.Text = "";
-                    foreach (var m in mouseOverMinimapSystems)
-                    {
-                        if (!string.IsNullOrEmpty(MouseoverSystemName.Text)) MouseoverSystemName.Text += ",";
-                        MouseoverSystemName.Text += m.solarSystem.Name + (m.solarSystem.GetNPCKillsDeltaLastHour() == null ? "" : $"  {m.solarSystem.GetNPCKillsDeltaLastHour()}");
-                    }
-                    ImageGenerator.PaintDrawText(e.Graphics, MouseoverSystemName);
-                }
+                
+                if (mouseOverMinimapSystems.Count() > 0) ImageGenerator.PaintDrawText(e.Graphics, MouseoverSystemName);
             }
 
             // draw red dot
@@ -2265,22 +2241,14 @@ namespace Quesadilla
                                 UpdatePlanetInfo();
                             }
 
-                            var planetInfo = Program.Universe.SolarSystems[c.LocationId].Planets
-                                .GroupBy(o => o.PlanetTypeName.Replace("Planet ", ""))
-                                .Select(group => new
-                                {
-                                    type = group.Key,
-                                    Count = group.Count()
-                                })
-                                .OrderBy(x => x.type);
-
-                            int currentX = ExtraInformation.Left;
+							int currentX = ExtraInformation.Left;
                             int currentY = EveScoutStatus.Top - (Program.MainConfiguration.PlanetInfoViewSize);
+							var planetInfo = GetPlanetInfo(c.LocationId);
                             foreach (var p in planetInfo)
                             {
                                 Brush systemBrush;
                                 Color dotColour = Color.Red;
-                                switch (p.type)
+                                switch (p.Type)
                                 {
                                     case "(Storm)": dotColour = Program.MainConfiguration.PlanetInfoStormColour; break;
                                     case "(Barren)": dotColour = Program.MainConfiguration.PlanetInfoBarrenColour; break;
@@ -2296,12 +2264,11 @@ namespace Quesadilla
                                 e.Graphics.FillEllipse(systemBrush, currentX - Program.MainConfiguration.PlanetInfoViewSize, currentY - Program.MainConfiguration.PlanetInfoViewSize, Program.MainConfiguration.PlanetInfoViewSize * 2, Program.MainConfiguration.PlanetInfoViewSize * 2);
 
                                 // set x/y
-                                var cpi = CurrentPlanetInfos.Where(o => o.PlanetType == p.type).First();
+                                var cpi = CurrentPlanetInfos.Where(o => o.PlanetType == p.Type).First();
                                 cpi.X = currentX; cpi.Y = currentY;
 
                                 currentX += (Program.MainConfiguration.PlanetInfoViewSize);
-                                Font font = new Font("Verdana", Program.MainConfiguration.PlanetInfoFontSize, FontStyle.Regular);
-                                Size size = ImageGenerator.PaintDrawText(e, p.Count.ToString(), currentX, currentY - (Program.MainConfiguration.PlanetInfoViewSize), dotColour, font);
+                                Size size = ImageGenerator.PaintDrawText(e, p.Count.ToString(), currentX, currentY - (Program.MainConfiguration.PlanetInfoViewSize), dotColour, _planetInfoFont);
                                 currentX += size.Width + (Program.MainConfiguration.PlanetInfoViewSize);
 
                             }
@@ -2321,11 +2288,10 @@ namespace Quesadilla
                                     case "(Oceanic)": fontColour = Program.MainConfiguration.PlanetInfoOceanicColour; break;
                                     default: fontColour = Color.Red; break;
                                 }
-                                Font font = new Font("Verdana", Program.MainConfiguration.PlanetInfoFontSize, FontStyle.Regular);
                                 Size size = ImageGenerator.PaintDrawText(e, mouseOverPlanet.PlanetType + " " + mouseOverPlanet.Planets,
                                     mouseOverPlanet.X - (Program.MainConfiguration.PlanetInfoViewSize),
                                     mouseOverPlanet.Y - ((Program.MainConfiguration.PlanetInfoViewSize * 2) + Program.MainConfiguration.PlanetInfoFontSize),
-                                    fontColour, font);
+                                    fontColour, _planetInfoFont);
                             }
                             ;
                         }
@@ -2339,113 +2305,118 @@ namespace Quesadilla
 
         private void UpdateISK()
         {
-                
-            if (ISKPerHourTotal == false)
+			void UpdateOverlayRatting(string text, Color colour)
+			{
+				if (OverlayMapWindow == null)
+					return;
+
+				OverlayMapWindow.RattingData.Text = text;
+				OverlayMapWindow.RattingData.ForeColor = colour;
+				OverlayMapWindow.UpdateMapData();
+			}
+			void UpdateRattingData(string text, Color colour)
+			{
+				RattingData.Text = text;
+				RattingData.ForeColor = colour;
+			}
+
+			var mainConfig = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData"));
+			var overlayConfig = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData"));
+
+			if (ISKPerHourTotal == false)
             {
                 if (CurrentActiveToon != null && Program.GraphDataManager.GetIskDataKeys().Contains(CurrentActiveToon))
                 {
-                    RattingData.Text = Program.GraphDataManager.GetIskLastHour(CurrentActiveToon);
-                    RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
-                    this.Invalidate();
-
-                    if (OverlayMapWindow != null)
-                    {
-                        OverlayMapWindow.RattingData.Text = Program.GraphDataManager.GetIskLastHour(CurrentActiveToon);
-                        OverlayMapWindow.RattingData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
-                        OverlayMapWindow.UpdateMapData();
-                    }
+                    UpdateRattingData(Program.GraphDataManager.GetIskLastHour(CurrentActiveToon), mainConfig.Color);
+                    UpdateOverlayRatting(RattingData.Text, overlayConfig.Color);
                 }
                 else
                 {
-                    RattingData.Text = "";
-                    if (OverlayMapWindow != null)
-                    {
-                        OverlayMapWindow.RattingData.Text = "";
-                        OverlayMapWindow.UpdateMapData();
-                    }
+                    UpdateRattingData("", mainConfig.Color);
+                    UpdateOverlayRatting("", overlayConfig.Color);
                 }
             }
             else
             {
-                try
-                {
-                    RattingData.Text = Program.GraphDataManager.GetIskLastHour("");
-                    RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).AlternateColor;
-                    if (OverlayMapWindow != null)
-                    {
-                        OverlayMapWindow.RattingData.Text = Program.GraphDataManager.GetIskLastHour("");
-                        OverlayMapWindow.RattingData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData")).AlternateColor;
-                        OverlayMapWindow.UpdateMapData();
-                    }
-                }
-                catch
-                {
-
-                }
+                    UpdateRattingData(Program.GraphDataManager.GetIskLastHour(""), mainConfig.AlternateColor);
+                    UpdateOverlayRatting(RattingData.Text, overlayConfig.AlternateColor);
             }
         }
         private void UpdateMining()
         {
+            void UpdateOverlayMining(string text, Color colour)
+		    {
+			    if (OverlayMapWindow == null)
+				    return;
 
-            if (MiningPerHourTotal == false)
+			    OverlayMapWindow.MiningData.Text = text;
+			    OverlayMapWindow.MiningData.ForeColor = colour;
+			    OverlayMapWindow.UpdateMapData();
+		    }
+			void UpdateMiningData(string text, Color colour)
+			{
+				MiningData.Text = text;
+				MiningData.ForeColor = colour;
+			}
+
+			var mainConfig = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData"));
+			var overlayConfig =Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData"));
+
+			if (MiningPerHourTotal == false)
             {
                 if (CurrentActiveToon != null && Program.GraphDataManager.GetMiningDataKeys().Contains(CurrentActiveToon))
                 {
-                    MiningData.Text = Program.GraphDataManager.GetMiningLastHour(CurrentActiveToon);
-                    MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
-                    this.Invalidate();
-                    //lblISK.Visible = true;
-                    if (OverlayMapWindow != null)
-                    {
-                        OverlayMapWindow.MiningData.Text = MiningData.Text;
-						OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
-                        OverlayMapWindow.UpdateMapData();
-                    }
+                    UpdateMiningData(Program.GraphDataManager.GetMiningLastHour(CurrentActiveToon), mainConfig.Color);
+                    UpdateOverlayMining(MiningData.Text, overlayConfig.Color);
                 }
                 else
                 {
-                    //lblISK.Visible = false;
-                    MiningData.Text = "";
-                    if (OverlayMapWindow != null)
-                    {
-                        OverlayMapWindow.MiningData.Text = "";
-                        OverlayMapWindow.UpdateMapData();
-                    }
-                }
+					UpdateMiningData("", mainConfig.Color);
+					UpdateOverlayMining("", overlayConfig.Color);
+				}
             }
             else
             {
-                MiningData.Text = Program.GraphDataManager.GetMiningLastHour("");
-                MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
-                if (OverlayMapWindow != null)
-                {
-                    OverlayMapWindow.MiningData.Text = MiningData.Text;
-					OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
-                    OverlayMapWindow.UpdateMapData();
-                }
-            }
+				UpdateMiningData(Program.GraphDataManager.GetMiningLastHour(""), mainConfig.AlternateColor);
+				UpdateOverlayMining(MiningData.Text, overlayConfig.AlternateColor);
+            }            
         }
-
 
         private void lblEtxraInformation_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void pMinimapImage_MouseMove(object sender, MouseEventArgs e)
-        {
-            mouseOverMinimapSystems = Program.Universe.MouseOverSystem(e.X, e.Y, MinimapSystems);
-            if (mouseOverMinimapSystems.Count() > 0)
-            {
-                foreach (var s in mouseOverMinimapSystems)
-                {
-                    Program.Universe.GetSystemInfo((int)s.solarSystem.Id);
-                }
-                this.Invalidate();
-            }
-        }
+		private long? _mouseMoveLastSystemId;
 
-        private void pMinimapImage_Click(object sender, EventArgs e)
+		private void pMinimapImage_MouseMove(object sender, MouseEventArgs e)
+		{
+			var systems = Program.Universe.MouseOverSystem(e.X,e.Y,MinimapSystems);
+			mouseOverMinimapSystems = systems;
+
+			var system = systems.FirstOrDefault();
+			if (system == null)
+			{
+				_mouseMoveLastSystemId = null;
+				MouseoverSystemName.Text = "";
+				return;
+			}
+
+			var systemId = system.solarSystem.Id;
+			if (_mouseMoveLastSystemId == systemId) return;
+
+			MouseoverSystemName.Text = "";
+			foreach (var m in mouseOverMinimapSystems)
+			{
+				if (!string.IsNullOrEmpty(MouseoverSystemName.Text)) MouseoverSystemName.Text += ",";
+				MouseoverSystemName.Text += m.solarSystem.Name + (m.solarSystem.GetNPCKillsDeltaLastHour() == null ? "" : $"  {m.solarSystem.GetNPCKillsDeltaLastHour()}");
+			}
+
+			_mouseMoveLastSystemId = systemId;
+			Program.Universe.GetSystemInfo((int)systemId);
+			Invalidate();
+		}
+		private void pMinimapImage_Click(object sender, EventArgs e)
         {
 
         }
@@ -2465,10 +2436,10 @@ namespace Quesadilla
         private void ShowAlertWindow(AlertQueueItem alert)
         {
             // try to prevent new alert stealing focus
-            var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground), this);
-            var ptr =   User32NativeMethods.GetForegroundWindowHandle();
+            var NewAlertWindow = new QuesadillaAlertPopup(alert, Program.MainConfiguration, Program.CachedBackground, this);
+            //var ptr =   User32NativeMethods.GetForegroundWindowHandle();
             NewAlertWindow.Show(this);
-            var result = User32NativeMethods.SetForegroundWindowHandle(ptr);
+            //var result = User32NativeMethods.SetForegroundWindowHandle(ptr);
         }
 
         private void SetupToastAlert()
@@ -2487,28 +2458,37 @@ namespace Quesadilla
 
             if (alert.Path != null)
             {
-                t.AddButton(new ToastButton()
+
+				var dotlanUrl = $"https://evemaps.dotlan.net/map/{alert.Path.ToSystemRegionName.Replace(" ", "_")}/{alert.Path.ToSystemName}";
+
+				t.AddButton(new ToastButton()
                     .SetContent($"View {alert.Path.ToSystemName}")
                     .AddArgument("action", "viewURL")
-                    .AddArgument("url", "https://evemaps.dotlan.net/map/" + alert.Path.ToSystemRegionName.Replace(" ", "_") + "/" + alert.Path.ToSystemName));
+                    .AddArgument("url", dotlanUrl)
+                    );
 
                 t.AddText($"System: {alert.Path.ToSystemName} ({alert.Path.ToSystemRegionName})");
             }
 
             if (alert.Kill != null)
             {
+				var zkillUrl = $"https://zkillboard.com/kill/{alert.Kill.ID}/";
+
                 t.AddButton(new ToastButton()
                     .SetContent($"View Zkill")
                     .AddArgument("action", "viewURL")
-                    .AddArgument("url", $"https://zkillboard.com/kill/{alert.Kill.ID}/"));
+                    .AddArgument("url", zkillUrl)
+                    );
 
-                var shipUrl = $"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render?size=128";
-                shipUrl = "https://quesadilla.prioryofthelemon.co.uk/wp/wp-content/uploads/2024/07/Quesadilla-1.png";
+				var shipUrl = $"https://images.evetech.net/types/{alert.Kill.VictimShipTypeId}/render?size=128";
 
-                Uri img = new Uri(shipUrl);
-                t.AddAppLogoOverride(new Uri(shipUrl), ToastGenericAppLogoCrop.Circle);
-                t.AddInlineImage(img, alert.Kill.VictimShipName);
-            }
+				if (Uri.TryCreate(shipUrl, UriKind.Absolute, out var img))
+				{
+					t.AddAppLogoOverride(img, ToastGenericAppLogoCrop.Circle);
+					t.AddInlineImage(img, alert.Kill.VictimShipName);
+				}
+
+			}
 
             string contextInfo = "";
             if (alert.Path != null && !(alert.isFaction || alert.isDecloak))
@@ -2543,13 +2523,13 @@ namespace Quesadilla
             else if (alert.Kill != null)
             {
                 t.AddHeader("zkill", "Zkill alert", "");
-                intelLine = alert.Kill.Context.Replace("\n", " - ");
-            }
+				intelLine = alert.Kill.Context?.Replace("\n", " - ") ?? "";
+			}
             else
             {
                 t.AddHeader("intel", "Intel alert", "");
-                intelLine = alert.Entry.LineContent;
-            }
+				intelLine = alert.Entry?.LineContent ?? "";
+			}
             t.AddText(intelLine);
 
             t.Show(toast =>
@@ -2866,5 +2846,13 @@ namespace Quesadilla
 			await Task.Delay(500);
             SplashScreen?.FadeOut();
 		}
+
+
+		private IEnumerable<AlertConfig> GetEnabledAlerts(AlertConfigType alertType)
+		{
+			return Program.MainConfiguration.AlertConfiguration
+				.Where(a => a.Enabled && a.AlertType == alertType).ToList();
+		}
+
 	}
 }

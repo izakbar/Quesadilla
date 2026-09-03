@@ -670,24 +670,26 @@ namespace Quesadilla
 		}
 
 
-
 		protected override void OnOverlayMouseMove(Point clientLocation)
 		{
-			var hovered = Program.Universe.MouseOverSystem(clientLocation.X, clientLocation.Y, MinimapSystems);
+			var hovered = Program.Universe.MouseOverSystem(
+				clientLocation.X,
+				clientLocation.Y,
+				MinimapSystems);
 
-			if (hovered.Count() > 0)
-			{
-				foreach (var s in hovered)
-					Program.Universe.GetSystemInfo((int)s.solarSystem.Id);
-			}
-
-			// Only redraw if the hover set actually changed, to avoid re-rendering
-			// on every single poll tick while the mouse is merely sitting still inside.
 			if (!mouseOverMinimapSystems.SequenceEqual(hovered))
 			{
+				foreach (var s in hovered)
+				{
+					Program.Universe.GetSystemInfo((int)s.solarSystem.Id);
+				}
+
 				mouseOverMinimapSystems = hovered;
-				mouseOverPoint = new Point(clientLocation.X + 6, clientLocation.Y + 4);
-				RenderAndUpdate(); // replaces the old Invalidate() — painting is manual now, Invalidate does nothing
+				mouseOverPoint = new Point(
+					clientLocation.X + 6,
+					clientLocation.Y + 4);
+
+				RenderAndUpdate();
 			}
 		}
 

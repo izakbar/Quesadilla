@@ -548,5 +548,18 @@ namespace Quesadilla
 		{
 
 		}
+
+		protected override CreateParams CreateParams
+		{
+			get
+			{
+				const int WS_EX_NOACTIVATE = 0x08000000;
+
+				var cp = base.CreateParams;
+				cp.ExStyle |= WS_EX_NOACTIVATE;
+
+				return cp;
+			}
+		}
 	}
 }
