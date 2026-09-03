@@ -538,7 +538,27 @@ namespace Quesadilla
 
         private void logFile_ProcessNewData(object sender, ProcessNewDataEventArgs e)
         {
-            LogEntry entry = e.LogEntry;
+			AlertQueueItem QueueIntelAlert(LogEntry le,AlertConfig alert,PathInfo path,string context,string character,string triggerText)
+			{
+				var alertText = GenerateAlertText(le,path,alert,character,AlertTextType.Alert,triggerText);
+				var alertItem = new AlertQueueItem
+				{
+					AlertText = alertText,
+					MenuText = GenerateAlertText(le,path,alert,character,AlertTextType.Menu,triggerText),
+					Entry = le,
+					Path = path,
+					Context = context,
+					SoundFile = alert.SoundFile,
+					FriendlyName = alert.FriendlyName,
+					ShowAlert = true
+				};
+
+				Program.AlertQueueManager.EnqueueNewAlert(alertItem);
+				Log.Debug($"ALERT - {alertText}");
+				return alertItem;
+			}
+
+			LogEntry entry = e.LogEntry;
             int alertCount = 0;
 
             if (entry == null || entry.PlayerName == "EVE System")
@@ -568,17 +588,21 @@ namespace Quesadilla
                 if (!entry.ParseSuccess) return;
 
                 HashSet<int> intSet = new HashSet<int>();
-                if (!Program.MainConfiguration.ignoreStrings.Any<Regex>((Func<Regex, bool>)(ignoreString => ignoreString.IsMatch(entry.LineContent))) && entry.LogType == LogFileType.ChatIntel)
-                {
-                    // try and find systems mentioned in intel
-                    foreach (SolarSystem solarSystem in
-                        Program.Universe.SolarSystems.Values.Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => tempSystem.MatchNameRegex(entry.LineContent)))
-                        .Where<SolarSystem>((Func<SolarSystem, bool>)(tempSystem => !Program.MainConfiguration.ignoreSystems.Contains(Program.Universe.Names[tempSystem.Name])))
-                        )
-                        intSet.Add(Program.Universe.Names[solarSystem.Name]);
-                }
+				bool ignored = Program.MainConfiguration.ignoreStrings.Any(r => r.IsMatch(entry.LineContent));
+				if (!ignored && entry.LogType == LogFileType.ChatIntel)
+				{
+					foreach (var solarSystem in Program.Universe.SolarSystems.Values)
+					{
+						if (!solarSystem.MatchNameRegex(entry.LineContent)) continue;
+						if (!Program.Universe.Names.TryGetValue(solarSystem.Name,out var systemId)) continue;
+						if (Program.MainConfiguration.ignoreSystems.Contains(systemId)) continue;
 
-                if (intSet.Count > 0)
+						intSet.Add(systemId);
+					}
+				}
+
+
+				if (intSet.Count > 0)
                 {
                     AlertQueueItem insertedAlert = null;
 
@@ -609,7 +633,6 @@ namespace Quesadilla
                         {
                             bool sendAlert = false;
                             PathInfo path = new PathInfo();
-                            string alertText = "";
 
                             switch (alert.AlertRangeType)
                             {
@@ -618,21 +641,8 @@ namespace Quesadilla
                                     sendAlert = CheckJumpsRange(alert, path);
                                     if (sendAlert)
                                     {
-                                        alertText = GenerateAlertText(entry, path, alert, "", AlertTextType.Alert, "");
-                                        Log.Debug("ALERT - " + alertText);
-                                        insertedAlert = new AlertQueueItem()
-                                        {
-                                            AlertText = alertText,
-                                            MenuText = GenerateAlertText(entry, path, alert, "", AlertTextType.Menu, ""),
-                                            Entry = entry,
-                                            Path = path,
-                                            Context = homeSystemPathInfo.FromSystemName,
-                                            SoundFile = alert.SoundFile,
-                                            FriendlyName = alert.FriendlyName,
-                                            ShowAlert = true,
-                                        };
-                                        Program.AlertQueueManager.EnqueueNewAlert(insertedAlert);
-                                        alertCount++;
+										insertedAlert = QueueIntelAlert(entry,alert,path,homeSystemPathInfo.FromSystemName,"","");
+										alertCount++;
                                     }
                                     break;
 
@@ -642,22 +652,9 @@ namespace Quesadilla
                                     sendAlert = CheckJumpsRange(alert, path);
                                     if (sendAlert)
                                     {
-                                        alertText = GenerateAlertText(entry, path, alert, "", AlertTextType.Alert, "");
-                                        Log.Debug("ALERT - " + alertText);
-                                        insertedAlert = new AlertQueueItem()
-                                        {
-                                            AlertText = alertText,
-                                            MenuText = GenerateAlertText(entry, path, alert, "", AlertTextType.Menu, ""),
-                                            Entry = entry,
-                                            Path = path,
-                                            Context = path.FromSystemName,
-                                            SoundFile = alert.SoundFile,
-                                            FriendlyName = alert.FriendlyName,
-                                            ShowAlert = true,
-                                        };
-                                        Program.AlertQueueManager.EnqueueNewAlert(insertedAlert);
-                                        alertCount++;
-                                    }
+										insertedAlert = QueueIntelAlert(entry,alert,path,path.FromSystemName,"","");
+										alertCount++;
+									}
                                     break;
                                 case AlertConfigRangeType.OneCharacter:
                                 case AlertConfigRangeType.OneOnlineCharacter:
@@ -670,29 +667,15 @@ namespace Quesadilla
                                             sendAlert = CheckJumpsRange(alert, path);
                                             if (sendAlert)
                                             {
-                                                alertText = GenerateAlertText(entry, path, alert, x.CharacterName, AlertTextType.Alert, "");
-                                                Log.Debug("ALERT - " + alertText);
                                                 if (
                                                     alert.AlertRangeType == AlertConfigRangeType.OneCharacter ||
                                                     alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive
                                                     )
                                                 {
-                                                    insertedAlert = new AlertQueueItem()
-                                                    {
-                                                        AlertText = alertText,
-                                                        MenuText = GenerateAlertText(entry, path, alert, x.CharacterName, AlertTextType.Menu, ""),
-                                                        Entry = entry,
-                                                        Path = path,
-                                                        Context = x.CharacterName,
-                                                        SoundFile = alert.SoundFile,
-                                                        FriendlyName = alert.FriendlyName,
-                                                        ShowAlert = true,
-                                                    };
-                                                    Program.AlertQueueManager.EnqueueNewAlert(insertedAlert);
-
-                                                    alertCount++;
-                                                }
-                                            }
+													insertedAlert = QueueIntelAlert(entry, alert, path, x.CharacterName, x.CharacterName, "");
+													alertCount++;
+												}
+											}
                                         }
                                     }
                                     break;
@@ -705,26 +688,12 @@ namespace Quesadilla
 										sendAlert = CheckJumpsRange(alert, path);
 										if (sendAlert)
 										{
-											alertText = GenerateAlertText(entry, path, alert, x.CharacterName, AlertTextType.Alert, "");
-											Log.Debug("ALERT - " + alertText);
 											if (
 												alert.AlertRangeType == AlertConfigRangeType.AllCharacters ||
 												alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive
 												)
 											{
-												insertedAlert = new AlertQueueItem()
-												{
-													AlertText = alertText,
-													MenuText = GenerateAlertText(entry, path, alert, x.CharacterName, AlertTextType.Menu, ""),
-													Entry = entry,
-													Path = path,
-													Context = x.CharacterName,
-													SoundFile = alert.SoundFile,
-													FriendlyName = alert.FriendlyName,
-													ShowAlert = true,
-												};
-												Program.AlertQueueManager.EnqueueNewAlert(insertedAlert);
-
+												insertedAlert = QueueIntelAlert(entry,alert,path,x.CharacterName,x.CharacterName,"");
 												alertCount++;
 											}
 										}
@@ -737,24 +706,9 @@ namespace Quesadilla
                                         foreach (var x in Program.CharacterManager.Characters)
                                         {
                                             path = Program.Universe.FindAndCachePath(x.LocationId, toSystemId);
-
-                                            alertText = GenerateAlertText(entry, path, alert, alert.TriggerText, AlertTextType.Alert, alert.TriggerText);
-                                            Log.Debug("ALERT - " + alertText);
-                                            insertedAlert = new AlertQueueItem()
-                                            {
-                                                AlertText = alertText,
-                                                MenuText = GenerateAlertText(entry, path, alert, alert.TriggerText, AlertTextType.Menu, alert.TriggerText),
-                                                Entry = entry,
-                                                Path = path,
-                                                Context = alert.TriggerText,
-                                                SoundFile = alert.SoundFile,
-                                                FriendlyName = alert.FriendlyName,
-                                                ShowAlert = true,
-                                            };
-                                            Program.AlertQueueManager.EnqueueNewAlert(insertedAlert);
-
-                                            alertCount++;
-                                        }
+											insertedAlert = QueueIntelAlert(entry,alert,path,alert.TriggerText,alert.TriggerText,alert.TriggerText);
+											alertCount++;
+										}
                                     }
                                     break;
                                 default:
@@ -765,6 +719,7 @@ namespace Quesadilla
                     int systemId1 = -1;
                     foreach (int systemId2 in intSet)
                     {
+                        // if no alert - still STORE alert for later checks and display on map
                         if (insertedAlert == null)
                         {
                             insertedAlert = new AlertQueueItem()
@@ -794,22 +749,9 @@ namespace Quesadilla
                     {
                         if (entry.LineContent.Contains(alert.TriggerText, StringComparison.OrdinalIgnoreCase))
                         {
-                            string alertText = GenerateAlertText(entry, null, alert, alert.TriggerText, AlertTextType.Alert, alert.TriggerText);
-                            Log.Debug("ALERT - " + alertText);
-                            Program.AlertQueueManager.EnqueueNewAlert(
-                                new AlertQueueItem()
-                                {
-                                    AlertText = alertText,
-                                    MenuText = GenerateAlertText(entry, null, alert, alert.TriggerText, AlertTextType.Menu, alert.TriggerText),
-                                    Entry = entry,
-                                    Path = null,
-                                    Context = alert.TriggerText,
-                                    SoundFile = alert.SoundFile,
-                                    FriendlyName = alert.FriendlyName,
-                                    ShowAlert = true,
-                                });
-                            alertCount++;
-                        }
+							QueueIntelAlert(entry,alert,null,alert.TriggerText,alert.TriggerText,alert.TriggerText);
+							alertCount++;
+						}
                     }
                 }
             }
