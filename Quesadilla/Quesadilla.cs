@@ -519,8 +519,8 @@ namespace Quesadilla
                 return;
             if (entry.EntryType != LogEntryType.ChatEvent && entry.EntryType != LogEntryType.UnknownChatLogEvent && entry.EntryType != LogEntryType.UnknownGameLogEvent)
             {
-                if (Program.CharacterList.Where(o => o.CharacterName == entry.CharacterName).ToList().Count == 0)
-                    Program.AddNewCharacter(entry.CharacterName);
+                var c = Program.CharacterManager.GetOrCreate(entry.CharacterName);
+
                 switch (entry.EntryType)
                 {
                     case LogEntryType.OpenChatLogEvent:
@@ -573,7 +573,7 @@ namespace Quesadilla
                             Log.Debug("Jumps from HOME:" + Program.Universe.SolarSystems[homeSystemId].Name + " to " + Program.Universe.SolarSystems[toSystemId].Name + " is " + homeSystemPathInfo.TotalJumps);
                         }
 
-                        foreach (var c in Program.CharacterList.Where(o => o.LocationId > 0))
+                        foreach (var c in Program.CharacterManager.CharactersWithLocation())
                         {
                             var CurrectLocationPathInfo = Program.Universe.FindAndCachePath(c.LocationId, toSystemId);
                             if (CurrectLocationPathInfo != null)
@@ -645,7 +645,7 @@ namespace Quesadilla
                                 case AlertConfigRangeType.OneCharacter:
                                 case AlertConfigRangeType.OneOnlineCharacter:
                                     // check against one specific character
-                                    foreach (var x in Program.CharacterList.Where(o => o.CharacterName == alert.TriggerText))
+                                    foreach (var x in Program.CharacterManager.CharactersNamed(alert.TriggerText))
                                     {
                                         if (x.LocationId != 0)
                                         {
@@ -680,47 +680,44 @@ namespace Quesadilla
                                     }
                                     break;
                                 case AlertConfigRangeType.AllCharacters:
-                                case AlertConfigRangeType.AllOnlineCharacters:
-                                    // check against all characters
-                                    foreach (var x in Program.CharacterList)
-                                    {
-                                        if (x.LocationId != 0)
-                                        {
-                                            path = Program.Universe.FindAndCachePath(x.LocationId, toSystemId);
-                                            sendAlert = CheckJumpsRange(alert, path);
-                                            if (sendAlert)
-                                            {
-                                                alertText = GenerateAlertText(entry, path, alert, x.CharacterName, AlertTextType.Alert, "");
-                                                Log.Debug("ALERT - " + alertText);
-                                                if (
-                                                    alert.AlertRangeType == AlertConfigRangeType.AllCharacters ||
-                                                    alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive
-                                                    )
-                                                {
-                                                    insertedAlert = new AlertQueueItem()
-                                                    {
-                                                        AlertText = alertText,
-                                                        MenuText = GenerateAlertText(entry, path, alert, x.CharacterName, AlertTextType.Menu, ""),
-                                                        Entry = entry,
-                                                        Path = path,
-                                                        Context = x.CharacterName,
-                                                        SoundFile = alert.SoundFile,
-                                                        FriendlyName = alert.FriendlyName,
-                                                        ShowAlert = true,
-                                                    };
-                                                    Program.AlertQueueManager.EnqueueNewAlert(insertedAlert);
+								case AlertConfigRangeType.AllOnlineCharacters:
+									// check against all characters
+									foreach (var x in Program.CharacterManager.CharactersWithLocation())
+									{
+										path = Program.Universe.FindAndCachePath(x.LocationId, toSystemId);
+										sendAlert = CheckJumpsRange(alert, path);
+										if (sendAlert)
+										{
+											alertText = GenerateAlertText(entry, path, alert, x.CharacterName, AlertTextType.Alert, "");
+											Log.Debug("ALERT - " + alertText);
+											if (
+												alert.AlertRangeType == AlertConfigRangeType.AllCharacters ||
+												alert.AlertRangeType == AlertConfigRangeType.AllOnlineCharacters && x.IsClientActive
+												)
+											{
+												insertedAlert = new AlertQueueItem()
+												{
+													AlertText = alertText,
+													MenuText = GenerateAlertText(entry, path, alert, x.CharacterName, AlertTextType.Menu, ""),
+													Entry = entry,
+													Path = path,
+													Context = x.CharacterName,
+													SoundFile = alert.SoundFile,
+													FriendlyName = alert.FriendlyName,
+													ShowAlert = true,
+												};
+												Program.AlertQueueManager.EnqueueNewAlert(insertedAlert);
 
-                                                    alertCount++;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    break;
-                                case AlertConfigRangeType.None:
+												alertCount++;
+											}
+										}
+									}
+									break;
+								case AlertConfigRangeType.None:
                                     // must be custom text
                                     if (entry.LineContent.Contains(alert.TriggerText, StringComparison.OrdinalIgnoreCase))
                                     {
-                                        foreach (var x in Program.CharacterList)
+                                        foreach (var x in Program.CharacterManager.Characters)
                                         {
                                             path = Program.Universe.FindAndCachePath(x.LocationId, toSystemId);
 
@@ -807,102 +804,60 @@ namespace Quesadilla
             }
         }
 
-        private void _localWatcher_SystemChange(object sender, ProcessSystemChangeEventArgs e)
-        {
-            int foundSystemId = -1;
-            string foundSystemName = "Unknown";
+		private SolarSystem FindSystem(string systemName)
+		{
+			int nativeId;
 
-            int nativeId;
-            if (int.TryParse(e.SystemName, out nativeId))
-            {
-                using (IEnumerator<KeyValuePair<int, SolarSystem>> enumerator = Program.Universe.SolarSystems.Select(tempSolarSystem => new
-                {
-                    tempSolarSystem = tempSolarSystem,
-                    tempSystem = tempSolarSystem.Value
-                }).Where(_param1 => _param1.tempSystem.Id == nativeId).Select(_param1 => _param1.tempSolarSystem).GetEnumerator())
-                {
-                    if (enumerator.MoveNext())
-                    {
-                        foundSystemId = enumerator.Current.Key;
-                        foundSystemName = enumerator.Current.Value.Name;
-                    }
-                }
-            }
-            else
-            {
-                using (IEnumerator<KeyValuePair<int, SolarSystem>> enumerator = Program.Universe.SolarSystems.Select(tempSolarSystem => new
-                {
-                    tempSolarSystem = tempSolarSystem,
-                    tempSystem = tempSolarSystem.Value
-                }).Where(_param1 => _param1.tempSystem.MatchNameRegex(e.SystemName)).Select(_param1 => _param1.tempSolarSystem).GetEnumerator())
-                {
-                    if (enumerator.MoveNext())
-                    {
-                        foundSystemId = enumerator.Current.Key;
-                        foundSystemName = enumerator.Current.Value.Name;
-                    }
-                }
-            }
-            string characterName = e.CharName.Trim();
-			if (!string.IsNullOrEmpty(characterName) && foundSystemId != -1)
+			if (int.TryParse(systemName, out nativeId))
 			{
-				var c = Program.CharacterList.FirstOrDefault(o => o.CharacterName == characterName);
+				return Program.Universe.SolarSystems.Values
+					.FirstOrDefault(s => s.Id == nativeId);
+			}
 
-				if (c == null)
-				{
-					c = new Character
-					{
-						CharacterName = characterName
-					};
-					Program.CharacterList.Add(c);
-				}
+			return Program.Universe.SolarSystems.Values
+				.FirstOrDefault(s => s.MatchNameRegex(systemName));
+		}
 
-				c.LocationId = foundSystemId;
-				c.Location = foundSystemName;
-				c.InAbyss = false;
+		private void _localWatcher_SystemChange(object sender, ProcessSystemChangeEventArgs e)
+        {
+            var foundSystem = FindSystem(e.SystemName);
 
-				EveOClient.UpdateSystem(c.CharacterName, c.Location);
+			string characterName = e.CharName.Trim();
+			if (!string.IsNullOrEmpty(characterName) && foundSystem != null)
+			{
+                Program.CharacterManager.UpdateLocation(characterName, foundSystem.Id, foundSystem.Name);
+                EveOClient.UpdateSystem(characterName, foundSystem?.Name);
 			
 
-			// add to list of regions to check on dotlan
-			string region = Program.Universe.SolarSystems[foundSystemId].RegionName;
-                if (!DotlanProcessor.RegionsToCheck.Contains(region))
+			    // add to list of regions to check on dotlan
+                if (!DotlanProcessor.RegionsToCheck.Contains(foundSystem?.RegionName))
                 {
-                    DotlanProcessor.RegionsToCheck.Add(region);
+                    DotlanProcessor.RegionsToCheck.Add(foundSystem?.RegionName);
                     DotlanProcessor.RunWorkerIfPossible();
                 }
 
-                CheckEveScoutConnection(c);
+                CheckEveScoutConnection(characterName);
 
-                Program.Universe.GetSystemInfo(foundSystemId);
+                Program.Universe.GetSystemInfo(foundSystem.Id);
 
                 GetSkyhookTimers();
             }
 
             // System not ound and not WH space... so Abyss
-            if (!string.IsNullOrEmpty(characterName) && foundSystemId == -1 && !e.SystemName.StartsWith("J"))
+            if (!string.IsNullOrEmpty(characterName) && foundSystem == null && !e.SystemName.StartsWith("J"))
             {
-				var c = Program.CharacterList.FirstOrDefault(o => o.CharacterName == characterName);
-                if (c == null)
-                {
-                    c = new Character()
-                    {
-                        CharacterName = characterName,
-                        LocationId = foundSystemId,
-                        Location = foundSystemName,
-                    };
-                    Program.CharacterList.Add(c);
-                }
-				c.InAbyss = true;
+                Program.CharacterManager.UpdateLocation(characterName, 0, e.SystemName);
+				EveOClient.UpdateSystem(characterName, e.SystemName);
+                Program.CharacterManager.SetInAbyss(characterName);
 			}
 
 			SetupStatusBar();
 
-            if (foundSystemId == -1 && e.SystemName.StartsWith("J"))
+            if (foundSystem == null && e.SystemName.StartsWith("J"))
             {
                 // wormhole ? - get info from http://anoik.is/
             }
-            Log.Information("System Change: " + characterName + " (" + foundSystemName + ")");
+            Log.Information("System Change: " + characterName + " (" + foundSystem?.Name ?? " Ukknown " + ")");
 
             // Should we update system information in system log file ?
             if (Program.MainConfiguration.OutputCharacterLocationsToFile)
@@ -910,9 +865,9 @@ namespace Quesadilla
                 try
                 {
                     StringBuilder s = new StringBuilder();
-                    foreach (var c in Program.CharacterList)
-                    {
-                        s.Append($"{c.CharacterName}:{c.Location}{(c.InAbyss ? " *IN-ABYSS*" : "")}");
+					foreach (var c in Program.CharacterManager.Characters)
+					{
+						s.Append($"{c.CharacterName}:{c.Location}{(c.InAbyss ? " *IN-ABYSS*" : "")}");
                         File.WriteAllText($"Quesadilla.Locations.{c.CharacterName}", $"{c.Location} {(c.InAbyss ? " *IN-ABYSS*" : "")}");
                     }
                     File.WriteAllText($"Quesadilla.Locations", s.ToString());
@@ -1077,22 +1032,24 @@ namespace Quesadilla
                     EveOClient.Agression(e.Entry.CharacterName, true);
                 }
 
-                if (!Program.Combat.ContainsKey(e.Entry.CharacterName))
+                if (!Program.CombatDataKeys().Contains(e.Entry.CharacterName))
                 {
                     Program.Combat.TryAdd(e.Entry.CharacterName, new List<CombatLine>());
                 }
                 //Log.Information(e.Entry.LineContent);
 
                 Match match = _CombatRegexMissesYouCompletely.Match(e.Entry.LineContent);
-                if (match.Success)
-                {
-                    Program.Combat[e.Entry.CharacterName].Add(new CombatLine()
-                    {
-                        TimeAdded = e.Entry.TimeAdded,
-                        Entity = match.Groups["combatEntity"].ToString(),
-                    });
-                }
-                match = _CombatRegexCombatData.Match(e.Entry.LineContent);
+				if (match.Success)
+				{
+					Program.AddCombat(
+						e.Entry.CharacterName,
+						new CombatLine()
+						{
+							TimeAdded = e.Entry.TimeAdded,
+							Entity = match.Groups["combatEntity"].ToString(),
+						});
+				}
+				match = _CombatRegexCombatData.Match(e.Entry.LineContent);
                 if (match.Success)
                 {
                     int dmgAmount = 0;
@@ -1178,9 +1135,9 @@ namespace Quesadilla
                         if (_FactionRats.Any(s => match.Groups["combatEntity"].ToString().Contains(s)))
                         {
                             string alertText = GenerateAlertText(e.Entry, null, alert, "Faction Spawn", AlertTextType.Alert, match.Groups["combatEntity"].ToString());
-                            PathInfo path = null;
-                            var c = Program.CharacterList.Find(o => o.CharacterName.Equals(e.CharacterName));
 
+                            PathInfo path = null;
+                            var c = Program.CharacterManager.Get(e.CharacterName);
                             bool sendAlert = true;
 
                             if (c != null)
@@ -1205,7 +1162,7 @@ namespace Quesadilla
                             if (sendAlert)
                             {
                                 LastFactionAlert = DateTime.Now;
-                                if (c != null) { c.LastFactionAlert = LastFactionAlert; }
+                                if (c != null) { Program.CharacterManager.SetLastFactionAlert(c.CharacterName, LastFactionAlert); }
                                 Log.Debug("ALERT - " + alertText);
                                 Program.AlertQueueManager.EnqueueNewAlert(
                                     new AlertQueueItem()
@@ -1237,7 +1194,7 @@ namespace Quesadilla
             //Log.Information("COMBAT:" + e.CombatEvent);
             if (e.Entry != null)
             {
-                if (!Program.ISK.ContainsKey(e.Entry.CharacterName))
+                if (!Program.IskDataKeys().Contains(e.Entry.CharacterName))
                 {
                     Program.ISK.TryAdd(e.Entry.CharacterName, new List<IskLine>());
                 }
@@ -1250,23 +1207,19 @@ namespace Quesadilla
                     var amount = match.Groups["iskAmount"].ToString();
                     iskAmount = Double.Parse(amount.Trim());
 
-                    Program.ISK[e.Entry.CharacterName].Add(new IskLine()
-                    {
-                        TimeAdded = e.Entry.TimeAdded,
-                        IskAmount = iskAmount,
-                    });
-                }
-            }
-        }
+					Program.AddISK(e.Entry.CharacterName,
+						new IskLine()
+						{
+							TimeAdded = e.Entry.TimeAdded,
+							IskAmount = iskAmount,
+						});
+				}
+			}
+		}
         private void logFile_ProcessMining(object sender, ProcessMiningEventArgs e)
         {
-            //Log.Information("COMBAT:" + e.CombatEvent);
             if (e.Entry != null)
             {
-                if (!Program.Mining.ContainsKey(e.Entry.CharacterName))
-                {
-                    Program.Mining.TryAdd(e.Entry.CharacterName, new List<MiningLine>());
-                }
 
                 // is this actual mining data
                 Match match = _MiningRegexAmounts.Match(e.Entry.LineContent);
@@ -1275,16 +1228,12 @@ namespace Quesadilla
                     var minedAmount = match.Groups["miningAmount"].ToString();
                     int mined = Int32.Parse(minedAmount.Trim());
 
-                    //var minedWasted = match.Groups["miningResidue"].ToString();
-                    //int wasted = Int32.Parse(minedWasted.Trim());
-
-                    Program.Mining[e.Entry.CharacterName].Add(new MiningLine()
+                    Program.AddMining(e.Entry.CharacterName, new MiningLine()
                     {
                         TimeAdded = e.Entry.TimeAdded,
                         MiningItem = match.Groups["miningContext"].ToString(),
                         MiningAmount = mined,
                         Critical = false,
-                        //WastageAmount = wasted,
                     });
                 }
 
@@ -1295,12 +1244,9 @@ namespace Quesadilla
                     var minedAmount = match.Groups["miningAmount"].ToString();
                     int mined = Int32.Parse(minedAmount.Trim());
 
-                    //var minedWasted = match.Groups["miningResidue"].ToString();
-                    //int wasted = Int32.Parse(minedWasted.Trim());
-
-                    Program.Mining[e.Entry.CharacterName].Add(new MiningLine()
-                    {
-                        TimeAdded = e.Entry.TimeAdded,
+					Program.AddMining(e.Entry.CharacterName, new MiningLine()
+					{
+						TimeAdded = e.Entry.TimeAdded,
                         MiningItem = match.Groups["miningContext"].ToString(),
                         MiningAmount = mined,
                         Critical = true,
@@ -1312,15 +1258,12 @@ namespace Quesadilla
                 match = _MiningRegexAmountsResidue.Match(e.Entry.LineContent);
                 if (match.Success)
                 {
-                    //var minedAmount = match.Groups["miningAmount"].ToString();
-                    //int mined = Int32.Parse(minedAmount.Trim());
-
                     var minedWasted = match.Groups["miningResidue"].ToString();
                     int wasted = Int32.Parse(minedWasted.Trim());
 
-                    Program.Mining[e.Entry.CharacterName].Add(new MiningLine()
-                    {
-                        TimeAdded = e.Entry.TimeAdded,
+					Program.AddMining(e.Entry.CharacterName, new MiningLine()
+					{
+						TimeAdded = e.Entry.TimeAdded,
                         MiningItem = "WASTE",
                         //MiningAmount = mined,
                         WastageAmount = wasted,
@@ -1373,7 +1316,6 @@ namespace Quesadilla
                         return tempTrigger.AlertType == AlertConfigType.MiningEndedFull;
                     })))
                     {
-
                         Log.Information("Mining: cargo full");
                         var alertText = GenerateAlertText(e.Entry, null, alert, e.Entry.CharacterName, AlertTextType.Alert, match.Groups["miningDevice"].ToString() + " stopped - Cargo full");
                         PathInfo path = null;
@@ -1404,7 +1346,6 @@ namespace Quesadilla
             {
 
                 PathInfo path = null;
-                var c = Program.CharacterList.Find(o => o.CharacterName.Equals(e.CharacterName));
                 string alertText = "";
 
                 foreach (AlertConfig alert in Program.MainConfiguration.AlertConfiguration.Where<AlertConfig>((Func<AlertConfig, bool>)(tempTrigger =>
@@ -1433,7 +1374,7 @@ namespace Quesadilla
                     new AlertQueueItem()
                     {
                         AlertText = alertText,
-                        MenuText = c.CharacterName + alertText,
+                        MenuText = e.CharacterName + alertText,
                         Entry = e.Entry,
                         Path = path,
                         Context = alertText,
@@ -1452,15 +1393,10 @@ namespace Quesadilla
 
             if (Program.MainConfiguration.ShowMinimap)
             {
-                //lblISK.Left = pMinimapImage.Left + 10 + pMinimapImage.Width;|
-                //lblISK.Top = pMinimapImage.Top + pMinimapImage.Height - 1 - lblISK.Height;
             }
 
             buttonIntelSize.Top = IntelLog.Top + 2;
             buttonIntelSize.Left = IntelLog.Width - buttonIntelSize.Width - 2;
-
-            //ActivityLineInc = (Width) / Program.MainConfiguration.HeartBeatIndicatorDivisions;
-            //ActivityLineMax = (Width);
         }
         private void ToggleIntelSize()
         {
@@ -1669,11 +1605,11 @@ namespace Quesadilla
                 }
             }
 
-            // just double check thru charachter list active clients to make sure there is still an active client.
-            foreach (var c in Program.CharacterList)
+			// just double check thru charachter list active clients to make sure there is still an active client.
+			Program.CharacterManager.SetCurrentlyActiveClient(CurrentActiveToon);
+			foreach (var c in Program.CharacterManager.Characters)
             {
-                c.IsClientActive = Program.ProcessMonitorHandler.IsCharStillActive(c.CharacterName);
-                c.IsCurrentlActiveClient = (c.CharacterName == CurrentActiveToon ? true : false);
+                Program.CharacterManager.SetIsActive(c.CharacterName, Program.ProcessMonitorHandler.IsCharStillActive(c.CharacterName));
             }
         }
 
@@ -1729,7 +1665,7 @@ namespace Quesadilla
             {
                 Log.Debug("Jumps from HOME:" + Program.Universe.SolarSystems[homeSystemId].Name + " to " + Program.Universe.SolarSystems[toSystemId].Name + " is " + homeSystemPathInfo.TotalJumps);
             }
-            foreach (var c in Program.CharacterList.Where(o => o.LocationId > 0))
+            foreach (var c in Program.CharacterManager.CharactersWithLocation())
             {
                 var CurrectLocationPathInfo = Program.Universe.FindAndCachePath(c.LocationId, toSystemId);
                 if (CurrectLocationPathInfo != null)
@@ -1801,7 +1737,7 @@ namespace Quesadilla
                     case AlertConfigRangeType.OneCharacter:
                     case AlertConfigRangeType.OneOnlineCharacter:
                         // check against one specific character
-                        foreach (var x in Program.CharacterList.Where(o => o.CharacterName == alert.TriggerText))
+                        foreach (var x in Program.CharacterManager.CharactersNamed(alert.TriggerText))
                         {
                             if (x.LocationId != 0)
                             {
@@ -1837,7 +1773,7 @@ namespace Quesadilla
                     case AlertConfigRangeType.AllCharacters:
                     case AlertConfigRangeType.AllOnlineCharacters:
                         // check against all characters
-                        foreach (var x in Program.CharacterList)
+                        foreach (var x in Program.CharacterManager.Characters)
                         {
                             if (x.LocationId != 0)
                             {
@@ -1896,7 +1832,7 @@ namespace Quesadilla
 
 			if (!string.IsNullOrEmpty(CurrentActiveToon))
 			{
-				var c = Program.CharacterList.FirstOrDefault(o => o.CharacterName == CurrentActiveToon);
+                var c = Program.CharacterManager.Get(CurrentActiveToon);
                 if (c != null)
                 {
                     if (c.InAbyss)
@@ -1937,52 +1873,32 @@ namespace Quesadilla
             Program.ESIHandler.EnqueueRequestSkyhookData();
         }
 
-        private void CheckEveScoutConnection(Character c)
+        private void CheckEveScoutConnection(string characterName)
         {
+            var c = Program.CharacterManager.GetOrCreate(characterName);
 
-            if (c == null || c.LocationId == 0) return;
+            if (c.LocationId == 0) return;
 
             var ClosestThera = Program.EveScoutProcessor.FindClosest(Program.Universe, c.LocationId, "Thera");
-
             var ClosestTurnur = Program.EveScoutProcessor.FindClosest(Program.Universe, c.LocationId, "Turnur");
-            PathInfo closePath;
 
-            if (ClosestThera != null)
-            {
-                closePath = Program.Universe.FindAndCachePath(c.LocationId, (ClosestThera.FromSystemId == EveScoutManager.SYSTEMID_THERA) ? (int)ClosestThera.ToSystemId : (int)ClosestThera.FromSystemId);
-                if (closePath != null)
-                {
-                    Log.Information($"EveScout: Closest Thera {ClosestThera.ToSystemId}:{ClosestThera.FromSystemId} {closePath.TotalJumps} {closePath.ToSystemName}");
-                    c.ClosestThera = ClosestThera;
-                    c.ClosestTheraPath = closePath;
-                }
-                else
-                {
-                    c.ClosestThera = null;
-                    c.ClosestTheraPath = null;
-                }
-            }
-            if (ClosestTurnur != null)
-            {
-                closePath = Program.Universe.FindAndCachePath(c.LocationId, (ClosestTurnur.FromSystemId == EveScoutManager.SYSTEMID_TURNUR) ? (int)ClosestTurnur.ToSystemId : (int)ClosestTurnur.FromSystemId);
-                if (closePath != null)
-                {
-                    Log.Information($"EveScout: Closest Turnur {ClosestTurnur.ToSystemId}:{ClosestTurnur.FromSystemId} {closePath.TotalJumps} {closePath.ToSystemName}");
-                    c.ClosestTurnur = ClosestTurnur;
-                    c.ClosestTurnurPath = closePath;
-                }
-                else
-                {
-                    c.ClosestTurnur = null;
-                    c.ClosestTurnurPath = null;
-                }
-            }
-        }
-        private void EveScout_ProcessNewData(object sender, EveScoutEventArgs e)
+			Program.CharacterManager.SetClosestThera(characterName,ClosestThera,
+				Program.Universe.FindAndCachePath(c.LocationId, (ClosestThera.FromSystemId == EveScoutManager.SYSTEMID_THERA) ? (int)ClosestThera.ToSystemId : (int)ClosestThera.FromSystemId)
+				);
+
+			Program.CharacterManager.SetClosestTurnur(characterName,ClosestTurnur,
+				Program.Universe.FindAndCachePath(c.LocationId, (ClosestTurnur.FromSystemId == EveScoutManager.SYSTEMID_TURNUR) ? (int)ClosestTurnur.ToSystemId : (int)ClosestTurnur.FromSystemId)
+				);
+
+			Log.Information($"EveScout: Closest Thera {c.ClosestThera?.ToSystemId}:{c.ClosestThera?.FromSystemId} {c.ClosestTheraPath?.TotalJumps} {c.ClosestTheraPath?.ToSystemName}");
+			Log.Information($"EveScout: Closest Turnur {c.ClosestTurnur?.ToSystemId}:{c.ClosestTurnur?.FromSystemId} {c.ClosestTurnurPath?.TotalJumps} {c.ClosestTurnurPath?.ToSystemName}");
+		}
+
+		private void EveScout_ProcessNewData(object sender, EveScoutEventArgs e)
         {
-            foreach (var c in Program.CharacterList.Where(o => o.IsClientActive))
+            foreach (var c in Program.CharacterManager.IsActive())
             {
-                CheckEveScoutConnection(c);
+                CheckEveScoutConnection(c.CharacterName);
             }
             EveScoutProcessStormData();
         }
@@ -2165,7 +2081,7 @@ namespace Quesadilla
         {
             shouldUpdatePlanetInfo = false;
 
-			var c = Program.CharacterList.FirstOrDefault(o => o.CharacterName == CurrentActiveToon); 
+            var c = Program.CharacterManager.Get(CurrentActiveToon);
             if (c != null)
             {
                 try
@@ -2228,7 +2144,7 @@ namespace Quesadilla
 */
 			}
 
-			var c = Program.CharacterList.FirstOrDefault(o => o.CharacterName == CurrentActiveToon);
+			var c = Program.CharacterManager.Get(CurrentActiveToon);
 
 			PathInfo _dummyPath = null;
             if (c != null)
@@ -2359,7 +2275,7 @@ namespace Quesadilla
 
             if (Program.MainConfiguration.ShowPlanetInformation && CurrentActiveToon != null && CurrentActiveToon != "")
             {
-				var c = Program.CharacterList.FirstOrDefault(o => o.CharacterName == CurrentActiveToon);
+				var c = Program.CharacterManager.Get(CurrentActiveToon);
                 if (c != null)
                 {
                     try
@@ -2448,7 +2364,7 @@ namespace Quesadilla
 
             if (ISKPerHourTotal == false)
             {
-                if (CurrentActiveToon != null && Program.ISK.ContainsKey(CurrentActiveToon))
+                if (CurrentActiveToon != null && Program.IskDataKeys().Contains(CurrentActiveToon))
                 {
                     RattingData.Text = Program.GetIskLastHour(CurrentActiveToon);
                     RattingData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
@@ -2460,11 +2376,9 @@ namespace Quesadilla
                         OverlayMapWindow.RattingData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("RattingData")).Color;
                         OverlayMapWindow.UpdateMapData();
                     }
-                    //lblISK.Visible = true;
                 }
                 else
                 {
-                    //lblISK.Visible = false;
                     RattingData.Text = "";
                     if (OverlayMapWindow != null)
                     {
@@ -2497,7 +2411,7 @@ namespace Quesadilla
 
             if (MiningPerHourTotal == false)
             {
-                if (CurrentActiveToon != null && Program.Mining.ContainsKey(CurrentActiveToon))
+                if (CurrentActiveToon != null && Program.MiningDataKeys().Contains(CurrentActiveToon))
                 {
                     MiningData.Text = Program.GetMiningLastHour(CurrentActiveToon);
                     MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
@@ -2505,8 +2419,8 @@ namespace Quesadilla
                     //lblISK.Visible = true;
                     if (OverlayMapWindow != null)
                     {
-                        OverlayMapWindow.MiningData.Text = Program.GetMiningLastHour(CurrentActiveToon);
-                        OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
+                        OverlayMapWindow.MiningData.Text = MiningData.Text;
+						OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).Color;
                         OverlayMapWindow.UpdateMapData();
                     }
                 }
@@ -2527,8 +2441,8 @@ namespace Quesadilla
                 MiningData.ForeColor = Program.MainConfiguration.MainWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
                 if (OverlayMapWindow != null)
                 {
-                    OverlayMapWindow.MiningData.Text = Program.GetMiningLastHour("");
-                    OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
+                    OverlayMapWindow.MiningData.Text = MiningData.Text;
+					OverlayMapWindow.MiningData.ForeColor = Program.MainConfiguration.OverlayWindowItemLocations.Find(o => o.Name.Equals("MiningData")).AlternateColor;
                     OverlayMapWindow.UpdateMapData();
                 }
             }
@@ -2764,14 +2678,14 @@ namespace Quesadilla
 
 		private void RefreshEveLocations()
 		{
-			foreach (var c in Program.CharacterList)
+			foreach (var c in Program.CharacterManager.Characters)
 			{
 				EveOClient.UpdateSystem(c.CharacterName, c.Location);
 			}
 		}
 		private void ClearEveLocations()
 		{
-			foreach (var c in Program.CharacterList)
+			foreach (var c in Program.CharacterManager.Characters)
 			{
 				EveOClient.UpdateSystem(c.CharacterName, "");
 			}

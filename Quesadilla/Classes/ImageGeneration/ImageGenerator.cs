@@ -848,7 +848,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					// DrawSystemName(g, currentPoint.X, currentPoint.Y, $"{currentSystem.solarSystem.NPCKillsDeltaLastHour}", Color.AliceBlue, textSize); 
 
 					// active alt in sytstem ?
-					if (Program.CharacterList.Any(o => o.IsClientActive && !o.IsCurrentlActiveClient && o.LocationId == currentSystem.solarSystem.Id))
+					if (Program.CharacterManager.Characters.Any(o => o.IsClientActive && !o.IsCurrentlActiveClient && o.LocationId == currentSystem.solarSystem.Id))
 					{
 						circlesUsed++;
 						float circleSize = CIRCLE_INITIAL_GAP + uniHoleAdjust + ((CIRCLE_INCREASE_GAP * circlesUsed) / (float)GUI_SCALING);

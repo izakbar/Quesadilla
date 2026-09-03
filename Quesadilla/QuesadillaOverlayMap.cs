@@ -128,7 +128,7 @@ namespace Quesadilla
 				Toon = _main.CurrentActiveToon;
 			}
 
-			if (string.IsNullOrEmpty(Toon) || !Program.ISK.ContainsKey(Toon))
+			if (string.IsNullOrEmpty(Toon) || !Program.IskDataKeys().Contains(Toon))
 			{
 				iskPerMinuteChart.Visible = false;
 				return;
@@ -167,15 +167,15 @@ namespace Quesadilla
 			DateTime end = start;
 
 			// work out start/end times of combat - for cuirrent/all toons
-			lock(Program.ISK.Keys)
-				foreach(var currToon in Program.ISK.Keys)
+			foreach(var currToon in Program.IskDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
-					if (Program.ISK[currToon].Any())
+					var isk = Program.IskDataLines(currToon);
+					if (isk.Any())
 					{
-						if (Program.ISK[currToon].First().TimeAdded < start) start = Program.ISK[currToon].First().TimeAdded;
-						if (Program.ISK[currToon].Last().TimeAdded > end) end = Program.ISK[currToon].Last().TimeAdded;
+						if (isk.First().TimeAdded < start) start = isk.First().TimeAdded;
+						if (isk.Last().TimeAdded > end) end = isk.Last().TimeAdded;
 					}
 				}
 			}
@@ -185,13 +185,12 @@ namespace Quesadilla
 			curr = DateTime.Now.AddSeconds(-1 * span * 30);
 			start = curr;
 
-
-			foreach (var currToon in Program.ISK.Keys.ToArray())
+			foreach (var currToon in Program.IskDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
 					// setup second slots
-					foreach (var c in Program.ISK[currToon].ToArray()  /*.OrderBy(o => o.TimeAdded).ToList()*/ )
+					foreach (var c in Program.IskDataLines(currToon)  /*.OrderBy(o => o.TimeAdded).ToList()*/ )
 					{
 						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds / span);
 						if (!_iskGraphData.ContainsKey(slot))
@@ -325,7 +324,7 @@ namespace Quesadilla
 				Toon = _main.CurrentActiveToon;
 			}
 
-			if (string.IsNullOrEmpty(Toon) || !Program.Mining.ContainsKey(Toon))
+			if (string.IsNullOrEmpty(Toon) || !Program.MiningDataKeys().Contains(Toon))
 			{
 				minedPerMinuteChart.Visible = false;
 				return;
@@ -374,15 +373,15 @@ namespace Quesadilla
 			DateTime end = start;
 
 			// work out start/end times of combat - for cuirrent/all toons
-			lock(Program.Mining)
-			foreach (var currToon in Program.Mining.Keys)
+			foreach (var currToon in Program.MiningDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
-					if (Program.Mining[currToon].Any())
+					var md = Program.MiningDataLines(currToon);
+					if (md.Any())
 					{
-						if (Program.Mining[currToon].First().TimeAdded < start) start = Program.Mining[currToon].First().TimeAdded;
-						if (Program.Mining[currToon].Last().TimeAdded > end) end = Program.Mining[currToon].Last().TimeAdded;
+						if (md.First().TimeAdded < start) start = md.First().TimeAdded;
+						if (md.Last().TimeAdded > end) end = md.Last().TimeAdded;
 					}
 				}
 			}
@@ -394,12 +393,12 @@ namespace Quesadilla
 			start = curr;
 
 
-			foreach (var currToon in Program.Mining.Keys.ToArray())
+			foreach (var currToon in Program.MiningDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
 					// setup second slots
-					foreach (var c in Program.Mining[currToon].ToArray() /*.OrderBy(o => o.TimeAdded).ToList() */ )
+					foreach (var c in Program.MiningDataLines(currToon) /*.OrderBy(o => o.TimeAdded).ToList() */ )
 					{
 						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds / span);
 						if (!_minedGraphData.ContainsKey(slot))
@@ -420,7 +419,6 @@ namespace Quesadilla
 					}
 				}
 			}
-
 
 			int maxMined = 0; int totalMined = 0;
 			int maxWasted = 0; int totalWasted = 0;
@@ -607,8 +605,7 @@ namespace Quesadilla
 				//SetScreenPosition();
 			}
 
-			var c = Program.CharacterList.FirstOrDefault(o => o.CharacterName == Toon);
-
+			var c = Program.CharacterManager.Get(Toon);
 			PathInfo _dummyPath = null;
 			if (c != null)
 			{

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quesadilla.Classes
+namespace Quesadilla.Classes.Characters
 {
     public class Character
     {

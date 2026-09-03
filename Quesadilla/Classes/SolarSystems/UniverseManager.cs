@@ -280,7 +280,9 @@ namespace Quesadilla.Classes.SolarSystems
 		{
 			HashSet<int> data = new HashSet<int>();
 
-			foreach (var system in SolarSystems[systemId].ConnectedTo)
+            if (systemId == 0) return data.ToList();
+
+			foreach (var system in SolarSystems[systemId]?.ConnectedTo)
 			{
 				if (!visited.Add(system.ToSystemId))
 				{

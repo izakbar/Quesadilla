@@ -103,6 +103,8 @@
   <ItemGroup>
     <Compile Include="Classes\Alerts\AlertQueueManager.cs" />
     <Compile Include="Classes\Alerts\AlertTextType.cs" />
+    <Compile Include="Classes\Characters\Character.cs" />
+    <Compile Include="Classes\Characters\CharacterManager.cs" />
     <Compile Include="Classes\ImageGeneration\Animation\AnimationManager.cs" />
     <Compile Include="Classes\ImageGeneration\Animation\AnimationState.cs" />
     <Compile Include="Classes\Attributes\IsColourAttribute.cs" />
@@ -186,7 +188,6 @@
     <Compile Include="QuesadillaAlertPopup.Designer.cs">
       <DependentUpon>QuesadillaAlertPopup.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes\Character.cs" />
     <Compile Include="Classes\Configuration\AlertConfig.cs" />
     <Compile Include="Classes\Configuration\AlertConfigJumpsComparison.cs" />
     <Compile Include="Classes\Configuration\AlertConfigRangeType.cs" />

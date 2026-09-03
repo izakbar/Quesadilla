@@ -1,18 +1,14 @@
 ﻿using EVEStandard;
 using EVEStandard.Enumerations;
-using EVEStandard.Models;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Alerts;
+using Quesadilla.Classes.Characters;
 using Quesadilla.Classes.ESIData;
-using Quesadilla.Classes.Events;
 using Quesadilla.Classes.EveScout;
 using Quesadilla.Classes.ImageGeneration;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Processes;
-using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.Resources;
 using Quesadilla.Classes.SolarSystems;
 using Quesadilla.Classes.ZKill;
@@ -28,10 +24,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Media;
-using System.Net.Http;
 using System.Reflection;
 using System.Resources;
-using System.Threading;
+using System.Text.RegularExpressions;
 using System.Web.WebPages;
 using System.Windows.Forms;
 
@@ -59,15 +54,18 @@ namespace Quesadilla
         public static AlertQueueManager AlertQueueManager;
 
 		public static LogWatcherManager LogWatcherManager;
-		public static List<Character> CharacterList { get; set; }
-
         public static ProcessMonitor ProcessMonitorHandler = new ProcessMonitor();
+		public static CharacterManager CharacterManager = new CharacterManager();
 
         public static ConcurrentDictionary<string, List<CombatLine>> Combat = new ConcurrentDictionary<string, List<CombatLine>>();
         public static ConcurrentDictionary<string, List<IskLine>> ISK = new ConcurrentDictionary<string, List<IskLine>>();
         public static ConcurrentDictionary<string, List<MiningLine>> Mining = new ConcurrentDictionary<string, List<MiningLine>>();
 
-        public const string configuration_filename = "Quesadilla.config.json";
+		private static readonly object _combatLineLock = new object();
+		private static readonly object _iskLineLock = new object();
+		private static readonly object _miningLineLock = new object();
+
+		public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
 
         public static Version version = Assembly.GetEntryAssembly().GetName().Version;
@@ -90,8 +88,6 @@ namespace Quesadilla
             ESIHandler = new ESIWorker(esiClient, Log.Logger);
             Universe = new UniverseManager(esiClient, Log.Logger);
 			EveScoutProcessor = new EveScoutManager(Log.Logger);
-
-			CharacterList = new List<Character>();
 
             string listeningPort = MainConfiguration.IntegrationPort.ToString();
 
@@ -181,18 +177,6 @@ namespace Quesadilla
 			LogWatcherManager.AddWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs");
         }
 
-        public static void AddNewCharacter(string characterName)
-        {
-            if (characterName.Trim().Length == 0)
-                return;
-
-            CharacterList.Add(new Character()
-            {
-                CharacterName = characterName.Trim(),
-                IsClientActive = false,
-            });
-            Log.Information("New character found: " + characterName);
-        }
         public static void InitializeResources()
         {
             // find all resources - put sounds into sound array, backgrounds in background
@@ -235,10 +219,10 @@ namespace Quesadilla
             //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
             var expireTime = DateTime.Now.AddSeconds(-3600);
 
-            foreach (var t in CharacterList)
+            foreach (var t in Program.CharacterManager.Characters)
             {
-                if (!toon.IsEmpty() && t.CharacterName != toon || !ISK.ContainsKey(t.CharacterName)) continue;
-                foreach (var i in ISK[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
+                if (!toon.IsEmpty() && t.CharacterName != toon || ! IskDataKeys().Contains(t.CharacterName)) continue;
+                foreach (var i in IskDataLines(t.CharacterName).Where(o => o.TimeAdded >= expireTime))
                 {
                     isk += i.IskAmount;
                 }
@@ -260,13 +244,16 @@ namespace Quesadilla
             //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
             var expireTime = DateTime.Now.AddSeconds(-3600);
 
-            foreach (var t in CharacterList)
+            foreach (var t in Program.CharacterManager.Characters)
             {
-                if (!toon.IsEmpty() && t.CharacterName != toon || !Mining.ContainsKey(t.CharacterName)) continue;
-                foreach (var m in Mining[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
+                lock (_miningLineLock)
                 {
-                    units += m.MiningAmount;
-                    units3Wasted += m.WastageAmount;
+                    if (!toon.IsEmpty() && t.CharacterName != toon || !Mining.ContainsKey(t.CharacterName)) continue;
+                    foreach (var m in Mining[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
+                    {
+                        units += m.MiningAmount;
+                        units3Wasted += m.WastageAmount;
+                    }
                 }
             }
 
@@ -284,35 +271,39 @@ namespace Quesadilla
         //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
         var expireTime = DateTime.Now.AddSeconds(-3600);
 
-            foreach (var t in CharacterList)
-            {
-                if (!toon.IsEmpty() && t.CharacterName != toon || !Mining.ContainsKey(t.CharacterName)) continue;
-                if (!miningDetails.ContainsKey(t.CharacterName))
-                {
-                    miningDetails[t.CharacterName] = new List<MiningDetails>();
-                }
+			foreach (var t in Program.CharacterManager.Characters)
+			{
+				lock (_miningLineLock)
+				{
 
-                foreach (var m in Mining[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
-                {
-                    MiningDetails md = miningDetails[t.CharacterName].Find(o => o.MiningItem == m.MiningItem);
-                    if (md == null)
-                    {
-                        md = new MiningDetails()
-                        {
-                            MiningItem = m.MiningItem,
-                            MiningAmount = m.MiningAmount,
-                            WastageAmount = m.WastageAmount,
-                        };
-                        miningDetails[t.CharacterName].Add(md);
-                    } else
-                    {
-                        md.MiningAmount += m.MiningAmount;
-                        md.WastageAmount += m.WastageAmount;
-                    }
-                }
-            }
+					if (!toon.IsEmpty() && t.CharacterName != toon || !Mining.ContainsKey(t.CharacterName)) continue;
+					if (!miningDetails.ContainsKey(t.CharacterName))
+					{
+						miningDetails[t.CharacterName] = new List<MiningDetails>();
+					}
+					foreach (var m in Mining[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
+					{
+						MiningDetails md = miningDetails[t.CharacterName].Find(o => o.MiningItem == m.MiningItem);
+						if (md == null)
+						{
+							md = new MiningDetails()
+							{
+								MiningItem = m.MiningItem,
+								MiningAmount = m.MiningAmount,
+								WastageAmount = m.WastageAmount,
+							};
+							miningDetails[t.CharacterName].Add(md);
+						}
+						else
+						{
+							md.MiningAmount += m.MiningAmount;
+							md.WastageAmount += m.WastageAmount;
+						}
+					}
+				}
+			}
 
-            if ( itemTotalsOnly)
+			if ( itemTotalsOnly)
             {
                 return MiningItemSummary(miningDetails);
             }
@@ -356,69 +347,66 @@ namespace Quesadilla
 
         public static void ExpireMining()
         {
-            // expire ISK ?
+            // expire Mining ?
+            lock(_miningLineLock) {
             foreach (var k in Mining.Keys)
             {
                 bool removedEntry = true;
-                while (removedEntry && Mining[k].Count > 0)
-                {
-                    removedEntry = false;
-                    lock (Mining[k])
+                    while (removedEntry && Mining[k].Count > 0)
                     {
-                        TimeSpan ts = DateTime.Now - Mining[k].First().TimeAdded;
-                        if (ts.TotalSeconds > MainConfiguration.ExpireMiningSeconds)
-                        {
-                            Mining[k].Remove(Mining[k].First());
-                            removedEntry = true;
+                        removedEntry = false;
+                            TimeSpan ts = DateTime.Now - Mining[k].First().TimeAdded;
+                            if (ts.TotalSeconds > MainConfiguration.ExpireMiningSeconds)
+                            {
+                                Mining[k].Remove(Mining[k].First());
+                                removedEntry = true;
+                            }
                         }
-                    }
                 }
             }
         }
         public static void ExpireISK()
         {
             // expire ISK ?
-            foreach (var k in ISK.Keys)
+            foreach (var k in IskDataKeys())
             {
                 bool removedEntry = true;
+                lock(_iskLineLock)
                 while (removedEntry && ISK[k].Count > 0)
                 {
                     removedEntry = false;
-                    lock (ISK[k])
-                    {
                         TimeSpan ts = DateTime.Now - ISK[k].First().TimeAdded;
                         if (ts.TotalSeconds > MainConfiguration.ExpireISKSeconds)
                         {
                             ISK[k].Remove(ISK[k].First());
                             removedEntry = true;
                         }
-                    }
                 }
             }
         }
-        public static void ExpireCombat()
-        {
-            // expire combats ?
-            foreach (var k in Combat.Keys)
-            {
+		public static void ExpireCombat()
+		{
+			// expire combats ?
+			foreach (var k in CombatDataKeys())
+			{
 
-                bool removedEntry = true;
-                while (removedEntry && Combat[k].Any())
-                {
-                    removedEntry = false;
-                    lock (Combat[k])
-                    {
-                        TimeSpan ts = DateTime.Now - Combat[k].First().TimeAdded;
-                        if (ts.TotalSeconds > MainConfiguration.ExpireCombatSeconds)
-                        {
-                            Combat[k].Remove(Combat[k].First());
-                            removedEntry = true;
-                        }
-                    }
-                }
-            }
-        }
-        public static SoundPlayer LoadSoundFromFile(string fileName)
+				bool removedEntry = true;
+				lock (_combatLineLock)
+					while (removedEntry && Combat[k].Any())
+					{
+						removedEntry = false;
+						{
+							TimeSpan ts = DateTime.Now - Combat[k].First().TimeAdded;
+							if (ts.TotalSeconds > MainConfiguration.ExpireCombatSeconds)
+							{
+								Combat[k].Remove(Combat[k].First());
+								removedEntry = true;
+							}
+						}
+					}
+			}
+		}
+		public static SoundPlayer LoadSoundFromFile(string fileName)
         {
             Stream soundStream = null;
 
@@ -475,5 +463,65 @@ namespace Quesadilla
                 .WriteToSimpleAndRichTextBox(new MessageTemplateTextFormatter("{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Exception}\n"))
                 .CreateLogger();
         }
-    }
+
+        public static void AddMining(string characterName, MiningLine line)
+        {
+            lock(_miningLineLock)
+            {
+				Mining.TryAdd(characterName, new List<MiningLine>());
+				Program.Mining[characterName].Add(line);
+            }
+		}
+        public static void AddISK(string characterName, IskLine line)
+		{
+			lock (_iskLineLock)
+			{
+				ISK.TryAdd(characterName, new List<IskLine>());
+				Program.ISK[characterName].Add(line);
+			}
+		}
+		public static void AddCombat(string characterName, CombatLine line)
+		{
+			lock (_combatLineLock)
+			{
+				Combat.TryAdd(characterName, new List<CombatLine>());
+				Program.Combat[characterName].Add(line);
+			}
+		}
+		public static List<string> MiningDataKeys()
+        {
+            lock (_miningLineLock)
+                return Mining.Keys.ToList();
+        }
+
+        public static List<MiningLine> MiningDataLines(string characterName)
+        {
+            lock (_miningLineLock)
+                return Mining[characterName].ToList();
+        }
+
+		public static List<string> CombatDataKeys()
+		{
+			lock (_combatLineLock)
+				return Combat.Keys.ToList();
+		}
+
+		public static List<CombatLine> CombatDataLines(string characterName)
+		{
+			lock (_combatLineLock)
+				return Combat[characterName].ToList();
+		}
+
+		public static List<string> IskDataKeys()
+		{
+			lock (_iskLineLock)
+				return ISK.Keys.ToList();
+		}
+
+		public static List<IskLine> IskDataLines(string characterName)
+		{
+			lock (_iskLineLock)
+				return ISK[characterName].ToList();
+		}
+	}
 }

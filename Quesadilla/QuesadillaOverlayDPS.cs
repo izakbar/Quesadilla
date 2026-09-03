@@ -113,7 +113,7 @@ namespace Quesadilla
 				Toon = _main.CurrentActiveToon;
 			}
 
-			if (string.IsNullOrEmpty(Toon) || !Program.Combat.ContainsKey(Toon))
+			if (string.IsNullOrEmpty(Toon) || !Program.CombatDataKeys().Contains(Toon))
 			{
 				dpsChart.Visible = false;
 				return;
@@ -174,14 +174,15 @@ namespace Quesadilla
 
 			// work out start/end times of combat - for cuirrent/all toons
 			lock(Program.Combat)
-			foreach (var currToon in Program.Combat.Keys)
+			foreach (var currToon in Program.CombatDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
-					if (Program.Combat[currToon].Count > 0)
+					var combat = Program.CombatDataLines(currToon);
+					if (combat.Any())
 					{
-						if (Program.Combat[currToon].First().TimeAdded < start) start = Program.Combat[currToon].First().TimeAdded;
-						if (Program.Combat[currToon].Last().TimeAdded > end) end = Program.Combat[currToon].Last().TimeAdded;
+						if (combat.First().TimeAdded < start) start = combat.First().TimeAdded;
+						if (combat.Last().TimeAdded > end) end = combat.Last().TimeAdded;
 					}
 				}
 			}
@@ -198,12 +199,12 @@ namespace Quesadilla
 			var span = Math.Truncate(totalTime.TotalSeconds > maxPoints ? totalTime.TotalSeconds / maxPoints : 1);
 			if (span < minSpanSize) span = minSpanSize;
 
-			foreach (var currToon in Program.Combat.Keys.ToArray())
+			foreach (var currToon in Program.CombatDataKeys())
 			{
 				if (currToon == Toon || Toon == "*ALL*")
 				{
 					// setup second slots
-					foreach (var c in Program.Combat[currToon].ToArray() /*.OrderBy(o => o.TimeAdded).ToList() */ )
+					foreach (var c in Program.CombatDataLines(currToon) /*.OrderBy(o => o.TimeAdded).ToList() */ )
 					{
 						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds);
 
@@ -398,12 +399,9 @@ namespace Quesadilla
 						file.WriteLine(a + "," + _combatGraphData[a].ToCSV());
 					}
 				}
-
 			}
 			RenderAndUpdate();
 		}
-
-
 
 		protected override void RenderOverlay(Graphics g)
 		{
@@ -418,7 +416,6 @@ namespace Quesadilla
 				);
 			}
 		}
-
 		public void SetScreenPosition()
 		{
 			// position on screen
@@ -428,6 +425,5 @@ namespace Quesadilla
 				Y = _main.currentEveWindowRect.Top + SystemInformation.CaptionHeight + Program.MainConfiguration.OverlayDPSWindowPosition.Y,
 			};
 		}
-
 	}
 }
