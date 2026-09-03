@@ -202,8 +202,8 @@ namespace Quesadilla.Classes
 				c.OverlayMapWindowSize = new Size(600, 350);
 				c.OverlayMapWindowPosition = new Point(275, 1);
 
-				c.OverlayDPSWindowPosition = new Point(1000, 10);
-				c.OverlayDPSWindowSize = new Size(250, 100);
+				c.OverlayDPSWindowPosition = new Point(1000, 150);
+				c.OverlayDPSWindowSize = new Size(250, 130);
 
 				c.AlertPopupLocation = PopupLocationType.BottomLeft;
                 c.DPSLocation = PopupLocationType.TopRight;
