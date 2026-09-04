@@ -1647,22 +1647,11 @@ namespace Quesadilla
                 status.Append("No active Character");
             }
 
-            EveScoutStatus.Text = status.ToString().Trim();
-
-			if (OverlayMapWindow != null)
+			UI(() =>
 			{
-				if (OverlayMapWindow.InvokeRequired)
-				{
-					OverlayMapWindow.BeginInvoke(new Action(() =>
-					{
-						OverlayMapWindow.EveScoutStatus.Text = EveScoutStatus.Text;
-					}));
-				}
-				else
-				{
-					OverlayMapWindow.EveScoutStatus.Text = EveScoutStatus.Text;
-				}
-			}
+				EveScoutStatus.Text = status.ToString().Trim();
+				if (OverlayMapWindow!= null) OverlayMapWindow.EveScoutStatus.Text = EveScoutStatus.Text;
+			});
 		}
 
 		private void GetSkyhookTimers()
