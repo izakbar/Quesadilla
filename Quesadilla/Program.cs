@@ -89,7 +89,6 @@ namespace Quesadilla
 
             ESIHandler = new ESIWorker(esiClient, Log.Logger);
             Universe = new UniverseManager(esiClient, Log.Logger);
-			EveScoutProcessor = new EveScoutManager(Log.Logger);
 
             string listeningPort = MainConfiguration.IntegrationPort.ToString();
 
@@ -108,8 +107,6 @@ namespace Quesadilla
 			var splash = new QuesadillaSplashScreen();
 			splash.Show();
 
-			splash.Show();
-
 			DateTime end = DateTime.Now.AddSeconds(2);
 
 			while (DateTime.Now < end)
@@ -119,21 +116,25 @@ namespace Quesadilla
 			}
 
 			splash.SetStatus("Loading Universe...");
-			Universe.ReadSolarSystems("Quesadilla.Systems.Json");
 			Application.DoEvents();
+			Universe.ReadSolarSystems("Quesadilla.Systems.Json");
 
 			splash.SetStatus("Loading Item Types...");
-			Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
 			Application.DoEvents();
+			Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
+
+
+			splash.SetStatus("Setting up EveScout...");
+			Application.DoEvents();
+			EveScoutProcessor = new EveScoutManager(Log.Logger);
 
 			splash.SetStatus("Loading Character Cache...");
-			Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
 			Application.DoEvents();
+			Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
 
 			splash.SetStatus("Creating Zkill Handler");
-			ZKillHandler = new ZKill();
 			Application.DoEvents();
-
+			ZKillHandler = new ZKill();
 
 			splash.SetStatus("Creating Logfile Watchers...");
 			Application.DoEvents();
@@ -151,6 +152,7 @@ namespace Quesadilla
 
 			splash.SetStatus("Done.");
 			Application.DoEvents();
+			System.Threading.Thread.Sleep(500);
 
 			Application.Run(q);
 			MainConfiguration.Save(configuration_filename);

@@ -49,6 +49,7 @@ namespace Quesadilla
 		private ImageAttributes ImageAttrMainMap = new ImageAttributes();
 		private ImageAttributes ImageAttrISKGraph = new ImageAttributes();
 		private ImageAttributes ImageAttrMinedGraph = new ImageAttributes();
+		private MinimapParameters _minimapParameters = new MinimapParameters();
 
 		public QuesadillaOverlayMap(Quesadilla mainForm) : base()
 		{
@@ -77,6 +78,56 @@ namespace Quesadilla
 			ImageGenerator.SetImageAlpha(ImageAttrMinedGraph, Program.MainConfiguration.OverlayMinedGraphAlpha);
 
 			SetupPerMinuteCharts();
+			UpdateMinimapParameters();
+		}
+		public void UpdateMinimapParameters()
+		{
+			_minimapParameters.StormCentreOutlineAlpha = Program.MainConfiguration.OverlayMinimapStormCentreOutlineAlpha;
+			_minimapParameters.StormStrongOutlineAlpha = Program.MainConfiguration.OverlayMinimapStormStrongOutlineAlpha;
+			_minimapParameters.StormWeakOutlineAlpha = Program.MainConfiguration.OverlayMinimapStormWeakOutlineAlpha;
+			_minimapParameters.StormMainAlpha = Program.MainConfiguration.OverlayMinimapStormMainAlpha;
+			_minimapParameters.ShowStorm = Program.MainConfiguration.OverlayMinimapShowStorm;
+
+			_minimapParameters.SecLimitValue = Program.MainConfiguration.OverlayMinimapSecLimitValue;
+			_minimapParameters.SecLimitAlphaAmount = Program.MainConfiguration.OverlayMinimapSecLimitAlpha;
+			_minimapParameters.SecLimitCloudSize = Program.MainConfiguration.OverlayMinimapSecLimitCloudSize;
+			_minimapParameters.SecLimitShow = Program.MainConfiguration.OverlayMinimapSecLimitShow;
+			_minimapParameters.SecLimitColour = Program.MainConfiguration.OverlayMinimapSecLimitColour;
+			_minimapParameters.SecLimitOutlineColour = Program.MainConfiguration.OverlayMinimapSecLimitOutlineColour;
+			_minimapParameters.StormSize = Program.MainConfiguration.OverlayMinimapStormSize;
+
+			_minimapParameters.IncursionAlphaAmount = Program.MainConfiguration.OverlayMinimapIncursionAlpha;
+			_minimapParameters.IncursionCloudSize = Program.MainConfiguration.OverlayMinimapIncursionCloudSize;
+			_minimapParameters.IncursionColour = Program.MainConfiguration.OverlayMinimapIncursionColour;
+			_minimapParameters.IncursionOutlineColour = Program.MainConfiguration.OverlayMinimapIncursionOutlineColour;
+			_minimapParameters.IncursionShow = Program.MainConfiguration.OverlayMinimapIncursionShow;
+
+			_minimapParameters.BorderColor = Program.MainConfiguration.OverlayMinimapBorderColour;
+			_minimapParameters.LineColourNormal = Program.MainConfiguration.OverlayMinimapLineColourNormal;
+			_minimapParameters.LineColourOutOfRegion = Program.MainConfiguration.OverlayMinimapLineColourOutOfRegion;
+			_minimapParameters.LineColourRoute = Program.MainConfiguration.OverlayMinimapLineColourRoute;
+			_minimapParameters.SystemColourNormal = Program.MainConfiguration.OverlayMinimapSystemColourNormal;
+			_minimapParameters.SystemColourRoute = Program.MainConfiguration.OverlayMinimapSystemColourRoute;
+			_minimapParameters.SystemColourFrom = Program.MainConfiguration.OverlayMinimapSystemColourFrom;	
+			_minimapParameters.SystemColourTo = Program.MainConfiguration.OverlayMinimapSystemColourTo;
+			_minimapParameters.SystemColourText = Program.MainConfiguration.OverlayMinimapSystemColourText;
+			_minimapParameters.SystemColourAllText = Program.MainConfiguration.OverlayMinimapColourAllText;
+			_minimapParameters.SystemColourConnectingText = Program.MainConfiguration.OverlayMinimapColourConnectingText;
+			_minimapParameters.ZKillColour = Program.MainConfiguration.OverlayMinimapZKillColour;
+			_minimapParameters.IntelColour = Program.MainConfiguration.OverlayMinimapIntelColour;
+			_minimapParameters.AltColour = Program.MainConfiguration.OverlayMinimapAltColour;
+			_minimapParameters.UniHoleColour = Program.MainConfiguration.OverlayMinimapUniHoleColour;
+			_minimapParameters.IceColour = Program.MainConfiguration.OverlayMinimapIceColour;
+			_minimapParameters.MercoxitColour = Program.MainConfiguration.OverlayMinimapMercoxitColour;
+
+			_minimapParameters.CloseSystems = Program.MainConfiguration.OverlayMinimapCloseSystems;
+			_minimapParameters.MapType = Program.MainConfiguration.OverlayMinimapMapType;
+			_minimapParameters.ShowSystemText = Program.MainConfiguration.OverlayMinimapShowSystemText;
+			_minimapParameters.ShowAllSystemsText = Program.MainConfiguration.OverlayMinimapShowAllSystemText;
+			_minimapParameters.ShowConnectingSystemsText = Program.MainConfiguration.OverlayMinimapShowConnectingSystemsText;
+			_minimapParameters.ShowBorder = Program.MainConfiguration.OverlayMinimapShowBorder;
+			_minimapParameters.DefaultTextSize = false;
+			_minimapParameters.ShowOutOfRegion = Program.MainConfiguration.OverlayMinimapShowOutOfRegion;
 		}
 		private void ConfigureChart(Chart chart, string areaName)
 		{
@@ -622,46 +673,16 @@ namespace Quesadilla
 
 			string extraInformation = "";
 
-			Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(Minimap.Width, Minimap.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
-				Program.MainConfiguration.OverlayMinimapJumps, Program.MainConfiguration.OverlayMapMapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation, ref MinimapSystems,
-				Program.MainConfiguration.OverlayMinimapShowSystemText, Program.MainConfiguration.OverlayMinimapShowAllSystemText, Program.MainConfiguration.OverlayMinimapShowConnectingSystemText,
-				Program.MainConfiguration.OverlayShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
-				Program.MainConfiguration.OverlayMinimapLineColourNormal,
-				Program.MainConfiguration.OverlayMinimapLineColourOutOfRegion,
-				Program.MainConfiguration.OverlayMinimapLineColourRoute,
-				Program.MainConfiguration.OverlayMinimapSystemColourNormal,
-				Program.MainConfiguration.OverlayMinimapSystemColourRoute,
-				Program.MainConfiguration.OverlayMinimapSystemColourFrom,
-				Program.MainConfiguration.OverlayMinimapSystemColourTo,
-				Program.MainConfiguration.OverlayMinimapSystemColourText, Program.MainConfiguration.OverlayMinimapAllSystemColourText, Program.MainConfiguration.OverlayMinimapConnectingSystemColourText,
-				Program.MainConfiguration.OverlayMinimapZKillColour,
-				Program.MainConfiguration.OverlayMinimapIntelColour,
-				Program.MainConfiguration.OverlayMinimapAltPositionColour,
-				Program.MainConfiguration.OverlayMinimapUniHoleColour,
-				Program.MainConfiguration.OverlayMinimapIncursionColour,
-				Program.MainConfiguration.OverlayMinimapIncursionOutlineColour,
-				Program.MainConfiguration.OverlayMinimapSecLimitColour,
-				Program.MainConfiguration.OverlayMinimapSecLimitOutlineColour,
-				Program.MainConfiguration.OverlayMinimapIceColour,
-				Program.MainConfiguration.OverlayMinimapMercoxitColour,
-					_animationManager[AnimationType.Intel].GetNextValue(),
-					_animationManager[AnimationType.Kills].GetNextValue(),
-					_animationManager[AnimationType.Alts].GetNextValue(),
-					_animationManager[AnimationType.UniHoles].GetNextValue(),
-					_animationManager[AnimationType.Incursion].GetNextValue(),
-					_animationManager[AnimationType.SecLimit].GetNextValue(),
-				false,
-				Program.MainConfiguration.OverlayMinimapShowOutOfRegion,
-				Program.MainConfiguration.OverlayMinimapSecLimit,
-				Program.MainConfiguration.OverlayMinimapIncursionAlpha,
-				Program.MainConfiguration.OverlayMinimapIncursionCloudSize,
-				Program.MainConfiguration.OverlayMinimapSecLimitAlpha,
-				Program.MainConfiguration.OverlayMinimapSecLimitCloudSize,
-				Program.MainConfiguration.OverlayMinimapConnectionGap,
-				Program.MainConfiguration.OverlayMinimapSecLimitValue
+			Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(Minimap.Width, Minimap.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath, Program.MainConfiguration.OverlayMapMapScale,
+				ref extraInformation, ref MinimapSystems,
+				_animationManager[AnimationType.Intel].GetNextValue(),
+				_animationManager[AnimationType.Kills].GetNextValue(),
+				_animationManager[AnimationType.Alts].GetNextValue(),
+				_animationManager[AnimationType.UniHoles].GetNextValue(),
+				_animationManager[AnimationType.Incursion].GetNextValue(),
+				_animationManager[AnimationType.SecLimit].GetNextValue(),
+				_minimapParameters
 				);
-			//                Bitmap minimapBitmap = new Bitmap(minimapImage);
-			//                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
 
 			var oldImage = _sourceMapImage;
 			_sourceMapImage = minimapImage;

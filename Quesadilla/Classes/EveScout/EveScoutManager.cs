@@ -160,10 +160,11 @@ namespace Quesadilla.Classes.EveScout
                         if (weatherCells == null || weatherCells.Count < 3)
                             continue;
 
-						var parsedSystemId = Program.Universe.SolarSystems.Values.FirstOrDefault(o => o.Name == weatherCells[1].InnerText.Trim())?.Id ?? 0;
+                        var systemName = weatherCells[1].InnerText.Trim();
+						var parsedSystemId = Program.Universe.SolarSystems.Values.FirstOrDefault(o => o.Name == systemName)?.Id ?? 0;
 						Storms.Add(new EveScoutStorm()
                         {
-							RegionName = weatherCells[1].InnerText.Trim(),
+							RegionName = weatherCells[0].InnerText.Trim(),
 							SystemName = weatherCells[1].InnerText.Trim(),
 							StormName = weatherCells[2].InnerText.Trim(),
 							StormType = weatherCells[3].InnerText.Trim(),

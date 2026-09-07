@@ -35,7 +35,6 @@ namespace Quesadilla
 {
     public partial class Quesadilla : Form
     {
-
         private List<String> _FactionRats = new List<string>()
         {
             "Dark Blood",
@@ -156,6 +155,7 @@ namespace Quesadilla
 		private Font _planetInfoFont = new Font("Verdana", 10, FontStyle.Regular);
 		private int _cachedPlanetSystemId = -1;
         private List<PlanetSummary> _cachedPlanetInfo;
+        private MinimapParameters _minimapParameters = new MinimapParameters();
 		public Quesadilla()
         {
             OriginalBackgroundColour = BackColor;
@@ -265,6 +265,62 @@ namespace Quesadilla
 			TickManagerUpdates.Start();
 			TickManagerUI.Start();
 		}
+
+        private void UpdateMinimapParameters()
+		{
+			_minimapParameters.StormStrongOutlineAlpha = Program.MainConfiguration.MinimapStormStrongOutlineAlpha;
+			_minimapParameters.StormWeakOutlineAlpha = Program.MainConfiguration.MinimapStormWeakOutlineAlpha;
+			_minimapParameters.StormCentreOutlineAlpha = Program.MainConfiguration.MinimapStormCentreOutlineAlpha;
+			_minimapParameters.StormMainAlpha = Program.MainConfiguration.MinimapStormMainAlpha;
+			_minimapParameters.ShowStorm = Program.MainConfiguration.MinimapShowStorm;
+
+            _minimapParameters.SecLimitValue = Program.MainConfiguration.MinimapSecLimitValue;
+            _minimapParameters.SecLimitAlphaAmount = Program.MainConfiguration.MinimapSecLimitAlpha;
+            _minimapParameters.SecLimitCloudSize = Program.MainConfiguration.MinimapSecLimitCloudSize;
+            _minimapParameters.SecLimitShow = Program.MainConfiguration.MinimapSecLimitShow;
+			_minimapParameters.SecLimitColour = Program.MainConfiguration.MinimapSecLimitColour;
+            _minimapParameters.SecLimitOutlineColour = Program.MainConfiguration.MinimapSecLimitOutlineColour;
+            _minimapParameters.StormSize = Program.MainConfiguration.MinimapStormSize;
+
+            _minimapParameters.IncursionAlphaAmount = Program.MainConfiguration.MinimapIncursionAlpha;
+			_minimapParameters.IncursionCloudSize = Program.MainConfiguration.MinimapIncursionCloudSize;
+			_minimapParameters.IncursionColour = Program.MainConfiguration.MinimapIncursionColour;
+			_minimapParameters.IncursionOutlineColour = Program.MainConfiguration.MinimapIncursionOutlineColour;
+			_minimapParameters.IncursionShow = Program.MainConfiguration.MinimapIncursionShow;
+
+			_minimapParameters.BorderColor = Program.MainConfiguration.MinimapBorderColour;
+			_minimapParameters.LineColourNormal = Program.MainConfiguration.MinimapLineColourNormal;
+			_minimapParameters.LineColourOutOfRegion = Program.MainConfiguration.MinimapLineColourOutOfRegion;
+			_minimapParameters.LineColourRoute = Program.MainConfiguration.MinimapLineColourRoute;
+			_minimapParameters.SystemColourNormal = Program.MainConfiguration.MinimapSystemColourNormal;
+			_minimapParameters.SystemColourRoute = Program.MainConfiguration.MinimapSystemColourRoute;
+			_minimapParameters.SystemColourFrom = Program.MainConfiguration.MinimapSystemColourFrom;
+			_minimapParameters.SystemColourTo = Program.MainConfiguration.MinimapSystemColourTo;
+			_minimapParameters.SystemColourText = Program.MainConfiguration.MinimapSystemColourText;
+			_minimapParameters.SystemColourAllText = Program.MainConfiguration.MinimapColourAllText;
+			_minimapParameters.SystemColourConnectingText = Program.MainConfiguration.MinimapColourConnectingText;
+			_minimapParameters.ZKillColour = Program.MainConfiguration.MinimapZKillColour;
+			_minimapParameters.IntelColour = Program.MainConfiguration.MinimapIntelColour;
+			_minimapParameters.AltColour = Program.MainConfiguration.MinimapAltColour;
+			_minimapParameters.UniHoleColour = Program.MainConfiguration.MinimapUniHoleColour;
+			_minimapParameters.IceColour = Program.MainConfiguration.MinimapIceColour;
+			_minimapParameters.MercoxitColour = Program.MainConfiguration.MinimapMercoxitColour;
+
+            _minimapParameters.CloseSystems = Program.MainConfiguration.MinimapCloseSystems;
+            _minimapParameters.MapType = Program.MainConfiguration.MinimapMapType;
+            _minimapParameters.ShowSystemText = Program.MainConfiguration.MinimapShowSystemText;
+			_minimapParameters.ShowAllSystemsText = Program.MainConfiguration.MinimapShowAllSystemText;
+			_minimapParameters.ShowConnectingSystemsText = Program.MainConfiguration.MinimapShowConnectingSystemsText;
+            _minimapParameters.ShowBorder = Program.MainConfiguration.MinimapShowBorder;
+            _minimapParameters.DefaultTextSize = Program.MainConfiguration.MinimapDefaultTextSize;
+            _minimapParameters.ShowOutOfRegion = Program.MainConfiguration.MinimapShowOutOfRegion;
+
+			if (OverlayMapWindow != null)
+			{
+				OverlayMapWindow.UpdateMinimapParameters();
+			}
+		}
+
 
 		private void EveScoutProcessor_EveScoutEventHandler(object sender, EveScoutEventArgs e)
         {
@@ -391,6 +447,8 @@ namespace Quesadilla
             Program.CachedBackground = Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground);
 
 			_planetInfoFont = new Font("Verdana", Program.MainConfiguration.PlanetInfoFontSize, FontStyle.Regular);
+
+            UpdateMinimapParameters();
 		}
 
 		private void Quesadilla_Load(object sender, EventArgs e)
@@ -1668,10 +1726,12 @@ namespace Quesadilla
             var ClosestThera = Program.EveScoutProcessor.FindClosest(Program.Universe, c.LocationId, "Thera");
             var ClosestTurnur = Program.EveScoutProcessor.FindClosest(Program.Universe, c.LocationId, "Turnur");
 
+            if ( ClosestThera != null )
 			Program.CharacterManager.SetClosestThera(characterName,ClosestThera,
 				Program.Universe.FindAndCachePath(c.LocationId, (ClosestThera.FromSystemId == EveScoutManager.SYSTEMID_THERA) ? (int)ClosestThera.ToSystemId : (int)ClosestThera.FromSystemId)
 				);
 
+            if ( ClosestTurnur != null)
 			Program.CharacterManager.SetClosestTurnur(characterName,ClosestTurnur,
 				Program.Universe.FindAndCachePath(c.LocationId, (ClosestTurnur.FromSystemId == EveScoutManager.SYSTEMID_TURNUR) ? (int)ClosestTurnur.ToSystemId : (int)ClosestTurnur.FromSystemId)
 				);
@@ -1938,42 +1998,14 @@ namespace Quesadilla
             {
                 string extraInformation = "";
                 Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MainMinimap.Width, MainMinimap.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
-                    Program.MainConfiguration.MinimapJumps, mapScale, Program.MainConfiguration.MinimapRawXY, ref extraInformation, ref MinimapSystems,
-                    Program.MainConfiguration.MinimapShowSystemText, Program.MainConfiguration.MinimapShowAllSystemText, Program.MainConfiguration.MinimapShowConnectingSystemText,
-                    Program.MainConfiguration.ShowMinimapBorder, Program.MainConfiguration.MinimapBorderColour,
-                    Program.MainConfiguration.MinimapLineColourNormal,
-                    Program.MainConfiguration.MinimapLineColourOutOfRegion,
-                    Program.MainConfiguration.MinimapLineColourRoute,
-                    Program.MainConfiguration.MinimapSystemColourNormal,
-                    Program.MainConfiguration.MinimapSystemColourRoute,
-                    Program.MainConfiguration.MinimapSystemColourFrom,
-                    Program.MainConfiguration.MinimapSystemColourTo,
-                    Program.MainConfiguration.MinimapSystemColourText, Program.MainConfiguration.MinimapAllSystemColourText, Program.MainConfiguration.MinimapConnectingSystemColourText,
-                    Program.MainConfiguration.MinimapZKillColour,
-                    Program.MainConfiguration.MinimapIntelColour,
-                    Program.MainConfiguration.MinimapAltPositionColour,
-                    Program.MainConfiguration.MinimapUniHoleColour,
-                    Program.MainConfiguration.MinimapIncursionColour,
-                    Program.MainConfiguration.MinimapIncursionOutlineColour,
-                    Program.MainConfiguration.MinimapSecLimitColour,
-                    Program.MainConfiguration.MinimapSecLimitOutlineColour,
-                    Program.MainConfiguration.MinimapIceColour,
-                    Program.MainConfiguration.MinimapMercoxitColour,
+                    mapScale, ref extraInformation, ref MinimapSystems,
                     AnimationManager[AnimationType.Intel].GetNextValue(),
                     AnimationManager[AnimationType.Kills].GetNextValue(),
 					AnimationManager[AnimationType.Alts].GetNextValue(),
 					AnimationManager[AnimationType.UniHoles].GetNextValue(),
 					AnimationManager[AnimationType.Incursion].GetNextValue(),
 					AnimationManager[AnimationType.SecLimit].GetNextValue(),
-                    false,
-                    Program.MainConfiguration.MinimapShowOutOfRegion,
-                    Program.MainConfiguration.MinimapSecLimit,
-                    Program.MainConfiguration.MinimapIncursionAlpha,
-                    Program.MainConfiguration.MinimapIncursionCloudSize,
-                    Program.MainConfiguration.MinimapSecLimitAlpha,
-                    Program.MainConfiguration.MinimapSecLimitCloudSize,
-                    Program.MainConfiguration.MinimapConnectionGap,
-                    Program.MainConfiguration.MinimapSecLimitValue
+                    _minimapParameters
                     );
                 //                Bitmap minimapBitmap = new Bitmap(minimapImage);
                 //                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));

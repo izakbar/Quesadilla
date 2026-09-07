@@ -111,6 +111,7 @@
     <Compile Include="Classes\ImageGeneration\Animation\AnimationManager.cs" />
     <Compile Include="Classes\ImageGeneration\Animation\AnimationState.cs" />
     <Compile Include="Classes\Attributes\IsColourAttribute.cs" />
+    <Compile Include="Classes\ImageGeneration\MinimapParameters.cs" />
     <Compile Include="Classes\InterOp\EVEOPreview\EveOAgression.cs" />
     <Compile Include="Classes\InterOp\EVEOPreview\EveOAlertClient.cs" />
     <Compile Include="Classes\InterOp\EVEOPreview\EveOClient.cs" />

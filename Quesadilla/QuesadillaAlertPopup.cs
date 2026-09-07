@@ -59,6 +59,7 @@ namespace Quesadilla
 		private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
 
 		private Config _config;
+		private MinimapParameters _minimapParameters = new MinimapParameters();
 
 		public QuesadillaAlertPopup(AlertQueueItem alert, Config configuration, Image background, Quesadilla mainForm)
 		{
@@ -73,6 +74,8 @@ namespace Quesadilla
 			_opacitystep = configuration.AlertPopupOpacityStep;
 
 			_config = configuration;
+
+			UpdateMinimapParameters();
 
 			Opacity = 0;
 
@@ -226,38 +229,10 @@ namespace Quesadilla
 			if (configuration.AlertPopupShowMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0))
 			{
 				string extraInformation = "";
-				Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MinimapImage.Width, MinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), alert.Path, 0, 100,
-					configuration.AlertPopupMinimapRawXY, ref extraInformation, ref MinimapSystems,
-					configuration.AlertPopupMinimapShowSystemText, configuration.AlertPopupMinimapShowAllSystemText, configuration.AlertPopupMinimapShowConnectingSystemText,
-					configuration.AlertPopupShowMinimapBorder, configuration.AlertPopupMinimapBorderColour,
-					configuration.AlertPopupMinimapLineColourNormal,
-					configuration.AlertPopupMinimapLineColourOutOfRegion,
-					configuration.AlertPopupMinimapLineColourRoute,
-					configuration.AlertPopupMinimapSystemColourNormal,
-					configuration.AlertPopupMinimapSystemColourRoute,
-					configuration.AlertPopupMinimapSystemColourFrom,
-					configuration.AlertPopupMinimapSystemColourTo,
-					configuration.AlertPopupMinimapSystemColourText, configuration.AlertPopupMinimapAllSystemColourText, configuration.AlertPopupMinimapConnectingSystemColourText,
-					configuration.AlertPopupMinimapZKillColour,
-					configuration.AlertPopupMinimapIntelColour,
-					configuration.AlertPopupMinimapAltPositionColour,
-					configuration.AlertPopupMinimapUniHoleColour,
-					configuration.AlertPopupMinimapIncursionColour,
-					configuration.AlertPopupMinimapIncursionOutlineColour,
-					configuration.AlertPopupMinimapSecLimitColour,
-					configuration.AlertPopupMinimapSecLimitOutlineColour,
-					configuration.AlertPopupMinimapIceColour,
-					configuration.AlertPopupMinimapMercoxitColour,
+				Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MinimapImage.Width, MinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), alert.Path, 100,
+					ref extraInformation, ref MinimapSystems,
 					null, null, null, null,null, null,
-					true,
-					true, // show out of region 
-					configuration.AlertPopupMinimapSecLimit,
-					configuration.AlertPopupMinimapIncursionAlpha,
-					configuration.AlertPopupMinimapIncursionCloudSize,
-					configuration.AlertPopupMinimapSecLimitAlpha,
-					configuration.AlertPopupMinimapSecLimitCloudSize,
-					configuration.AlertPopupMinimapConnectionGap,
-					configuration.AlertPopupMinimapSecLimitValue
+					_minimapParameters
 					);
 				Bitmap minimapBitmap = new Bitmap(minimapImage);
 				minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
@@ -329,6 +304,46 @@ namespace Quesadilla
 					};
 					break;
 			}
+		}
+		public void UpdateMinimapParameters()
+		{
+			_minimapParameters.StormCentreOutlineAlpha = Program.MainConfiguration.AlertPopupMinimapStormCentreOutlineAlpha;
+			_minimapParameters.StormStrongOutlineAlpha = Program.MainConfiguration.AlertPopupMinimapStormStrongOutlineAlpha;
+			_minimapParameters.StormWeakOutlineAlpha = Program.MainConfiguration.AlertPopupMinimapStormWeakOutlineAlpha;
+			_minimapParameters.StormMainAlpha = Program.MainConfiguration.AlertPopupMinimapStormMainAlpha;
+			_minimapParameters.ShowStorm = Program.MainConfiguration.AlertPopupMinimapShowStorm;
+
+			_minimapParameters.SecLimitValue = Program.MainConfiguration.AlertPopupMinimapSecLimitValue;
+			_minimapParameters.SecLimitAlphaAmount = Program.MainConfiguration.AlertPopupMinimapSecLimitAlpha;
+			_minimapParameters.SecLimitCloudSize = Program.MainConfiguration.AlertPopupMinimapSecLimitCloudSize;
+			_minimapParameters.SecLimitShow = Program.MainConfiguration.AlertPopupMinimapSecLimitShow;
+			_minimapParameters.SecLimitColour = Program.MainConfiguration.AlertPopupMinimapSecLimitColour;
+			_minimapParameters.SecLimitOutlineColour = Program.MainConfiguration.AlertPopupMinimapSecLimitOutlineColour;
+			_minimapParameters.StormSize = Program.MainConfiguration.AlertPopupMinimapStormSize;
+
+			_minimapParameters.IncursionAlphaAmount = Program.MainConfiguration.AlertPopupMinimapIncursionAlpha;
+			_minimapParameters.IncursionCloudSize = Program.MainConfiguration.AlertPopupMinimapIncursionCloudSize;
+			_minimapParameters.IncursionColour = Program.MainConfiguration.AlertPopupMinimapIncursionColour;
+			_minimapParameters.IncursionOutlineColour = Program.MainConfiguration.AlertPopupMinimapIncursionOutlineColour;
+			_minimapParameters.IncursionShow = Program.MainConfiguration.AlertPopupMinimapIncursionShow;
+
+			_minimapParameters.BorderColor = Program.MainConfiguration.AlertPopupMinimapBorderColour;
+			_minimapParameters.LineColourNormal = Program.MainConfiguration.AlertPopupMinimapLineColourNormal;
+			_minimapParameters.LineColourOutOfRegion = Program.MainConfiguration.AlertPopupMinimapLineColourOutOfRegion;
+			_minimapParameters.LineColourRoute = Program.MainConfiguration.AlertPopupMinimapLineColourRoute;
+			_minimapParameters.SystemColourNormal = Program.MainConfiguration.AlertPopupMinimapSystemColourNormal;
+			_minimapParameters.SystemColourRoute = Program.MainConfiguration.AlertPopupMinimapSystemColourRoute;
+			_minimapParameters.SystemColourFrom = Program.MainConfiguration.AlertPopupMinimapSystemColourFrom;
+			_minimapParameters.SystemColourTo = Program.MainConfiguration.AlertPopupMinimapSystemColourTo;
+			_minimapParameters.SystemColourText = Program.MainConfiguration.AlertPopupMinimapSystemColourText;
+			_minimapParameters.SystemColourAllText = Program.MainConfiguration.AlertPopupMinimapColourAllText;
+			_minimapParameters.SystemColourConnectingText = Program.MainConfiguration.AlertPopupMinimapColourConnectingText;
+			_minimapParameters.ZKillColour = Program.MainConfiguration.AlertPopupMinimapZKillColour;
+			_minimapParameters.IntelColour = Program.MainConfiguration.AlertPopupMinimapIntelColour;
+			_minimapParameters.AltColour = Program.MainConfiguration.AlertPopupMinimapAltColour;
+			_minimapParameters.UniHoleColour = Program.MainConfiguration.AlertPopupMinimapUniHoleColour;
+			_minimapParameters.IceColour = Program.MainConfiguration.AlertPopupMinimapIceColour;
+			_minimapParameters.MercoxitColour = Program.MainConfiguration.AlertPopupMinimapMercoxitColour;
 		}
 
 		private void QuesadillaAlertPopup_Load(object sender, EventArgs e)
