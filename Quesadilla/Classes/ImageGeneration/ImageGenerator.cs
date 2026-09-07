@@ -125,15 +125,9 @@ namespace Quesadilla.Classes.ImageGeneration
 
 					int alpha = 120 / i;
 
-					using (var glowBrush = new SolidBrush(
-						Color.FromArgb(alpha, severityColour)))
+					using (var glowBrush = new SolidBrush(Color.FromArgb(alpha, severityColour)))
 					{
-						g.FillEllipse(
-							glowBrush,
-							currentPoint.X - glowRadius,
-							currentPoint.Y - glowRadius,
-							glowRadius * 2,
-							glowRadius * 2);
+						g.FillEllipse(glowBrush,currentPoint.X - glowRadius,currentPoint.Y - glowRadius,glowRadius * 2,glowRadius * 2);
 					}
 				}
 
