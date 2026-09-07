@@ -1,14 +1,15 @@
-﻿using Quesadilla.Classes.Queues;
+﻿using Cyotek.Windows.Forms;
 using Quesadilla.Classes;
+using Quesadilla.Classes.Extensions;
+using Quesadilla.Classes.Queues;
+using Quesadilla.Classes.SolarSystems;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using Quesadilla.Classes.SolarSystems;
-using Cyotek.Windows.Forms;
-using Quesadilla.Classes.Extensions;
 
 namespace Quesadilla
 {
@@ -23,8 +24,9 @@ namespace Quesadilla
 
         private bool _formLoaded = false;
 
+		private CustomPropertyExtractorWrapper _propertySource;
 
-        public QuesadillaConfiguration(Config configuration, MenuItem configWindowMenu, Quesadilla mainForm)
+		public QuesadillaConfiguration(Config configuration, MenuItem configWindowMenu, Quesadilla mainForm)
         {
             InitializeComponent();
             _configuration = configuration.Duplicate();
@@ -94,10 +96,52 @@ namespace Quesadilla
             _formLoaded = true;
             ShowAlertBitmap();
 
-            ConfigurationProperties.SelectedObject = new CustomPropertyExtractorWrapper(_configuration);
-
+			_propertySource = new CustomPropertyExtractorWrapper(_configuration);
+			ConfigurationProperties.SelectedObject = _propertySource;
+			PopulateConfigurationFilter();
         }
-        private Bitmap GetControlImage(Control ctl)
+
+		private void PopulateConfigurationFilter()
+		{
+			var categories = TypeDescriptor.GetProperties(_propertySource)
+				.Cast<PropertyDescriptor>()
+				.Select(p => p.Category)
+				.Where(c => !string.IsNullOrWhiteSpace(c))
+				.Distinct()
+				.OrderBy(c => c)
+				.ToList();
+
+			cmbFilterCategory.Items.Clear();
+			cmbFilterCategory.Items.Add("All Categories");
+
+			foreach (var category in categories)
+			{
+				cmbFilterCategory.Items.Add(category);
+			}
+
+			cmbFilterCategory.SelectedIndex = 0;
+		}
+
+		private void ApplyPropertyFilter()
+		{
+			string filterText = txtFilterProperties.Text?.Trim();
+
+			string category = null;
+
+			if (cmbFilterCategory.SelectedIndex > 0)
+			{
+				category = cmbFilterCategory.SelectedItem.ToString();
+			}
+
+			ConfigurationProperties.SelectedObject = new PropertyGridFilterWrapper(
+				_configuration,
+				filterText,
+				category);
+
+			ConfigurationProperties.Refresh();
+		}
+
+		private Bitmap GetControlImage(Control ctl)
         {
             Bitmap bm = new Bitmap(ctl.Width, ctl.Height);
             ctl.DrawToBitmap(bm,
@@ -241,5 +285,84 @@ namespace Quesadilla
         {
             ShowAlertBitmap();
         }
-    }
+
+		private void txtFilterProperties_TextChanged(object sender, EventArgs e)
+		{
+			ApplyPropertyFilter();
+		}
+
+		private void cmbFilterCategory_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			ApplyPropertyFilter();
+		}
+	}
+
+
+
+
+	public class PropertyGridFilterWrapper : CustomTypeDescriptor
+	{
+		private readonly object _instance;
+		private readonly string _filterText;
+		private readonly string _category;
+
+		public PropertyGridFilterWrapper(
+			object instance,
+			string filterText,
+			string category)
+			: base(TypeDescriptor.GetProvider(instance).GetTypeDescriptor(instance))
+		{
+			_instance = instance;
+			_filterText = filterText ?? string.Empty;
+			_category = category;
+		}
+
+		public override object GetPropertyOwner(PropertyDescriptor pd)
+		{
+			return _instance;
+		}
+
+		public override PropertyDescriptorCollection GetProperties()
+		{
+			return Filter(base.GetProperties());
+		}
+
+		public override PropertyDescriptorCollection GetProperties(Attribute[] attributes)
+		{
+			return Filter(base.GetProperties(attributes));
+		}
+
+		private PropertyDescriptorCollection Filter(PropertyDescriptorCollection properties)
+		{
+			List<PropertyDescriptor> filtered = new List<PropertyDescriptor>();
+
+			foreach (PropertyDescriptor property in properties)
+			{
+				if (!string.IsNullOrEmpty(_category) &&
+					!string.Equals(property.Category, _category, StringComparison.OrdinalIgnoreCase))
+				{
+					continue;
+				}
+
+				if (!string.IsNullOrWhiteSpace(_filterText))
+				{
+					bool match =
+						property.Name.IndexOf(_filterText, StringComparison.OrdinalIgnoreCase) >= 0
+						|| property.DisplayName.IndexOf(_filterText, StringComparison.OrdinalIgnoreCase) >= 0
+						|| (property.Description?.IndexOf(_filterText, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0;
+
+					if (!match)
+					{
+						continue;
+					}
+				}
+
+				filtered.Add(property);
+			}
+
+			return new PropertyDescriptorCollection(filtered.ToArray());
+		}
+	}
+
+
 }

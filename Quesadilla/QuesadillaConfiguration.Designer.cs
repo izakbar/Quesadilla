@@ -52,6 +52,8 @@
 			this.label7 = new System.Windows.Forms.Label();
 			this.trackShowLastUnexpiredAlerts = new System.Windows.Forms.TrackBar();
 			this.ConfigurationProperties = new System.Windows.Forms.PropertyGrid();
+			this.cmbFilterCategory = new System.Windows.Forms.ComboBox();
+			this.txtFilterProperties = new System.Windows.Forms.TextBox();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.alertDemo)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.trackOpacity)).BeginInit();
@@ -65,28 +67,29 @@
 			this.cmbHomeSystem.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
 			this.cmbHomeSystem.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
 			this.cmbHomeSystem.FormattingEnabled = true;
-			this.cmbHomeSystem.Location = new System.Drawing.Point(1311, 569);
-			this.cmbHomeSystem.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.cmbHomeSystem.Location = new System.Drawing.Point(874, 370);
+			this.cmbHomeSystem.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
 			this.cmbHomeSystem.Name = "cmbHomeSystem";
-			this.cmbHomeSystem.Size = new System.Drawing.Size(146, 28);
+			this.cmbHomeSystem.Size = new System.Drawing.Size(99, 21);
 			this.cmbHomeSystem.TabIndex = 0;
 			this.cmbHomeSystem.SelectedIndexChanged += new System.EventHandler(this.cmbHomeSystem_SelectedIndexChanged);
 			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(1196, 572);
+			this.label1.Location = new System.Drawing.Point(797, 372);
+			this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(109, 20);
+			this.label1.Size = new System.Drawing.Size(72, 13);
 			this.label1.TabIndex = 1;
 			this.label1.Text = "Home System";
 			// 
 			// buttonSave
 			// 
-			this.buttonSave.Location = new System.Drawing.Point(1335, 872);
-			this.buttonSave.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.buttonSave.Location = new System.Drawing.Point(890, 567);
+			this.buttonSave.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
 			this.buttonSave.Name = "buttonSave";
-			this.buttonSave.Size = new System.Drawing.Size(124, 55);
+			this.buttonSave.Size = new System.Drawing.Size(83, 36);
 			this.buttonSave.TabIndex = 3;
 			this.buttonSave.Text = "Save";
 			this.buttonSave.UseVisualStyleBackColor = true;
@@ -94,10 +97,10 @@
 			// 
 			// buttonCancel
 			// 
-			this.buttonCancel.Location = new System.Drawing.Point(1202, 872);
-			this.buttonCancel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.buttonCancel.Location = new System.Drawing.Point(801, 567);
+			this.buttonCancel.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
 			this.buttonCancel.Name = "buttonCancel";
-			this.buttonCancel.Size = new System.Drawing.Size(124, 55);
+			this.buttonCancel.Size = new System.Drawing.Size(83, 36);
 			this.buttonCancel.TabIndex = 4;
 			this.buttonCancel.Text = "Cancel";
 			this.buttonCancel.UseVisualStyleBackColor = true;
@@ -112,10 +115,10 @@
 			// pictureBox1
 			// 
 			this.pictureBox1.Image = global::Quesadilla.Properties.Resources.Quesadilla;
-			this.pictureBox1.Location = new System.Drawing.Point(1202, 608);
-			this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.pictureBox1.Location = new System.Drawing.Point(801, 395);
+			this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
 			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(258, 258);
+			this.pictureBox1.Size = new System.Drawing.Size(172, 168);
 			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.pictureBox1.TabIndex = 5;
 			this.pictureBox1.TabStop = false;
@@ -123,10 +126,10 @@
 			// alertDemo
 			// 
 			this.alertDemo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.alertDemo.Location = new System.Drawing.Point(12, 15);
-			this.alertDemo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.alertDemo.Location = new System.Drawing.Point(8, 10);
+			this.alertDemo.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
 			this.alertDemo.Name = "alertDemo";
-			this.alertDemo.Size = new System.Drawing.Size(552, 233);
+			this.alertDemo.Size = new System.Drawing.Size(369, 152);
 			this.alertDemo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
 			this.alertDemo.TabIndex = 6;
 			this.alertDemo.TabStop = false;
@@ -134,9 +137,10 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(591, 225);
+			this.label2.Location = new System.Drawing.Point(394, 146);
+			this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(95, 20);
+			this.label2.Size = new System.Drawing.Size(65, 13);
 			this.label2.TabIndex = 14;
 			this.label2.Text = "Background";
 			// 
@@ -145,21 +149,20 @@
 			this.cmbBackground.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
 			this.cmbBackground.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
 			this.cmbBackground.FormattingEnabled = true;
-			this.cmbBackground.Location = new System.Drawing.Point(756, 220);
-			this.cmbBackground.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.cmbBackground.Location = new System.Drawing.Point(504, 143);
+			this.cmbBackground.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
 			this.cmbBackground.Name = "cmbBackground";
-			this.cmbBackground.Size = new System.Drawing.Size(222, 28);
+			this.cmbBackground.Size = new System.Drawing.Size(149, 21);
 			this.cmbBackground.TabIndex = 13;
 			this.cmbBackground.SelectedIndexChanged += new System.EventHandler(this.cmbBackground_SelectedIndexChanged);
 			// 
 			// trackOpacity
 			// 
 			this.trackOpacity.LargeChange = 10;
-			this.trackOpacity.Location = new System.Drawing.Point(710, 15);
-			this.trackOpacity.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			this.trackOpacity.Location = new System.Drawing.Point(473, 10);
 			this.trackOpacity.Maximum = 100;
 			this.trackOpacity.Name = "trackOpacity";
-			this.trackOpacity.Size = new System.Drawing.Size(225, 69);
+			this.trackOpacity.Size = new System.Drawing.Size(150, 45);
 			this.trackOpacity.TabIndex = 15;
 			this.trackOpacity.TickFrequency = 10;
 			this.trackOpacity.Scroll += new System.EventHandler(this.trackOpacity_Scroll);
@@ -167,9 +170,10 @@
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(638, 18);
+			this.label3.Location = new System.Drawing.Point(425, 12);
+			this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(62, 20);
+			this.label3.Size = new System.Drawing.Size(43, 13);
 			this.label3.TabIndex = 16;
 			this.label3.Text = "Opacity";
 			// 
@@ -177,12 +181,11 @@
 			// 
 			this.trackPopupTime.AccessibleDescription = "";
 			this.trackPopupTime.LargeChange = 10;
-			this.trackPopupTime.Location = new System.Drawing.Point(710, 62);
-			this.trackPopupTime.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			this.trackPopupTime.Location = new System.Drawing.Point(473, 40);
 			this.trackPopupTime.Maximum = 60;
 			this.trackPopupTime.Minimum = 1;
 			this.trackPopupTime.Name = "trackPopupTime";
-			this.trackPopupTime.Size = new System.Drawing.Size(225, 69);
+			this.trackPopupTime.Size = new System.Drawing.Size(150, 45);
 			this.trackPopupTime.TabIndex = 17;
 			this.trackPopupTime.TickFrequency = 10;
 			this.trackPopupTime.Value = 1;
@@ -191,18 +194,20 @@
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(612, 58);
+			this.label4.Location = new System.Drawing.Point(408, 38);
+			this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(89, 20);
+			this.label4.Size = new System.Drawing.Size(60, 13);
 			this.label4.TabIndex = 18;
 			this.label4.Text = "Popup time";
 			// 
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(584, 105);
+			this.label5.Location = new System.Drawing.Point(389, 68);
+			this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(121, 20);
+			this.label5.Size = new System.Drawing.Size(83, 13);
 			this.label5.TabIndex = 39;
 			this.label5.Text = "DPS Line Width";
 			// 
@@ -210,12 +215,11 @@
 			// 
 			this.trackDPSGraphLineSize.AccessibleDescription = "";
 			this.trackDPSGraphLineSize.LargeChange = 10;
-			this.trackDPSGraphLineSize.Location = new System.Drawing.Point(710, 105);
-			this.trackDPSGraphLineSize.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			this.trackDPSGraphLineSize.Location = new System.Drawing.Point(473, 68);
 			this.trackDPSGraphLineSize.Maximum = 12;
 			this.trackDPSGraphLineSize.Minimum = 1;
 			this.trackDPSGraphLineSize.Name = "trackDPSGraphLineSize";
-			this.trackDPSGraphLineSize.Size = new System.Drawing.Size(225, 69);
+			this.trackDPSGraphLineSize.Size = new System.Drawing.Size(150, 45);
 			this.trackDPSGraphLineSize.TabIndex = 38;
 			this.trackDPSGraphLineSize.TickFrequency = 10;
 			this.trackDPSGraphLineSize.Value = 1;
@@ -224,57 +228,61 @@
 			// lblOpacity
 			// 
 			this.lblOpacity.AutoSize = true;
-			this.lblOpacity.Location = new System.Drawing.Point(942, 22);
+			this.lblOpacity.Location = new System.Drawing.Point(628, 14);
+			this.lblOpacity.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.lblOpacity.Name = "lblOpacity";
-			this.lblOpacity.Size = new System.Drawing.Size(36, 20);
+			this.lblOpacity.Size = new System.Drawing.Size(25, 13);
 			this.lblOpacity.TabIndex = 40;
 			this.lblOpacity.Text = "999";
 			// 
 			// lblPopupSeconds
 			// 
 			this.lblPopupSeconds.AutoSize = true;
-			this.lblPopupSeconds.Location = new System.Drawing.Point(942, 58);
+			this.lblPopupSeconds.Location = new System.Drawing.Point(628, 38);
+			this.lblPopupSeconds.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.lblPopupSeconds.Name = "lblPopupSeconds";
-			this.lblPopupSeconds.Size = new System.Drawing.Size(36, 20);
+			this.lblPopupSeconds.Size = new System.Drawing.Size(25, 13);
 			this.lblPopupSeconds.TabIndex = 41;
 			this.lblPopupSeconds.Text = "999";
 			// 
 			// lblDPSGraphLineSize
 			// 
 			this.lblDPSGraphLineSize.AutoSize = true;
-			this.lblDPSGraphLineSize.Location = new System.Drawing.Point(942, 105);
+			this.lblDPSGraphLineSize.Location = new System.Drawing.Point(628, 68);
+			this.lblDPSGraphLineSize.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.lblDPSGraphLineSize.Name = "lblDPSGraphLineSize";
-			this.lblDPSGraphLineSize.Size = new System.Drawing.Size(36, 20);
+			this.lblDPSGraphLineSize.Size = new System.Drawing.Size(25, 13);
 			this.lblDPSGraphLineSize.TabIndex = 42;
 			this.lblDPSGraphLineSize.Text = "999";
 			// 
 			// lblShowLastUnexpiredAlerts
 			// 
 			this.lblShowLastUnexpiredAlerts.AutoSize = true;
-			this.lblShowLastUnexpiredAlerts.Location = new System.Drawing.Point(942, 155);
+			this.lblShowLastUnexpiredAlerts.Location = new System.Drawing.Point(628, 101);
+			this.lblShowLastUnexpiredAlerts.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.lblShowLastUnexpiredAlerts.Name = "lblShowLastUnexpiredAlerts";
-			this.lblShowLastUnexpiredAlerts.Size = new System.Drawing.Size(36, 20);
+			this.lblShowLastUnexpiredAlerts.Size = new System.Drawing.Size(25, 13);
 			this.lblShowLastUnexpiredAlerts.TabIndex = 45;
 			this.lblShowLastUnexpiredAlerts.Text = "999";
 			// 
 			// label7
 			// 
 			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(608, 152);
+			this.label7.Location = new System.Drawing.Point(405, 99);
+			this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(95, 20);
+			this.label7.Size = new System.Drawing.Size(63, 13);
 			this.label7.TabIndex = 44;
 			this.label7.Text = "Alert History";
 			// 
 			// trackShowLastUnexpiredAlerts
 			// 
 			this.trackShowLastUnexpiredAlerts.LargeChange = 10;
-			this.trackShowLastUnexpiredAlerts.Location = new System.Drawing.Point(710, 148);
-			this.trackShowLastUnexpiredAlerts.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+			this.trackShowLastUnexpiredAlerts.Location = new System.Drawing.Point(473, 96);
 			this.trackShowLastUnexpiredAlerts.Maximum = 25;
 			this.trackShowLastUnexpiredAlerts.Minimum = 1;
 			this.trackShowLastUnexpiredAlerts.Name = "trackShowLastUnexpiredAlerts";
-			this.trackShowLastUnexpiredAlerts.Size = new System.Drawing.Size(225, 69);
+			this.trackShowLastUnexpiredAlerts.Size = new System.Drawing.Size(150, 45);
 			this.trackShowLastUnexpiredAlerts.TabIndex = 43;
 			this.trackShowLastUnexpiredAlerts.TickFrequency = 10;
 			this.trackShowLastUnexpiredAlerts.Value = 1;
@@ -282,19 +290,40 @@
 			// 
 			// ConfigurationProperties
 			// 
-			this.ConfigurationProperties.Location = new System.Drawing.Point(12, 263);
+			this.ConfigurationProperties.Location = new System.Drawing.Point(8, 171);
+			this.ConfigurationProperties.Margin = new System.Windows.Forms.Padding(2);
 			this.ConfigurationProperties.Name = "ConfigurationProperties";
 			this.ConfigurationProperties.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-			this.ConfigurationProperties.Size = new System.Drawing.Size(696, 663);
+			this.ConfigurationProperties.Size = new System.Drawing.Size(464, 431);
 			this.ConfigurationProperties.TabIndex = 94;
 			this.ConfigurationProperties.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.ColourProperties_PropertyValueChanged);
 			this.ConfigurationProperties.Click += new System.EventHandler(this.Properties_Click);
 			// 
+			// cmbFilterCategory
+			// 
+			this.cmbFilterCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cmbFilterCategory.FormattingEnabled = true;
+			this.cmbFilterCategory.Location = new System.Drawing.Point(331, 171);
+			this.cmbFilterCategory.Name = "cmbFilterCategory";
+			this.cmbFilterCategory.Size = new System.Drawing.Size(137, 21);
+			this.cmbFilterCategory.TabIndex = 95;
+			this.cmbFilterCategory.SelectedIndexChanged += new System.EventHandler(this.cmbFilterCategory_SelectedIndexChanged);
+			// 
+			// txtFilterProperties
+			// 
+			this.txtFilterProperties.Location = new System.Drawing.Point(171, 171);
+			this.txtFilterProperties.Name = "txtFilterProperties";
+			this.txtFilterProperties.Size = new System.Drawing.Size(154, 20);
+			this.txtFilterProperties.TabIndex = 96;
+			this.txtFilterProperties.TextChanged += new System.EventHandler(this.txtFilterProperties_TextChanged);
+			// 
 			// QuesadillaConfiguration
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1476, 938);
+			this.ClientSize = new System.Drawing.Size(984, 610);
+			this.Controls.Add(this.txtFilterProperties);
+			this.Controls.Add(this.cmbFilterCategory);
 			this.Controls.Add(this.ConfigurationProperties);
 			this.Controls.Add(this.lblShowLastUnexpiredAlerts);
 			this.Controls.Add(this.label7);
@@ -316,7 +345,7 @@
 			this.Controls.Add(this.buttonSave);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.cmbHomeSystem);
-			this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			this.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
 			this.Name = "QuesadillaConfiguration";
 			this.Text = "Quesadilla Configuration";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.QuesadillaConfiguration_FormClosing);
@@ -357,5 +386,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TrackBar trackShowLastUnexpiredAlerts;
         private System.Windows.Forms.PropertyGrid ConfigurationProperties;
-    }
+		private System.Windows.Forms.ComboBox cmbFilterCategory;
+		private System.Windows.Forms.TextBox txtFilterProperties;
+	}
 }

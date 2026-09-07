@@ -153,7 +153,6 @@ namespace QuesadillaExport
 			File.WriteAllText(@"Quesadilla.Systems.json", Outputjson);
 
 		}
-
 		static void GenerateSolarSystemDataFromDB()
         {
             var solarSystems = DataAccess.mapSolarSystems.SelectAll();
