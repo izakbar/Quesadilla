@@ -273,8 +273,9 @@ namespace Quesadilla
 			_minimapParameters.StormCentreOutlineAlpha = Program.MainConfiguration.MinimapStormCentreOutlineAlpha;
 			_minimapParameters.StormMainAlpha = Program.MainConfiguration.MinimapStormMainAlpha;
 			_minimapParameters.ShowStorm = Program.MainConfiguration.MinimapShowStorm;
+			_minimapParameters.StormGlowLayers = Program.MainConfiguration.MinimapStormGlowLayers;
 
-            _minimapParameters.SecLimitValue = Program.MainConfiguration.MinimapSecLimitValue;
+			_minimapParameters.SecLimitValue = Program.MainConfiguration.MinimapSecLimitValue;
             _minimapParameters.SecLimitAlphaAmount = Program.MainConfiguration.MinimapSecLimitAlpha;
             _minimapParameters.SecLimitCloudSize = Program.MainConfiguration.MinimapSecLimitCloudSize;
             _minimapParameters.SecLimitShow = Program.MainConfiguration.MinimapSecLimitShow;

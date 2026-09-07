@@ -87,6 +87,7 @@ namespace Quesadilla
 			_minimapParameters.StormWeakOutlineAlpha = Program.MainConfiguration.OverlayMinimapStormWeakOutlineAlpha;
 			_minimapParameters.StormMainAlpha = Program.MainConfiguration.OverlayMinimapStormMainAlpha;
 			_minimapParameters.ShowStorm = Program.MainConfiguration.OverlayMinimapShowStorm;
+			_minimapParameters.StormGlowLayers = Program.MainConfiguration.OverlayMinimapStormGlowLayers;
 
 			_minimapParameters.SecLimitValue = Program.MainConfiguration.OverlayMinimapSecLimitValue;
 			_minimapParameters.SecLimitAlphaAmount = Program.MainConfiguration.OverlayMinimapSecLimitAlpha;

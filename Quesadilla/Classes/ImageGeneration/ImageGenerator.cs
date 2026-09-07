@@ -51,7 +51,7 @@ namespace Quesadilla.Classes.ImageGeneration
 			}
 		}
 
-		public static void DrawStorm(string stormType, string location, Graphics g, Point currentPoint, float circleSize, float blobSize, bool outline)
+		public static void DrawStorm(string stormType, string location, Graphics g, Point currentPoint, float circleSize, float blobSize, bool outline, int glowLayers)
 		{
 			Color stormFillColour;
 			switch (stormType)
@@ -119,7 +119,7 @@ namespace Quesadilla.Classes.ImageGeneration
 				//
 				// Glow based on severity
 				//
-				for (int i = 6; i >= 1; i--)
+				for (int i = glowLayers; i >= 1; i--)
 				{
 					float glowRadius = radius + (i * 3);
 
@@ -635,11 +635,11 @@ namespace Quesadilla.Classes.ImageGeneration
 									foreach (var storm in Program.Universe.Storms)
 									{
 										if (stormStrength == 0 && storm.WeakSystemIds != null && storm.WeakSystemIds.Contains(currentSystem.solarSystem.Id))
-											DrawStorm(storm.StormType, "WEAK", gStorm, currentPoint, circleSizeStorm, blobSize, true);
+											DrawStorm(storm.StormType, "WEAK", gStorm, currentPoint, circleSizeStorm, blobSize, true, parameters.StormGlowLayers);
 										if (stormStrength == 1 && storm.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id))
-											DrawStorm(storm.StormType, "STRONG", gStorm, currentPoint, circleSizeStorm, blobSize, true);
+											DrawStorm(storm.StormType, "STRONG", gStorm, currentPoint, circleSizeStorm, blobSize, true, parameters.StormGlowLayers);
 										if (stormStrength == 2 && storm.SystemId == currentSystem.solarSystem.Id)
-											DrawStorm(storm.StormType, "CENTRE", gStorm, currentPoint, circleSizeStorm, blobSize, true);
+											DrawStorm(storm.StormType, "CENTRE", gStorm, currentPoint, circleSizeStorm, blobSize, true, parameters.StormGlowLayers);
 									}
 								}
 							}
@@ -666,7 +666,7 @@ namespace Quesadilla.Classes.ImageGeneration
 									(storm?.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id)) ||
 									(storm?.SystemId == currentSystem.solarSystem.Id)
 									)
-									DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false);
+									DrawStorm(storm.StormType, "EMPTY", g, currentPoint, circleSizeStorm, blobSize, false, 0);
 							}
 						}
 
@@ -686,7 +686,7 @@ namespace Quesadilla.Classes.ImageGeneration
 										(storm?.StrongSystemIds != null && storm.StrongSystemIds.Contains(currentSystem.solarSystem.Id)) ||
 										(storm?.SystemId == currentSystem.solarSystem.Id)
 										)
-										DrawStorm(storm.StormType, "CENTRE", gStorm, currentPoint, circleSizeStorm, blobSize, false);
+										DrawStorm(storm.StormType, "CENTRE", gStorm, currentPoint, circleSizeStorm, blobSize, false, 0);
 								}
 							}
 

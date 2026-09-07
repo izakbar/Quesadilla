@@ -18,6 +18,7 @@ namespace Quesadilla.Classes.ImageGeneration
 		public int StormMainAlpha { get; set; }
 		public bool ShowStorm { get; set; }
 		public int StormSize { get; set; }
+		public int StormGlowLayers { get; set; }
 
 		// Sec limit data
 		public float SecLimitValue { get; set; }

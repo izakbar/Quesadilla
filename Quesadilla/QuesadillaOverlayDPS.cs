@@ -123,7 +123,7 @@ namespace Quesadilla
 				dpsChart.Visible = true;
 			}
 
-			if (Program.MainConfiguration.OverlayISKGraphAllToons)
+			if (Program.MainConfiguration.DPSAllToons)
 			{
 				Toon = "*ALL*";
 			}

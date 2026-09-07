@@ -2050,7 +2050,7 @@ img.rounded-corners {
 		[Category("Alert")]
 		[DisplayName("Storm Size")]
 		[Description("Size of storm indicators on the alert popup minimap")]
-		[DefaultValue(typeof(int), "55")]
+		[DefaultValue(typeof(int), "300")]
 		public int AlertPopupMinimapStormSize { get; set; }
 
 
@@ -2676,6 +2676,28 @@ img.rounded-corners {
 		[Description("The extra information display shows zkill and alert activity recently in systems on the current minimap view")]
 		[DefaultValue(typeof(bool), "false")]
 		public bool MainWindowShowExtraInformation { get; set; }
+
+
+		[Category("Main window")]
+		[DisplayName("Minimap Storm glow layers")]
+		[Description("Number of glow layers for storms on the minimap")]
+		[DefaultValue(typeof(int), "3")]
+		[Range(0, 15)]
+		public int MinimapStormGlowLayers { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap Storm glow layers")]
+		[Description("Number of glow layers for storms on the alert popup minimap")]
+		[DefaultValue(typeof(int), "3")]
+		[Range(0, 15)]
+		public int AlertPopupMinimapStormGlowLayers { get; set; }
+
+		[Category("Overlay Map")]
+		[DisplayName("Minimap Storm glow layers")]
+		[Description("Number of glow layers for storms on the overlay minimap")]
+		[DefaultValue(typeof(int), "6")]
+		[Range(0, 15)]
+		public int OverlayMinimapStormGlowLayers { get; set; }
 
 
 	}

@@ -312,6 +312,7 @@ namespace Quesadilla
 			_minimapParameters.StormWeakOutlineAlpha = Program.MainConfiguration.AlertPopupMinimapStormWeakOutlineAlpha;
 			_minimapParameters.StormMainAlpha = Program.MainConfiguration.AlertPopupMinimapStormMainAlpha;
 			_minimapParameters.ShowStorm = Program.MainConfiguration.AlertPopupMinimapShowStorm;
+			_minimapParameters.StormGlowLayers = Program.MainConfiguration.AlertPopupMinimapStormGlowLayers;
 
 			_minimapParameters.SecLimitValue = Program.MainConfiguration.AlertPopupMinimapSecLimitValue;
 			_minimapParameters.SecLimitAlphaAmount = Program.MainConfiguration.AlertPopupMinimapSecLimitAlpha;
