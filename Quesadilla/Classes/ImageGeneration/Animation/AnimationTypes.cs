@@ -18,6 +18,7 @@ namespace Quesadilla.Classes.ImageGeneration
 		StormElectric,
 		StormGamma,
 		StormPlasma,
-		StormExotic
+		StormExotic,
+		Skyhooks
 	}
 }

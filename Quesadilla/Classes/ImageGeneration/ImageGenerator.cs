@@ -306,6 +306,140 @@ namespace Quesadilla.Classes.ImageGeneration
 			g.DrawEllipse(mainPen, rect);
 		}
 
+		private static void DrawPulseIndicatorLine(Graphics g,Point center,Color colour,float baseRadius,int? animationCycle,float pulseSize = 2.0f,int maxAlpha = 120,float ringWidth = 2.0f)
+		{
+			RectangleF innerRect = new RectangleF(
+				center.X - baseRadius,
+				center.Y - baseRadius,
+				baseRadius * 2,
+				baseRadius * 2);
+
+			if (animationCycle == null)
+			{
+				Pen ringPen = GDICache.GetPen(colour, ringWidth, DashStyle.Solid);
+				g.DrawEllipse(ringPen, innerRect);
+				return;
+			}
+
+			float radius = baseRadius + (animationCycle.Value * pulseSize);
+
+			int alpha = Math.Max(0,maxAlpha - (animationCycle.Value * 6));
+
+			//
+			// Slowly rotate the tri-circle spokes to give a sense of motion
+			//
+			float angleOffset =(animationCycle.Value * 15f) % 120f;
+
+			/*
+						//
+						// Outer pulse glow
+						//
+						for (int glow = 4; glow >= 1; glow--)
+						{
+							int glowAlpha = Math.Max(1,alpha / (glow * 2));
+
+							using (Pen glowPen = new Pen(Color.FromArgb(glowAlpha, colour),ringWidth + glow))
+							{
+								float grow = glow * 2;
+
+								g.DrawEllipse(
+									glowPen,
+									center.X - radius - grow,
+									center.Y - radius - grow,
+									(radius + grow) * 2,
+									(radius + grow) * 2);
+							}
+						}
+
+						//
+						// Main pulse ring
+						//
+						using (Pen pulsePen = new Pen(Color.FromArgb(Math.Max(1, alpha),colour),ringWidth))
+						{
+							g.DrawEllipse(
+								pulsePen,
+								center.X - radius,
+								center.Y - radius,
+								radius * 2,
+								radius * 2);
+						}
+			*/
+
+
+			//
+			// Motion blur trail
+			//
+			const int trailSteps = 8;
+			const float trailAngleStep = 6f;
+
+			for (int trail = trailSteps; trail >= 1; trail--)
+			{
+				float trailRotation = angleOffset - (trail * trailAngleStep);
+				int trailAlpha =Math.Max(1,alpha / (trail * 3));
+				float trailWidth =1f + ((trailSteps - trail) * 0.7f);
+
+				using (Pen trailPen = new Pen(Color.FromArgb(trailAlpha, colour),trailWidth))
+				{
+					for (int spoke = 0; spoke < 3; spoke++)
+					{
+						float angle = trailRotation + (spoke * 120f);
+						float radians = angle * (float)Math.PI / 180f;
+
+						PointF end = new PointF(
+							center.X + (float)Math.Cos(radians) * radius,
+							center.Y + (float)Math.Sin(radians) * radius);
+
+						g.DrawLine(trailPen,center,end);
+					}
+				}
+			}
+
+			//
+			// Spoke glow
+			//
+			for (int glow = 4; glow >= 1; glow--)
+			{
+				int glowAlpha =Math.Max(1,alpha / (glow * 2));
+				using (Pen glowPen = new Pen(Color.FromArgb(glowAlpha, colour),2f + (glow * 2)))
+				{
+					for (int spoke = 0; spoke < 3; spoke++)
+					{
+						float angle =angleOffset + (spoke * 120f);
+						float radians = angle * (float)Math.PI / 180f;
+
+						PointF end = new PointF(
+							center.X + (float)Math.Cos(radians) * radius,
+							center.Y + (float)Math.Sin(radians) * radius);
+
+						g.DrawLine(glowPen,center,end);
+					}
+				}
+			}
+
+			//
+			// Main spokes
+			//
+			using (Pen spokePen = new Pen(Color.FromArgb(Math.Max(1, alpha),colour),3f))
+			{
+				for (int spoke = 0; spoke < 3; spoke++)
+				{
+					float angle = angleOffset + (spoke * 120f);
+					float radians = angle * (float)Math.PI / 180f;
+
+					PointF end = new PointF(
+						center.X + (float)Math.Cos(radians) * radius,
+						center.Y + (float)Math.Sin(radians) * radius);
+
+					g.DrawLine(spokePen,center,end);
+				}
+			}
+
+			//
+			// Permanent centre ring
+			//
+			Pen mainPen =GDICache.GetPen(colour,ringWidth,DashStyle.Solid);
+			g.DrawEllipse(mainPen, innerRect);
+		}
 
 		public static Image ClipMiniMap(Image srcImage, PathInfo path, int mapScale,
 			ref string extraInformation, ref List<MinimapSystem> returnMinimapSystems,
@@ -315,6 +449,7 @@ namespace Quesadilla.Classes.ImageGeneration
 			int? animationCycleUniHoles,
 			int? animationIncursion,
 			int? animationCycleSecLimit,
+			int? animationCycleSkyhooks,
 			MinimapParameters parameters
 			)
 		{
@@ -738,6 +873,38 @@ namespace Quesadilla.Classes.ImageGeneration
 
 					Point currentPoint = new Point(originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y);
 
+
+					// Check skyhooks
+					bool skyhooksVulnerable = false;
+					bool skyhooksVulnerableSoon = false;
+
+					float addX = (float)(0 / GUI_SCALING) + (blobSize/2);
+					float addY = (float)(0 / GUI_SCALING) + (blobSize/2);
+
+					float skyhookTextSize = (float)(10 / GUI_SCALING);
+
+					//uint animationCycleSkyhooks = 10;
+
+					DateTime utcNow = DateTime.UtcNow;
+					if (currentSystem.solarSystem.Planets != null)
+					{
+						foreach (var p in currentSystem.solarSystem?.Planets.Where(o => o.SkyhookVulneralbilityStart != null && o.SkyhookVulneralbilityEnd >= utcNow))
+						{
+							if (p.SkyhookVulneralbilityStart > utcNow) skyhooksVulnerableSoon = true;
+							if (p.SkyhookVulneralbilityStart <= utcNow) skyhooksVulnerable = true;
+						}
+					}
+
+					if (skyhooksVulnerableSoon)
+					{
+						DrawPulseIndicatorLine(g, new Point(currentPoint.X, currentPoint.Y), Color.Orange, 1 / (float)GUI_SCALING, animationCycleSkyhooks, pulseSize: (3 / (float)GUI_SCALING), maxAlpha: 120, ringWidth: 1.5f / (float)GUI_SCALING);
+					}
+
+					if (skyhooksVulnerable)
+					{
+						DrawPulseIndicatorLine(g, new Point(currentPoint.X , currentPoint.Y ), Color.LimeGreen, 1 / (float)GUI_SCALING, animationCycleSkyhooks, pulseSize: (3 / (float)GUI_SCALING), maxAlpha: 120, ringWidth: 1.5f/(float)GUI_SCALING);
+					}
+
 					Color systemBrushColour = parameters.SystemColourNormal;
 					if (currentSystem.route) systemBrushColour = parameters.SystemColourRoute;
 					if (currentSystem.fromSystem) systemBrushColour = parameters.SystemColourFrom;
@@ -760,42 +927,12 @@ namespace Quesadilla.Classes.ImageGeneration
 					}
 
 
-					// Check skyhooks
-					bool skyhooksVulnerable = false;
-					bool skyhooksVulnerableSoon = false;
-
-					float addX = (float)(6 + (blobSize / 2) / GUI_SCALING);
-					float addY = (float)(20 + (blobSize / 2) / GUI_SCALING);
-
-					float skyhookTextSize = (float)(10 / GUI_SCALING);
-
-					//uint animationCycleSkyhooks = 10;
-
-					DateTime utcNow = DateTime.UtcNow;
-					if (currentSystem.solarSystem.Planets != null)
-					{
-						foreach (var p in currentSystem.solarSystem?.Planets.Where(o => o.SkyhookVulneralbilityStart != null && o.SkyhookVulneralbilityEnd >= utcNow))
-						{
-							if (p.SkyhookVulneralbilityStart > utcNow) skyhooksVulnerableSoon = true;
-							if (p.SkyhookVulneralbilityStart <= utcNow) skyhooksVulnerable = true;
-						}
-					}
-
-					if (skyhooksVulnerableSoon)
-					{
-						DrawSystemName(g, currentPoint.X + (int)addX, currentPoint.Y - (int)addY - (int)skyhookTextSize, "◌", Color.Orange, skyhookTextSize);
-					}
-
-					if (skyhooksVulnerable)
-					{
-						DrawSystemName(g, currentPoint.X + (int)addX, currentPoint.Y - (int)addY - (int)skyhookTextSize, "◉", Color.LimeGreen, skyhookTextSize);
-					}
 
 					// Unihole
 					int uniHoleAdjust = 0;
 					if (currentSystem.solarSystem.UniHole)
 					{
-						DrawPulseIndicator(g, currentPoint, parameters.UniHoleColour, blobSize, animationCycleUniHoles, pulseSize: (25 / (float)GUI_SCALING), maxAlpha: 60, glowLayers: 3, ringWidth: 2.0f);
+						DrawPulseIndicator(g, currentPoint, parameters.UniHoleColour, blobSize, animationCycleUniHoles, pulseSize: (25 / (float)GUI_SCALING), maxAlpha: 80, glowLayers: 3, ringWidth: 2.0f);
 						uniHoleAdjust = 1;
 					}
 

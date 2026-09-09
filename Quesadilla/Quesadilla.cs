@@ -2006,8 +2006,9 @@ namespace Quesadilla
 					AnimationManager[AnimationType.UniHoles].GetNextValue(),
 					AnimationManager[AnimationType.Incursion].GetNextValue(),
 					AnimationManager[AnimationType.SecLimit].GetNextValue(),
+                    AnimationManager[AnimationType.Skyhooks].GetNextValue(),
                     _minimapParameters
-                    );
+					);
                 //                Bitmap minimapBitmap = new Bitmap(minimapImage);
                 //                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
                 var _oldImage = MainMinimap.Image;

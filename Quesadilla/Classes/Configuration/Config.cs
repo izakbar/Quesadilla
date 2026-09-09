@@ -88,20 +88,19 @@ namespace Quesadilla.Classes
 
 		public Config Duplicate()
         {
-            Config c = new Config()
-            {
-                AlertPopupLocation = AlertPopupLocation,
-                DPSLocation = DPSLocation,
-                InitialPosition = InitialPosition,
-                ZKillSound = ZKillSound,
-                AlertPopupMinimapRawXY = AlertPopupMinimapRawXY,
-                MinimapMapType = MinimapMapType,
+			Config c = new Config()
+			{
+				AlertPopupLocation = AlertPopupLocation,
+				DPSLocation = DPSLocation,
+				InitialPosition = InitialPosition,
+				ZKillSound = ZKillSound,
+				AlertPopupMinimapRawXY = AlertPopupMinimapRawXY,
+				MinimapMapType = MinimapMapType,
 				OverlayDPSWindowPosition = OverlayDPSWindowPosition,
 				OverlayDPSWindowSize = OverlayDPSWindowSize,
 				OverlayMapWindowPosition = OverlayMapWindowPosition,
-				OverlayMapWindowSize	= OverlayMapWindowSize,
+				OverlayMapWindowSize = OverlayMapWindowSize,
 			};
-
             // copy as many config items as possible
             foreach(var p in typeof(Config).GetProperties().Where(o => o.PropertyType == typeof(Color) || o.PropertyType == typeof(int) || o.PropertyType == typeof(string) || o.PropertyType == typeof(bool) || o.PropertyType == typeof(float)))
             {
@@ -1075,6 +1074,41 @@ img.rounded-corners {
 					Location = new Point(320, 270),
 					Size = new Size(280, 80),
 					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+				});
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "MouseOver",
+					Color = Color.Red,
+					BackColor = Color.Black,
+					AlternateColor = Color.Red,
+					IsVisible = true,
+					Location = new Point(-1, -1),
+					Size = new Size(120, 80),
+					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
+				});
+
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "MouseOverSystemName",
+					Color = Color.White,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Red,
+					IsVisible = true,
+					Location = new Point(2, 2),
+					Size = new Size(120, 11),
+					Font = new Font("Microsoft Sans Serif", 9.3f, FontStyle.Bold),
+				});
+
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "MouseOverSecurity",
+					Color = Color.Yellow,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Red,
+					IsVisible = true,
+					Location = new Point(2, 13),
+					Size = new Size(40, 11),
+					Font = new Font("Microsoft Sans Serif", 9.2f, FontStyle.Regular),
 				});
 
 				if (c.DPSWindowItemLocations == null)
@@ -2704,6 +2738,13 @@ img.rounded-corners {
 		[DefaultValue(typeof(int), "6")]
 		[Range(0, 15)]
 		public int OverlayMinimapStormGlowLayers { get; set; }
+
+		[Category("Overlay Map")]
+		[DisplayName("Mouse Over Graph Alpha")]
+		[Description("Alpha to use for the mouse over graph on the overlay minimap")]
+		[DefaultValue(typeof(int), "95")]
+		[Range(0, 100)]
+		public int OverlayMouseOverGraphAlpha { get; set; }
 
 
 	}

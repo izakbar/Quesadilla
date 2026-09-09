@@ -29,15 +29,22 @@ namespace Quesadilla
 		private Image _sourceMapImage = null;
 		private Bitmap _sourceIskPerMinuteImage = null;
 		private Bitmap _sourceMinedPerMinuteImage = null;
+		private Bitmap _mouseOverImage = null;
 
 		private List<MinimapSystem> MinimapSystems = new List<MinimapSystem>();
 		private List<MinimapSystem> mouseOverMinimapSystems = new List<MinimapSystem>();
 		private Point mouseOverPoint;
 
+		// "Controls"
 		public Label RattingData = new Label() { Name = "RattingData" };
 		public Label MiningData = new Label() { Name = "MiningData" };
 		public Label EveScoutStatus = new Label() { Name = "EveScoutStatus" };
 		public PictureBox Minimap = new PictureBox() { Name = "Minimap" };
+		public Panel MouseOver = new Panel() { Name = "MouseOver" };
+		public Label MouseOverSystemName = new Label() { Name = "MouseOverSystemName" };
+		public Label MouseOverSecurity = new Label() { Name = "MouseOverSecurity" };
+
+
 
 		public Chart iskPerMinuteChart = new Chart() { Name = "IskPerMinuteChart" };
 		public Chart minedPerMinuteChart = new Chart() { Name = "MinedPerMinuteChart" };
@@ -49,6 +56,7 @@ namespace Quesadilla
 		private ImageAttributes ImageAttrMainMap = new ImageAttributes();
 		private ImageAttributes ImageAttrISKGraph = new ImageAttributes();
 		private ImageAttributes ImageAttrMinedGraph = new ImageAttributes();
+		private ImageAttributes ImageAttrMouseOverGraph = new ImageAttributes();
 		private MinimapParameters _minimapParameters = new MinimapParameters();
 
 		public QuesadillaOverlayMap(Quesadilla mainForm) : base()
@@ -68,7 +76,8 @@ namespace Quesadilla
 				EveScoutStatus,
 				Minimap,
 				iskPerMinuteChart,
-				minedPerMinuteChart
+				minedPerMinuteChart,
+				MouseOver, MouseOverSystemName, MouseOverSecurity
 			});
 
 			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.OverlayWindowItemLocations, 0, false, false, true);
@@ -76,9 +85,12 @@ namespace Quesadilla
 			ImageGenerator.SetImageAlpha(ImageAttrMainMap, Program.MainConfiguration.OverlayMinimapAlpha);
 			ImageGenerator.SetImageAlpha(ImageAttrISKGraph, Program.MainConfiguration.OverlayISKGraphAlpha);
 			ImageGenerator.SetImageAlpha(ImageAttrMinedGraph, Program.MainConfiguration.OverlayMinedGraphAlpha);
+			ImageGenerator.SetImageAlpha(ImageAttrMouseOverGraph, Program.MainConfiguration.OverlayMouseOverGraphAlpha);
 
 			SetupPerMinuteCharts();
 			UpdateMinimapParameters();
+
+			_mouseOverImage = new Bitmap(MouseOver.Width,MouseOver.Height,PixelFormat.Format32bppPArgb);
 		}
 		public void UpdateMinimapParameters()
 		{
@@ -610,13 +622,6 @@ namespace Quesadilla
 				ImageGenerator.PaintDrawText(g, EveScoutStatus);
 			}
 
-			if (mouseOverMinimapSystems.Count > 0)
-			{
-				//var brushBackground = new SolidBrush(Color.Navy);
-				var brush = GDICache.GetBrush(Program.MainConfiguration.OverlayMinimapMouseoverSystemColour);
-				using (var font = new Font("Segoe UI", 12f, FontStyle.Regular))
-					g.DrawString($"{mouseOverMinimapSystems[0].solarSystem.Name}", font, brush, mouseOverPoint);
-			}
 
 			ImageGenerator.PaintDrawText(g, RattingData);
 			ImageGenerator.PaintDrawText(g, MiningData);
@@ -650,6 +655,54 @@ namespace Quesadilla
 				}
 				catch { }
 			}
+
+			if (mouseOverMinimapSystems.Count > 0)
+			{
+				//var brushBackground = new SolidBrush(Color.Navy);
+				var brush = GDICache.GetBrush(Program.MainConfiguration.OverlayMinimapMouseoverSystemColour);
+				using (var font = new Font("Segoe UI", 12f, FontStyle.Regular))
+					g.DrawString($"{mouseOverMinimapSystems[0].solarSystem.Name}", font, brush, mouseOverPoint);
+
+				if (MouseOver.Visible)
+				{
+					using (var gMouseOver = Graphics.FromImage(_mouseOverImage))
+					{
+						gMouseOver.Clear(Color.Transparent);
+						var borderPen = GDICache.GetPen(MouseOver.ForeColor, 1);
+						var FillBrush = GDICache.GetBrush(MouseOver.BackColor);
+						gMouseOver.FillRectangle(FillBrush, 0, 0, MouseOver.Width - 1, MouseOver.Height - 1);
+						gMouseOver.DrawRectangle(borderPen, 0, 0, MouseOver.Width - 1, MouseOver.Height - 1);
+
+						gMouseOver.DrawString($"{mouseOverMinimapSystems[0].solarSystem.Name}", MouseOverSystemName.Font, GDICache.GetBrush(MouseOverSystemName.ForeColor), MouseOverSystemName.Left, MouseOverSystemName.Top);
+						gMouseOver.DrawString($"{Math.Round(mouseOverMinimapSystems[0].solarSystem.Security,1)}", MouseOverSecurity.Font, GDICache.GetBrush(MouseOverSecurity.ForeColor), MouseOverSecurity.Left, MouseOverSecurity.Top);
+
+
+
+
+						var x = MouseOver.Left;
+						var y = MouseOver.Top;
+						if (x == -1 && y == -1)
+						{
+							// calculate x/y based on mouse posisiton and size of window
+							x = mouseOverPoint.X+2; y = mouseOverPoint.Y+2;
+							if (x + MouseOver.Width > Width) x = Width - MouseOver.Width - 2;
+							if (y + MouseOver.Height > Height) y = Height - MouseOver.Height - 2;
+						}
+
+						// Draw MouseOver -> main canvas now
+						g.DrawImage(
+							_mouseOverImage,
+							new Rectangle(x, y, MouseOver.Width, MouseOver.Height),
+							0, 0, _mouseOverImage.Width, _mouseOverImage.Height,
+							GraphicsUnit.Pixel,
+							ImageAttrMouseOverGraph
+						);
+
+					}
+				}
+			}
+
+
 
 		}
 
@@ -698,6 +751,8 @@ namespace Quesadilla
 				_animationManager[AnimationType.UniHoles].GetNextValue(),
 				_animationManager[AnimationType.Incursion].GetNextValue(),
 				_animationManager[AnimationType.SecLimit].GetNextValue(),
+				_animationManager[AnimationType.Skyhooks].GetNextValue(),
+
 				_minimapParameters
 				);
 

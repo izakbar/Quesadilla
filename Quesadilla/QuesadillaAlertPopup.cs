@@ -231,7 +231,7 @@ namespace Quesadilla
 				string extraInformation = "";
 				Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MinimapImage.Width, MinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), alert.Path, 100,
 					ref extraInformation, ref MinimapSystems,
-					null, null, null, null,null, null,
+					null, null, null, null,null, null,null,
 					_minimapParameters
 					);
 				Bitmap minimapBitmap = new Bitmap(minimapImage);
