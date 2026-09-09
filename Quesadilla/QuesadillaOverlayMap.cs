@@ -43,7 +43,7 @@ namespace Quesadilla
 		public Panel MouseOver = new Panel() { Name = "MouseOver" };
 		public Label MouseOverSystemName = new Label() { Name = "MouseOverSystemName" };
 		public Label MouseOverSecurity = new Label() { Name = "MouseOverSecurity" };
-
+		public Label MouseOverSkyhookInfo = new Label() { Name = "MouseOverSkyhookInfo" };
 
 
 		public Chart iskPerMinuteChart = new Chart() { Name = "IskPerMinuteChart" };
@@ -51,7 +51,6 @@ namespace Quesadilla
 		private Timer xPerMinuteTimer = null;
 		private Dictionary<int, IskGraphData> _iskGraphData = new Dictionary<int, IskGraphData>();
 		private Dictionary<int, MinedGraphData> _minedGraphData = new Dictionary<int, MinedGraphData>();
-
 
 		private ImageAttributes ImageAttrMainMap = new ImageAttributes();
 		private ImageAttributes ImageAttrISKGraph = new ImageAttributes();
@@ -77,7 +76,7 @@ namespace Quesadilla
 				Minimap,
 				iskPerMinuteChart,
 				minedPerMinuteChart,
-				MouseOver, MouseOverSystemName, MouseOverSecurity
+				MouseOver, MouseOverSystemName, MouseOverSecurity, MouseOverSkyhookInfo
 			});
 
 			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.OverlayWindowItemLocations, 0, false, false, true);
@@ -607,6 +606,33 @@ namespace Quesadilla
 			};
 		}
 
+
+		public string TimeSpanToFriendlyString(TimeSpan ts)
+		{
+			var parts = new List<string>();
+
+			if (ts.Days > 0)
+				parts.Add($"{ts.Days} day{(ts.Days == 1 ? "" : "s")}");
+
+			if (ts.Hours > 0)
+				parts.Add($"{ts.Hours}hr{(ts.Hours == 1 ? "" : "s")}");
+
+			if (ts.TotalHours >= 1)
+			{
+				if (ts.Minutes > 0)
+					parts.Add($"{ts.Minutes}min{(ts.Minutes == 1 ? "" : "s")}");
+			}
+			else
+			{
+				if (ts.Minutes > 0)
+					parts.Add($"{ts.Minutes}min{(ts.Minutes == 1 ? "" : "s")}");
+
+				if (ts.Seconds > 0 || parts.Count == 0)
+					parts.Add($"{ts.Seconds}sec{(ts.Seconds == 1 ? "" : "s")}");
+			}
+			return string.Join(" ", parts);
+		}
+
 		protected override void RenderOverlay(Graphics g)
 		{
 			if (_sourceMapImage != null)
@@ -658,10 +684,13 @@ namespace Quesadilla
 
 			if (mouseOverMinimapSystems.Count > 0)
 			{
+
+				var currentSystem = mouseOverMinimapSystems[0];
+
 				//var brushBackground = new SolidBrush(Color.Navy);
 				var brush = GDICache.GetBrush(Program.MainConfiguration.OverlayMinimapMouseoverSystemColour);
 				using (var font = new Font("Segoe UI", 12f, FontStyle.Regular))
-					g.DrawString($"{mouseOverMinimapSystems[0].solarSystem.Name}", font, brush, mouseOverPoint);
+					g.DrawString($"{currentSystem.solarSystem.Name}", font, brush, mouseOverPoint);
 
 				if (MouseOver.Visible)
 				{
@@ -673,11 +702,43 @@ namespace Quesadilla
 						gMouseOver.FillRectangle(FillBrush, 0, 0, MouseOver.Width - 1, MouseOver.Height - 1);
 						gMouseOver.DrawRectangle(borderPen, 0, 0, MouseOver.Width - 1, MouseOver.Height - 1);
 
-						gMouseOver.DrawString($"{mouseOverMinimapSystems[0].solarSystem.Name}", MouseOverSystemName.Font, GDICache.GetBrush(MouseOverSystemName.ForeColor), MouseOverSystemName.Left, MouseOverSystemName.Top);
-						gMouseOver.DrawString($"{Math.Round(mouseOverMinimapSystems[0].solarSystem.Security,1)}", MouseOverSecurity.Font, GDICache.GetBrush(MouseOverSecurity.ForeColor), MouseOverSecurity.Left, MouseOverSecurity.Top);
+						gMouseOver.DrawString($"{currentSystem.solarSystem.Name}", MouseOverSystemName.Font, GDICache.GetBrush(MouseOverSystemName.ForeColor), MouseOverSystemName.Left, MouseOverSystemName.Top);
+						gMouseOver.DrawString($"{Math.Round(currentSystem.solarSystem.Security,1)}", MouseOverSecurity.Font, GDICache.GetBrush(MouseOverSecurity.ForeColor), MouseOverSecurity.Left, MouseOverSecurity.Top);
 
+						// Skyhooks ?
+						DateTime utcNow = DateTime.UtcNow;
+						DateTime? skyhookExpiry = null;
+						string skyhookinfo = "";
 
+						if (currentSystem.solarSystem.Planets != null)
+						{
+							foreach (var p in currentSystem.solarSystem?.Planets.Where(o => o.SkyhookVulneralbilityStart != null && o.SkyhookVulneralbilityEnd >= utcNow))
+							{
 
+								if (
+									(p.SkyhookVulneralbilityStart > utcNow || p.SkyhookVulneralbilityStart <= utcNow) &&
+									(skyhookExpiry == null || skyhookExpiry > p.SkyhookVulneralbilityEnd)
+									)
+								{
+									skyhookExpiry = p.SkyhookVulneralbilityEnd;
+									skyhookinfo = $"P{p.PlanetName} {p.PlanetTypeName.Replace("Planet", "")}";
+									if (p.SkyhookVulneralbilityStart > utcNow)
+									{
+										TimeSpan difference = (DateTime)p.SkyhookVulneralbilityStart - utcNow;
+										skyhookinfo += $" raid in\n{TimeSpanToFriendlyString(difference)}";
+									}
+									if (p.SkyhookVulneralbilityStart <= utcNow)
+									{
+										TimeSpan difference = (DateTime)p.SkyhookVulneralbilityEnd - utcNow;
+										skyhookinfo += $" raid for\n{TimeSpanToFriendlyString(difference)}";
+									}
+								}
+							}
+							if (skyhookExpiry != null)
+							{
+								gMouseOver.DrawString($"{skyhookinfo}", MouseOverSkyhookInfo.Font, GDICache.GetBrush(MouseOverSkyhookInfo.ForeColor), MouseOverSkyhookInfo.Left, MouseOverSkyhookInfo.Top);
+							}
+						}
 
 						var x = MouseOver.Left;
 						var y = MouseOver.Top;

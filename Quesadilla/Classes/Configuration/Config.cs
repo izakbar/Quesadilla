@@ -1111,6 +1111,18 @@ img.rounded-corners {
 					Font = new Font("Microsoft Sans Serif", 9.2f, FontStyle.Regular),
 				});
 
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "MouseOverSkyhookInfo",
+					Color = Color.GreenYellow,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Red,
+					IsVisible = true,
+					Location = new Point(2, 55),
+					Size = new Size(116, 22),
+					Font = new Font("Segoe UI Variable", 8.5f, FontStyle.Regular),
+				});
+
 				if (c.DPSWindowItemLocations == null)
 				{
 					c.DPSWindowItemLocations = new List<ConfigurationItemLocationInformation>();
