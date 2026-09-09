@@ -416,6 +416,15 @@ namespace Quesadilla
 			toonMined["PointWidth"] = "1";
 			toonMined.BorderDashStyle = ChartDashStyle.Solid;
 
+			var toonMinedCritical = minedPerMinuteChart.Series.Add(Toon + " Critical");
+			toonMinedCritical.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StackedArea;
+			toonMinedCritical.Points.Clear();
+			toonMinedCritical.Color = Program.MainConfiguration.OverlayMinedGraphCriticalColour; ;
+			toonMinedCritical.XAxisType = AxisType.Primary;
+			toonMinedCritical["PointWidth"] = "1";
+			toonMinedCritical.BorderDashStyle = ChartDashStyle.Solid;
+
+			toonMinedCritical.YAxisType = toonMined.YAxisType;
 			toonWasted.YAxisType = toonMined.YAxisType;
 
 
@@ -460,50 +469,57 @@ namespace Quesadilla
 							{
 								MinedAmount = 0,
 								WastageAmount = 0,
+								CriticalAmount = 0
 							};
 						}
 						if (c.MiningAmount != 0 || c.WastageAmount != 0)
 						{
-							_minedGraphData[slot].MinedAmount += c.MiningAmount;
 							_minedGraphData[slot].WastageAmount += c.WastageAmount;
-							// ignore minint item for now
+							if (c.Critical)
+								_minedGraphData[slot].CriticalAmount += c.MiningAmount;
+							else
+								_minedGraphData[slot].MinedAmount += c.MiningAmount;
 						}
 					}
 				}
 			}
 
 			int maxMined = 0; int totalMined = 0;
+			int maxCritical = 0; int totalCritical = 0;
 			int maxWasted = 0; int totalWasted = 0;
 			while (curr <= end)
 			{
 				var minutes = (int)Math.Truncate((curr - start).TotalSeconds / span);
-				int mined = 0; int wasted = 0;
+				int mined = 0; int wasted = 0; int critical = 0;
 				if (_minedGraphData.ContainsKey(minutes))
 				{
 					mined += _minedGraphData[minutes].MinedAmount;
 					wasted += _minedGraphData[minutes].WastageAmount;
-				} 
-
-				if (mined > maxMined)
-				{
-					maxMined = mined;
+					critical += _minedGraphData[minutes].CriticalAmount;
 				}
 
-				if (wasted > maxWasted)
-				{
-					maxWasted = wasted;
-				}
+				if (mined > maxMined) maxMined = mined;
+				if (critical > maxCritical) maxCritical = critical;
+				if (wasted > maxWasted) maxWasted = wasted;
 
 				curr = curr.AddSeconds(span);
 				toonMined.Points.AddXY(minutes, mined);
+				toonMinedCritical.Points.AddXY(minutes, critical);
 				toonWasted.Points.AddXY(minutes, wasted);
-				totalMined += mined;totalWasted += wasted;
+				totalMined += mined + critical ;totalWasted += wasted;
 			}
+
+			double div = 100;
+			if (maxMined > 1000) div = 100;
+			if (maxMined > 10000) div = 1000;
+			if (maxMined > 100000) div = 10000;
+			if (maxMined > 1000000) div = 100000;
+			double interval = Math.Ceiling((maxMined + maxCritical) / 4.0 / div) * div;
 
 			int axis = 1;
 			if (Program.MainConfiguration.OverlayMinedGraphYLegendRight)
 			{
-				minedPerMinuteChart.ChartAreas[0].AxisY2.Interval = 1000;
+				minedPerMinuteChart.ChartAreas[0].AxisY2.Interval = interval;
 				minedPerMinuteChart.ChartAreas[0].AxisY2.IsReversed = Program.MainConfiguration.OverlayMinedGraphYReversed;
 
 				minedPerMinuteChart.ChartAreas[0].AxisY2.LineDashStyle = ChartDashStyle.Dash;
@@ -522,7 +538,7 @@ namespace Quesadilla
 				minedPerMinuteChart.ChartAreas[0].AxisY.LabelStyle.ForeColor = Program.MainConfiguration.OverlayMinedGraphLabelColour;
 				minedPerMinuteChart.ChartAreas[0].AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dash;
 
-				minedPerMinuteChart.ChartAreas[0].AxisY.Interval = 1000; //minedPerMinuteChart.ChartAreas[0].AxisY.Maximum / 3;
+				minedPerMinuteChart.ChartAreas[0].AxisY.Interval = interval; 
 				minedPerMinuteChart.ChartAreas[0].AxisY.IsReversed = Program.MainConfiguration.OverlayMinedGraphYReversed;
 			}
 

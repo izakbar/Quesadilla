@@ -1825,6 +1825,12 @@ img.rounded-corners {
 		public Color OverlayMinedGraphWastedColour { get; set; }
 
 		[Category("OverlayMap")]
+		[DisplayName("Mined Graph Critical Amount colour")]
+		[Description("Colour to use for Mined Graph Critical Amount")]
+		[DefaultValue(typeof(Color), "Blue")]
+		public Color OverlayMinedGraphCriticalColour { get; set; }
+
+		[Category("OverlayMap")]
 		[DisplayName("ISK Graph Low Boundry")]
 		[Description("ISK Amount for Low boundry")]
 		[DefaultValue(typeof(double), "1000000")]
