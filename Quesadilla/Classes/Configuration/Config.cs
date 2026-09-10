@@ -96,6 +96,7 @@ namespace Quesadilla.Classes
 				ZKillSound = ZKillSound,
 				AlertPopupMinimapRawXY = AlertPopupMinimapRawXY,
 				MinimapMapType = MinimapMapType,
+				OverlayMinimapMapType = OverlayMinimapMapType,
 				OverlayDPSWindowPosition = OverlayDPSWindowPosition,
 				OverlayDPSWindowSize = OverlayDPSWindowSize,
 				OverlayMapWindowPosition = OverlayMapWindowPosition,
@@ -131,7 +132,7 @@ namespace Quesadilla.Classes
                     AlertType = a.AlertType,
                     CustomTriggerEverySeconds = a.CustomTriggerEverySeconds,
                     Enabled = a.Enabled,
-                    FriendlyName = a.FriendlyName,
+                    Name = a.Name,
                     Jumps1Comparison = a.Jumps1Comparison,
                     MenuDisplay = a.MenuDisplay,
                     TextDisplay = a.TextDisplay,
@@ -236,7 +237,7 @@ namespace Quesadilla.Classes
                 c.AlertConfiguration = new List<AlertConfig>();
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "All online toons <= 5 jumps",
+                    Name = "All online toons <= 5 jumps",
                     Enabled = true,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.AllOnlineCharacters,
@@ -249,7 +250,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "Izakbar (if online) <= 5 jumps",
+                    Name = "Izakbar (if online) <= 5 jumps",
                     Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.OneOnlineCharacter,
@@ -263,7 +264,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "Home system < 5 jumps",
+                    Name = "Home system < 5 jumps",
                     Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.Home,
@@ -276,7 +277,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "1DQ1-A < 5 jumps",
+                    Name = "1DQ1-A < 5 jumps",
                     Enabled = false,
                     AlertType = AlertConfigType.Range,
                     AlertRangeType = AlertConfigRangeType.System,
@@ -290,7 +291,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "ESS robbery",
+                    Name = "ESS robbery",
                     Enabled = false,
                     AlertType = AlertConfigType.Text,
                     TextDisplay = "ESS robbery {text} reported by {reporter}",
@@ -300,7 +301,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "Skyhook robbery",
+                    Name = "Skyhook robbery",
                     Enabled = false,
                     AlertType = AlertConfigType.Text,
                     TextDisplay = "Skyhook robbery {text} reported by {reporter}",
@@ -310,7 +311,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "Faction Spawn",
+                    Name = "Faction Spawn",
                     Enabled = true,
                     AlertType = AlertConfigType.FactionSpawn,
                     TextDisplay = "Spawn {context}",
@@ -320,7 +321,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "Decloak",
+                    Name = "Decloak",
                     Enabled = true,
                     AlertType = AlertConfigType.Decloak,
                     TextDisplay = "Decloak by {context}",
@@ -329,7 +330,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "Out of rock",
+                    Name = "Out of rock",
                     Enabled = true,
                     AlertType = AlertConfigType.MiningEndedRoidPopped,
                     TextDisplay = "{character} rock depleated",
@@ -338,7 +339,7 @@ namespace Quesadilla.Classes
                 });
                 c.AlertConfiguration.Add(new AlertConfig()
                 {
-                    FriendlyName = "Miner full",
+                    Name = "Miner full",
                     Enabled = true,
                     AlertType = AlertConfigType.MiningEndedFull,
                     TextDisplay = "{character} cargo full",
@@ -481,28 +482,28 @@ namespace Quesadilla.Classes
 				c.Logfiles.Add(new LogfileConfig()
 				{
 					Enabled = true,
-					FriendlyName = "wc.Dek+Fa+PB",
+					Name = "wc.Dek+Fa+PB",
 					Logfile = "wc.Dek+Fa+PB",
 					LogType = Logfile.LogFileType.ChatIntel,
 				});
 				c.Logfiles.Add(new LogfileConfig()
 				{
 					Enabled = true,
-					FriendlyName = "wc.Poch",
+					Name = "wc.Poch",
 					Logfile = "wc.Poch",
 					LogType = Logfile.LogFileType.ChatIntel,
 				});
 				c.Logfiles.Add(new LogfileConfig()
 				{
 					Enabled = true,
-					FriendlyName = "wc.Vale",
+					Name = "wc.Vale",
 					Logfile = "wc.Vale",
 					LogType = Logfile.LogFileType.ChatIntel,
 				});
 				c.Logfiles.Add(new LogfileConfig()
 				{
 					Enabled = true,
-					FriendlyName = "wc.Venal+Br+Te",
+					Name = "wc.Venal+Br+Te",
 					Logfile = "wc.Venal+Br+Te",
 					LogType = Logfile.LogFileType.ChatIntel,
 				});
@@ -1107,7 +1108,7 @@ img.rounded-corners {
 					AlternateColor = Color.Red,
 					IsVisible = true,
 					Location = new Point(2, 13),
-					Size = new Size(40, 11),
+					Size = new Size(25, 11),
 					Font = new Font("Microsoft Sans Serif", 9.2f, FontStyle.Regular),
 				});
 
@@ -1118,9 +1119,42 @@ img.rounded-corners {
 					BackColor = Color.Transparent,
 					AlternateColor = Color.Red,
 					IsVisible = true,
-					Location = new Point(2, 55),
+					Location = new Point(2, 50),
 					Size = new Size(116, 22),
-					Font = new Font("Segoe UI Variable", 8.5f, FontStyle.Regular),
+					Font = new Font("Segoe UI", 8.0f, FontStyle.Regular),
+				});
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "MouseOverNPCDelta",
+					Color = Color.LightSkyBlue,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Red,
+					IsVisible = true,
+					Location = new Point(30, 13),
+					Size = new Size(30, 11),
+					Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
+				});
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "MouseOverKills",
+					Color = Color.Crimson,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Red,
+					IsVisible = true,
+					Location = new Point(65, 13),
+					Size = new Size(20, 11),
+					Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
+				});
+				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
+				{
+					Name = "MouseOverAlerts",
+					Color = Color.DarkOrange,
+					BackColor = Color.Transparent,
+					AlternateColor = Color.Red,
+					IsVisible = true,
+					Location = new Point(90, 13),
+					Size = new Size(20, 11),
+					Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
 				});
 
 				if (c.DPSWindowItemLocations == null)
@@ -1267,52 +1301,52 @@ img.rounded-corners {
         [DefaultValue(typeof(int), "500")] 
         public int HowManyTicksMiningCSVOutput { get; set; }
         
-        [Category("Main window")]
+        [Category("Main Window")]
         public Point InitialPosition { get; set; }
 
-        [Category("Main window")]
+        [Category("Main Window")]
         public Size MainWindowSize { get; set; }
 
-		[Category("Alert window")]
+		[Category("Alert")]
 		public Size AlertWindowSize { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
         [DisplayName("Stay On Top")]
         [Description("Should the main window stay on top of other windows")]
         [DefaultValue(typeof(bool), "true")]
         public bool StayOnTop { get; set; }
 
-        [Category("Main window")]
+        [Category("Main Window")]
         [DisplayName("Text Colour")]
         [Description("The Text Foreground colour for the main window")]
         [DefaultValue(typeof(Color), "LightGoldenrodYellow")]
         public Color MainWindowTextColour { get; set; }
 
-        [Category("Main window")]
+        [Category("Main Window")]
         [DisplayName("Background Colour")]
         [Description("Background Colour for the main window")]
         [DefaultValue(typeof(Color), "#0f0f11")]
         public Color MainWindowBackgroundColour { get; set; }
 
-        [Category("Main window")]
+        [Category("Main Window")]
         [DisplayName("Show Minimap")]
         [Description("Show minimap")]
         [DefaultValue(typeof(bool), "true")]
         public bool ShowMinimap { get; set; }
 
-        [Category("Main window")]
+        [Category("Main Window")]
         [DisplayName("Minimap system name colour for mouseover")]
         [Description("")]
         [DefaultValue(typeof(Color), "OrangeRed")]
         public Color MinimapMouseoverSystemColour { get; set; }
 
-        [Category("Main window")]
+        [Category("Main Window")]
         [DisplayName("Minimap zoom delta")]
         [Description("How much to adjust zoom on mouse scroll")]
         [DefaultValue(typeof(int), "5")]
         public int MainWindowMouseScrollAmount { get; set; }
 
-        [Category("Main window")]
+        [Category("Main Window")]
         [DisplayName("Minimap zoom initial map scale")]
         [Description("How to scale main window minimap - default 100")]
         [DefaultValue(typeof(int), "90")]
@@ -1325,26 +1359,26 @@ img.rounded-corners {
         [DefaultValue(typeof(Color), "OrangeRed")]
         public Color AlertPopupMinimapMouseoverSystemColour { get; set; }
 
-        [Category("Main window")]
+        [Category("Main Window")]
         [DisplayName("Maptype to use")]
         [Description("Which map layout to use for the Minimap")]
         [DefaultValue(typeof(MapType), "Dotlan")]
         public MapType MinimapMapType { get; set; }
 
 
-        [Category("Main window")]
+        [Category("Main Window")]
         [DisplayName("Show total ISK per Hour")]
         [Description("Show the total ISK per hour earned as well as per toon")]
         [DefaultValue(typeof(bool), "true")]
         public bool ShowISKTotal { get; set; }
 
-        [Category("Main window")]
+        [Category("Main Window")]
         [DisplayName("Show total Mining per Hour")]
         [Description("Show the total Mining per hour as well as per toon")]
         [DefaultValue(typeof(bool), "true")]
         public bool ShowMiningTotal { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Item Locations")]
 		public List<ConfigurationItemLocationInformation> MainWindowItemLocations { get; set; }
 
@@ -2107,39 +2141,39 @@ img.rounded-corners {
 
 
 		// Seclimit - main minimap
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap sec limit Indicator colour")]
 		[Description("Colour to use for security limit indicators on the minimap")]
 		[DefaultValue(typeof(Color), "DarkBlue")]
 		public Color MinimapSecLimitColour { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap sec limit Indicator outline colour")]
 		[Description("Colour to use for security limit indicators on the minimap")]
 		[DefaultValue(typeof(Color), "Blue")]
 		public Color MinimapSecLimitOutlineColour { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap sec limit Indicator enabled")]
 		[Description("use security limit indicators on the minimap")]
 		[DefaultValue(typeof(bool), "true")]
 		public bool MinimapSecLimitShow { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap seclimit Indicator alpha")]
 		[Description("Alpha to use for seclimit indicators on the minimap")]
 		[DefaultValue(typeof(int), "70")]
 		[Range(0, 100)]
 		public int MinimapSecLimitAlpha { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap seclimit cloud size")]
 		[Description("Size to use for seclimit indicators on the minimap")]
 		[DefaultValue(typeof(int), "60")]
 		[Range(0, 100)]
 		public int MinimapSecLimitCloudSize { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap seclimit")]
 		[Description("seclimit on the minimap")]
 		[DefaultValue(typeof(float), "-0.7")]
@@ -2260,26 +2294,26 @@ img.rounded-corners {
 		public bool OverlayMinimapIncursionShow { get; set; }
 
 		// Main window Incursion
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap incursion Indicator colour")]
 		[Description("Colour to use for incursion indicators on the minimap")]
 		[DefaultValue(typeof(Color), "DarkGreen")]
 		public Color MinimapIncursionColour { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap incursion Indicator outline colour")]
 		[Description("Colour to use for outline for incursion indicators on the minimap")]
 		[DefaultValue(typeof(Color), "Red")]
 		public Color MinimapIncursionOutlineColour { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap incursion Indicator alpha")]
 		[Description("Alpha to use for incursion indicators on the minimap")]
 		[DefaultValue(typeof(int), "60")]
 		[Range(0, 100)]
 		public int MinimapIncursionAlpha { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap incursion cloud size")]
 		[Description("Size to use for incursion indicators on the minimap")]
 		[DefaultValue(typeof(int), "65")]
@@ -2430,101 +2464,101 @@ img.rounded-corners {
 		[DefaultValue(typeof(Color), "IndianRed")]
 		public Color OverlayMinimapMercoxitColour { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap Border Colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "SteelBlue")]
 		public Color MinimapBorderColour { get; set; }
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap Normal connection colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "Gainsboro")]
 		public Color MinimapLineColourNormal { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap Out of region connection colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "DimGray")]
 		public Color MinimapLineColourOutOfRegion { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap Route connection colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "Tomato")]
 		public Color MinimapLineColourRoute { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap normal system colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "Gainsboro")]
 		public Color MinimapSystemColourNormal { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap route system colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "Pink")]
 		public Color MinimapSystemColourRoute { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap from system colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "Red")]
 		public Color MinimapSystemColourFrom { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap to system colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "Green")]
 		public Color MinimapSystemColourTo { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap system name colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "LemonChiffon")]
 		public Color MinimapSystemColourText { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap all system name colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "PaleGoldenrod")]
 		public Color MinimapColourAllText { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap connecting system name colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "DarkKhaki")]
 		public Color MinimapColourConnectingText { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap zkill indicator colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "Red")]
 		public Color MinimapZKillColour { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap intel indicator colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "Orange")]
 		public Color MinimapIntelColour { get; set; }
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap Alt Indicator colour")]
 		[Description("Colour to use for the logged in alt indicators on the minimap")]
 		[DefaultValue(typeof(Color), "Aqua")]
 		public Color MinimapAltColour { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap Unihole Indicator colour")]
 		[Description("Colour to use for Unihole indicators on the minimap")]
 		[DefaultValue(typeof(Color), "Fuchsia")]
 		public Color MinimapUniHoleColour { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap Ice Indicator colour")]
 		[Description("Colour to use for ice indicatos on the minimap")]
 		[DefaultValue(typeof(Color), "Cyan")]
 		public Color MinimapIceColour { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap Mercoxit Indicator colour")]
 		[Description("Colour to use for Mercoxit indicatos on the minimap")]
 		[DefaultValue(typeof(Color), "IndianRed")]
@@ -2542,7 +2576,7 @@ img.rounded-corners {
 		[DefaultValue(typeof(Color), "Gainsboro")]
 		public Color AlertPopupMinimapLineColourNormal { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap Out of region connection colour")]
 		[Description("")]
 		[DefaultValue(typeof(Color), "DimGray")]
@@ -2633,43 +2667,43 @@ img.rounded-corners {
 
 
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap Jumps")]
 		[Description("How many jumps to show in the minimap away from starting system")]
 		[DefaultValue(typeof(int), "3")]
 		public int MinimapCloseSystems { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Show Minimap Border")]
 		[Description("Show border on the minimap")]
 		[DefaultValue(typeof(bool), "false")]
 		public bool MinimapShowBorder { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Show system text on minimap")]
 		[Description("")]
 		[DefaultValue(typeof(bool), "true")]
 		public bool MinimapShowSystemText { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Show all system text on minimap")]
 		[Description("")]
 		[DefaultValue(typeof(bool), "false")]
 		public bool MinimapShowAllSystemText { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Show connecting system text on minimap")]
 		[Description("")]
 		[DefaultValue(typeof(bool), "true")]
 		public bool MinimapShowConnectingSystemsText { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Use default text size on minimap")]
 		[Description("")]
 		[DefaultValue(typeof(bool), "false")]
 		public bool MinimapDefaultTextSize { get; set; }
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap show out of region systems")]
 		[Description("Show systems outside current region if in configured jumps range {MinimapJumps}")]
 		[DefaultValue(typeof(bool), "false")]
@@ -2723,14 +2757,14 @@ img.rounded-corners {
 
 
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Show Extra Information")]
 		[Description("The extra information display shows zkill and alert activity recently in systems on the current minimap view")]
 		[DefaultValue(typeof(bool), "false")]
 		public bool MainWindowShowExtraInformation { get; set; }
 
 
-		[Category("Main window")]
+		[Category("Main Window")]
 		[DisplayName("Minimap Storm glow layers")]
 		[Description("Number of glow layers for storms on the minimap")]
 		[DefaultValue(typeof(int), "3")]
@@ -2744,14 +2778,14 @@ img.rounded-corners {
 		[Range(0, 15)]
 		public int AlertPopupMinimapStormGlowLayers { get; set; }
 
-		[Category("Overlay Map")]
+		[Category("OverlayMap")]
 		[DisplayName("Minimap Storm glow layers")]
 		[Description("Number of glow layers for storms on the overlay minimap")]
 		[DefaultValue(typeof(int), "6")]
 		[Range(0, 15)]
 		public int OverlayMinimapStormGlowLayers { get; set; }
 
-		[Category("Overlay Map")]
+		[Category("OverlayMap")]
 		[DisplayName("Mouse Over Graph Alpha")]
 		[Description("Alpha to use for the mouse over graph on the overlay minimap")]
 		[DefaultValue(typeof(int), "95")]

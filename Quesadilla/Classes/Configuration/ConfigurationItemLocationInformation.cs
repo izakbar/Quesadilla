@@ -10,6 +10,8 @@ namespace Quesadilla.Classes.Configuration
 {
 	public class ConfigurationItemLocationInformation
 	{
+		[DisplayName("Name")]
+		[ReadOnly(true)]
 		public string Name { get; set; }
 		[DisplayName("Location inside window")]
 		public Point Location { get; set; }

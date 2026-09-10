@@ -37,15 +37,16 @@ namespace Quesadilla.Classes.SolarSystems
 		private Regex _nameRegex;
 		private Regex NameRegex => this._nameRegex;
 		private List<AlertQueueItem> Alerts { get; set; }
-		public int CountAlerts(bool faction, bool decloak, bool kill)
+		public int? CountAlerts(bool faction, bool decloak, bool kill)
 		{
-			int count = 0;
-			if (Alerts == null) { return count; }
+			int? count = 0;
+			if (Alerts == null) { return null;}
 			count = Alerts.Count(o =>
 				o.isFaction == faction &&
 				o.isDecloak == decloak &&
 				((o.Kill == null && !kill) || (o.Kill != null && kill))); 
-            return count;
+            if (count == 0) return null;
+			return count;
 		}
 		public List<AlertQueueItem> GetAlerts(bool faction, bool decloak, bool kill)
 		{
@@ -71,7 +72,7 @@ namespace Quesadilla.Classes.SolarSystems
 		private List<ZKillKill> Kills { get; set; }
         public int? CountKills()
         {
-            if (Kills == null) return 0;
+            if (Kills == null) return null;
             return Kills.Count();
 		}
         public void AddKill(ZKillKill kill)

@@ -378,7 +378,7 @@ namespace Quesadilla
             menuConfiguredAlerts.MenuItems.Clear();
             foreach (var alertConfigItem in Program.MainConfiguration.AlertConfiguration)
             {
-                MenuItem menuAlert = new MenuItem(alertConfigItem.FriendlyName, trayIconMenuAlertClick);
+                MenuItem menuAlert = new MenuItem(alertConfigItem.Name, trayIconMenuAlertClick);
                 menuAlert.Checked = alertConfigItem.Enabled;
                 menuConfiguredAlerts.MenuItems.Add(menuAlert);
             }
@@ -608,7 +608,7 @@ namespace Quesadilla
 					Path = path,
 					Context = context,
 					SoundFile = alert.SoundFile,
-					FriendlyName = alert.FriendlyName,
+					FriendlyName = alert.Name,
 					ShowAlert = true
 				};
 
@@ -966,7 +966,7 @@ namespace Quesadilla
         {
             // enable / disable config item
             MenuItem m = (MenuItem)sender;
-            var configAlert = Program.MainConfiguration.AlertConfiguration.Find(o => o.FriendlyName == m.Text);
+            var configAlert = Program.MainConfiguration.AlertConfiguration.Find(o => o.Name == m.Text);
             if (configAlert != null)
             {
 				configAlert.Enabled = !configAlert.Enabled;
@@ -1147,7 +1147,7 @@ namespace Quesadilla
 									Path = path,
 									Context = combatEntity,
 									SoundFile = alert.SoundFile,
-									FriendlyName = alert.FriendlyName,
+									FriendlyName = alert.Name,
 									isFaction = true,
 									ShowAlert = true,
 								});
@@ -1241,7 +1241,7 @@ namespace Quesadilla
 							Path = path,
 							Context = alertText,
 							SoundFile = alert.SoundFile,
-							FriendlyName = alert.FriendlyName + " - " + e.Entry.CharacterName,
+							FriendlyName = alert.Name + " - " + e.Entry.CharacterName,
 							isMiningOver = true,
 							ShowAlert = true,
 						});
@@ -1267,7 +1267,7 @@ namespace Quesadilla
 							Path = path,
 							Context = alertText,
 							SoundFile = alert.SoundFile,
-							FriendlyName = alert.FriendlyName + " - " + e.Entry.CharacterName,
+							FriendlyName = alert.Name + " - " + e.Entry.CharacterName,
 							isMiningOver = true,
 							ShowAlert = true,
 						});
@@ -1311,7 +1311,7 @@ namespace Quesadilla
                         Path = path,
                         Context = alertText,
                         SoundFile = alert.SoundFile,
-                        FriendlyName = alert.FriendlyName,
+                        FriendlyName = alert.Name,
                         isDecloak = true,
                         ShowAlert = true,
                     });
@@ -1646,7 +1646,7 @@ namespace Quesadilla
 							if (!sendAlert) continue;
 							bool alertAllowed = alert.AlertRangeType == AlertConfigRangeType.OneCharacter || (alert.AlertRangeType == AlertConfigRangeType.OneOnlineCharacter && x.IsClientActive);
 							if (!alertAllowed) continue;
-							QueueZKillAlert(e.Kill, path, x.CharacterName, x.CharacterName, alert.FriendlyName);
+							QueueZKillAlert(e.Kill, path, x.CharacterName, x.CharacterName, alert.Name);
 						}
 						break;
                     case AlertConfigRangeType.AllCharacters:

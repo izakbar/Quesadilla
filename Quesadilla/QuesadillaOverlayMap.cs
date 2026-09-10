@@ -44,6 +44,9 @@ namespace Quesadilla
 		public Label MouseOverSystemName = new Label() { Name = "MouseOverSystemName" };
 		public Label MouseOverSecurity = new Label() { Name = "MouseOverSecurity" };
 		public Label MouseOverSkyhookInfo = new Label() { Name = "MouseOverSkyhookInfo" };
+		public Label MouseOverNPCDelta = new Label() { Name = "MouseOverNPCDelta" };
+		public Label MouseOverKills = new Label() { Name = "MouseOverKills" };
+		public Label MouseOverAlerts = new Label() { Name = "MouseOverAlerts" };
 
 
 		public Chart iskPerMinuteChart = new Chart() { Name = "IskPerMinuteChart" };
@@ -76,7 +79,7 @@ namespace Quesadilla
 				Minimap,
 				iskPerMinuteChart,
 				minedPerMinuteChart,
-				MouseOver, MouseOverSystemName, MouseOverSecurity, MouseOverSkyhookInfo
+				MouseOver, MouseOverSystemName, MouseOverSecurity, MouseOverSkyhookInfo, MouseOverNPCDelta, MouseOverKills, MouseOverAlerts
 			});
 
 			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.OverlayWindowItemLocations, 0, false, false, true);
@@ -245,7 +248,7 @@ namespace Quesadilla
 			var span = 60;
 
 			DateTime curr = start;
-			curr = DateTime.Now.AddSeconds(-1 * span * 30);
+			curr = end.AddSeconds(-1 * span * 30);
 			start = curr;
 
 			foreach (var currToon in Program.GraphDataManager.GetIskDataKeys())
@@ -461,7 +464,7 @@ namespace Quesadilla
 			var span = 60;
 
 			DateTime curr = start;
-			curr = DateTime.Now.AddSeconds(-1 * span * 30);
+			curr = end.AddSeconds(-1 * span * 30);
 			start = curr;
 
 
@@ -700,10 +703,30 @@ namespace Quesadilla
 						var borderPen = GDICache.GetPen(MouseOver.ForeColor, 1);
 						var FillBrush = GDICache.GetBrush(MouseOver.BackColor);
 						gMouseOver.FillRectangle(FillBrush, 0, 0, MouseOver.Width - 1, MouseOver.Height - 1);
-						gMouseOver.DrawRectangle(borderPen, 0, 0, MouseOver.Width - 1, MouseOver.Height - 1);
+
+
+						using (Pen glow1 = new Pen(Color.FromArgb(60, MouseOver.ForeColor)))
+						using (Pen glow2 = new Pen(Color.FromArgb(30, MouseOver.ForeColor)))
+						using (Pen glow3 = new Pen(Color.FromArgb(15, MouseOver.ForeColor)))
+						{
+							// Outer border
+							gMouseOver.DrawRectangle(borderPen, 0, 0, MouseOver.Width - 1, MouseOver.Height - 1);
+
+							// Inner glow
+							gMouseOver.DrawRectangle(glow1, 1, 1, MouseOver.Width - 3, MouseOver.Height - 3);
+							gMouseOver.DrawRectangle(glow2, 2, 2, MouseOver.Width - 5, MouseOver.Height - 5);
+							gMouseOver.DrawRectangle(glow3, 3, 3, MouseOver.Width - 7, MouseOver.Height - 7);
+						}
+
+						//gMouseOver.DrawRectangle(borderPen, 0, 0, MouseOver.Width - 1, MouseOver.Height - 1);
+
 
 						gMouseOver.DrawString($"{currentSystem.solarSystem.Name}", MouseOverSystemName.Font, GDICache.GetBrush(MouseOverSystemName.ForeColor), MouseOverSystemName.Left, MouseOverSystemName.Top);
 						gMouseOver.DrawString($"{Math.Round(currentSystem.solarSystem.Security,1)}", MouseOverSecurity.Font, GDICache.GetBrush(MouseOverSecurity.ForeColor), MouseOverSecurity.Left, MouseOverSecurity.Top);
+
+						gMouseOver.DrawString($"{currentSystem.solarSystem.GetNPCKillsDeltaLastHour()}", MouseOverNPCDelta.Font, GDICache.GetBrush(MouseOverNPCDelta.ForeColor), MouseOverNPCDelta.Left, MouseOverNPCDelta.Top);
+						gMouseOver.DrawString($"{currentSystem.solarSystem.CountKills()}", MouseOverKills.Font, GDICache.GetBrush(MouseOverKills.ForeColor), MouseOverKills.Left, MouseOverKills.Top);
+						gMouseOver.DrawString($"{currentSystem.solarSystem.CountAlerts(false,false,false)}", MouseOverAlerts.Font, GDICache.GetBrush(MouseOverAlerts.ForeColor), MouseOverAlerts.Left, MouseOverAlerts.Top);
 
 						// Skyhooks ?
 						DateTime utcNow = DateTime.UtcNow;
@@ -739,6 +762,12 @@ namespace Quesadilla
 								gMouseOver.DrawString($"{skyhookinfo}", MouseOverSkyhookInfo.Font, GDICache.GetBrush(MouseOverSkyhookInfo.ForeColor), MouseOverSkyhookInfo.Left, MouseOverSkyhookInfo.Top);
 							}
 						}
+
+
+
+
+
+
 
 						var x = MouseOver.Left;
 						var y = MouseOver.Top;

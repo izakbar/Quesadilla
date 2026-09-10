@@ -8,7 +8,7 @@ namespace Quesadilla.Classes.Configuration
 {
     public class AlertConfig
     {
-        public string FriendlyName { get; set; }
+        public string Name { get; set; }
         public bool Enabled { get; set; }
         public AlertConfigType AlertType { get; set; }
         public AlertConfigRangeType AlertRangeType { get; set; }

@@ -169,34 +169,11 @@ namespace Quesadilla
 
 			_combatGraphData.Clear();
 
-			DateTime start = DateTime.Now;
-			DateTime end = start;
+			DateTime end = DateTime.Now;
+			DateTime curr = end.AddSeconds(-1 * Program.MainConfiguration.GraphCombatSeconds);
+			DateTime start = curr;
 
-			// work out start/end times of combat - for cuirrent/all toons
-			foreach (var currToon in Program.GraphDataManager.GetCombatDataKeys())
-			{
-				if (currToon == Toon || Toon == "*ALL*")
-				{
-					var combat = Program.GraphDataManager.GetCombatDataLines(currToon);
-					if (combat.Any())
-					{
-						if (combat.First().TimeAdded < start) start = combat.First().TimeAdded;
-						if (combat.Last().TimeAdded > end) end = combat.Last().TimeAdded;
-					}
-				}
-			}
-			TimeSpan totalTime = end - start;
-
-			DateTime curr = start;
-			// check range
-			if (totalTime.TotalSeconds > Program.MainConfiguration.GraphCombatSeconds)
-			{
-				curr = end.AddSeconds(-1 * Program.MainConfiguration.GraphCombatSeconds);
-				totalTime = end - curr;
-			}
-
-			var span = Math.Truncate(totalTime.TotalSeconds > maxPoints ? totalTime.TotalSeconds / maxPoints : 1);
-			if (span < minSpanSize) span = minSpanSize;
+			var span = 10; // 10 second buckets - this is the smoothing factor for the graph - 10 seconds is a good compromise between smoothness and responsiveness
 
 			foreach (var currToon in Program.GraphDataManager.GetCombatDataKeys())
 			{
@@ -205,8 +182,8 @@ namespace Quesadilla
 					// setup second slots
 					foreach (var c in Program.GraphDataManager.GetCombatDataLines(currToon) /*.OrderBy(o => o.TimeAdded).ToList() */ )
 					{
-						var slot = (int)Math.Truncate((c.TimeAdded.TrimSeconds() - start.TrimSeconds()).TotalSeconds);
-
+						var slot = (int)Math.Truncate((c.TimeAdded.TrimToSeconds(span) - start.TrimToSeconds(span)).TotalSeconds);
+						if (slot < 0) continue;
 						if (!_combatGraphData.ContainsKey(slot))
 						{
 							// slot does not exist - create
@@ -240,8 +217,6 @@ namespace Quesadilla
 				}
 			}
 
-			// now go thru from start -> end in slot seconds
-
 			var graphStartXp = (int)Math.Truncate((curr - start).TotalSeconds);
 			if (graphStartXp < 0) graphStartXp = 0;
 			var graphEndXp = (int)Math.Truncate((end - start).TotalSeconds);
@@ -251,6 +226,7 @@ namespace Quesadilla
 			dpsChart.ChartAreas[0].AxisX.LabelStyle.Enabled = false;
 
 			double maxDReceived = 0; double maxDGiven = 0;
+			//while (curr <= end)
 			while (curr <= end)
 			{
 				// curr is mid point of damage
@@ -391,7 +367,7 @@ namespace Quesadilla
 			// dump to csv
 			if (Program.MainConfiguration.DPSSaveCSV)
 			{
-				using (var file = File.CreateText(Toon + "_raw_combat.csv"))
+				using (var file = File.CreateText((Toon == "*ALL*" ? "All" : Toon) + "_raw_combat.csv"))
 				{
 					foreach (var a in _combatGraphData.Keys)
 					{

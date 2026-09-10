@@ -173,7 +173,7 @@ namespace Quesadilla
             // load from config
             foreach(var l in MainConfiguration.Logfiles.Where(o => o.Enabled == true))
             {
-                LogWatcherManager.AddWatcher(l.Logfile, l.LogType, l.FriendlyName);
+                LogWatcherManager.AddWatcher(l.Logfile, l.LogType, l.Name);
             }
 
 			// always add gamelogs and local !
