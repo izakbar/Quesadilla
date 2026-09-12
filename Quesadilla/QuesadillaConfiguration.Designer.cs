@@ -78,7 +78,7 @@
 			this.MiddlePanel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.MiddlePanel.Location = new System.Drawing.Point(0, 237);
 			this.MiddlePanel.Name = "MiddlePanel";
-			this.MiddlePanel.Size = new System.Drawing.Size(1054, 417);
+			this.MiddlePanel.Size = new System.Drawing.Size(651, 417);
 			this.MiddlePanel.TabIndex = 97;
 			// 
 			// panel4
@@ -88,7 +88,7 @@
 			this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
 			this.panel4.Location = new System.Drawing.Point(0, 0);
 			this.panel4.Name = "panel4";
-			this.panel4.Size = new System.Drawing.Size(1054, 30);
+			this.panel4.Size = new System.Drawing.Size(651, 30);
 			this.panel4.TabIndex = 102;
 			// 
 			// txtFilterProperties
@@ -116,7 +116,7 @@
 			this.ConfigurationProperties.Margin = new System.Windows.Forms.Padding(2);
 			this.ConfigurationProperties.Name = "ConfigurationProperties";
 			this.ConfigurationProperties.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-			this.ConfigurationProperties.Size = new System.Drawing.Size(1054, 417);
+			this.ConfigurationProperties.Size = new System.Drawing.Size(651, 417);
 			this.ConfigurationProperties.TabIndex = 95;
 			this.ConfigurationProperties.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.ConfigurationProperties_PropertyValueChanged);
 			this.ConfigurationProperties.SelectedObjectsChanged += new System.EventHandler(this.ConfigurationProperties_SelectedObjectsChanged);
@@ -132,7 +132,7 @@
 			this.TopPanel.Dock = System.Windows.Forms.DockStyle.Top;
 			this.TopPanel.Location = new System.Drawing.Point(0, 0);
 			this.TopPanel.Name = "TopPanel";
-			this.TopPanel.Size = new System.Drawing.Size(1054, 237);
+			this.TopPanel.Size = new System.Drawing.Size(651, 237);
 			this.TopPanel.TabIndex = 100;
 			// 
 			// label2
@@ -208,7 +208,7 @@
 			this.BottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.BottomPanel.Location = new System.Drawing.Point(0, 654);
 			this.BottomPanel.Name = "BottomPanel";
-			this.BottomPanel.Size = new System.Drawing.Size(1054, 39);
+			this.BottomPanel.Size = new System.Drawing.Size(651, 39);
 			this.BottomPanel.TabIndex = 98;
 			// 
 			// buttonCancel
@@ -226,7 +226,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1054, 693);
+			this.ClientSize = new System.Drawing.Size(651, 693);
 			this.Controls.Add(this.MiddlePanel);
 			this.Controls.Add(this.TopPanel);
 			this.Controls.Add(this.BottomPanel);
@@ -235,6 +235,7 @@
 			this.Text = "Quesadilla Configuration";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.QuesadillaConfiguration_FormClosing);
 			this.Load += new System.EventHandler(this.QuesadillaConfiguration_Load);
+			this.ResizeEnd += new System.EventHandler(this.QuesadillaConfiguration_ResizeEnd);
 			this.MiddlePanel.ResumeLayout(false);
 			this.panel4.ResumeLayout(false);
 			this.panel4.PerformLayout();

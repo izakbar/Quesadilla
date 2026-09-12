@@ -26,6 +26,7 @@ namespace Quesadilla
         private bool _formLoaded = false;
 
 		private CustomPropertyExtractorWrapper _propertySource;
+		private int _fixedWidth;
 
 		public QuesadillaConfiguration(Config configuration, MenuItem configWindowMenu, Quesadilla mainForm)
         {
@@ -51,8 +52,12 @@ namespace Quesadilla
         }
         private void QuesadillaConfiguration_Load(object sender, EventArgs e)
         {
+			_fixedWidth = Width;
 
-            ConfigurationProperties.SetLabelColumnWidth(270);
+			MinimumSize = new Size(Width, 640);
+			MaximumSize = new Size(Width, 5000);
+
+			ConfigurationProperties.SetLabelColumnWidth(270);
 
             SetSystem(cmbHomeSystem, _configuration.HomeSystem);
             _dummyAlert = new AlertQueueItem()
@@ -237,6 +242,11 @@ namespace Quesadilla
 		private void ConfigurationProperties_SelectedObjectsChanged(object sender, EventArgs e)
 		{
 			ShowAlertBitmap();
+		}
+
+		private void QuesadillaConfiguration_ResizeEnd(object sender, EventArgs e)
+		{
+			if (Width != _fixedWidth) Width = _fixedWidth;
 		}
 	}
 

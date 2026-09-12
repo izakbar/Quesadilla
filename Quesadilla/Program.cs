@@ -65,7 +65,7 @@ namespace Quesadilla
 		public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
 
-        public static Version version = Assembly.GetEntryAssembly().GetName().Version;
+        public static Version version;
         public static String UserAgent = $"Mozilla/5.0 (Quesadilla version {version.ToString()} )";
         public static Image CachedBackground;
 
@@ -101,8 +101,8 @@ namespace Quesadilla
 			}
             catch
             {
-
-            }
+                version = Assembly.GetEntryAssembly().GetName().Version;
+			}
 
 			esiClient = new EVEStandardAPI(
                     "Quesadilla",                  // User agent
