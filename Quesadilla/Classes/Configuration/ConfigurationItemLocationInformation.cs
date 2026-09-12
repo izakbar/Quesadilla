@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Quesadilla.Classes.Configuration
@@ -25,7 +26,22 @@ namespace Quesadilla.Classes.Configuration
 		public Color AlternateColor { get; set; }
 		[DisplayName("Visible")]
 		public bool IsVisible { get; set; }
-		[DisplayName("Font")]
-		public Font Font { get; set; }
+
+
+		[JsonIgnore]
+		public Font Font
+		{
+			get => new Font(FontFamily, FontSize, FontStyle);
+			set
+			{
+				FontFamily = value.FontFamily.Name;
+				FontSize = value.Size;
+				FontStyle = value.Style;
+			}
+		}
+
+		public string FontFamily { get; set; }
+		public float FontSize { get; set; }
+		public FontStyle FontStyle { get; set; }
 	}
 }

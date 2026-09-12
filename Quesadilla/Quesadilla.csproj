@@ -87,6 +87,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Net" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Security" />
@@ -109,6 +110,8 @@
     <Compile Include="Classes\Alerts\AlertTextType.cs" />
     <Compile Include="Classes\Characters\Character.cs" />
     <Compile Include="Classes\Characters\CharacterManager.cs" />
+    <Compile Include="Classes\Configuration\ColorConvertor.cs" />
+    <Compile Include="Classes\Configuration\LocationCollectionEditor.cs" />
     <Compile Include="Classes\GraphData\GraphDataManager.cs" />
     <Compile Include="Classes\ImageGeneration\Animation\AnimationManager.cs" />
     <Compile Include="Classes\ImageGeneration\Animation\AnimationState.cs" />

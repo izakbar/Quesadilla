@@ -8,6 +8,7 @@ using Quesadilla.Classes.ESIData;
 using Quesadilla.Classes.EveScout;
 using Quesadilla.Classes.GraphData;
 using Quesadilla.Classes.ImageGeneration;
+using Quesadilla.Classes.InterOp;
 using Quesadilla.Classes.Logfile;
 using Quesadilla.Classes.Processes;
 using Quesadilla.Classes.Resources;
@@ -28,8 +29,10 @@ using System.Media;
 using System.Reflection;
 using System.Resources;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Web.WebPages;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Quesadilla
 {
@@ -66,10 +69,26 @@ namespace Quesadilla
         public static String UserAgent = $"Mozilla/5.0 (Quesadilla version {version.ToString()} )";
         public static Image CachedBackground;
 
+		private static Mutex _mutex;
+		private static string MUTEX_NAME = "Quesadilla Single Instance Mutex";
+		public const string RESTORE_INSTANCE_MESSAGE_NAME = "Quesadilla Restore Instance";
+
+
 		[STAThread]
         static void Main()
         {
-            ConfigureSerilog();
+			Program._mutex = Program.GetMutex();
+			if (Program._mutex == null)
+			{
+				uint message = User32NativeMethods.RegisterWindowMessage(Program.RESTORE_INSTANCE_MESSAGE_NAME);
+				if (message != 0)
+				{
+					User32NativeMethods.PostMessage(User32NativeMethods.HWND_BROADCAST, message, IntPtr.Zero, IntPtr.Zero);
+				}
+				return;
+			}
+
+			ConfigureSerilog();
 
             MainConfiguration = Config.Load(configuration_filename);
 
@@ -159,7 +178,25 @@ namespace Quesadilla
             GDICache.Clear();
         }
 
-        public static void SaveAndReloadConfiguration(Config c)
+		private static Mutex GetMutex()
+		{
+			try
+			{
+				Mutex.OpenExisting(Program.MUTEX_NAME);
+				return null;
+			}
+			catch (UnauthorizedAccessException)
+			{
+				return null;
+			}
+			catch (Exception)
+			{
+				Mutex m = new Mutex(true, Program.MUTEX_NAME, out var result);
+				return result ? m : null;
+			}
+		}
+
+		public static void SaveAndReloadConfiguration(Config c)
         {
             // Store items into config
             Program.MainConfiguration = c;

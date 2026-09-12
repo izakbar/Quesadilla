@@ -1,5 +1,6 @@
 ﻿using Cyotek.Windows.Forms;
 using Quesadilla.Classes;
+using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Extensions;
 using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.SolarSystems;
@@ -32,9 +33,11 @@ namespace Quesadilla
             _configuration = configuration.Duplicate();
             _configMenu = configWindowMenu;
             _mainForm = mainForm;
-        }
 
-        private void SetSystem(ComboBox cmb, string systemName)
+			LocationCollectionEditor.CollectionChanged += OnCollectionChanged;
+		}
+
+		private void SetSystem(ComboBox cmb, string systemName)
         {
             cmb.Items.Clear();
             cmb.DataSource = Program.Universe.Names.Keys.OrderBy(x => x).ToList();
@@ -82,16 +85,8 @@ namespace Quesadilla
                     RawLine = "rawXXXraw",
                 },
             };
-            trackOpacity.Value = _configuration.AlertPopupOpacity;
-            trackPopupTime.Value = _configuration.AlertPopupSeconds;
-            trackDPSGraphLineSize.Value = _configuration.DPSGraphLineSize;
-            trackShowLastUnexpiredAlerts.Value = _configuration.ShowLastUnexpiredAlerts;
 
             SetBackground(cmbBackground, _configuration.AlertPopupBackground);
-            lblOpacity.Text = _configuration.AlertPopupOpacity.ToString();
-            lblPopupSeconds.Text = _configuration.AlertPopupSeconds.ToString();
-            lblDPSGraphLineSize.Text = _configuration.DPSGraphLineSize.ToString();
-            lblShowLastUnexpiredAlerts.Text = _configuration.ShowLastUnexpiredAlerts.ToString();
 
             _formLoaded = true;
             ShowAlertBitmap();
@@ -188,12 +183,19 @@ namespace Quesadilla
             _oldBitmap?.Dispose();
 		}
 
-        private void QuesadillaConfiguration_FormClosing(object sender, FormClosingEventArgs e)
+		private void OnCollectionChanged(object sender, EventArgs e)
+		{
+			ShowAlertBitmap();
+		}
+
+		private void QuesadillaConfiguration_FormClosing(object sender, FormClosingEventArgs e)
         {
             _configMenu.Enabled = true;
 
 			_alertPopup?.Dispose();
 			alertDemo.Image?.Dispose();
+
+			LocationCollectionEditor.CollectionChanged -= OnCollectionChanged;
 		}
 
         private void buttonCancel_Click(object sender, EventArgs e)
@@ -204,86 +206,17 @@ namespace Quesadilla
         private void buttonSave_Click(object sender, EventArgs e)
         {
             Program.SaveAndReloadConfiguration(_configuration);
-            Close();
-        }
-        private Color ChooseColour(Color c)
-        {
-            /*
-                        colourPicker.Color = c;
-                        colourPicker.SolidColorOnly = false;
-                        colourPicker.AnyColor = true;
-                        colourPicker.AllowFullOpen = true;
-                        if (colourPicker.ShowDialog() == DialogResult.OK)
-                        {
-                            return(colourPicker.Color);
-                        }
-            */
-
-            using (ColorPickerDialog dialog = new ColorPickerDialog
-            {
-                Color = c,
-            })
-            {
-                //dialog.CustomColorsLoading += this.DialogCustomColorsLoadingHandler;
-                //dialog.PreviewColorChanged += this.DialogColorChangedHandler;
-
-                if (dialog.ShowDialog(this) == DialogResult.OK)
-                {
-                    c = dialog.Color;
-                }
-
-                //dialog.PreviewColorChanged -= this.DialogColorChangedHandler;
-            }
-
-
-            return (c);
-        }
+			ShowAlertBitmap();
+		}
 
         private void cmbBackground_SelectedIndexChanged(object sender, EventArgs e)
         {
             _configuration.AlertPopupBackground = cmbBackground.Text;
             ShowAlertBitmap();
         }
-
-        private void trackOpacity_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupOpacity = ((TrackBar)sender).Value;
-            lblOpacity.Text = ((TrackBar)sender).Value.ToString();
-            ShowAlertBitmap();
-        }
-
-        private void trackPopupTime_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupSeconds = ((TrackBar)sender).Value;
-            lblPopupSeconds.Text = ((TrackBar)sender).Value.ToString();
-        }
-
-        private void trackDPSGraphLineSize_Scroll(object sender, EventArgs e)
-        {
-            _configuration.DPSGraphLineSize = ((TrackBar)sender).Value;
-            lblDPSGraphLineSize.Text = ((TrackBar)sender).Value.ToString();
-        }
-
-        private void trackShowLastUnexpiredAlerts_Scroll(object sender, EventArgs e)
-        {
-            _configuration.ShowLastUnexpiredAlerts = ((TrackBar)sender).Value;
-            lblShowLastUnexpiredAlerts.Text = ((TrackBar)sender).Value.ToString();
-        }
-
         private void cmbHomeSystem_SelectedIndexChanged(object sender, EventArgs e)
         {
             _configuration.HomeSystem = cmbHomeSystem.Text;
-        }
-
-
-        private void Properties_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ColourProperties_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
-        {
-            ShowAlertBitmap();
         }
 
 		private void txtFilterProperties_TextChanged(object sender, EventArgs e)
@@ -295,10 +228,17 @@ namespace Quesadilla
 		{
 			ApplyPropertyFilter();
 		}
+
+		private void ConfigurationProperties_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+		{
+			ShowAlertBitmap();
+		}
+
+		private void ConfigurationProperties_SelectedObjectsChanged(object sender, EventArgs e)
+		{
+			ShowAlertBitmap();
+		}
 	}
-
-
-
 
 	public class PropertyGridFilterWrapper : CustomTypeDescriptor
 	{

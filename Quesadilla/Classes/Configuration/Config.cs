@@ -1,9 +1,4 @@
-﻿using Cyotek.Windows.Forms;
-using Microsoft.AspNetCore.Mvc.Formatters.Json.Internal;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Quesadilla.Classes.Attributes;
-using Quesadilla.Classes.Configuration;
-using Quesadilla.Classes.SolarSystems;
+﻿using Quesadilla.Classes.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,12 +8,9 @@ using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Policy;
-using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Controls.Primitives;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -41,22 +33,18 @@ namespace Quesadilla.Classes
 
 				if (foundItem != null)
 				{
-					if (!foundItem.Name.Equals("ChatServerDown") && !ignoreVisible)
-						foundItem.Visible = item.IsVisible;
+					if (!foundItem.Name.Equals("ChatServerDown") && !ignoreVisible) foundItem.Visible = item.IsVisible;
 
-					foundItem.Location =
-						new Point(item.Location.X, item.Location.Y + topAdjust);
+					foundItem.Location = new Point(item.Location.X, item.Location.Y + topAdjust);
 
 					foundItem.ForeColor = item.Color;
 					foundItem.BackColor = item.BackColor;
 					foundItem.Size = item.Size;
+
 					foundItem.Font = item.Font;
 
-					if (foundItem.Name.Equals("MiningData") && miningPerHourTotal)
-						foundItem.ForeColor = item.AlternateColor;
-
-					if (foundItem.Name.Equals("RattingData") && iskPerHourTotal)
-						foundItem.ForeColor = item.AlternateColor;
+					if (foundItem.Name.Equals("MiningData") && miningPerHourTotal) foundItem.ForeColor = item.AlternateColor;
+					if (foundItem.Name.Equals("RattingData") && iskPerHourTotal) foundItem.ForeColor = item.AlternateColor;
 				}
 			}
 		}
@@ -86,437 +74,218 @@ namespace Quesadilla.Classes
             return newItems;
 		}
 
-		public Config Duplicate()
-        {
-			Config c = new Config()
+		private void InitialiseCollections()
+		{
+			IgnoreSystems = new List<int>();
+
+			IgnoreStrings = new List<string>
+				{
+					"\\bclr\\b",
+					"\\bclear\\b",
+					"\\bstatus\\b"
+				};
+
+			AlertConfiguration = new List<AlertConfig>();
+			Logfiles = new List<LogfileConfig>();
+			CSSData = new List<CSSData>();
+		}
+
+		private void ApplyDefaultAttributes()
+		{
+			foreach (PropertyDescriptor p in TypeDescriptor.GetProperties(this))
 			{
-				AlertPopupLocation = AlertPopupLocation,
-				DPSLocation = DPSLocation,
-				InitialPosition = InitialPosition,
-				ZKillSound = ZKillSound,
-				AlertPopupMinimapRawXY = AlertPopupMinimapRawXY,
-				MinimapMapType = MinimapMapType,
-				OverlayMinimapMapType = OverlayMinimapMapType,
-				OverlayDPSWindowPosition = OverlayDPSWindowPosition,
-				OverlayDPSWindowSize = OverlayDPSWindowSize,
-				OverlayMapWindowPosition = OverlayMapWindowPosition,
-				OverlayMapWindowSize = OverlayMapWindowSize,
-			};
-            // copy as many config items as possible
-            foreach(var p in typeof(Config).GetProperties().Where(o => o.PropertyType == typeof(Color) || o.PropertyType == typeof(int) || o.PropertyType == typeof(string) || o.PropertyType == typeof(bool) || o.PropertyType == typeof(float)))
-            {
-                var propertyType = typeof(Config).GetProperty(p.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.ExactBinding);
-                var value = propertyType.GetValue(this);
-                propertyType.SetValue(c, value);
-            }
-
-            c.ignoreStrings = new List<Regex>();
-            c.ignoreSystems = new List<int>();
-            c.AlertConfiguration = new List<AlertConfig>();
-            c.Logfiles = new List<LogfileConfig>();
-            c.CSSData = new List<CSSData>();
-
-            foreach (var s in ignoreStrings)
-            {
-                c.ignoreStrings.Add(s);
-            }
-            foreach (var s in ignoreSystems)
-            {
-                c.ignoreSystems.Add(s);
-            }
-            foreach (var a in AlertConfiguration)
-            {
-                c.AlertConfiguration.Add(new AlertConfig()
-                {
-                    AlertRangeType = a.AlertRangeType,
-                    AlertType = a.AlertType,
-                    CustomTriggerEverySeconds = a.CustomTriggerEverySeconds,
-                    Enabled = a.Enabled,
-                    Name = a.Name,
-                    Jumps1Comparison = a.Jumps1Comparison,
-                    MenuDisplay = a.MenuDisplay,
-                    TextDisplay = a.TextDisplay,
-                    Jumps1Number = a.Jumps1Number,
-                    Jumps2Comparison = a.Jumps2Comparison,
-                    SoundFile = a.SoundFile,
-                    Jumps2Number = a.Jumps2Number,
-                    TriggerText = a.TriggerText
-                });
-            }
-            foreach (var l in Logfiles)
-            {
-                c.Logfiles.Add(l);
-            }
-            foreach (var css in CSSData)
-            {
-                c.CSSData.Add(css);
-            }
-
-            c.MainWindowItemLocations = DuplicateLocations(MainWindowItemLocations);
-			c.AlertWindowItemLocations = DuplicateLocations(AlertWindowItemLocations);
-			c.OverlayWindowItemLocations = DuplicateLocations(OverlayWindowItemLocations);
-			c.DPSWindowItemLocations = DuplicateLocations(DPSWindowItemLocations);
-
-			c.InitialPosition = new Point(InitialPosition.X, InitialPosition.Y);
-			c.MainWindowSize = new Size(MainWindowSize.Width, MainWindowSize.Height);
-			c.AlertWindowSize = new Size(AlertWindowSize.Width, AlertWindowSize.Height);
-
-            return (c);
-        }
-
-
-        public static Config Load(string filename)
-        {
-            Config c = null;
-
-            try
-            {
-                StreamReader reader = new StreamReader(filename);
-                var json = reader.ReadToEnd();
-                reader.Close();
-                c = JsonSerializer.Deserialize<Config>(json);
-            }
-            catch (Exception ex)
-            {
-            }
-
-            if (c is null)
-            {
-                c = new Config();
-
-                // Find/set default values from DefaultValue attribute
-                foreach (PropertyDescriptor p in TypeDescriptor.GetProperties(c))
-                {
-                    var propertyType = typeof(Config).GetProperty(p.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.ExactBinding);
-                    DefaultValueAttribute myAttribute = (DefaultValueAttribute)p.Attributes[typeof(DefaultValueAttribute)];
-                    if ( myAttribute != null)
-                    {
-                        propertyType.SetValue(c, myAttribute.Value);
-                    }
-                }
-
-                c.InitialPosition = new Point(0, 0);
-				c.MainWindowSize = new Size(760, 404);
-				c.AlertWindowSize = new Size(400, 180);
-
-				c.OverlayMapWindowSize = new Size(600, 350);
-				c.OverlayMapWindowPosition = new Point(275, 1);
-
-				c.OverlayDPSWindowPosition = new Point(1000, 150);
-				c.OverlayDPSWindowSize = new Size(250, 130);
-
-				c.AlertPopupLocation = PopupLocationType.BottomLeft;
-                c.DPSLocation = PopupLocationType.TopRight;
-
-                c.AlertPopZkillLogoSize = 120;
-                c.AlertPopZkillHeight = 130;
-
-				c.AlertPopupShowKillerLogo = true;
-                c.AlertPopupShowVictimLogo = true;
-                c.MinimapSecLimitValue = -0.7f;
-
-				//c.MinimapSecLimitColour = Color.Aqua;
-				//c.MinimapSecLimitAlpha = 10;
-				//c.MinimapSecLimitCloudSize = 30;
-				c.MinimapSecLimitShow = true;
-				c.OverlayMinimapSecLimitShow = true;
-				c.AlertPopupMinimapSecLimitShow = true;
+				var property = GetType().GetProperty(p.Name);
+				var defaultValue = (DefaultValueAttribute)p.Attributes[typeof(DefaultValueAttribute)];
+				if (defaultValue != null) property?.SetValue(this, defaultValue.Value);
 			}
+		}
 
-			if (c.ignoreSystems == null) c.ignoreSystems = new List<int>();
-            if (c.ignoreStrings == null)
-            {
-                c.ignoreStrings = new List<Regex>();
-                c.ignoreStrings.Add(new Regex("\\b" + "clr" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
-                c.ignoreStrings.Add(new Regex("\\b" + "clear" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
-                c.ignoreStrings.Add(new Regex("\\b" + "status" + "\\b", RegexOptions.IgnoreCase | RegexOptions.Compiled));
-            }
+		private void InitialiseGeneralSettings()
+		{
+			InitialPosition = new Point(0, 0);
 
-            if (c.AlertConfiguration == null)
-            {
-                c.AlertConfiguration = new List<AlertConfig>();
-                c.AlertConfiguration.Add(new AlertConfig()
-                {
-                    Name = "All online toons <= 5 jumps",
-                    Enabled = true,
-                    AlertType = AlertConfigType.Range,
-                    AlertRangeType = AlertConfigRangeType.AllOnlineCharacters,
-                    TextDisplay = "{jumps}->{fromsystem} : {route}",
-                    MenuDisplay = "{jumps} jumps from {character} in {tosystem}",
-                    SoundFile = "xylophone",
-                    Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
-                    Jumps1Number = 5,
-                    Jumps2Comparison = AlertConfigJumpsComparison.None,
-                });
-                c.AlertConfiguration.Add(new AlertConfig()
-                {
-                    Name = "Izakbar (if online) <= 5 jumps",
-                    Enabled = false,
-                    AlertType = AlertConfigType.Range,
-                    AlertRangeType = AlertConfigRangeType.OneOnlineCharacter,
-                    TextDisplay = "{jumps}->{fromsystem} : {route}",
-                    MenuDisplay = "{jumps} jumps from {character} in {tosystem}",
-                    SoundFile = "xylophone",
-                    Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
-                    Jumps1Number = 5,
-                    Jumps2Comparison = AlertConfigJumpsComparison.None,
-                    TriggerText = "Izakbar",
-                });
-                c.AlertConfiguration.Add(new AlertConfig()
-                {
-                    Name = "Home system < 5 jumps",
-                    Enabled = false,
-                    AlertType = AlertConfigType.Range,
-                    AlertRangeType = AlertConfigRangeType.Home,
-                    TextDisplay = "{jumps}->{fromsystem} : {route}",
-                    MenuDisplay = "{jumps} jumps from {fromsystem} in {tosystem}",
-                    SoundFile = "xylophone",
-                    Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
-                    Jumps1Number = 5,
-                    Jumps2Comparison = AlertConfigJumpsComparison.None,
-                });
-                c.AlertConfiguration.Add(new AlertConfig()
-                {
-                    Name = "1DQ1-A < 5 jumps",
-                    Enabled = false,
-                    AlertType = AlertConfigType.Range,
-                    AlertRangeType = AlertConfigRangeType.System,
-                    TextDisplay = "{jumps}->{fromsystem} : {route}",
-                    MenuDisplay = "{jumps} jumps from {fromsystem} in {tosystem}",
-                    SoundFile = "xylophone",
-                    Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
-                    Jumps1Number = 5,
-                    Jumps2Comparison = AlertConfigJumpsComparison.None,
-                    TriggerText = "1DQ1-A",
-                });
-                c.AlertConfiguration.Add(new AlertConfig()
-                {
-                    Name = "ESS robbery",
-                    Enabled = false,
-                    AlertType = AlertConfigType.Text,
-                    TextDisplay = "ESS robbery {text} reported by {reporter}",
-                    MenuDisplay = "ESS robbery {text} reported by {reporter}",
-                    SoundFile = "Boo2",
-                    TriggerText = "ess",
-                });
-                c.AlertConfiguration.Add(new AlertConfig()
-                {
-                    Name = "Skyhook robbery",
-                    Enabled = false,
-                    AlertType = AlertConfigType.Text,
-                    TextDisplay = "Skyhook robbery {text} reported by {reporter}",
-                    MenuDisplay = "Skyhook robbery {text} reported by {reporter}",
-                    SoundFile = "Boo2",
-                    TriggerText = "skyhook",
-                });
-                c.AlertConfiguration.Add(new AlertConfig()
-                {
-                    Name = "Faction Spawn",
-                    Enabled = true,
-                    AlertType = AlertConfigType.FactionSpawn,
-                    TextDisplay = "Spawn {context}",
-                    MenuDisplay = "Spawn {context}",
-                    SoundFile = "trumpet",
-                    CustomTriggerEverySeconds = 30,
-                });
-                c.AlertConfiguration.Add(new AlertConfig()
-                {
-                    Name = "Decloak",
-                    Enabled = true,
-                    AlertType = AlertConfigType.Decloak,
-                    TextDisplay = "Decloak by {context}",
-                    MenuDisplay = "Decloak by {context}",
-                    SoundFile = "tuba",
-                });
-                c.AlertConfiguration.Add(new AlertConfig()
-                {
-                    Name = "Out of rock",
-                    Enabled = true,
-                    AlertType = AlertConfigType.MiningEndedRoidPopped,
-                    TextDisplay = "{character} rock depleated",
-                    MenuDisplay = "rock depleated",
-                    SoundFile = "pop1",
-                });
-                c.AlertConfiguration.Add(new AlertConfig()
-                {
-                    Name = "Miner full",
-                    Enabled = true,
-                    AlertType = AlertConfigType.MiningEndedFull,
-                    TextDisplay = "{character} cargo full",
-                    MenuDisplay = "cargo full",
-                    SoundFile = "full",
-                });
-            }
+			MainWindowSize = new Size(760, 404);
+			AlertWindowSize = new Size(400, 180);
 
-            if (c.Logfiles == null)
-            {
-                c.Logfiles = new List<LogfileConfig> { };
-				/*
-								c.Logfiles.Add(new LogfileConfig()
-								{
-									Enabled = true,
-									FriendlyName = "Tenerifis/Immensea/Catch/Impass (CONDI Sov)",
-									Logfile = "east.imperium",
-									LogType = Logfile.LogFileType.ChatIntel,
-								});
-								c.Logfiles.Add(new LogfileConfig()
-								{
-									Enabled = true,
-									FriendlyName = "Delve/Querious/Period Basis",
-									Logfile = "west.imperium",
-									LogType = Logfile.LogFileType.ChatIntel,
-								});
-								c.Logfiles.Add(new LogfileConfig()
-								{
-									Enabled = true,
-									FriendlyName = "Paragon Soul, Esoteria, Feythabolis",
-									Logfile = "southeast.imperium",
-									LogType = Logfile.LogFileType.ChatIntel,
-								});
-								c.Logfiles.Add(new LogfileConfig()
-								{
-									Enabled = true,
-									FriendlyName = "LS Aridia Intel",
-									Logfile = "aridia.imperium",
-									LogType = Logfile.LogFileType.ChatIntel,
-								});
-								c.Logfiles.Add(new LogfileConfig()
-								{
-									Enabled = true,
-									FriendlyName = "LS Khanid Intel",
-									Logfile = "khanid.imperium",
-									LogType = Logfile.LogFileType.ChatIntel,
-								});
-								c.Logfiles.Add(new LogfileConfig()
-								{
-									Enabled = true,
-									FriendlyName = "Pochven Intel",
-									Logfile = "triangle.imperium",
-									LogType = Logfile.LogFileType.ChatIntel,
-								});
-								c.Logfiles.Add(new LogfileConfig()
-								{
-									Enabled = true,
-									FriendlyName = "Fountain Intel",
-									Logfile = "ftn.imperium",
-									LogType = Logfile.LogFileType.ChatIntel,
-								});
-								c.Logfiles.Add(new LogfileConfig()
-								{
-									Enabled = true,
-									FriendlyName = "Curse Intel",
-									Logfile = "curse.imperium ",
-									LogType = Logfile.LogFileType.ChatIntel,
-								});
-								c.Logfiles.Add(new LogfileConfig()
-								{
-									Enabled = true,
-									FriendlyName = "Querious/Catch Intel",
-									Logfile = "Quer_Catch.imperium",
-									LogType = Logfile.LogFileType.ChatIntel,
-								});
+			OverlayMapWindowSize = new Size(600, 350);
+			OverlayMapWindowPosition = new Point(275, 1);
 
-				c.Logfiles.Add(new LogfileConfig()
-				{
-					Enabled = true,
-					FriendlyName = "Fountain Intel",
-					Logfile = "I. Ftn Intel",
-					LogType = Logfile.LogFileType.ChatIntel,
-				});
-				c.Logfiles.Add(new LogfileConfig()
-				{
-					Enabled = true,
-					FriendlyName = "Cloud Ring Intel",
-					Logfile = "I. C Ring Intel",
-					LogType = Logfile.LogFileType.ChatIntel,
-				});
-				c.Logfiles.Add(new LogfileConfig()
-				{
-					Enabled = true,
-					FriendlyName = "Aridia Intel",
-					Logfile = "I. Aridia Intel",
-					LogType = Logfile.LogFileType.ChatIntel,
-				});
+			OverlayDPSWindowPosition = new Point(1000, 150);
+			OverlayDPSWindowSize = new Size(250, 130);
 
-				c.Logfiles.Add(new LogfileConfig()
-				{
-					Enabled = true,
-					FriendlyName = "Delve and Querious Intel",
-					Logfile = "I. Delve & Q Intel",
-					LogType = Logfile.LogFileType.ChatIntel,
-				});
+			AlertPopupLocation = PopupLocationType.BottomLeft;
+			DPSLocation = PopupLocationType.TopRight;
 
-                c.Logfiles.Add(new LogfileConfig()
-				{
-					Enabled = true,
-					FriendlyName = "Curse Intel",
-					Logfile = "I. Curse Intel",
-					LogType = Logfile.LogFileType.ChatIntel,
-				});
-				c.Logfiles.Add(new LogfileConfig()
-				{
-					Enabled = true,
-					FriendlyName = "OuterRing Intel",
-					Logfile = "I. OR Intel",
-					LogType = Logfile.LogFileType.ChatIntel,
-				});
-				c.Logfiles.Add(new LogfileConfig()
-				{
-					Enabled = true,
-					FriendlyName = "Pochven Intel",
-					Logfile = "I. Poch Intel",
-					LogType = Logfile.LogFileType.ChatIntel,
-				});
+			AlertPopZkillLogoSize = 120;
+			AlertPopZkillHeight = 130;
 
+			AlertPopupShowKillerLogo = true;
+			AlertPopupShowVictimLogo = true;
 
-				c.Logfiles.Add(new LogfileConfig()
-                {
-                    Enabled = true,
-                    FriendlyName = "Izakbar DEBUG",
-                    Logfile = "izakbar.debug",
-                    LogType = Logfile.LogFileType.ChatIntel,
-                });
+			MinimapSecLimitValue = -0.7f;
 
-				*/
+			MinimapSecLimitShow = true;
+			OverlayMinimapSecLimitShow = true;
+			AlertPopupMinimapSecLimitShow = true;
+		}
 
-				c.Logfiles.Add(new LogfileConfig()
-				{
-					Enabled = true,
-					Name = "wc.Dek+Fa+PB",
-					Logfile = "wc.Dek+Fa+PB",
-					LogType = Logfile.LogFileType.ChatIntel,
-				});
-				c.Logfiles.Add(new LogfileConfig()
-				{
-					Enabled = true,
-					Name = "wc.Poch",
-					Logfile = "wc.Poch",
-					LogType = Logfile.LogFileType.ChatIntel,
-				});
-				c.Logfiles.Add(new LogfileConfig()
-				{
-					Enabled = true,
-					Name = "wc.Vale",
-					Logfile = "wc.Vale",
-					LogType = Logfile.LogFileType.ChatIntel,
-				});
-				c.Logfiles.Add(new LogfileConfig()
-				{
-					Enabled = true,
-					Name = "wc.Venal+Br+Te",
-					Logfile = "wc.Venal+Br+Te",
-					LogType = Logfile.LogFileType.ChatIntel,
-				});
-			}
+		private void InitialiseAlertDefaults()
+		{
+			AlertConfiguration.Add(new AlertConfig()
+			{
+				Name = "All online toons <= 5 jumps",
+				Enabled = true,
+				AlertType = AlertConfigType.Range,
+				AlertRangeType = AlertConfigRangeType.AllOnlineCharacters,
+				TextDisplay = "{jumps}->{fromsystem} : {route}",
+				MenuDisplay = "{jumps} jumps from {character} in {tosystem}",
+				SoundFile = "xylophone",
+				Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
+				Jumps1Number = 5,
+				Jumps2Comparison = AlertConfigJumpsComparison.None,
+			});
+			/*
+							AlertConfiguration.Add(new AlertConfig()
+							{
+								Name = "Izakbar (if online) <= 5 jumps",
+								Enabled = false,
+								AlertType = AlertConfigType.Range,
+								AlertRangeType = AlertConfigRangeType.OneOnlineCharacter,
+								TextDisplay = "{jumps}->{fromsystem} : {route}",
+								MenuDisplay = "{jumps} jumps from {character} in {tosystem}",
+								SoundFile = "xylophone",
+								Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
+								Jumps1Number = 5,
+								Jumps2Comparison = AlertConfigJumpsComparison.None,
+								TriggerText = "Izakbar",
+							});
+			*/
+			AlertConfiguration.Add(new AlertConfig()
+			{
+				Name = "Home system < 5 jumps",
+				Enabled = false,
+				AlertType = AlertConfigType.Range,
+				AlertRangeType = AlertConfigRangeType.Home,
+				TextDisplay = "{jumps}->{fromsystem} : {route}",
+				MenuDisplay = "{jumps} jumps from {fromsystem} in {tosystem}",
+				SoundFile = "xylophone",
+				Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
+				Jumps1Number = 5,
+				Jumps2Comparison = AlertConfigJumpsComparison.None,
+			});
+			AlertConfiguration.Add(new AlertConfig()
+			{
+				Name = "1DQ1-A < 5 jumps",
+				Enabled = false,
+				AlertType = AlertConfigType.Range,
+				AlertRangeType = AlertConfigRangeType.System,
+				TextDisplay = "{jumps}->{fromsystem} : {route}",
+				MenuDisplay = "{jumps} jumps from {fromsystem} in {tosystem}",
+				SoundFile = "xylophone",
+				Jumps1Comparison = AlertConfigJumpsComparison.LessThanEqual,
+				Jumps1Number = 5,
+				Jumps2Comparison = AlertConfigJumpsComparison.None,
+				TriggerText = "1DQ1-A",
+			});
+			AlertConfiguration.Add(new AlertConfig()
+			{
+				Name = "ESS robbery",
+				Enabled = false,
+				AlertType = AlertConfigType.Text,
+				TextDisplay = "ESS robbery {text} reported by {reporter}",
+				MenuDisplay = "ESS robbery {text} reported by {reporter}",
+				SoundFile = "Boo2",
+				TriggerText = "ess",
+			});
+			AlertConfiguration.Add(new AlertConfig()
+			{
+				Name = "Skyhook robbery",
+				Enabled = false,
+				AlertType = AlertConfigType.Text,
+				TextDisplay = "Skyhook robbery {text} reported by {reporter}",
+				MenuDisplay = "Skyhook robbery {text} reported by {reporter}",
+				SoundFile = "Boo2",
+				TriggerText = "skyhook",
+			});
+			AlertConfiguration.Add(new AlertConfig()
+			{
+				Name = "Faction Spawn",
+				Enabled = true,
+				AlertType = AlertConfigType.FactionSpawn,
+				TextDisplay = "Spawn {context}",
+				MenuDisplay = "Spawn {context}",
+				SoundFile = "trumpet",
+				CustomTriggerEverySeconds = 30,
+			});
+			AlertConfiguration.Add(new AlertConfig()
+			{
+				Name = "Decloak",
+				Enabled = true,
+				AlertType = AlertConfigType.Decloak,
+				TextDisplay = "Decloak by {context}",
+				MenuDisplay = "Decloak by {context}",
+				SoundFile = "tuba",
+			});
+			AlertConfiguration.Add(new AlertConfig()
+			{
+				Name = "Out of rock",
+				Enabled = true,
+				AlertType = AlertConfigType.MiningEndedRoidPopped,
+				TextDisplay = "{character} rock depleated",
+				MenuDisplay = "rock depleated",
+				SoundFile = "pop1",
+			});
+			AlertConfiguration.Add(new AlertConfig()
+			{
+				Name = "Miner full",
+				Enabled = true,
+				AlertType = AlertConfigType.MiningEndedFull,
+				TextDisplay = "{character} cargo full",
+				MenuDisplay = "cargo full",
+				SoundFile = "full",
+			});
 
-			if (c.CSSData== null)
-            {
-                c.CSSData = new List<CSSData> { };
-                c.CSSData.Add(new CSSData()
-                {
-                    Name = "OBS.MiningTable",
-                    FriendlyName = "OBS Mining Table",
-                    CSS = @"
+		}
+
+		private void InitialiseLogfileDefaults()
+		{
+			Logfiles.Add(new LogfileConfig()
+			{
+				Enabled = true,
+				Name = "wc.Dek+Fa+PB",
+				Logfile = "wc.Dek+Fa+PB",
+				LogType = Logfile.LogFileType.ChatIntel,
+			});
+			Logfiles.Add(new LogfileConfig()
+			{
+				Enabled = true,
+				Name = "wc.Poch",
+				Logfile = "wc.Poch",
+				LogType = Logfile.LogFileType.ChatIntel,
+			});
+			Logfiles.Add(new LogfileConfig()
+			{
+				Enabled = true,
+				Name = "wc.Vale",
+				Logfile = "wc.Vale",
+				LogType = Logfile.LogFileType.ChatIntel,
+			});
+			Logfiles.Add(new LogfileConfig()
+			{
+				Enabled = true,
+				Name = "wc.Venal+Br+Te",
+				Logfile = "wc.Venal+Br+Te",
+				LogType = Logfile.LogFileType.ChatIntel,
+			});
+		}
+
+		private void InitialiseCssDefaults()
+		{
+			CSSData.Add(new CSSData()
+			{
+				Name = "OBS.MiningTable",
+				FriendlyName = "OBS Mining Table",
+				CSS = @"
 @import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
 
 .miningcontainer {
@@ -580,12 +349,13 @@ namespace Quesadilla.Classes
         padding-right:5px;
  }
 ",
-                });
-                c.CSSData.Add(new CSSData()
-                {
-                    Name = "OBS.Mining",
-                    FriendlyName = "OBS Mining Info",
-                    CSS = @"
+			});
+
+			CSSData.Add(new CSSData()
+			{
+				Name = "OBS.Mining",
+				FriendlyName = "OBS Mining Info",
+				CSS = @"
 
 @import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
 
@@ -609,12 +379,13 @@ namespace Quesadilla.Classes
   margin: auto;
 }
 ",
-                });
-                c.CSSData.Add(new CSSData()
-                {
-                    Name = "OBS.ISK",
-                    FriendlyName = "OBS ISK Value",
-                    CSS = @"
+			});
+
+			CSSData.Add(new CSSData()
+			{
+				Name = "OBS.ISK",
+				FriendlyName = "OBS ISK Value",
+				CSS = @"
 @import url(https://fonts.googleapis.com/css?family=Titan+One);
 
 .iskcontainer {
@@ -636,12 +407,13 @@ namespace Quesadilla.Classes
 
   margin: auto;
 }",
-                });
-                c.CSSData.Add(new CSSData()
-                {
-                    Name = "OBS.LatestAlert",
-                    FriendlyName = "OBS Latest Alert",
-                    CSS = @"
+			});
+
+			CSSData.Add(new CSSData()
+			{
+				Name = "OBS.LatestAlert",
+				FriendlyName = "OBS Latest Alert",
+				CSS = @"
 .alert {
   border: 2px solid transparent;
   border-radius: 15px;
@@ -651,12 +423,13 @@ namespace Quesadilla.Classes
   position: relative;
 }
 ",
-                });
-                c.CSSData.Add(new CSSData()
-                {
-                    Name = "OBS.ZkillList",
-                    FriendlyName = "OBS Zkill Listing",
-                    CSS = @"
+			});
+
+			CSSData.Add(new CSSData()
+			{
+				Name = "OBS.ZkillList",
+				FriendlyName = "OBS Zkill Listing",
+				CSS = @"
 @import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
 
 img.rounded-corners {
@@ -767,428 +540,229 @@ img.rounded-corners {
 {
     visibility: hidden;
 }",
-                });
+			});
+		}
+
+
+		private ConfigurationItemLocationInformation CreateItem(
+			string name,
+			Color color,
+			Point location,
+			Size size,
+			Font font,
+			Color? alternateColor = null,
+			Color? backColor = null,
+			bool isVisible = true)
+		{
+			return new ConfigurationItemLocationInformation
+			{
+				Name = name,
+				Color = color,
+				AlternateColor = alternateColor ?? Color.Empty,
+				BackColor = backColor ?? Color.Transparent,
+				IsVisible = isVisible,
+				Location = location,
+				Size = size,
+				Font = font
+			};
+		}
+
+		private void InitialiseMainWindowLayout()
+		{
+			MainWindowItemLocations = new List<ConfigurationItemLocationInformation>
+			{
+				CreateItem("WorkingIndicator",Color.Red,new Point(625, -1),new Size(13, 15),new Font("Microsoft Sans Serif", 12f, FontStyle.Bold)),
+				CreateItem("CurrentClient",Color.MediumTurquoise,new Point(2, 2),new Size(265, 21),new Font("Segoe UI", 12f, FontStyle.Bold)),
+				CreateItem("EveScoutStatus",Color.LimeGreen,new Point(0, 218),new Size(163, 13),new Font("Segoe UI", 8.25f, FontStyle.Regular)),
+				CreateItem("AlertsOutstanding",Color.LightCoral,new Point(240, 3),new Size(114, 11),new Font("Segoe UI", 8.25f, FontStyle.Regular)),
+				CreateItem("MiningData",Color.Aqua,new Point(200, 3),new Size(118, 11),new Font("Segoe UI", 8.25f, FontStyle.Bold),Color.Orange),
+				CreateItem("RattingData",Color.Aqua,new Point(350, 3),new Size(118, 11),new Font("Segoe UI", 8.25f, FontStyle.Bold),Color.Orange),
+				CreateItem("MainMinimap",Color.White,new Point(3, 3),new Size(260, 200),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red),
+				CreateItem("MouseoverSystemName",Color.Orchid,new Point(445, 203),new Size(193, 11),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red),
+				CreateItem("ExtraInformation",Color.LimeGreen,new Point(270, 18),new Size(360, 170),new Font("Segoe UI Variable", 8.25f, FontStyle.Regular),Color.Brown),
+				CreateItem("ChatServerDown",Color.Red,new Point(471, 3),new Size(152, 20),new Font("Microsoft Sans Serif", 12f, FontStyle.Bold),Color.Brown),
+				CreateItem("IntelLog",Color.LightGoldenrodYellow,new Point(471, 3),new Size(152, 20),new Font("Segoe UI Variable", 8.25f, FontStyle.Regular),Color.Brown,ColorTranslator.FromHtml("#0f0f11"))
+			};
+		}
+		private void InitialiseAlertWindowLayout()
+		{
+			AlertWindowItemLocations = new List<ConfigurationItemLocationInformation>
+			{
+				CreateItem("AlertText",Color.White,new Point(0, 165),new Size(400, 12),new Font("Tahoma", 8.25f, FontStyle.Regular)),
+				CreateItem("SystemName",Color.Lime,new Point(115, 4),new Size(280, 31),new Font("Segoe UI Variable", 20f, FontStyle.Bold)),
+				CreateItem("RegionName",Color.Cyan,new Point(275, 36),new Size(120, 13),new Font("Segoe UI Variable", 8f, FontStyle.Bold)),
+				CreateItem("ContextInfo",Color.Yellow,new Point(2, 47),new Size(396, 19),new Font("Verdana", 10f, FontStyle.Bold)),
+				CreateItem("IntelLine",Color.White,new Point(155, 64),new Size(240, 57),new Font("Tahoma", 9f, FontStyle.Regular)),
+				CreateItem("ShipName",Color.Lime,new Point(180, 125),new Size(150, 13),new Font("Segoe UI Variable", 8.25f, FontStyle.Bold)),
+				CreateItem("AlertImage",Color.White,new Point(335, 95),new Size(53, 57),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold)),
+				CreateItem("MinimapImage",Color.White,new Point(34, 3),new Size(193, 128),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold)),
+				CreateItem("AlertLogoKiller",Color.White,new Point(437, 138),new Size(34, 34),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold)),
+				CreateItem("AlertLogoVictim",Color.White,new Point(516, 122),new Size(34, 34),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold))
+			};
+		}
+		private void InitialiseOverlayLayout()
+		{
+			OverlayWindowItemLocations = new List<ConfigurationItemLocationInformation>
+			{
+				CreateItem("RattingData",Color.Aqua,new Point(440, 12),new Size(118, 15),new Font("Impact", 10f, FontStyle.Regular),Color.Orange),
+				CreateItem("MiningData",Color.Aqua,new Point(300, 323),new Size(118, 15),new Font("Impact", 10f, FontStyle.Regular),Color.Orange),
+				CreateItem("EveScoutStatus",Color.LimeGreen,new Point(1, 1),new Size(640, 13),new Font("Segoe UI Variable", 9f, FontStyle.Regular)),
+				CreateItem("Minimap",Color.White,new Point(0, 0),new Size(500, 350),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red),
+				CreateItem("IskPerMinuteChart",Color.Orchid,new Point(320, 32),new Size(280, 80),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red),
+				CreateItem("MinedPerMinuteChart",Color.Orchid,new Point(320, 270),new Size(280, 80),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red),
+				CreateItem("MouseOver",Color.Red,new Point(-1, -1),new Size(120, 80),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red,Color.Black),
+				CreateItem("MouseOverSystemName",Color.White,new Point(2, 2),new Size(120, 11),new Font("Microsoft Sans Serif", 9.3f, FontStyle.Bold),Color.Red),
+				CreateItem("MouseOverSecurity",Color.Yellow,new Point(2, 13),new Size(25, 11),new Font("Microsoft Sans Serif", 9.2f, FontStyle.Regular),Color.Red),
+				CreateItem("MouseOverSkyhookInfo",Color.GreenYellow,new Point(2, 50),new Size(116, 22),new Font("Segoe UI", 8.0f, FontStyle.Regular),Color.Red),
+				CreateItem("MouseOverNPCDelta",Color.LightSkyBlue,new Point(30, 13),new Size(30, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
+				CreateItem("MouseOverKills",Color.Crimson,new Point(65, 13),new Size(20, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
+				CreateItem("MouseOverAlerts",Color.DarkOrange,new Point(90, 13),new Size(20, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red)
+			};
+		}
+
+		private void InitialiseDpsLayout()
+		{
+			DPSWindowItemLocations = new List<ConfigurationItemLocationInformation>
+			{
+				CreateItem("DPSChart",Color.Aqua,new Point(5, 5),new Size(300, 200),new Font("Impact", 10f, FontStyle.Regular),Color.Orange)
+			};
+		}
+
+		public Config()
+		{
+			ApplyDefaultAttributes();
+			InitialiseCollections();
+			InitialiseGeneralSettings();
+
+			InitialiseAlertDefaults();
+			InitialiseLogfileDefaults();
+			InitialiseCssDefaults();
+
+			InitialiseMainWindowLayout();
+			InitialiseAlertWindowLayout();
+			InitialiseOverlayLayout();
+			InitialiseDpsLayout();
+		}
+
+
+		public Config Duplicate()
+        {
+			Config c = new Config()
+			{
+				AlertPopupLocation = AlertPopupLocation,
+				DPSLocation = DPSLocation,
+				InitialPosition = InitialPosition,
+				ZKillSound = ZKillSound,
+				AlertPopupMinimapRawXY = AlertPopupMinimapRawXY,
+				MinimapMapType = MinimapMapType,
+				OverlayMinimapMapType = OverlayMinimapMapType,
+				OverlayDPSWindowPosition = OverlayDPSWindowPosition,
+				OverlayDPSWindowSize = OverlayDPSWindowSize,
+				OverlayMapWindowPosition = OverlayMapWindowPosition,
+				OverlayMapWindowSize = OverlayMapWindowSize,
+			};
+            // copy as many config items as possible
+            foreach(var p in typeof(Config).GetProperties().Where(o => o.PropertyType == typeof(Color) || o.PropertyType == typeof(int) || o.PropertyType == typeof(string) || o.PropertyType == typeof(bool) || o.PropertyType == typeof(float)))
+            {
+                var propertyType = typeof(Config).GetProperty(p.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.ExactBinding);
+                var value = propertyType.GetValue(this);
+                propertyType.SetValue(c, value);
             }
 
+            c.IgnoreStringRegex = new List<Regex>();
+            c.IgnoreSystems = new List<int>();
+            c.AlertConfiguration = new List<AlertConfig>();
+            c.Logfiles = new List<LogfileConfig>();
+            c.CSSData = new List<CSSData>();
 
-            if (c.MainWindowItemLocations == null)
+            foreach (var s in IgnoreStringRegex)
             {
-                c.MainWindowItemLocations = new List<ConfigurationItemLocationInformation>();
-                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-                {
-                    Name = "WorkingIndicator",
-                    Color = Color.Red,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-                    Location = new Point(625, -1),
-                    Size = new Size(13, 15),
-                    Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold),
-                });
-                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-                {
-                    Name = "CurrentClient",
-                    Color = Color.MediumTurquoise,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-                    Location = new Point(2, 2),
-                    Size = new Size(265, 21),
-                    Font = new Font("Segoe UI", 12.0f, FontStyle.Bold),
-                });
-                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-                {
-                    Name = "EveScoutStatus",
-                    Color = Color.LimeGreen,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-                    Location = new Point(0, 218),
-                    Size = new Size(163, 13),
-                    Font = new Font("Segoe UI", 8.25f, FontStyle.Regular),
-                });
-
-                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-                {
-                    Name = "AlertsOutstanding",
-                    Color = Color.LightCoral,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-                    Location = new Point(240, 3),
-                    Size = new Size(114, 11),
-                    Font = new Font("Segoe UI", 8.25f, FontStyle.Regular),
-                });
-
-                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-                {
-                    Name = "MiningData",
-                    Color = Color.Aqua,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Orange,
-                    IsVisible = true,
-                    Location = new Point(200, 3),
-                    Size = new Size(118, 11),
-                    Font = new Font("Segoe UI", 8.25f, FontStyle.Bold),
-                });
-
-                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-                {
-                    Name = "RattingData",
-                    Color = Color.Aqua,
-                    AlternateColor = Color.Orange,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-                    Location = new Point(350, 3),
-                    Size = new Size(118, 11),
-                    Font = new Font("Segoe UI", 8.25f, FontStyle.Bold),
-                });
-
-                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-                {
-                    Name = "MainMinimap",
-                    Color = Color.White,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Red,
-                    IsVisible = true,
-                    Location = new Point(3, 3),
-                    Size = new Size(260, 200),
-                    Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
-                });
-
-				c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "MouseoverSystemName",
-					Color = Color.Orchid,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Red,
-					IsVisible = true,
-					Location = new Point(445, 203),
-					Size = new Size(193, 11),
-					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
-				});
-
-				c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "ExtraInformation",
-					Color = Color.LimeGreen,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Brown,
-					IsVisible = true,
-					Location = new Point(270, 18),
-					Size = new Size(360, 170),
-					Font = new Font("Segoe UI Variable", 8.25f, FontStyle.Regular),
-				});
-
-				c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "ChatServerDown",
-					Color = Color.Red,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Brown,
-					IsVisible = true,
-					Location = new Point(471, 3),
-					Size = new Size(152, 20),
-					Font = new Font("Microsoft Sans Serif", 12.0f, FontStyle.Bold),
-				});
-
-                c.MainWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-                {
-                    Name = "IntelLog",
-                    Color = Color.LightGoldenrodYellow,
-                    BackColor = System.Drawing.ColorTranslator.FromHtml("#0f0f11"),
-					AlternateColor = Color.Brown,		
-                    IsVisible = true,
-                    Location = new Point(471, 3),
-                    Size = new Size(152, 20),
-                    Font = new Font("Segoe UI Variable", 8.25f, FontStyle.Regular),
-                });
-			}
-
-            if (c.AlertWindowItemLocations == null)
+                c.IgnoreStringRegex.Add(s);
+            }
+            foreach (var s in IgnoreSystems)
             {
-                c.AlertWindowItemLocations = new List<ConfigurationItemLocationInformation>();
-				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "AlertText",
-					Color = Color.White,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-					Location = new Point(0, 165),
-					Size = new Size(400, 12),
-					Font = new Font("Tahoma", 8.25f, FontStyle.Regular),
-				});
-				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "SystemName",
-					Color = Color.Lime,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-					Location = new Point(115, 4),
-					Size = new Size(280, 31),
-					Font = new Font("Segoe UI Variable", 20.0f, FontStyle.Bold),
-				});
-				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "RegionName",
-					Color = Color.Cyan,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-					Location = new Point(275, 36),
-					Size = new Size(120, 13),
-					Font = new Font("Segoe UI Variable", 8.0f, FontStyle.Bold),
-				});
-				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "ContextInfo",
-					Color = Color.Yellow,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-					Location = new Point(2,47),
-					Size = new Size(396, 19),
-					Font = new Font("Verdana", 10.0f, FontStyle.Bold),
-				});
-				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "IntelLine",
-					Color = Color.White,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-					Location = new Point(155,64),
-					Size = new Size(240, 57),
-					Font = new Font("Tahoma", 9.0f, FontStyle.Regular),
-				});
-				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "ShipName",
-					Color = Color.Lime,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-					Location = new Point(180, 125),
-					Size = new Size(150, 13),
-					Font = new Font("Segoe UI Variable", 8.25f, FontStyle.Bold),
-				});
-				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "AlertImage",
-					Color = Color.White,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-					Location = new Point(335, 95),
-					Size = new Size(53, 57),
-					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
-				});
-				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "MinimapImage",
-					Color = Color.White,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-					Location = new Point(34, 3),
-					Size = new Size(193, 128),
-					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
-				});
-				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "AlertLogoKiller",
-					Color = Color.White,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-					Location = new Point(437, 138),
-					Size = new Size(34, 34),
-					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
-				});
-				c.AlertWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "AlertLogoVictim",
-					Color = Color.White,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-					Location = new Point(516, 122),
-					Size = new Size(34, 34),
-					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold),
-				});
-			}
-
-			if (c.OverlayWindowItemLocations == null)
-			{
-				c.OverlayWindowItemLocations = new List<ConfigurationItemLocationInformation>();
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "RattingData",
-					Color = Color.Aqua,
-					AlternateColor = Color.Orange,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-					Location = new Point(440, 12),
-					Size = new Size(118, 15),
-					Font = new Font("Impact", 10f, FontStyle.Regular),
-				});
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "MiningData",
-					Color = Color.Aqua,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Orange,
-					IsVisible = true,
-					Location = new Point(300, 323),
-					Size = new Size(118, 15),
-					Font = new Font("Impact", 10f, FontStyle.Regular),
-				});
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "EveScoutStatus",
-                    Color = Color.LimeGreen,
-					BackColor = Color.Transparent,
-					IsVisible = true,
-                    Location = new Point(1, 1),
-                    Size = new Size(640, 13),
-                    Font = new Font("Segoe UI Variable", 9f, FontStyle.Regular),
+                c.IgnoreSystems.Add(s);
+            }
+            foreach (var a in AlertConfiguration)
+            {
+                c.AlertConfiguration.Add(new AlertConfig()
+                {
+                    AlertRangeType = a.AlertRangeType,
+                    AlertType = a.AlertType,
+                    CustomTriggerEverySeconds = a.CustomTriggerEverySeconds,
+                    Enabled = a.Enabled,
+                    Name = a.Name,
+                    Jumps1Comparison = a.Jumps1Comparison,
+                    MenuDisplay = a.MenuDisplay,
+                    TextDisplay = a.TextDisplay,
+                    Jumps1Number = a.Jumps1Number,
+                    Jumps2Comparison = a.Jumps2Comparison,
+                    SoundFile = a.SoundFile,
+                    Jumps2Number = a.Jumps2Number,
+                    TriggerText = a.TriggerText
                 });
+            }
+            foreach (var l in Logfiles)
+            {
+                c.Logfiles.Add(l);
+            }
+            foreach (var css in CSSData)
+            {
+                c.CSSData.Add(css);
+            }
 
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "Minimap",
-					Color = Color.White,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Red,
-					IsVisible = true,
-					Location = new Point(0,0),
-					Size = new Size(500, 350),
-					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
-				});
+            c.MainWindowItemLocations = DuplicateLocations(MainWindowItemLocations);
+			c.AlertWindowItemLocations = DuplicateLocations(AlertWindowItemLocations);
+			c.OverlayWindowItemLocations = DuplicateLocations(OverlayWindowItemLocations);
+			c.DPSWindowItemLocations = DuplicateLocations(DPSWindowItemLocations);
 
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "IskPerMinuteChart",
-					Color = Color.Orchid,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Red,
-					IsVisible = true,
-					Location = new Point(320, 32),
-					Size = new Size(280, 80),
-					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
-				});
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "MinedPerMinuteChart",
-					Color = Color.Orchid,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Red,
-					IsVisible = true,
-					Location = new Point(320, 270),
-					Size = new Size(280, 80),
-					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
-				});
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "MouseOver",
-					Color = Color.Red,
-					BackColor = Color.Black,
-					AlternateColor = Color.Red,
-					IsVisible = true,
-					Location = new Point(-1, -1),
-					Size = new Size(120, 80),
-					Font = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),
-				});
+			c.InitialPosition = new Point(InitialPosition.X, InitialPosition.Y);
+			c.MainWindowSize = new Size(MainWindowSize.Width, MainWindowSize.Height);
+			c.AlertWindowSize = new Size(AlertWindowSize.Width, AlertWindowSize.Height);
 
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "MouseOverSystemName",
-					Color = Color.White,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Red,
-					IsVisible = true,
-					Location = new Point(2, 2),
-					Size = new Size(120, 11),
-					Font = new Font("Microsoft Sans Serif", 9.3f, FontStyle.Bold),
-				});
-
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "MouseOverSecurity",
-					Color = Color.Yellow,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Red,
-					IsVisible = true,
-					Location = new Point(2, 13),
-					Size = new Size(25, 11),
-					Font = new Font("Microsoft Sans Serif", 9.2f, FontStyle.Regular),
-				});
-
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "MouseOverSkyhookInfo",
-					Color = Color.GreenYellow,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Red,
-					IsVisible = true,
-					Location = new Point(2, 50),
-					Size = new Size(116, 22),
-					Font = new Font("Segoe UI", 8.0f, FontStyle.Regular),
-				});
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "MouseOverNPCDelta",
-					Color = Color.LightSkyBlue,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Red,
-					IsVisible = true,
-					Location = new Point(30, 13),
-					Size = new Size(30, 11),
-					Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-				});
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "MouseOverKills",
-					Color = Color.Crimson,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Red,
-					IsVisible = true,
-					Location = new Point(65, 13),
-					Size = new Size(20, 11),
-					Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-				});
-				c.OverlayWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-				{
-					Name = "MouseOverAlerts",
-					Color = Color.DarkOrange,
-					BackColor = Color.Transparent,
-					AlternateColor = Color.Red,
-					IsVisible = true,
-					Location = new Point(90, 13),
-					Size = new Size(20, 11),
-					Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-				});
-
-				if (c.DPSWindowItemLocations == null)
-				{
-					c.DPSWindowItemLocations = new List<ConfigurationItemLocationInformation>();
-					c.DPSWindowItemLocations.Add(new ConfigurationItemLocationInformation()
-					{
-						Name = "DPSChart",
-						Color = Color.Aqua,
-						AlternateColor = Color.Orange,
-						BackColor = Color.Transparent,
-						IsVisible = true,
-						Location = new Point(5, 5),
-						Size = new Size(300, 200),
-						Font = new Font("Impact", 10f, FontStyle.Regular),
-					});
-				}
-
-
-				}
-
-				return (c);
+            return (c);
         }
 
-        public void Save(string filename)
+		private static JsonSerializerOptions CreateJsonOptions()
+		{
+			var options = new JsonSerializerOptions
+			{
+				WriteIndented = true
+			};
+
+			options.Converters.Add(new ColorJsonConverter());
+
+			return options;
+		}
+
+		public static Config Load(string filename)
+		{
+			try
+			{
+				if (!File.Exists(filename))
+					return new Config();
+
+				return JsonSerializer.Deserialize<Config>(
+						   File.ReadAllText(filename),
+						   CreateJsonOptions())
+					   ?? new Config();
+			}
+			catch
+			{
+				return new Config();
+			}
+		}
+
+		public void Save(string filename)
         {
-            var json = JsonSerializer.Serialize(this);
-            File.WriteAllText(filename, json);
+			var json = JsonSerializer.Serialize(this, CreateJsonOptions());
+			File.WriteAllText(filename, json);
         }
 
 		[Category("General")]
 		[DisplayName("Staging system")]
 		[Description("When alerts are generated relative to your home/staging system - this is the value used")]
-		[DefaultValue(typeof(string), "K7D-II")]
+		[DefaultValue(typeof(string), "BKG-Q2")]
 		public string HomeSystem { get; set; }
 
 		[Category("General")]
@@ -1380,22 +954,18 @@ img.rounded-corners {
 
 		[Category("Main Window")]
 		[DisplayName("Item Locations")]
+		[Editor(typeof(LocationCollectionEditor), typeof(UITypeEditor))]
 		public List<ConfigurationItemLocationInformation> MainWindowItemLocations { get; set; }
 
 		[Category("Alert")]
 		[DisplayName("Item Locations")]
+		[Editor(typeof(LocationCollectionEditor), typeof(UITypeEditor))]
 		public List<ConfigurationItemLocationInformation> AlertWindowItemLocations { get; set; }
 
 		[Category("DPS")]
         [DisplayName("DPS Graph location")]
         [Description("Location to display DPS graph when required")]
         public PopupLocationType DPSLocation { get; set; }
-
-        [Category("DPS")]
-        [DisplayName("Legends")]
-        [Description("Show legends on the DPS graph")]
-        [DefaultValue(typeof(bool), "false")]
-        public bool DPSGraphLegends { get; set; }
 
         [Category("DPS")]
         [DisplayName("Show DPS")]
@@ -1550,30 +1120,6 @@ img.rounded-corners {
         [DefaultValue(typeof(bool), "true")]
         public bool AlertPopupShowMinimap { get; set; }
 
-        [Category("Alert")]
-        [DisplayName("Show Minimap Border")]
-        [Description("")]
-        [DefaultValue(typeof(bool), "false")]
-        public bool AlertPopupShowMinimapBorder { get; set; }
-
-		[Category("Alert")]
-		[DisplayName("Minimap Show System Text")]
-		[Description("Show to/from system names in minimap")]
-		[DefaultValue(typeof(bool), "true")]
-		public bool AlertPopupMinimapShowSystemText { get; set; }
-
-		[Category("Alert")]
-		[DisplayName("Minimap Show All System Text")]
-		[Description("Show all system names in minimap")]
-		[DefaultValue(typeof(bool), "false")]
-		public bool AlertPopupMinimapShowAllSystemText { get; set; }
-
-		[Category("Alert")]
-		[DisplayName("Minimap Show Connecting System Text")]
-		[Description("Show connecting system names in minimap")]
-		[DefaultValue(typeof(bool), "false")]
-		public bool AlertPopupMinimapShowConnectingSystemText { get; set; }
-
 		[Category("Alert")]
         [DisplayName("Which maptype to use for alert windows")]
         [Description("Which minimap to use for Alert windows")]
@@ -1622,7 +1168,6 @@ img.rounded-corners {
         [Description("")]
         [DefaultValue(typeof(string), "{killer} killed {victim} in {system} {value}")]
         public string ZKillMenuText { get; set; }
-
 
 		[Category("Alert")]
         [DisplayName("ZKillSound")]
@@ -1731,8 +1276,27 @@ img.rounded-corners {
         public List<LogfileConfig> Logfiles { get; set; }
         public List<CSSData> CSSData { get; set; }
 
-        public List<Regex> ignoreStrings { get; set; }
-        public List<int> ignoreSystems { get; set; }
+		
+		private List<string> _ignoreStrings = new List<string>();
+		[JsonIgnore]
+		public List<Regex> IgnoreStringRegex { get; private set; } = new List<Regex>();
+
+		public List<string> IgnoreStrings
+		{
+			get => _ignoreStrings;
+			set
+			{
+				_ignoreStrings = value ?? new List<string>();
+
+				IgnoreStringRegex = _ignoreStrings
+					.Select(s => new Regex(
+						s,
+						RegexOptions.IgnoreCase | RegexOptions.Compiled))
+					.ToList();
+			}
+		}
+
+		public List<int> IgnoreSystems { get; set; }
 
         [Category("Planet Info")]
         [DisplayName("Size of Planet on main window")]
@@ -1801,12 +1365,6 @@ img.rounded-corners {
         public int PlanetInfoFontSize { get; set; }
 
         [Category("HeartBeat")]
-        [DisplayName("Heartbeat indicator Colour")]
-        [Description("")]
-        [DefaultValue(typeof(Color), "Red")]
-        public Color HeartBeatIndicatorColour { get; set; }
-
-        [Category("HeartBeat")]
         [DisplayName("Heartbeat indicator text")]
         [Description("Check homepage for some examples")]
         //        [DefaultValue(typeof(string), " ▁▂▃▄▅▆▇█▇▆▅▄▃▁")]
@@ -1815,11 +1373,6 @@ img.rounded-corners {
         //        [DefaultValue(typeof(string), "⠁⠁⠉⠙⠚⠒⠂⠂⠒⠲⠴⠤⠄⠄⠤⠠⠠⠤⠦⠖⠒⠐⠐⠒⠓⠋⠉⠈⠈")]
         [DefaultValue(typeof(string), "⠈⠉⠋⠓⠒⠐⠐⠒⠖⠦⠤⠠⠠⠤⠦⠖⠒⠐⠐⠒⠓⠋⠉⠈")]
         public string HeartBeatIndicatorWorkingText { get; set; }
-        [Category("HeartBeat")]
-        [DisplayName("Show Heartbeat indicator")]
-        [Description("")]
-        [DefaultValue(typeof(bool), "true")]
-        public bool HeartBeatIndicatorVisible { get; set; }
 
         [Category("Alert")]
         [DisplayName("Show alerts as windows notifications")]
@@ -1860,13 +1413,6 @@ img.rounded-corners {
 		[Description("")]
 		[DefaultValue(typeof(Color), "Orchid")]
 		public Color OverlayMinimapMouseoverSystemColour { get; set; }
-
-		[Category("OverlayMap")]
-		[DisplayName("Minimap zoom delta")]
-		[Description("How much to adjust zoom on mouse scroll")]
-		[DefaultValue(typeof(int), "5")]
-		public int OverlayMainWindowMouseScrollAmount { get; set; }
-
 
 		[Category("OverlayMap")]
 		[DisplayName("ISK Graph Label colour")]
@@ -1945,8 +1491,6 @@ img.rounded-corners {
 		public Color OverlayISKGraphHighBoundryColour { get; set; }
 
 
-
-
 		[Category("OverlayMap")]
 		[DisplayName("Minimap alpha")]
 		[Description("Alpha to use for minimap on overlay window")]
@@ -2007,6 +1551,7 @@ img.rounded-corners {
 
 		[Category("OverlayMap")]
 		[DisplayName("Item Locations")]
+		[Editor(typeof(LocationCollectionEditor), typeof(UITypeEditor))]
 		public List<ConfigurationItemLocationInformation> OverlayWindowItemLocations { get; set; }
 
 		[Category("DPS")]
@@ -2028,6 +1573,7 @@ img.rounded-corners {
 
 		[Category("DPS")]
 		[DisplayName("Item Locations")]
+		[Editor(typeof(LocationCollectionEditor), typeof(UITypeEditor))]
 		public List<ConfigurationItemLocationInformation> DPSWindowItemLocations { get; set; }
 
 
@@ -2791,7 +2337,6 @@ img.rounded-corners {
 		[DefaultValue(typeof(int), "95")]
 		[Range(0, 100)]
 		public int OverlayMouseOverGraphAlpha { get; set; }
-
 
 	}
 }

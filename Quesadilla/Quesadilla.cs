@@ -647,14 +647,14 @@ namespace Quesadilla
                 if (!entry.ParseSuccess) return;
 
                 HashSet<int> intSet = new HashSet<int>();
-				bool ignored = Program.MainConfiguration.ignoreStrings.Any(r => r.IsMatch(entry.LineContent));
+				bool ignored = Program.MainConfiguration.IgnoreStringRegex.Any(r => r.IsMatch(entry.LineContent));
 				if (!ignored && entry.LogType == LogFileType.ChatIntel)
 				{
 					foreach (var solarSystem in Program.Universe.SolarSystems.Values)
 					{
 						if (!solarSystem.MatchNameRegex(entry.LineContent)) continue;
 						if (!Program.Universe.Names.TryGetValue(solarSystem.Name,out var systemId)) continue;
-						if (Program.MainConfiguration.ignoreSystems.Contains(systemId)) continue;
+						if (Program.MainConfiguration.IgnoreSystems.Contains(systemId)) continue;
 
 						intSet.Add(systemId);
 					}

@@ -19,6 +19,7 @@ namespace Quesadilla.Classes.InterOp
 		public const int WS_EX_NOACTIVATE = 0x08000000;
 		public const int WS_EX_TOOLWINDOW = 0x00000080;
 
+		public static readonly IntPtr HWND_BROADCAST = new IntPtr(0xFFFF);
 
 		public const int WM_NCLBUTTONDOWN = 0xA1;
 		public const int HT_CAPTION = 0x2;
@@ -146,6 +147,13 @@ namespace Quesadilla.Classes.InterOp
 			//var hWnd = new WindowInteropHelper(window).Handle;
 			SetWindowPos(w, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
 		}
+
+
+		[DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+		public static extern uint RegisterWindowMessage(string message);
+		[DllImport("user32.dll", SetLastError = true)]
+		public static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
 
 	}
 }
