@@ -66,7 +66,7 @@ namespace Quesadilla
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
 
         public static Version version;
-        public static String UserAgent = $"Mozilla/5.0 (Quesadilla version {version.ToString()} )";
+        public static String UserAgent;
         public static Image CachedBackground;
 
 		private static Mutex _mutex;
@@ -96,13 +96,13 @@ namespace Quesadilla
 				System.Deployment.Application.ApplicationDeployment ad = System.Deployment.Application.ApplicationDeployment.CurrentDeployment;
                 if (ad != null) {
                     version = ad.CurrentVersion;
-                    UserAgent = $"Mozilla/5.0 (Quesadilla version {version.ToString()} )";
                 }
 			}
             catch
             {
                 version = Assembly.GetEntryAssembly().GetName().Version;
 			}
+			UserAgent = $"Mozilla/5.0 (Quesadilla version {version.ToString()} )";
 
 			esiClient = new EVEStandardAPI(
                     "Quesadilla",                  // User agent
