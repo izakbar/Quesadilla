@@ -92,12 +92,17 @@ namespace Quesadilla
 
             MainConfiguration = Config.Load(configuration_filename);
 
-			if (System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed)
-			{
+            try { 
 				System.Deployment.Application.ApplicationDeployment ad = System.Deployment.Application.ApplicationDeployment.CurrentDeployment;
-                version = ad.CurrentVersion;
-				UserAgent = $"Mozilla/5.0 (Quesadilla version {version.ToString()} )";
+                if (ad != null) {
+                    version = ad.CurrentVersion;
+                    UserAgent = $"Mozilla/5.0 (Quesadilla version {version.ToString()} )";
+                }
 			}
+            catch
+            {
+
+            }
 
 			esiClient = new EVEStandardAPI(
                     "Quesadilla",                  // User agent
