@@ -124,7 +124,10 @@ namespace Quesadilla.Classes.ESIData
 						ESIGetIncursions();
 						break;
 					case ESIRequestType.SkyhookTheftData:
-                        ESIGetRaidableSkyhooks();
+						ESIGetRaidableSkyhooks();
+						break;
+					case ESIRequestType.JumpsPerHour:
+						ESIGetJumpsPerHour();
 						break;
 				}
 
@@ -135,8 +138,34 @@ namespace Quesadilla.Classes.ESIData
 					});
 			}
         }
+		private void ESIGetJumpsPerHour()
+        {
+			if (!retryAfterCheck(System.Reflection.MethodBase.GetCurrentMethod().Name)) return;
 
-        private void ESIGetSystem(int systemId)
+			try
+			{
+				var jumpsPerHour = _esiClient.Universe.GetSystemJumpsAsync().GetAwaiter().GetResult();
+				StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, jumpsPerHour.RetryAfter);
+
+				foreach (var s in jumpsPerHour.Model)
+				{
+					_log.Debug($"Hook : {s.SystemId} {s.ShipJumps}");
+					if (Program.Universe.SolarSystems.TryGetValue((int)s.SystemId, out var solarSystem))
+					{
+                        solarSystem.JumpsPerHour = s.ShipJumps;
+					}
+				}
+			}
+			catch
+			{
+				if (!retryAfterList.ContainsKey(System.Reflection.MethodBase.GetCurrentMethod().Name))
+				{
+					StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, 120);
+				}
+			}
+		}
+
+		private void ESIGetSystem(int systemId)
         {
             try
             {
@@ -279,6 +308,10 @@ namespace Quesadilla.Classes.ESIData
 		public void EnqueueRequestSystem(int systemid)
 		{
 			EnqueueRequest(ESIRequestType.System, systemid);
+		}
+		public void EnqueueRequestJumpsPerHour()
+		{
+			EnqueueRequest(ESIRequestType.JumpsPerHour, -1);
 		}
 		public void EnqueueRequestPlanet(int planetid)
         {

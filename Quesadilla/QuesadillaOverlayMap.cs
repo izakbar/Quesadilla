@@ -47,7 +47,7 @@ namespace Quesadilla
 		public Label MouseOverNPCDelta = new Label() { Name = "MouseOverNPCDelta" };
 		public Label MouseOverKills = new Label() { Name = "MouseOverKills" };
 		public Label MouseOverAlerts = new Label() { Name = "MouseOverAlerts" };
-
+		public Label MouseOverJumpsPerHour = new Label() { Name = "MouseOverJumpsPerHour" };
 
 		public Chart iskPerMinuteChart = new Chart() { Name = "IskPerMinuteChart" };
 		public Chart minedPerMinuteChart = new Chart() { Name = "MinedPerMinuteChart" };
@@ -79,7 +79,7 @@ namespace Quesadilla
 				Minimap,
 				iskPerMinuteChart,
 				minedPerMinuteChart,
-				MouseOver, MouseOverSystemName, MouseOverSecurity, MouseOverSkyhookInfo, MouseOverNPCDelta, MouseOverKills, MouseOverAlerts
+				MouseOver, MouseOverSystemName, MouseOverSecurity, MouseOverSkyhookInfo, MouseOverNPCDelta, MouseOverKills, MouseOverAlerts, MouseOverJumpsPerHour
 			});
 
 			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.OverlayWindowItemLocations, 0, false, false, true);
@@ -727,6 +727,8 @@ namespace Quesadilla
 						gMouseOver.DrawString($"{currentSystem.solarSystem.GetNPCKillsDeltaLastHour()}", MouseOverNPCDelta.Font, GDICache.GetBrush(MouseOverNPCDelta.ForeColor), MouseOverNPCDelta.Left, MouseOverNPCDelta.Top);
 						gMouseOver.DrawString($"{currentSystem.solarSystem.CountKills()}", MouseOverKills.Font, GDICache.GetBrush(MouseOverKills.ForeColor), MouseOverKills.Left, MouseOverKills.Top);
 						gMouseOver.DrawString($"{currentSystem.solarSystem.CountAlerts(false,false,false)}", MouseOverAlerts.Font, GDICache.GetBrush(MouseOverAlerts.ForeColor), MouseOverAlerts.Left, MouseOverAlerts.Top);
+
+						gMouseOver.DrawString($"Jumpa:{currentSystem.solarSystem.JumpsPerHour}", MouseOverJumpsPerHour.Font, GDICache.GetBrush(MouseOverJumpsPerHour.ForeColor), MouseOverJumpsPerHour.Left, MouseOverJumpsPerHour.Top);
 
 						// Skyhooks ?
 						DateTime utcNow = DateTime.UtcNow;

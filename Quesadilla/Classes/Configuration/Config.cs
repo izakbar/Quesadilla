@@ -74,6 +74,32 @@ namespace Quesadilla.Classes
             return newItems;
 		}
 
+		private List<ConfigurationItemLocationInformation> MergeLocations(List<ConfigurationItemLocationInformation> mergeData, List<ConfigurationItemLocationInformation> original)
+		{
+			var merged = new List<ConfigurationItemLocationInformation>();
+			var mergeLookup = mergeData.ToDictionary(x => x.Name);
+
+			foreach (var originalItem in original)
+			{
+				var source = mergeLookup.TryGetValue(originalItem.Name, out var loadedItem)
+					? loadedItem
+					: originalItem;
+
+				merged.Add(new ConfigurationItemLocationInformation
+				{
+					Name = source.Name,
+					Location = new Point(source.Location.X, source.Location.Y),
+					Color = source.Color,
+					IsVisible = source.IsVisible,
+					Size = new Size(source.Size.Width, source.Size.Height),
+					Font = source.Font,
+					BackColor = source.BackColor,
+					AlternateColor = source.AlternateColor
+				});
+			}
+
+			return merged;
+		}
 		private void InitialiseCollections()
 		{
 			IgnoreSystems = new List<int>();
@@ -616,7 +642,8 @@ img.rounded-corners {
 				CreateItem("MouseOverSkyhookInfo",Color.GreenYellow,new Point(2, 50),new Size(116, 22),new Font("Segoe UI", 8.0f, FontStyle.Regular),Color.Red),
 				CreateItem("MouseOverNPCDelta",Color.LightSkyBlue,new Point(30, 13),new Size(30, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
 				CreateItem("MouseOverKills",Color.Crimson,new Point(65, 13),new Size(20, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
-				CreateItem("MouseOverAlerts",Color.DarkOrange,new Point(90, 13),new Size(20, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red)
+				CreateItem("MouseOverAlerts",Color.DarkOrange,new Point(90, 13),new Size(20, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
+				CreateItem("MouseOverJumpsPerHour",Color.FloralWhite,new Point(2, 28),new Size(30, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
 			};
 		}
 
@@ -742,10 +769,24 @@ img.rounded-corners {
 				if (!File.Exists(filename))
 					return new Config();
 
-				return JsonSerializer.Deserialize<Config>(
+				var c = new Config();
+
+				var _MainWindowItemLocations = c.DuplicateLocations(c.MainWindowItemLocations);
+				var _AlertWindowItemLocations = c.DuplicateLocations(c.AlertWindowItemLocations);
+				var _OverlayWindowItemLocations = c.DuplicateLocations(c.OverlayWindowItemLocations);
+				var _DPSWindowItemLocations = c.DuplicateLocations(c.DPSWindowItemLocations);
+
+				c = JsonSerializer.Deserialize<Config>(
 						   File.ReadAllText(filename),
 						   CreateJsonOptions())
 					   ?? new Config();
+
+				c.MainWindowItemLocations = c.MergeLocations(c.MainWindowItemLocations, _MainWindowItemLocations);
+				c.AlertWindowItemLocations = c.MergeLocations(c.AlertWindowItemLocations, _AlertWindowItemLocations);
+				c.OverlayWindowItemLocations = c.MergeLocations(c.OverlayWindowItemLocations, _OverlayWindowItemLocations);
+				c.DPSWindowItemLocations = c.MergeLocations(c.DPSWindowItemLocations, _DPSWindowItemLocations);
+
+				return c;
 			}
 			catch
 			{

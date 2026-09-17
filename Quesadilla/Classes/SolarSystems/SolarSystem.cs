@@ -1,4 +1,5 @@
 ﻿using EVEStandard.Models;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Quesadilla.Classes.Queues;
 using Quesadilla.Classes.ZKill;
 using System;
@@ -31,6 +32,7 @@ namespace Quesadilla.Classes.SolarSystems
         public bool IceField { get; set; }
 		public double Security { get; set; }
         public Boolean UniHole {  get; set; }
+        public long JumpsPerHour { get; set; }
 
         private DateTime AlertTime { get; set; }
 		private int? NPCKillsDeltaLastHour { get; set; }

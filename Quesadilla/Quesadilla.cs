@@ -1,4 +1,5 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
+﻿using EVEStandard.Models;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Alerts;
 using Quesadilla.Classes.Configuration;
@@ -843,6 +844,8 @@ namespace Quesadilla
                 Program.Universe.GetSystemInfo(foundSystem.Id);
 
                 GetSkyhookTimers();
+
+                GetJumpsPerHour();
             }
 
             // System not found and not WH space... so Abyss
@@ -883,7 +886,6 @@ namespace Quesadilla
             shouldUpdatePlanetInfo = true;
             shouldUpdateMinimap = true;
         }
-
 
 		private void _localWatcher_ChatServerChange(object sender,ProcessChatServerChangeEventArgs e)
 		{
@@ -2700,5 +2702,10 @@ namespace Quesadilla
 				.Where(a => a.Enabled && a.AlertType == alertType).ToList();
 		}
 
+
+        private void GetJumpsPerHour()
+		{
+			Program.ESIHandler.EnqueueRequestJumpsPerHour();
+		}
 	}
 }
