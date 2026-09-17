@@ -722,7 +722,7 @@ namespace Quesadilla
 
 
 						gMouseOver.DrawString($"{currentSystem.solarSystem.Name}", MouseOverSystemName.Font, GDICache.GetBrush(MouseOverSystemName.ForeColor), MouseOverSystemName.Left, MouseOverSystemName.Top);
-						gMouseOver.DrawString($"{Math.Round(currentSystem.solarSystem.Security,1)}", MouseOverSecurity.Font, GDICache.GetBrush(MouseOverSecurity.ForeColor), MouseOverSecurity.Left, MouseOverSecurity.Top);
+						gMouseOver.DrawString($"{Math.Round(currentSystem.solarSystem.Security, 1).ToString("F1")}", MouseOverSecurity.Font, GDICache.GetBrush(MouseOverSecurity.ForeColor), MouseOverSecurity.Left, MouseOverSecurity.Top);
 
 						gMouseOver.DrawString($"{currentSystem.solarSystem.GetNPCKillsDeltaLastHour()}", MouseOverNPCDelta.Font, GDICache.GetBrush(MouseOverNPCDelta.ForeColor), MouseOverNPCDelta.Left, MouseOverNPCDelta.Top);
 						gMouseOver.DrawString($"{currentSystem.solarSystem.CountKills()}", MouseOverKills.Font, GDICache.GetBrush(MouseOverKills.ForeColor), MouseOverKills.Left, MouseOverKills.Top);
