@@ -644,6 +644,7 @@ img.rounded-corners {
 				CreateItem("MouseOverKills",Color.Crimson,new Point(65, 13),new Size(20, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
 				CreateItem("MouseOverAlerts",Color.DarkOrange,new Point(90, 13),new Size(20, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
 				CreateItem("MouseOverJumpsPerHour",Color.FloralWhite,new Point(2, 28),new Size(30, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
+				CreateItem("MouseOverKillsPerHour",Color.Chartreuse,new Point(45, 28),new Size(30, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
 			};
 		}
 

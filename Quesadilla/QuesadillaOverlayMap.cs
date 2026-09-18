@@ -48,6 +48,7 @@ namespace Quesadilla
 		public Label MouseOverKills = new Label() { Name = "MouseOverKills" };
 		public Label MouseOverAlerts = new Label() { Name = "MouseOverAlerts" };
 		public Label MouseOverJumpsPerHour = new Label() { Name = "MouseOverJumpsPerHour" };
+		public Label MouseOverKillsPerHour = new Label() { Name = "MouseOverKillsPerHour" };
 
 		public Chart iskPerMinuteChart = new Chart() { Name = "IskPerMinuteChart" };
 		public Chart minedPerMinuteChart = new Chart() { Name = "MinedPerMinuteChart" };
@@ -79,7 +80,7 @@ namespace Quesadilla
 				Minimap,
 				iskPerMinuteChart,
 				minedPerMinuteChart,
-				MouseOver, MouseOverSystemName, MouseOverSecurity, MouseOverSkyhookInfo, MouseOverNPCDelta, MouseOverKills, MouseOverAlerts, MouseOverJumpsPerHour
+				MouseOver, MouseOverSystemName, MouseOverSecurity, MouseOverSkyhookInfo, MouseOverNPCDelta, MouseOverKills, MouseOverAlerts, MouseOverJumpsPerHour, MouseOverKillsPerHour
 			});
 
 			Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.OverlayWindowItemLocations, 0, false, false, true);
@@ -728,7 +729,8 @@ namespace Quesadilla
 						gMouseOver.DrawString($"{currentSystem.solarSystem.CountKills()}", MouseOverKills.Font, GDICache.GetBrush(MouseOverKills.ForeColor), MouseOverKills.Left, MouseOverKills.Top);
 						gMouseOver.DrawString($"{currentSystem.solarSystem.CountAlerts(false,false,false)}", MouseOverAlerts.Font, GDICache.GetBrush(MouseOverAlerts.ForeColor), MouseOverAlerts.Left, MouseOverAlerts.Top);
 
-						gMouseOver.DrawString($"Jumpa:{currentSystem.solarSystem.JumpsPerHour}", MouseOverJumpsPerHour.Font, GDICache.GetBrush(MouseOverJumpsPerHour.ForeColor), MouseOverJumpsPerHour.Left, MouseOverJumpsPerHour.Top);
+						gMouseOver.DrawString($"J:{currentSystem.solarSystem.JumpsPerHour}", MouseOverJumpsPerHour.Font, GDICache.GetBrush(MouseOverJumpsPerHour.ForeColor), MouseOverJumpsPerHour.Left, MouseOverJumpsPerHour.Top);
+						gMouseOver.DrawString($"K:{currentSystem.solarSystem.ShipKillsPerHour}/{currentSystem.solarSystem.PodKillsPerHour}", MouseOverKillsPerHour.Font, GDICache.GetBrush(MouseOverKillsPerHour.ForeColor), MouseOverKillsPerHour.Left, MouseOverJumpsPerHour.Top);
 
 						// Skyhooks ?
 						DateTime utcNow = DateTime.UtcNow;

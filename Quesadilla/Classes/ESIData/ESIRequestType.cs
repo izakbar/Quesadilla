@@ -15,6 +15,7 @@ namespace Quesadilla.Classes.ESIData
         Killmail,
         SkyhookTheftData,
         Incursions,
-        JumpsPerHour
+        JumpsPerHour,
+        KillsPerHour
     }
 }

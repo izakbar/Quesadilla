@@ -129,6 +129,9 @@ namespace Quesadilla.Classes.ESIData
 					case ESIRequestType.JumpsPerHour:
 						ESIGetJumpsPerHour();
 						break;
+					case ESIRequestType.KillsPerHour:
+						ESIGetKillsPerHour();
+						break;
 				}
 
 				ESIEventHandler?.Invoke(this,
@@ -139,7 +142,7 @@ namespace Quesadilla.Classes.ESIData
 			}
         }
 		private void ESIGetJumpsPerHour()
-        {
+		{
 			if (!retryAfterCheck(System.Reflection.MethodBase.GetCurrentMethod().Name)) return;
 
 			try
@@ -152,7 +155,35 @@ namespace Quesadilla.Classes.ESIData
 					_log.Debug($"Hook : {s.SystemId} {s.ShipJumps}");
 					if (Program.Universe.SolarSystems.TryGetValue((int)s.SystemId, out var solarSystem))
 					{
-                        solarSystem.JumpsPerHour = s.ShipJumps;
+						solarSystem.JumpsPerHour = s.ShipJumps;
+					}
+				}
+			}
+			catch
+			{
+				if (!retryAfterList.ContainsKey(System.Reflection.MethodBase.GetCurrentMethod().Name))
+				{
+					StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, 120);
+				}
+			}
+		}
+		private void ESIGetKillsPerHour()
+		{
+			if (!retryAfterCheck(System.Reflection.MethodBase.GetCurrentMethod().Name)) return;
+
+			try
+			{
+				var killsPerHour = _esiClient.Universe.GetSystemKillsAsync().GetAwaiter().GetResult();
+				StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, killsPerHour.RetryAfter);
+
+				foreach (var s in killsPerHour.Model)
+				{
+					_log.Debug($"Hook : {s.SystemId} {s.NpcKills} {s.PodKills} {s.ShipKills}");
+					if (Program.Universe.SolarSystems.TryGetValue((int)s.SystemId, out var solarSystem))
+					{
+						solarSystem.NPCKillsPerHour = s.NpcKills;
+						solarSystem.ShipKillsPerHour = s.ShipKills;
+						solarSystem.PodKillsPerHour = s.PodKills;
 					}
 				}
 			}

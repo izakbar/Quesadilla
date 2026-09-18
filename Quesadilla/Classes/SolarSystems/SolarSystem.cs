@@ -32,9 +32,12 @@ namespace Quesadilla.Classes.SolarSystems
         public bool IceField { get; set; }
 		public double Security { get; set; }
         public Boolean UniHole {  get; set; }
-        public long JumpsPerHour { get; set; }
+		public long JumpsPerHour { get; set; }
+		public long NPCKillsPerHour { get; set; }
+		public long ShipKillsPerHour { get; set; }
+		public long PodKillsPerHour { get; set; }
 
-        private DateTime AlertTime { get; set; }
+		private DateTime AlertTime { get; set; }
 		private int? NPCKillsDeltaLastHour { get; set; }
 		private Regex _nameRegex;
 		private Regex NameRegex => this._nameRegex;
