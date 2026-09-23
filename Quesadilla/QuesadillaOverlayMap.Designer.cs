@@ -1,4 +1,6 @@
-﻿namespace Quesadilla
+﻿using System.Drawing.Imaging;
+
+namespace Quesadilla
 {
 	partial class QuesadillaOverlayMap
 	{
@@ -17,6 +19,11 @@
 			{
 				components.Dispose();
 			}
+
+			ImageAttrMainMap?.Dispose();
+			ImageAttrISKGraph?.Dispose();
+			ImageAttrMinedGraph?.Dispose();
+			ImageAttrMouseOverGraph?.Dispose();
 			base.Dispose(disposing);
 		}
 

@@ -27,16 +27,25 @@ namespace Quesadilla.Classes.Configuration
 		[DisplayName("Visible")]
 		public bool IsVisible { get; set; }
 
+		private Font _font;
 
 		[JsonIgnore]
 		public Font Font
 		{
-			get => new Font(FontFamily, FontSize, FontStyle);
+			get 
+			{
+				if (_font != null)
+					return _font;
+				_font = new Font(FontFamily, FontSize, FontStyle);
+				return _font;
+			}
 			set
 			{
 				FontFamily = value.FontFamily.Name;
 				FontSize = value.Size;
 				FontStyle = value.Style;
+				_font?.Dispose();
+				_font = null;
 			}
 		}
 

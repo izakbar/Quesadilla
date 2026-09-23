@@ -17,6 +17,8 @@
 			{
 				components.Dispose();
 			}
+			ImageAttrDPS?.Dispose();
+			axisFont?.Dispose();
 			base.Dispose(disposing);
 		}
 
