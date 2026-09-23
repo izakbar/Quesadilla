@@ -595,56 +595,110 @@ img.rounded-corners {
 
 		private void InitialiseMainWindowLayout()
 		{
+			using (var font1 = new Font("Microsoft Sans Serif", 12f, FontStyle.Bold))
+			using (var font2 = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular))
+			using (var font3 = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold))
+			using (var font4 = new Font("Segoe UI Variable", 8.25f, FontStyle.Regular))
+			using (var font5 = new Font("Segoe UI", 8.25f, FontStyle.Bold))
+			using (var font6 = new Font("Segoe UI", 12f, FontStyle.Bold))
+			using (var font7 = new Font("Segoe UI", 8.5f, FontStyle.Bold))
+			using (var font8 = new Font("Impact", 10f, FontStyle.Regular))
+			using (var font9 = new Font("Segoe UI Variable", 9f, FontStyle.Regular))
+			using (var font10 = new Font("Microsoft Sans Serif", 9.3f, FontStyle.Bold))
+			using (var font11 = new Font("Microsoft Sans Serif", 9.2f, FontStyle.Regular))
+			using (var font12 = new Font("Segoe UI", 8.0f, FontStyle.Regular))
+			using (var font13 = new Font("Segoe UI Variable", 8.25f, FontStyle.Bold))
+			using (var font14 = new Font("Tahoma", 8.25f, FontStyle.Regular))
+			using (var font15 = new Font("Segoe UI Variable", 20f, FontStyle.Bold))
+			using (var font16 = new Font("Segoe UI Variable", 8f, FontStyle.Bold))
+			using (var font17 = new Font("Verdana", 10f, FontStyle.Bold))
+			using (var font18 = new Font("Tahoma", 9f, FontStyle.Regular))
 			MainWindowItemLocations = new List<ConfigurationItemLocationInformation>
 			{
-				CreateItem("WorkingIndicator",Color.Red,new Point(625, -1),new Size(13, 15),new Font("Microsoft Sans Serif", 12f, FontStyle.Bold)),
-				CreateItem("CurrentClient",Color.MediumTurquoise,new Point(2, 2),new Size(265, 21),new Font("Segoe UI", 12f, FontStyle.Bold)),
-				CreateItem("EveScoutStatus",Color.LimeGreen,new Point(0, 218),new Size(163, 13),new Font("Segoe UI", 8.25f, FontStyle.Regular)),
-				CreateItem("AlertsOutstanding",Color.LightCoral,new Point(240, 3),new Size(114, 11),new Font("Segoe UI", 8.25f, FontStyle.Regular)),
-				CreateItem("MiningData",Color.Aqua,new Point(200, 3),new Size(118, 11),new Font("Segoe UI", 8.25f, FontStyle.Bold),Color.Orange),
-				CreateItem("RattingData",Color.Aqua,new Point(350, 3),new Size(118, 11),new Font("Segoe UI", 8.25f, FontStyle.Bold),Color.Orange),
-				CreateItem("MainMinimap",Color.White,new Point(3, 3),new Size(260, 200),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red),
-				CreateItem("MouseoverSystemName",Color.Orchid,new Point(445, 203),new Size(193, 11),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red),
-				CreateItem("ExtraInformation",Color.LimeGreen,new Point(270, 18),new Size(360, 170),new Font("Segoe UI Variable", 8.25f, FontStyle.Regular),Color.Brown),
-				CreateItem("ChatServerDown",Color.Red,new Point(471, 3),new Size(152, 20),new Font("Microsoft Sans Serif", 12f, FontStyle.Bold),Color.Brown),
-				CreateItem("IntelLog",Color.LightGoldenrodYellow,new Point(471, 3),new Size(152, 20),new Font("Segoe UI Variable", 8.25f, FontStyle.Regular),Color.Brown,ColorTranslator.FromHtml("#0f0f11"))
+				CreateItem("WorkingIndicator",Color.Red,new Point(625, -1),new Size(13, 15),font1),
+				CreateItem("CurrentClient",Color.MediumTurquoise,new Point(2, 2),new Size(265, 21),font6),
+				CreateItem("EveScoutStatus",Color.LimeGreen,new Point(0, 218),new Size(163, 13),font5),
+				CreateItem("AlertsOutstanding",Color.LightCoral,new Point(240, 3),new Size(114, 11),font5),
+				CreateItem("MiningData",Color.Aqua,new Point(200, 3),new Size(118, 11),font5,Color.Orange),
+				CreateItem("RattingData",Color.Aqua,new Point(350, 3),new Size(118, 11),font3,Color.Orange),
+				CreateItem("MainMinimap",Color.White,new Point(3, 3),new Size(260, 200),font2,Color.Red),
+				CreateItem("MouseoverSystemName",Color.Orchid,new Point(445, 203),new Size(193, 11),font2,Color.Red),
+				CreateItem("ExtraInformation",Color.LimeGreen,new Point(270, 18),new Size(360, 170),font4,Color.Brown),
+				CreateItem("ChatServerDown",Color.Red,new Point(471, 3),new Size(152, 20),font1,Color.Brown),
+				CreateItem("IntelLog",Color.LightGoldenrodYellow,new Point(471, 3),new Size(152, 20),font4,Color.Brown,ColorTranslator.FromHtml("#0f0f11"))
 			};
 		}
 		private void InitialiseAlertWindowLayout()
 		{
+			using (var font1 = new Font("Microsoft Sans Serif", 12f, FontStyle.Bold))
+			using (var font2 = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular))
+			using (var font3 = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold))
+			using (var font4 = new Font("Segoe UI Variable", 8.25f, FontStyle.Regular))
+			using (var font5 = new Font("Segoe UI", 8.25f, FontStyle.Bold))
+			using (var font6 = new Font("Segoe UI", 12f, FontStyle.Bold))
+			using (var font7 = new Font("Segoe UI", 8.5f, FontStyle.Bold))
+			using (var font8 = new Font("Impact", 10f, FontStyle.Regular))
+			using (var font9 = new Font("Segoe UI Variable", 9f, FontStyle.Regular))
+			using (var font10 = new Font("Microsoft Sans Serif", 9.3f, FontStyle.Bold))
+			using (var font11 = new Font("Microsoft Sans Serif", 9.2f, FontStyle.Regular))
+			using (var font12 = new Font("Segoe UI", 8.0f, FontStyle.Regular))
+			using (var font13 = new Font("Segoe UI Variable", 8.25f, FontStyle.Bold))
+			using (var font14 = new Font("Tahoma", 8.25f, FontStyle.Regular))
+			using (var font15 = new Font("Segoe UI Variable", 20f, FontStyle.Bold))
+			using (var font16 = new Font("Segoe UI Variable", 8f, FontStyle.Bold))
+			using (var font17 = new Font("Verdana", 10f, FontStyle.Bold))
+			using (var font18 = new Font("Tahoma", 9f, FontStyle.Regular)) 
 			AlertWindowItemLocations = new List<ConfigurationItemLocationInformation>
 			{
-				CreateItem("AlertText",Color.White,new Point(0, 165),new Size(400, 12),new Font("Tahoma", 8.25f, FontStyle.Regular)),
-				CreateItem("SystemName",Color.Lime,new Point(115, 4),new Size(280, 31),new Font("Segoe UI Variable", 20f, FontStyle.Bold)),
-				CreateItem("RegionName",Color.Cyan,new Point(275, 36),new Size(120, 13),new Font("Segoe UI Variable", 8f, FontStyle.Bold)),
-				CreateItem("ContextInfo",Color.Yellow,new Point(2, 47),new Size(396, 19),new Font("Verdana", 10f, FontStyle.Bold)),
-				CreateItem("IntelLine",Color.White,new Point(155, 64),new Size(240, 57),new Font("Tahoma", 9f, FontStyle.Regular)),
-				CreateItem("ShipName",Color.Lime,new Point(180, 125),new Size(150, 13),new Font("Segoe UI Variable", 8.25f, FontStyle.Bold)),
-				CreateItem("AlertImage",Color.White,new Point(335, 95),new Size(53, 57),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold)),
-				CreateItem("MinimapImage",Color.White,new Point(34, 3),new Size(193, 128),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold)),
-				CreateItem("AlertLogoKiller",Color.White,new Point(437, 138),new Size(34, 34),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold)),
-				CreateItem("AlertLogoVictim",Color.White,new Point(516, 122),new Size(34, 34),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold))
+				CreateItem("AlertText",Color.White,new Point(0, 165),new Size(400, 12),font14),
+				CreateItem("SystemName",Color.Lime,new Point(115, 4),new Size(280, 31),font15),
+				CreateItem("RegionName",Color.Cyan,new Point(275, 36),new Size(120, 13),font16),
+				CreateItem("ContextInfo",Color.Yellow,new Point(2, 47),new Size(396, 19),font17),
+				CreateItem("IntelLine",Color.White,new Point(155, 64),new Size(240, 57),font18),
+				CreateItem("ShipName",Color.Lime,new Point(180, 125),new Size(150, 13),font13),
+				CreateItem("AlertImage",Color.White,new Point(335, 95),new Size(53, 57),font3),
+				CreateItem("MinimapImage",Color.White,new Point(34, 3),new Size(193, 128),font3),
+				CreateItem("AlertLogoKiller",Color.White,new Point(437, 138),new Size(34, 34),font3),
+				CreateItem("AlertLogoVictim",Color.White,new Point(516, 122),new Size(34, 34),font3)
 			};
 		}
 		private void InitialiseOverlayLayout()
 		{
+			using (var font1 = new Font("Microsoft Sans Serif", 12f, FontStyle.Bold))
+			using (var font2 = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular))
+			using (var font3 = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold))
+			using (var font4 = new Font("Segoe UI Variable", 8.25f, FontStyle.Regular))
+			using (var font5 = new Font("Segoe UI", 8.25f, FontStyle.Bold))
+			using (var font6 = new Font("Segoe UI", 12f, FontStyle.Bold))
+			using (var font7 = new Font("Segoe UI", 8.5f, FontStyle.Bold))
+			using (var font8 = new Font("Impact", 10f, FontStyle.Regular))
+			using (var font9 = new Font("Segoe UI Variable", 9f, FontStyle.Regular))
+			using (var font10 = new Font("Microsoft Sans Serif", 9.3f, FontStyle.Bold))
+			using (var font11 = new Font("Microsoft Sans Serif", 9.2f, FontStyle.Regular))
+			using (var font12 = new Font("Segoe UI", 8.0f, FontStyle.Regular))
+			using (var font13 = new Font("Segoe UI Variable", 8.25f, FontStyle.Bold))
+			using (var font14 = new Font("Tahoma", 8.25f, FontStyle.Regular))
+			using (var font15 = new Font("Segoe UI Variable", 20f, FontStyle.Bold))
+			using (var font16 = new Font("Segoe UI Variable", 8f, FontStyle.Bold))
+			using (var font17 = new Font("Verdana", 10f, FontStyle.Bold))
+			using (var font18 = new Font("Tahoma", 9f, FontStyle.Regular))
 			OverlayWindowItemLocations = new List<ConfigurationItemLocationInformation>
 			{
-				CreateItem("RattingData",Color.Aqua,new Point(440, 12),new Size(118, 15),new Font("Impact", 10f, FontStyle.Regular),Color.Orange),
-				CreateItem("MiningData",Color.Aqua,new Point(300, 323),new Size(118, 15),new Font("Impact", 10f, FontStyle.Regular),Color.Orange),
-				CreateItem("EveScoutStatus",Color.LimeGreen,new Point(1, 1),new Size(640, 13),new Font("Segoe UI Variable", 9f, FontStyle.Regular)),
-				CreateItem("Minimap",Color.White,new Point(0, 0),new Size(500, 350),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red),
-				CreateItem("IskPerMinuteChart",Color.Orchid,new Point(320, 32),new Size(280, 80),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red),
-				CreateItem("MinedPerMinuteChart",Color.Orchid,new Point(320, 270),new Size(280, 80),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red),
-				CreateItem("MouseOver",Color.Red,new Point(-1, -1),new Size(120, 80),new Font("Microsoft Sans Serif", 8.25f, FontStyle.Regular),Color.Red,Color.Black),
-				CreateItem("MouseOverSystemName",Color.White,new Point(2, 2),new Size(120, 11),new Font("Microsoft Sans Serif", 9.3f, FontStyle.Bold),Color.Red),
-				CreateItem("MouseOverSecurity",Color.Yellow,new Point(2, 13),new Size(25, 11),new Font("Microsoft Sans Serif", 9.2f, FontStyle.Regular),Color.Red),
-				CreateItem("MouseOverSkyhookInfo",Color.GreenYellow,new Point(2, 50),new Size(116, 22),new Font("Segoe UI", 8.0f, FontStyle.Regular),Color.Red),
-				CreateItem("MouseOverNPCDelta",Color.LightSkyBlue,new Point(30, 13),new Size(30, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
-				CreateItem("MouseOverKills",Color.Crimson,new Point(65, 13),new Size(20, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
-				CreateItem("MouseOverAlerts",Color.DarkOrange,new Point(90, 13),new Size(20, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
-				CreateItem("MouseOverJumpsPerHour",Color.FloralWhite,new Point(2, 28),new Size(30, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
-				CreateItem("MouseOverKillsPerHour",Color.Chartreuse,new Point(45, 28),new Size(30, 11),new Font("Segoe UI", 8.5f, FontStyle.Bold),Color.Red),
+				CreateItem("RattingData",Color.Aqua,new Point(440, 12),new Size(118, 15),font8,Color.Orange),
+				CreateItem("MiningData",Color.Aqua,new Point(300, 323),new Size(118, 15),font8,Color.Orange),
+				CreateItem("EveScoutStatus",Color.LimeGreen,new Point(1, 1),new Size(640, 13),font9),
+				CreateItem("Minimap",Color.White,new Point(0, 0),new Size(500, 350),font2,Color.Red),
+				CreateItem("IskPerMinuteChart",Color.Orchid,new Point(320, 32),new Size(280, 80),font2,Color.Red),
+				CreateItem("MinedPerMinuteChart",Color.Orchid,new Point(320, 270),new Size(280, 80),font2,Color.Red),
+				CreateItem("MouseOver",Color.Red,new Point(-1, -1),new Size(120, 80),font2,Color.Red,Color.Black),
+				CreateItem("MouseOverSystemName",Color.White,new Point(2, 2),new Size(120, 11),font10,Color.Red),
+				CreateItem("MouseOverSecurity",Color.Yellow,new Point(2, 13),new Size(25, 11),font11,Color.Red),
+				CreateItem("MouseOverSkyhookInfo",Color.GreenYellow,new Point(2, 50),new Size(116, 22),font12,Color.Red),
+				CreateItem("MouseOverNPCDelta",Color.LightSkyBlue,new Point(30, 13),new Size(30, 11),font7,Color.Red),
+				CreateItem("MouseOverKills",Color.Crimson,new Point(65, 13),new Size(20, 11),font7,Color.Red),
+				CreateItem("MouseOverAlerts",Color.DarkOrange,new Point(90, 13),new Size(20, 11),font7,Color.Red),
+				CreateItem("MouseOverJumpsPerHour",Color.FloralWhite,new Point(2, 28),new Size(30, 11),font7,Color.Red),
+				CreateItem("MouseOverKillsPerHour",Color.Chartreuse,new Point(45, 28),new Size(30, 11),font7,Color.Red),
 			};
 		}
 

@@ -230,16 +230,19 @@ namespace Quesadilla
 			if (configuration.AlertPopupShowMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0))
 			{
 				string extraInformation = "";
+				using (
 				Image minimapImage = ImageGenerator.ClipMiniMap(MinimapImage.Width, MinimapImage.Height, alert.Path, 100,
 					ref extraInformation, ref MinimapSystems,
-					null, null, null, null,null, null,null,
+					null, null, null, null, null, null, null,
 					_minimapParameters
-					);
-				Bitmap minimapBitmap = new Bitmap(minimapImage);
-				minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
-				var _oldImage = MinimapImage.Image;
-				MinimapImage.Image = minimapBitmap;
-				_oldImage?.Dispose();
+					))
+				{
+					Bitmap minimapBitmap = new Bitmap(minimapImage);
+					minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));
+					var _oldImage = MinimapImage.Image;
+					MinimapImage.Image = minimapBitmap;
+					_oldImage?.Dispose();
+				}
 				MinimapImage.Visible = true;
 			}
 			else

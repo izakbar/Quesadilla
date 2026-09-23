@@ -17,7 +17,8 @@
             {
                 components.Dispose();
             }
-            base.Dispose(disposing);
+			_planetInfoFont?.Dispose();
+			base.Dispose(disposing);
         }
 
         #region Windows Form Designer generated code
