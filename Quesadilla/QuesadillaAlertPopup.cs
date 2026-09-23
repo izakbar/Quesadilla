@@ -210,6 +210,7 @@ namespace Quesadilla
 					var _oldImage = AlertImage.Image;
 					AlertImage.Image = killBitmap;
 					_oldImage?.Dispose();
+					RoundedImage.Dispose();
 				}
 				catch (Exception e)
 				{
@@ -442,14 +443,18 @@ namespace Quesadilla
 		private void Zoom_MouseEnter(object sender, EventArgs e)
 		{
 			System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
+			var _oldFont = x.Font;
 			x.Font = new Font(x.Font.Name, x.Font.Size + ZOOM_SIZE_INCREASE, FontStyle.Bold);
+			_oldFont?.Dispose();
 			x.TextAlign = ContentAlignment.TopLeft;
 		}
 
 		private void Zoom_MouseLeave(object sender, EventArgs e)
 		{
 			System.Windows.Forms.Label x = sender as System.Windows.Forms.Label;
+			var _oldFont = x.Font;
 			x.Font = new Font(x.Font.Name, x.Font.Size - ZOOM_SIZE_INCREASE, FontStyle.Regular);
+			_oldFont?.Dispose();
 			x.TextAlign = ContentAlignment.TopRight;
 		}
 
