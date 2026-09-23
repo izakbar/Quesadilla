@@ -448,6 +448,7 @@ namespace Quesadilla
 
             Program.CachedBackground = Program.LoadImageFromFile(Program.MainConfiguration.AlertPopupBackground);
 
+            _planetInfoFont?.Dispose();
 			_planetInfoFont = new Font("Verdana", Program.MainConfiguration.PlanetInfoFontSize, FontStyle.Regular);
 
             UpdateMinimapParameters();
@@ -2000,7 +2001,7 @@ namespace Quesadilla
             if (Program.MainConfiguration.ShowMinimap)
             {
                 string extraInformation = "";
-                Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MainMinimap.Width, MainMinimap.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath,
+                Image minimapImage = ImageGenerator.ClipMiniMap(MainMinimap.Width, MainMinimap.Height, _dummyPath,
                     mapScale, ref extraInformation, ref MinimapSystems,
                     AnimationManager[AnimationType.Intel].GetNextValue(),
                     AnimationManager[AnimationType.Kills].GetNextValue(),

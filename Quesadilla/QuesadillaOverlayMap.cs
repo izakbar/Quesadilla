@@ -837,7 +837,7 @@ namespace Quesadilla
 
 			string extraInformation = "";
 
-			Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(Minimap.Width, Minimap.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _dummyPath, Program.MainConfiguration.OverlayMapMapScale,
+			Image minimapImage = ImageGenerator.ClipMiniMap(Minimap.Width, Minimap.Height, _dummyPath, Program.MainConfiguration.OverlayMapMapScale,
 				ref extraInformation, ref MinimapSystems,
 				_animationManager[AnimationType.Intel].GetNextValue(),
 				_animationManager[AnimationType.Kills].GetNextValue(),

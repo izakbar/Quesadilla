@@ -229,7 +229,7 @@ namespace Quesadilla
 			if (configuration.AlertPopupShowMinimap && (alert.Path != null && alert.Path.PathSystems != null && alert.Path.PathSystems.Count > 0 && alert.Path.FromSystemId != 0))
 			{
 				string extraInformation = "";
-				Image minimapImage = ImageGenerator.ClipMiniMap(new Bitmap(MinimapImage.Width, MinimapImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb), alert.Path, 100,
+				Image minimapImage = ImageGenerator.ClipMiniMap(MinimapImage.Width, MinimapImage.Height, alert.Path, 100,
 					ref extraInformation, ref MinimapSystems,
 					null, null, null, null,null, null,null,
 					_minimapParameters

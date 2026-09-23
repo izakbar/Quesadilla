@@ -441,7 +441,7 @@ namespace Quesadilla.Classes.ImageGeneration
 			g.DrawEllipse(mainPen, innerRect);
 		}
 
-		public static Image ClipMiniMap(Image srcImage, PathInfo path, int mapScale,
+		public static Image ClipMiniMap(int width, int height, PathInfo path, int mapScale,
 			ref string extraInformation, ref List<MinimapSystem> returnMinimapSystems,
 			int? animationCycleIntel,
 			int? animationCycleKills,
@@ -457,12 +457,12 @@ namespace Quesadilla.Classes.ImageGeneration
 
 			StringBuilder sbExtraInformation = new StringBuilder();
 
-			Point center = new Point((srcImage.Width / 2) - 1, (srcImage.Height / 2) - 1);
+			Point center = new Point((width / 2) - 1, (height / 2) - 1);
 
 			// quick note on x/y coord calcs
 			// dotlan calcs need to be inverted to make sure map displays correctly - not an error
 
-			Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
+			Image dstImage = new Bitmap(width, height, PixelFormat.Format32bppArgb);
 
 			using (Graphics g = Graphics.FromImage(dstImage))
 			{
@@ -630,8 +630,8 @@ namespace Quesadilla.Classes.ImageGeneration
 				//int maxSize = Math.Max((int)(maxX - minX), (int)(maxY - minY));
 				//int pictureSize = Math.Min(srcImage.Width, srcImage.Height) - BORDER_WIDTH - TRANSPARENT_BORDER_WIDTH - (8);
 
-				double GUI_SCALINGx = (double)(maxX - minX) / (srcImage.Width * (parameters.MapType == MapType.SDE ? .9 : (parameters.MapType == MapType.SDE2D ? .9 : .9)));
-				double GUI_SCALINGy = (double)(maxY - minY) / (srcImage.Height * (parameters.MapType == MapType.SDE ? .9 : (parameters.MapType == MapType.SDE2D ? .9 : .9)));
+				double GUI_SCALINGx = (double)(maxX - minX) / (width * (parameters.MapType == MapType.SDE ? .9 : (parameters.MapType == MapType.SDE2D ? .9 : .9)));
+				double GUI_SCALINGy = (double)(maxY - minY) / (height * (parameters.MapType == MapType.SDE ? .9 : (parameters.MapType == MapType.SDE2D ? .9 : .9)));
 				GUI_SCALING = Math.Max(GUI_SCALINGx, GUI_SCALINGy);
 
 				//GUI_SCALING = (int)Math.Round((double)(maxSize) / ((pictureSize * (parameters.MapType == MapType.SDE ? .9 : (parameters.MapType == MapType.SDE2D ? .9 : .9 )) )));
@@ -663,8 +663,8 @@ namespace Quesadilla.Classes.ImageGeneration
 
 				if (minimapSystems.Count > 1)
 				{
-					ox = ((srcImage.Width - (maxX - minX)) / 2) - BORDER_WIDTH - CIRCLE_RADIUS  - 1;
-					oy = ((srcImage.Height - (maxY - minY)) / 2) - BORDER_WIDTH - CIRCLE_RADIUS  - 1;
+					ox = ((width - (maxX - minX)) / 2) - BORDER_WIDTH - CIRCLE_RADIUS  - 1;
+					oy = ((height - (maxY - minY)) / 2) - BORDER_WIDTH - CIRCLE_RADIUS  - 1;
 					if (minX < 0) ox = ox + Math.Abs(minX);
 					if (minY < 0) oy = oy + Math.Abs(minY);
 				}
@@ -690,7 +690,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					ImageAttributes incursionImageAttr = new ImageAttributes();
 					SetImageAlpha(incursionImageAttr, parameters.IncursionAlphaAmount);
 
-					using (Image incursionImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb))
+					using (Image incursionImage = new Bitmap(width, height, PixelFormat.Format32bppArgb))
 					using (Graphics gIncursion = Graphics.FromImage(incursionImage))
 					{
 						MapCircles(gIncursion, minimapSystems.Where(o => o.solarSystem.Incursion).ToList(), originPoint, incursionBlobSize, incursionOutlinePen, incursionBrush, parameters.IncursionOutlineColour, animationIncursion);
@@ -717,7 +717,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					ImageAttributes secLimitImageAttr = new ImageAttributes();
 					SetImageAlpha(secLimitImageAttr, parameters.SecLimitAlphaAmount);
 
-					using (Image secLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb))
+					using (Image secLimitImage = new Bitmap(width, height, PixelFormat.Format32bppArgb))
 					using (Graphics gSecLimit = Graphics.FromImage(secLimitImage))
 					{
 						MapCircles(gSecLimit, minimapSystems.Where(o => o.solarSystem.Security <= parameters.SecLimitValue).ToList(), originPoint, secLimitBlobSize, secLimitOutlinePen, secLimitBrush, parameters.SecLimitOutlineColour, animationCycleSecLimit);
@@ -751,7 +751,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					// go through systems used 3 times - draw weak first, then strong then centre
 					for (int stormStrength = 0; stormStrength <= 2; stormStrength++)
 					{
-						using (Image stormLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb))
+						using (Image stormLimitImage = new Bitmap(width, height, PixelFormat.Format32bppArgb))
 						using (Graphics gStorm = Graphics.FromImage(stormLimitImage))
 						{
 							switch (stormStrength)
@@ -805,7 +805,7 @@ namespace Quesadilla.Classes.ImageGeneration
 							}
 						}
 
-						using (Image stormLimitImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb))
+						using (Image stormLimitImage = new Bitmap(width, height, PixelFormat.Format32bppArgb))
 						using (Graphics gStorm = Graphics.FromImage(stormLimitImage))
 						{
 							stormAlphaAmount = parameters.StormMainAlpha;
