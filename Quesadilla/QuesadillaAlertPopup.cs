@@ -206,7 +206,7 @@ namespace Quesadilla
 					zKillVictimLogo?.Dispose();
 
 					Bitmap killBitmap = new Bitmap(RoundedImage);
-					killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
+					//killBitmap.MakeTransparent(killBitmap.GetPixel(0, 0));
 					var _oldImage = AlertImage.Image;
 					AlertImage.Image = killBitmap;
 					_oldImage?.Dispose();

@@ -1048,9 +1048,12 @@ namespace Quesadilla.Classes.ImageGeneration
 		{
 			float diameter = radius * 2;
 
-			Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
+			Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, PixelFormat.Format32bppArgb);
 			using (Graphics g = Graphics.FromImage(dstImage))
 			{
+
+				g.Clear(Color.Transparent);
+
 				int adj = 3;
 
 				// Border
