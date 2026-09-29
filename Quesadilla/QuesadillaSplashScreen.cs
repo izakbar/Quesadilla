@@ -93,7 +93,21 @@ namespace Quesadilla
 
 			ShowInTaskbar = false;
 
-			Version version = Assembly.GetEntryAssembly()?.GetName().Version;
+			Version version = Assembly.GetEntryAssembly().GetName().Version;
+
+			try
+			{
+				System.Deployment.Application.ApplicationDeployment ad = System.Deployment.Application.ApplicationDeployment.CurrentDeployment;
+				if (ad != null)
+				{
+					version = ad.CurrentVersion;
+				}
+			}
+			catch
+			{
+				version = Assembly.GetEntryAssembly().GetName().Version;
+			}
+
 			VersionNumber.Text = version?.ToString() ?? "Unknown";
 
 			Opacity = 0;
