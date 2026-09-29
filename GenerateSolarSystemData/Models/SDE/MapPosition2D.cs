@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GenerateSolarSystemData.Models.SDE
 {
-	public class MapPosition2D
+	public class mapPosition2D
 	{
 		public double X { get; set; }
 		public double Y { get; set; }

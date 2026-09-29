@@ -1,17 +1,14 @@
-﻿using GenerateSolarSystemData.Models.SDE;
+﻿using EVEStandard.Models;
+using GenerateSolarSystemData.Models.SDE;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Configuration;
 using Quesadilla;
 using Quesadilla.Classes;
 using Quesadilla.Classes.SolarSystems;
-using QuesadillaExport.DataAccess;
 using Serilog;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace QuesadillaExport
@@ -119,8 +116,27 @@ namespace QuesadillaExport
 			}
 			readerSolarsystems.Close();
 
+
+
+			// read types data
+			Dictionary<int, ItemType> ItemTypes = new Dictionary<int, ItemType>();
+			StreamReader readerTypes = new StreamReader("SDE/types.jsonl");
+			while ((json = readerTypes.ReadLine()) != null)
+			{
+				var typeData = JsonSerializer.Deserialize<type>(json);
+				ItemTypes.Add(typeData._key,
+					new ItemType()
+					{
+						Name = typeData.name.en,
+						GroupId = typeData.groupID,
+						Id = typeData._key,
+						// Group = Groups.ContainsKey(typeData.groupID) ? Groups[typeData.groupID].name.en : "Unknown"
+					});
+			}
+			readerTypes.Close();
+
+
 			// Read planets
-			var itemTypes = DataAccess.invTypes.SelectAll();
 			StreamReader readerPlanets = new StreamReader("SDE/mapPlanets.jsonl");
             while ((json = readerPlanets.ReadLine()) != null)
             {
@@ -141,112 +157,15 @@ namespace QuesadillaExport
                 {
                     PlanetId = planet._key,
                     PlanetTypeId = planet.typeID,
-                    PlanetTypeName = itemTypes.FirstOrDefault(i => i.TypeId == planet.typeID)?.TypeName ?? "Unknown",
+                    PlanetTypeName = ItemTypes.FirstOrDefault(i => i.Value.Id == planet.typeID).Value?.Name ?? "Unknown",
                     PlanetName = planet.celestialIndex.ToString()
                 });
 			}
 
-
-
-
-				var Outputjson = JsonSerializer.Serialize(SolarSystems);
+			var Outputjson = JsonSerializer.Serialize(SolarSystems);
 			File.WriteAllText(@"Quesadilla.Systems.json", Outputjson);
 
 		}
-		static void GenerateSolarSystemDataFromDB()
-        {
-            var solarSystems = DataAccess.mapSolarSystems.SelectAll();
-            Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
-
-            XmlDocument xmldoc = new XmlDocument
-            {
-                XmlResolver = null
-            };
-            string previousRegion = "";
-            bool dotlanRegionDataLoaded = false;
-            XmlNodeList dotlanNodes = null;
-
-            foreach (var solarSystem in solarSystems)
-            {
-                if (previousRegion != solarSystem.RegionName)
-                {
-                    // load dotlan svg for this region
-                    previousRegion = solarSystem.RegionName;
-                    var dotlanRegionName = solarSystem.RegionName.Replace(" ", "_");
-                    try
-                    {
-                        FileStream fs = new FileStream($"dotlan_data\\{dotlanRegionName}.svg", FileMode.Open, FileAccess.Read);
-                        xmldoc.Load(fs);
-                        dotlanNodes = xmldoc.SelectNodes(@"//*[@id='sysuse']/*");
-                        dotlanRegionDataLoaded |= true;
-                    }
-                    catch (Exception ex)
-                    {
-                        dotlanRegionDataLoaded |= false;
-                    }
-                }
-
-                double dotlanX = 0;
-                double dotlanY = 0;
-                string link = "";
-
-                if (dotlanRegionDataLoaded)
-                {
-                    foreach (XmlNode xn in dotlanNodes)
-                    {
-                        long systemID = long.Parse(xn.Attributes["id"].Value.Replace("sys",""));
-                        float x = float.Parse(xn.Attributes["x"].Value);
-                        float y = float.Parse(xn.Attributes["y"].Value);
-                        if (systemID == solarSystem.solarSystemId)
-                        {
-                            dotlanX = x;
-                            dotlanY = y;
-                            link = xn.Attributes["xlink:href"].Value.Replace("#", "");
-                        }
-                    }
-                }
-
-                bool IceField = false;
-
-                XmlNodeList iceFieldNode = xmldoc.SelectNodes($@"//*[@id='{link}']/*/*[@id='{link.Replace("def", "ice")}']");
-                if (iceFieldNode != null && iceFieldNode.Count > 0 )
-                {
-                    IceField = true;
-                }
-
-
-                SolarSystems.Add(solarSystem.solarSystemId,
-                new SolarSystem()
-                {
-                    Name = solarSystem.solarSystemname,
-                    RegionName = solarSystem.RegionName,
-                    X = solarSystem.X,
-                    Y = solarSystem.Y,
-                    Z = solarSystem.Z,
-                    DotlanX = dotlanX,
-                    DotlanY = dotlanY,
-                    Id = solarSystem.solarSystemId,
-                    Incursion = false,
-                    IceField = IceField,
-                    Security = solarSystem.Security,
-                    ConnectedTo = new List<SolarSystemConnectionData>(),
-                }
-            );
-            }
-
-            var solarSystemJumps = DataAccess.mapSolarSystemJumps.SelectAll();
-            foreach (var jump in solarSystemJumps)
-            {
-                SolarSystems[jump.fromSolarSystemId].ConnectedTo.Add(new SolarSystemConnectionData()
-                {
-                    ToSystemId = jump.toSolarSystemId,
-                    IsRegional = jump.fromRegionId == jump.toRegionId ? false : true,
-                });
-            }
-            var json = JsonSerializer.Serialize(SolarSystems);
-            File.WriteAllText(@"Quesadilla.Systems.json", json);
-        }
-
         static void GenerateSolarSystemDataFromDotlan()
         {
             Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
@@ -320,50 +239,86 @@ namespace QuesadillaExport
             File.WriteAllText(@"Quesadilla.Systems.json", Outputjson);
         }
 
-        static void GenerateSolarSystemConnectionsFromDB()
-        {
+		static void GenerateSolarSystemConnectionsFromSDEJson()
+		{
+			string json;
 
 			Dictionary<int, SolarSystem> SolarSystems = new Dictionary<int, SolarSystem>();
 			StreamReader reader = new StreamReader("Quesadilla.Systems.json");
-			var json = reader.ReadToEnd();
+			json = reader.ReadToEnd();
 			SolarSystems = JsonSerializer.Deserialize<Dictionary<int, SolarSystem>>(json);
 			reader.Close();
 
-			var solarSystemJumps = DataAccess.mapSolarSystemJumps.SelectAll();
+			// read group data
+			Dictionary<int, mapStargate> solarSystemJumps = new Dictionary<int, mapStargate>();
+			StreamReader readerMapStargates = new StreamReader("SDE/mapStargates.jsonl");
+			while ((json = readerMapStargates.ReadLine()) != null)
+			{
+				var stargateData = JsonSerializer.Deserialize<mapStargate>(json);
+				solarSystemJumps.Add(stargateData._key, stargateData);
+			}
+			readerMapStargates.Close();
+
+			// todo add regions into above
+
 			foreach (var jump in solarSystemJumps)
 			{
-				SolarSystems[jump.fromSolarSystemId].ConnectedTo.Add(new SolarSystemConnectionData()
+				if (!SolarSystems[jump.Value.solarSystemID].ConnectedTo.Any(x => x.ToSystemId == jump.Value.destination.solarSystemID))
 				{
-					ToSystemId = jump.toSolarSystemId,
-					IsRegional = jump.fromRegionId == jump.toRegionId ? false : true,
-				});
+					SolarSystems[jump.Value.solarSystemID].ConnectedTo.Add(new SolarSystemConnectionData()
+					{
+						ToSystemId = jump.Value.destination.solarSystemID,
+						IsRegional = SolarSystems[jump.Value.solarSystemID].RegionName == SolarSystems[jump.Value.destination.solarSystemID].RegionName ? false : true,
+					});
+				}
+			}
+
+			// sort destinations 
+			foreach (var solarSystem in SolarSystems)
+			{
+				solarSystem.Value.ConnectedTo.Sort((a, b) => a.ToSystemId.CompareTo(b.ToSystemId));
 			}
 
 			var Outputjson = JsonSerializer.Serialize(SolarSystems);
 			File.WriteAllText(@"Quesadilla.Systems.json", Outputjson);
-
 		}
 
-		static void GenerateItemTypesData()
-        {
-            var itemTypes = DataAccess.invTypes.SelectAll();
-            Dictionary<int, ItemType> ItemTypes = new Dictionary<int, ItemType>();
-            foreach (var item in itemTypes)
-            {
-                ItemTypes.Add(item.TypeId,
-                new ItemType()
-                {
-                    Name = item.TypeName,
-                    Group = item.GroupName,
-                    Id = item.TypeId,
-                });
-            }
-            var json = JsonSerializer.Serialize(ItemTypes);
-            File.WriteAllText(@"Quesadilla.ItemTypes.json", json);
-        }
+		static void GenerateItemTypesDataFromSDEJson()
+		{
+			string json;
 
+			// read group data
+			Dictionary<int, group> Groups = new Dictionary<int, group>();
+			StreamReader readerGroups = new StreamReader("SDE/groups.jsonl");
+			while ((json = readerGroups.ReadLine()) != null)
+			{
+				var groupData = JsonSerializer.Deserialize<group>(json);
+				Groups.Add(groupData._key, groupData);
+			}
+			readerGroups.Close();
 
-        static void Main(string[] args)
+			// read types data
+			Dictionary<int, ItemType> ItemTypes = new Dictionary<int, ItemType>();
+			StreamReader readerTypes = new StreamReader("SDE/types.jsonl");
+			while ((json = readerTypes.ReadLine()) != null)
+			{
+				var typeData = JsonSerializer.Deserialize<type>(json);
+				ItemTypes.Add(typeData._key,
+					new ItemType()
+					{
+						Name = typeData.name.en,
+						GroupId = typeData.groupID,
+						Id = typeData._key,
+                        Group = Groups.ContainsKey(typeData.groupID) ? Groups[typeData.groupID].name.en : "Unknown"
+					});
+			}
+			readerTypes.Close();
+
+			var jsonOut = JsonSerializer.Serialize(ItemTypes);
+			File.WriteAllText(@"Quesadilla.ItemTypes.json", jsonOut);
+		}
+
+		static void Main(string[] args)
         {
 
             // Build a config object, using env vars and JSON providers.
@@ -372,18 +327,18 @@ namespace QuesadillaExport
                 .AddEnvironmentVariables()
                 .Build();
 
-            QuesadillaExport.DataAccess.DataAccess.ConnectionString = Configuration.GetConnectionString("db");
-
             using var Log = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .WriteTo.Console()
                 .CreateLogger();
 
-            //GenerateSolarSystemDataFromDB();
-            GenerateItemTypesData();
-            GenerateSolarSystemsDataFromSDEJson();
+			GenerateItemTypesDataFromSDEJson(); 
+
+			GenerateSolarSystemsDataFromSDEJson();
             GenerateSolarSystemDataFromDotlan();
-            GenerateSolarSystemConnectionsFromDB();
+
+			GenerateSolarSystemConnectionsFromSDEJson();
+
 			GenerateUniHoleData();
 		}
 	}

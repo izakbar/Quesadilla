@@ -10,6 +10,7 @@ namespace QuesadillaExport.Models.Database
     {
         public int TypeId {  get; set; }
         public string GroupName { get; set; }
-        public string TypeName { get; set; }
+		public int GroupId { get; set; }
+		public string TypeName { get; set; }
     }
 }

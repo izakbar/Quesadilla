@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GenerateSolarSystemData.Models.SDE
 {
-	public class LocaleStrings
+	public class localeStrings
 	{
 		public string en {  get; set; }
 	}

@@ -9,6 +9,6 @@ namespace GenerateSolarSystemData.Models.SDE
 	public  class mapRegion
 	{
 		public int _key { get; set; }
-		public LocaleStrings name {  get; set; }
+		public localeStrings name {  get; set; }
 	}
 }

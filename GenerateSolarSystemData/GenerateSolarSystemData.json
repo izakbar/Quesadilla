@@ -1,5 +1,2 @@
 {
-"ConnectionStrings": {
-    "db": "Server=dsmfluf2;Database=eve_sde;UserId=root;Password=Rincewind72!;Port=13306;Pooling=True;ConnectionLifeTime=300;"
-  }
 }
