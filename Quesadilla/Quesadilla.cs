@@ -2,6 +2,7 @@
 using Microsoft.Toolkit.Uwp.Notifications;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Alerts;
+using Quesadilla.Classes.Anoikis;
 using Quesadilla.Classes.Configuration;
 using Quesadilla.Classes.Dotlan;
 using Quesadilla.Classes.ESIData;
@@ -105,9 +106,10 @@ namespace Quesadilla
         private MenuItem menuConfigurationDPSShowZkill = new MenuItem("Show ZKill Alerts");
         private MenuItem menuConfigurationDPSSaveCSV = new MenuItem("DPS Save CSV");
         private MenuItem menuConfigurationDPSShowAll = new MenuItem("DPS Combine");
-        private DotlanManager DotlanProcessor;
+		private DotlanManager DotlanProcessor;
 
-        public bool AlertShowing = false;
+
+		public bool AlertShowing = false;
 
         private bool ChatServerStatus = true;
         private bool InCombat = false;
@@ -223,13 +225,13 @@ namespace Quesadilla
             DotlanProcessor = new DotlanManager();
             DotlanProcessor.DotlanEventHandler += new EventHandler<DotlanEventArgs>(this.Dotlan_ProcessNewData);
 
-            SetupLogfileEvents();
+			SetupLogfileEvents();
 
             RebuildLogfilesMenu();
             Program.LogWatcherManager.Start();
 
-            // Program.ZKillHandler.ZKillFeedRedisQ.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
-            Program.ZKillHandler.ZKillFeedR2Z2.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
+			// Program.ZKillHandler.ZKillFeedRedisQ.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
+			Program.ZKillHandler.ZKillFeedR2Z2.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
             Program.ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(this.ESI_ProcessNewData);
 
             ActivityLineInc = 1;
@@ -852,7 +854,7 @@ namespace Quesadilla
                 GetSkyhookTimers();
 
                 GetJumpsPerHour();
-            }
+			}
 
             // System not found and not WH space... so Abyss
             if (!string.IsNullOrEmpty(characterName) && foundSystem == null && !e.SystemName.StartsWith("J"))
@@ -1767,64 +1769,10 @@ namespace Quesadilla
                 storm.WeakSystemIds = Program.Universe.FindConnections(storm.SystemId, 3);
                 storm.WeakSystemIds.Remove(storm.SystemId);
                 storm.WeakSystemIds = storm.WeakSystemIds.Except(storm.StrongSystemIds).ToList();
-
-                // we could just leave it there - but ingame some 3 jump systems are not in the storm
-                // why is this ?
-                // I think because they are over 2.5 ly away (either by gate or direct)
-                // I do not KNOW this for sure
-                // :(
-
-                /*
-                                var jumps2 = Program.Universe.FindConnections(storm.SystemId, 2);
-                                if (jumps2.Contains(storm.SystemId))
-                                    jumps2.Remove(storm.SystemId);
-                                jumps2 = jumps2.Except(storm.StrongSystemIds).ToList();
-
-                                var jumps3 = Program.Universe.FindConnections(storm.SystemId, 3);
-                                if (jumps3.Contains(storm.SystemId))
-                                    jumps3.Remove(storm.SystemId);
-                                jumps3 = jumps3.Except(storm.StrongSystemIds).ToList();
-                                jumps3 = jumps3.Except(jumps2).ToList();
-
-                                List<int> RemoveSystems = new List<int>();
-                                var s1 = Program.Universe.SolarSystems[storm.SystemId];
-                                foreach (var system in jumps3)
-                                {
-                                    var s2 = Program.Universe.SolarSystems[system];
-
-                                    double dx = s1.X - s2.X;
-                                    double dy = s1.Y - s2.Y;
-                                    double dz = s1.Z - s2.Z;
-                                    double distance = Math.Sqrt(dx * dx + dy * dy + dz * dz) / Program.Universe.MetersPerLightYear;
-                                    Log.Information($"Storm {s1.Name} to {s2.Name} distance LY direct {distance}");
-
-                                    var p = Program.Universe.FindAndCachePath(s1.Id, s2.Id);
-                                    var lastSystem = Program.Universe.SolarSystems[s1.Id];
-                                    double distance2 = 0.0;
-                                    foreach(var pathSystem in p.PathSystems)
-                                    {
-                                        var thisSystem = Program.Universe.SolarSystems[pathSystem];
-                                        double dx2 = lastSystem.X - thisSystem.X;
-                                        double dy2 = lastSystem.Y - thisSystem.Y;
-                                        double dz2 = lastSystem.Z - thisSystem.Z;
-                                        distance2 += Math.Sqrt(dx2 * dx2 + dy2 * dy2 + dz2 * dz2) / Program.Universe.MetersPerLightYear;
-                                        lastSystem = thisSystem;
-                                    }
-                                    Log.Information($"Storm {s1.Name} to {s2.Name} distance LY via gates {distance2}");
-
-                //					if (distance >= 2.5 || distance2 >= 2.5)
-                                    if (distance >= 2.5 )
-                                        {
-                                            RemoveSystems.Add(s2.Id);
-                                            Log.Information($"Removing {s2.Name} from storm");
-                                        }
-                                }
-                                storm.WeakSystemIds = storm.WeakSystemIds.Except(RemoveSystems).ToList();
-                */
             }
         }
 
-        private void Dotlan_ProcessNewData(object sender, DotlanEventArgs e)
+		private void Dotlan_ProcessNewData(object sender, DotlanEventArgs e)
         {
             Log.Information($"Processing dotlan data for {e.RegionName}");
 
@@ -1837,10 +1785,8 @@ namespace Quesadilla
                     XmlResolver = null
                 };
                 XmlNodeList dotlanXYNodes = null;
-                //XmlNodeList dotlanIncursionNodes = null;
                 xmldoc.LoadXml(e.MapContent);
                 dotlanXYNodes = xmldoc.SelectNodes(@"//*[@id='sysuse']/*");
-                //                dotlanIncursionNodes = xmldoc.SelectNodes(@"//*[@id='glow']/*");
 
                 double dotlanX = 0;
                 double dotlanY = 0;
@@ -1852,10 +1798,8 @@ namespace Quesadilla
                     float y = float.Parse(xn.Attributes["y"].Value);
 
                     string link = xn.Attributes["xlink:href"].Value.Replace("#", "");
-                    // XmlNode dotlanDEFNodes = xmldoc.SelectSingleNode($@"//*[@id='{link}']/*");
 
                     var s = Program.Universe.SolarSystems[(int)systemID];
-
                     if (s.RegionName == e.RegionName)
                     {
                         s.DotlanX = x;
@@ -1867,16 +1811,6 @@ namespace Quesadilla
                         {
                             s.IceField = true;
                         }
-
-                        /*
-                                                // default to no incursion
-                                                s.Incursion = false;
-                                                XmlNode incursionNode = xmldoc.SelectSingleNode($@"//*[@id='glow']/*[@id='{link.Replace("def", "inc")}']");
-                                                if (incursionNode != null)
-                                                {
-                                                    s.Incursion = true;
-                                                }
-                        */
                     }
                 }
             }

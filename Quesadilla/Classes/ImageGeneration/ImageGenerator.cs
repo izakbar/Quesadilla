@@ -1144,6 +1144,42 @@ namespace Quesadilla.Classes.ImageGeneration
 				}
 
 
+				// Wormhole ?
+				if (minimapSystems.Any(o => o.solarSystem.IsWormhole))
+				{
+					foreach (var currentSystem in minimapSystems.Where(o => o.solarSystem.IsWormhole))
+					{
+						var systemData = Program.AnoikisProcessor.GetSystem(currentSystem.solarSystem.Name);
+						var wormholeClass = Program.AnoikisProcessor.GetWormholeClass(systemData?.WormholeClass ?? "C1");
+						var wanderers = Program.AnoikisProcessor.GetPossibleWanderers(systemData);
+						DrawSystemName(g, originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y - (int)(textSize * .4),
+							wormholeClass.Title,
+							parameters.SystemColourText, textSize / 5 * 2);
+
+						DrawSystemName(g, originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y + (int)(textSize * 1.3),
+							systemData.EffectName,
+							parameters.SystemColourText, textSize / 5 * 2);
+
+						var staticWhs = "";
+						foreach (var c in systemData.Statics)
+						{
+							var whInfo = Program.AnoikisProcessor.GetWormhole(c).ToString().Replace(" ","");
+							staticWhs = $" {staticWhs} {whInfo}".Trim();
+						}
+						var wandererWhs = "";
+						foreach (var c in wanderers)
+						{
+							wandererWhs = $" {wandererWhs} {c.ToString().Replace(" ","")}".Trim();
+						}
+
+						DrawSystemName(g, originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y + (int)(textSize * 1.85),
+							staticWhs + (wandererWhs != "" ? $" + {wandererWhs}" : ""),
+							parameters.SystemColourText, textSize / 7);
+
+					}
+				}
+
+
 				extraInformation = sbExtraInformation.ToString();
 
 				if (returnMinimapSystems != null)

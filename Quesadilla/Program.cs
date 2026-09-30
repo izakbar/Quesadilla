@@ -3,6 +3,7 @@ using EVEStandard.Enumerations;
 using Microsoft.AspNetCore.Hosting;
 using Quesadilla.Classes;
 using Quesadilla.Classes.Alerts;
+using Quesadilla.Classes.Anoikis;
 using Quesadilla.Classes.Characters;
 using Quesadilla.Classes.ESIData;
 using Quesadilla.Classes.EveScout;
@@ -61,6 +62,7 @@ namespace Quesadilla
         public static ProcessMonitor ProcessMonitorHandler = new ProcessMonitor();
 		public static CharacterManager CharacterManager = new CharacterManager();
         public static GraphDataManager GraphDataManager = new GraphDataManager();
+        public static AnoikisManager AnoikisProcessor;
 
 		public const string configuration_filename = "Quesadilla.config.json";
         public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
@@ -155,6 +157,15 @@ namespace Quesadilla
 			splash.SetStatus("Loading Character Cache...");
 			Application.DoEvents();
 			Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
+
+			splash.SetStatus("Setting up Anoikis...");
+			Application.DoEvents();
+			AnoikisProcessor = new AnoikisManager();
+
+			splash.SetStatus("Setting up EveScout...");
+			Application.DoEvents();
+			EveScoutProcessor = new EveScoutManager(Log.Logger);
+
 
 			splash.SetStatus("Creating Zkill Handler");
 			Application.DoEvents();
@@ -311,8 +322,8 @@ namespace Quesadilla
                 .Enrich.FromLogContext()
                 .MinimumLevel.Information()
                 .WriteTo.File("Quesadilla_.log", rollingInterval: RollingInterval.Day)
-                .WriteToSimpleAndRichTextBox(new MessageTemplateTextFormatter("{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Exception}\n"))
-                .CreateLogger();
+                .WriteToSimpleAndRichTextBox(new MessageTemplateTextFormatter("{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}"))
+            .CreateLogger();
         }
 	}
 }

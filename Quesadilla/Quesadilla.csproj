@@ -108,10 +108,19 @@
   <ItemGroup>
     <Compile Include="Classes\Alerts\AlertQueueManager.cs" />
     <Compile Include="Classes\Alerts\AlertTextType.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisCelestialConverter.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisCelestialDefinition.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisCelestialType.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisManager.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisStaticData.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisSystemInfo.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisWormhole.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisWormholeClass.cs" />
     <Compile Include="Classes\Characters\Character.cs" />
     <Compile Include="Classes\Characters\CharacterManager.cs" />
     <Compile Include="Classes\Configuration\ColorConvertor.cs" />
     <Compile Include="Classes\Configuration\LocationCollectionEditor.cs" />
+    <Compile Include="Classes\Events\AnoiksEventArgs.cs" />
     <Compile Include="Classes\GraphData\GraphDataManager.cs" />
     <Compile Include="Classes\ImageGeneration\Animation\AnimationManager.cs" />
     <Compile Include="Classes\ImageGeneration\Animation\AnimationState.cs" />
