@@ -233,7 +233,7 @@ namespace Quesadilla
 				using (
 				Image minimapImage = ImageGenerator.ClipMiniMap(MinimapImage.Width, MinimapImage.Height, alert.Path, 100,
 					ref extraInformation, ref MinimapSystems,
-					null, null, null, null, null, null, null,
+					null, null, null, null, null, null, null,null,
 					_minimapParameters
 					))
 				{
@@ -349,6 +349,11 @@ namespace Quesadilla
 			_minimapParameters.UniHoleColour = Program.MainConfiguration.AlertPopupMinimapUniHoleColour;
 			_minimapParameters.IceColour = Program.MainConfiguration.AlertPopupMinimapIceColour;
 			_minimapParameters.MercoxitColour = Program.MainConfiguration.AlertPopupMinimapMercoxitColour;
+
+			_minimapParameters.WormholeColour = Program.MainConfiguration.AlertPopupMinimapWormholeColour;
+			_minimapParameters.WormholeOutlineColour = Program.MainConfiguration.AlertPopupMinimapWormholeOutlineColour;
+			_minimapParameters.WormholeAlphaAmount = Program.MainConfiguration.AlertPopupMinimapWormholeAlpha;
+			_minimapParameters.WormholeSize = Program.MainConfiguration.AlertPopupMinimapWormholeSize;
 		}
 
 		private void QuesadillaAlertPopup_Load(object sender, EventArgs e)

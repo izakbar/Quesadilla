@@ -136,6 +136,11 @@ namespace Quesadilla
 			_minimapParameters.IceColour = Program.MainConfiguration.OverlayMinimapIceColour;
 			_minimapParameters.MercoxitColour = Program.MainConfiguration.OverlayMinimapMercoxitColour;
 
+			_minimapParameters.WormholeColour = Program.MainConfiguration.OverlayMinimapWormholeColour;
+			_minimapParameters.WormholeOutlineColour = Program.MainConfiguration.OverlayMinimapWormholeOutlineColour;
+			_minimapParameters.WormholeAlphaAmount = Program.MainConfiguration.OverlayMinimapWormholeAlpha;
+			_minimapParameters.WormholeSize = Program.MainConfiguration.OverlayMinimapWormholeSize;
+
 			_minimapParameters.CloseSystems = Program.MainConfiguration.OverlayMinimapCloseSystems;
 			_minimapParameters.MapType = Program.MainConfiguration.OverlayMinimapMapType;
 			_minimapParameters.ShowSystemText = Program.MainConfiguration.OverlayMinimapShowSystemText;
@@ -846,6 +851,7 @@ namespace Quesadilla
 				_animationManager[AnimationType.Incursion].GetNextValue(),
 				_animationManager[AnimationType.SecLimit].GetNextValue(),
 				_animationManager[AnimationType.Skyhooks].GetNextValue(),
+				_animationManager[AnimationType.Wormhole].GetNextValue(),
 
 				_minimapParameters
 				);

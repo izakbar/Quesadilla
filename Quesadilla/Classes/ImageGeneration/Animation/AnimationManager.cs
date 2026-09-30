@@ -26,6 +26,7 @@ namespace Quesadilla.Classes.ImageGeneration
 			Register(AnimationType.StormPlasma,state: 9,direction: -1,maximum: 10,pulse: true);
 			Register(AnimationType.StormExotic, state: 0, direction: -1, maximum: 10, pulse: true);
 			Register(AnimationType.Skyhooks, state: 5, direction: -1, maximum: 12, pulse: false);
+			Register(AnimationType.Wormhole, state: 0, direction: 1, maximum: 30, pulse: true);
 		}
 
 		private void Register(

@@ -19,6 +19,7 @@ namespace Quesadilla.Classes.ImageGeneration
 		StormGamma,
 		StormPlasma,
 		StormExotic,
-		Skyhooks
+		Skyhooks,
+		Wormhole
 	}
 }

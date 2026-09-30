@@ -308,7 +308,12 @@ namespace Quesadilla
 			_minimapParameters.IceColour = Program.MainConfiguration.MinimapIceColour;
 			_minimapParameters.MercoxitColour = Program.MainConfiguration.MinimapMercoxitColour;
 
-            _minimapParameters.CloseSystems = Program.MainConfiguration.MinimapCloseSystems;
+			_minimapParameters.WormholeColour = Program.MainConfiguration.MinimapWormholeColour;
+			_minimapParameters.WormholeOutlineColour = Program.MainConfiguration.MinimapWormholeOutlineColour;
+            _minimapParameters.WormholeAlphaAmount = Program.MainConfiguration.MinimapWormholeAlpha;
+			_minimapParameters.WormholeSize = Program.MainConfiguration.MinimapWormholeSize;
+
+			_minimapParameters.CloseSystems = Program.MainConfiguration.MinimapCloseSystems;
             _minimapParameters.MapType = Program.MainConfiguration.MinimapMapType;
             _minimapParameters.ShowSystemText = Program.MainConfiguration.MinimapShowSystemText;
 			_minimapParameters.ShowAllSystemsText = Program.MainConfiguration.MinimapShowAllSystemText;
@@ -2009,8 +2014,9 @@ namespace Quesadilla
 					AnimationManager[AnimationType.UniHoles].GetNextValue(),
 					AnimationManager[AnimationType.Incursion].GetNextValue(),
 					AnimationManager[AnimationType.SecLimit].GetNextValue(),
-                    AnimationManager[AnimationType.Skyhooks].GetNextValue(),
-                    _minimapParameters
+					AnimationManager[AnimationType.Skyhooks].GetNextValue(),
+					AnimationManager[AnimationType.Wormhole].GetNextValue(),
+					_minimapParameters
 					);
                 //                Bitmap minimapBitmap = new Bitmap(minimapImage);
                 //                minimapBitmap.MakeTransparent(minimapBitmap.GetPixel(0, 0));

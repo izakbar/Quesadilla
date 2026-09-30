@@ -36,7 +36,8 @@ namespace Quesadilla.Classes.SolarSystems
 		public long NPCKillsPerHour { get; set; }
 		public long ShipKillsPerHour { get; set; }
 		public long PodKillsPerHour { get; set; }
-                
+        public bool IsWormhole { get; set; }
+
 		private DateTime AlertTime { get; set; }
 		private int? NPCKillsDeltaLastHour { get; set; }
 		private Regex _nameRegex;

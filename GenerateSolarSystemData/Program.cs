@@ -277,6 +277,10 @@ namespace QuesadillaExport
 			foreach (var solarSystem in SolarSystems)
 			{
 				solarSystem.Value.ConnectedTo.Sort((a, b) => a.ToSystemId.CompareTo(b.ToSystemId));
+				if (!solarSystem.Value.ConnectedTo.Any() || solarSystem.Value.Name.Equals("Thera") || solarSystem.Value.Name.Equals("Turnur"))
+				{
+					solarSystem.Value.IsWormhole = true;
+				}
 			}
 
 			var Outputjson = JsonSerializer.Serialize(SolarSystems);

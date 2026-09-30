@@ -54,6 +54,13 @@ namespace Quesadilla.Classes.ImageGeneration
 		public Color IceColour { get; set; }
 		public Color MercoxitColour { get; set; }
 
+		// Wormhole system
+		public Color WormholeColour { get; set; }
+		public Color WormholeOutlineColour { get; set; }
+		public int WormholeAlphaAmount { get; set; }
+		public int WormholeSize { get; set; }
+
+
 		public int CloseSystems { get; set; }
 		public MapType MapType { get; set; }
 		public bool ShowSystemText { get; set; }
@@ -63,5 +70,7 @@ namespace Quesadilla.Classes.ImageGeneration
 
 		public bool DefaultTextSize { get; set; }
 		public bool ShowOutOfRegion { get; set; }
+
+
 	}
 }

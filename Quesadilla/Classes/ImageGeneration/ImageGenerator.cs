@@ -165,9 +165,7 @@ namespace Quesadilla.Classes.ImageGeneration
 				pulse = (animationCycle.Value % 30) / 30f;
 			}
 
-			//
-			// PASS 1 - GLOW
-			//
+			// glow
 			foreach (var system in systems)
 			{
 				float centerX = originPoint.X + system.X;
@@ -202,9 +200,7 @@ namespace Quesadilla.Classes.ImageGeneration
 				}
 			}
 
-			//
-			// PASS 2 - OUTLINES
-			//
+			// outlines
 			foreach (var system in systems)
 			{
 				g.DrawEllipse(
@@ -215,9 +211,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					diameter);
 			}
 
-			//
-			// PASS 3 - PUNCH OUT
-			//
+			// tidy up
 			foreach (var system in systems)
 			{
 				g.FillEllipse(
@@ -228,9 +222,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					diameter);
 			}
 
-			//
-			// PASS 4 - FILL
-			//
+			// fills
 			foreach (var system in systems)
 			{
 				g.FillEllipse(
@@ -241,6 +233,122 @@ namespace Quesadilla.Classes.ImageGeneration
 					diameter);
 			}
 		}
+
+
+		private static void MapWormhole(
+			Graphics g,
+			IReadOnlyList<MinimapSystem> systems,
+			Point originPoint,
+			float size,
+			Pen outlinePen,
+			Brush fillBrush,
+			Color glowColor,
+			int? animationCycle)
+		{
+			Brush eraserBrush = GDICache.GetBrush(Color.Black);
+
+			// Animation phase
+			float phase = animationCycle.HasValue
+				? (animationCycle.Value % 120) / 120f * (float)(Math.PI * 2.0)
+				: 0f;
+
+			// Number of points making up the wormhole outline.
+			// More points = smoother.
+			const int pointCount = 64;
+
+			// Number of ripples around the circumference.
+			const float wiggleCount = 6f;
+
+			// Amount that the edge moves in/out.
+			float wiggleAmount = Math.Max(1.5f, size * 0.18f);
+
+			// glow
+			foreach (var system in systems)
+			{
+				float centerX = originPoint.X + system.X;
+				float centerY = originPoint.Y + system.Y;
+
+				for (int layer = 8; layer >= 1; layer--)
+				{
+					float layerRadius = size + (layer * 2.0f);
+					int alpha = (int)( (80.0f / layer) * (0.75f + (float)Math.Sin(phase * 0.5f) * 0.25f));
+
+					alpha = Math.Min(255, Math.Max(1, alpha));
+
+					PointF[] glowPoints = CreateWormholePoints(centerX,centerY,layerRadius,wiggleAmount,wiggleCount,phase,pointCount);
+
+					using (var glowBrush = new SolidBrush(Color.FromArgb(alpha, glowColor)))
+						g.FillPolygon(glowBrush, glowPoints);
+				}
+			}
+
+			// outlines
+			foreach (var system in systems)
+			{
+				float centerX = originPoint.X + system.X;
+				float centerY = originPoint.Y + system.Y;
+
+				PointF[] points = CreateWormholePoints(centerX,centerY,size,wiggleAmount,wiggleCount,phase,pointCount);
+				g.DrawClosedCurve(outlinePen,points,0.35f,System.Drawing.Drawing2D.FillMode.Winding);
+			}
+
+			// tidy up insides
+			foreach (var system in systems)
+			{
+				float centerX = originPoint.X + system.X;
+				float centerY = originPoint.Y + system.Y;
+
+				PointF[] points = CreateWormholePoints(centerX,centerY,size,wiggleAmount,wiggleCount,phase,pointCount);
+				g.FillClosedCurve(eraserBrush,points,System.Drawing.Drawing2D.FillMode.Winding,0.35f);
+			}
+
+			// fill
+			foreach (var system in systems)
+			{
+				float centerX = originPoint.X + system.X;
+				float centerY = originPoint.Y + system.Y;
+
+				PointF[] points = CreateWormholePoints(centerX,centerY,size,wiggleAmount,wiggleCount,phase,pointCount);
+				g.FillClosedCurve(fillBrush,points,System.Drawing.Drawing2D.FillMode.Winding,0.35f);
+			}
+		}
+
+		private static PointF[] CreateWormholePoints(
+			float centerX,
+			float centerY,
+			float radius,
+			float wiggleAmount,
+			float wiggleCount,
+			float phase,
+			int pointCount)
+		{
+			// full disclosure - I 100% used copilot to help with the maths here
+
+			PointF[] points = new PointF[pointCount];
+
+			for (int i = 0; i < pointCount; i++)
+			{
+				float angle = ((float)i / pointCount) * (float)(Math.PI * 2.0);
+
+				//
+				// Primary animated ripple.
+				//
+				float wiggle = (float)Math.Sin(angle * wiggleCount + phase);
+
+				//
+				// Secondary ripple prevents it looking like a
+				// mathematically perfect flower/star.
+				//
+				wiggle += (float)Math.Sin(angle * (wiggleCount + 3.0f) - phase * 1.7f) * 0.35f;
+
+				float r = radius + wiggle * wiggleAmount;
+
+				points[i] = new PointF(centerX + (float)Math.Cos(angle) * r, centerY + (float)Math.Sin(angle) * r);
+			}
+
+			return points;
+		}
+
 		public static void DrawPulseOrb(Graphics g, Point center, Color colour, float radius, int? animationCycle, int glowLayers = 4, float pulseSize = 3.0f, int maxAlpha = 100)
 		{
 			float pulse = 0;
@@ -450,6 +558,7 @@ namespace Quesadilla.Classes.ImageGeneration
 			int? animationIncursion,
 			int? animationCycleSecLimit,
 			int? animationCycleSkyhooks,
+			int? animationCycleWormhole,
 			MinimapParameters parameters
 			)
 		{
@@ -705,10 +814,9 @@ namespace Quesadilla.Classes.ImageGeneration
 				}
 
 				//Seclimit ?
-				if (parameters.SecLimitShow && minimapSystems.Any(o => o.solarSystem.Security <= parameters.SecLimitValue))
+				if (parameters.SecLimitShow && minimapSystems.Any(o => o.solarSystem.Security <= parameters.SecLimitValue && !o.solarSystem.IsWormhole))
 				{
 					g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-					//Brush secLimitBrush = GDICache.GetBrush(SecLimitColour);
 					Brush secLimitBrush = GDICache.GetHatchBrush(HatchStyle.Percent30, parameters.SecLimitColour);
 
 					Pen secLimitOutlinePen = GDICache.GetPen(parameters.SecLimitOutlineColour, 3);
@@ -728,6 +836,33 @@ namespace Quesadilla.Classes.ImageGeneration
 							0, 0, secLimitImage.Width, secLimitImage.Height,
 							GraphicsUnit.Pixel,
 							secLimitImageAttr
+							);
+					}
+				}
+
+				// Wormhole ?
+				if (minimapSystems.Any(o => o.solarSystem.IsWormhole))
+				{
+					g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+					Brush wormholeBrush = GDICache.GetHatchBrush(HatchStyle.Percent30, parameters.WormholeColour);
+
+					Pen wormholeOutlinePen = GDICache.GetPen(parameters.WormholeOutlineColour, 3);
+					float wormholeBlobSize = ((float)parameters.WormholeSize / (float)GUI_SCALING);
+
+					ImageAttributes wormholeImageAttr = new ImageAttributes();
+					SetImageAlpha(wormholeImageAttr, parameters.WormholeAlphaAmount);
+
+					using (Image wormholeImage = new Bitmap(width, height, PixelFormat.Format32bppArgb))
+					using (Graphics gWormhole = Graphics.FromImage(wormholeImage))
+					{
+						MapWormhole(gWormhole, minimapSystems.Where(o => o.solarSystem.IsWormhole).ToList(), originPoint, wormholeBlobSize, wormholeOutlinePen, wormholeBrush, parameters.WormholeOutlineColour, animationCycleWormhole);
+
+						g.DrawImage(
+							wormholeImage,
+							new Rectangle(0, 0, wormholeImage.Width, wormholeImage.Height),
+							0, 0, wormholeImage.Width, wormholeImage.Height,
+							GraphicsUnit.Pixel,
+							wormholeImageAttr
 							);
 					}
 				}
@@ -913,7 +1048,7 @@ namespace Quesadilla.Classes.ImageGeneration
 					g.FillEllipse(systemBrush, currentPoint.X - blobSize, currentPoint.Y - blobSize, blobSize * 2, blobSize * 2);
 
 					// How about mercoxit ?
-					if (currentSystem.solarSystem.Security < MERCOXIT_SECURITY)
+					if (currentSystem.solarSystem.Security < MERCOXIT_SECURITY && !currentSystem.solarSystem.IsWormhole)
 					{
 						DrawSystemName(g, currentPoint.X - 10, currentPoint.Y - 3, "✦", Color.FromArgb(50, parameters.MercoxitColour), textSize + 2);
 						DrawSystemName(g, currentPoint.X - 10, currentPoint.Y - 3, "✦", parameters.MercoxitColour, textSize);

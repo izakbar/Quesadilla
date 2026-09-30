@@ -2106,6 +2106,32 @@ img.rounded-corners {
 		[DefaultValue(typeof(Color), "IndianRed")]
 		public Color OverlayMinimapMercoxitColour { get; set; }
 
+		[Category("OverlayMap")]
+		[DisplayName("Minimap Wormhole colour")]
+		[Description("Colour to use for Wormhole system on the minimap")]
+		[DefaultValue(typeof(Color), "DeepPink")]
+		public Color OverlayMinimapWormholeColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap Wormhole Outline colour")]
+		[Description("Colour to use for Wormhole Outline on the minimap")]
+		[DefaultValue(typeof(Color), "DarkKhaki")]
+		public Color OverlayMinimapWormholeOutlineColour { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap Wormhole alpha")]
+		[Description("Alpha to use for Wormhole on the overlay minimap")]
+		[DefaultValue(typeof(int), "60")]
+		[Range(0, 100)]
+		public int OverlayMinimapWormholeAlpha { get; set; }
+
+		[Category("OverlayMap")]
+		[DisplayName("Minimap Wormhole size")]
+		[Description("Size to use for Wormhole on the minimap")]
+		[DefaultValue(typeof(int), "30")]
+		[Range(0, 100)]
+		public int OverlayMinimapWormholeSize { get; set; }
+
 		[Category("Main Window")]
 		[DisplayName("Minimap Border Colour")]
 		[Description("")]
@@ -2205,6 +2231,32 @@ img.rounded-corners {
 		[Description("Colour to use for Mercoxit indicatos on the minimap")]
 		[DefaultValue(typeof(Color), "IndianRed")]
 		public Color MinimapMercoxitColour { get; set; }
+
+		[Category("Main Window")]
+		[DisplayName("Minimap Wormhole colour")]
+		[Description("Colour to use for Wormhole system on the minimap")]
+		[DefaultValue(typeof(Color), "DeepPink")]
+		public Color MinimapWormholeColour { get; set; }
+		[Category("Main Window")]
+		[DisplayName("Minimap Wormhole outline colour")]
+		[Description("Colour to use for wormhole system outline on the minimap")]
+		[DefaultValue(typeof(Color), "DarkKhaki")]
+		public Color MinimapWormholeOutlineColour { get; set; }
+
+
+		[Category("Main Window")]
+		[DisplayName("Minimap wormhole alpha")]
+		[Description("Alpha to use for wormhole indicators on the minimap")]
+		[DefaultValue(typeof(int), "60")]
+		[Range(0, 100)]
+		public int MinimapWormholeAlpha { get; set; }
+
+		[Category("Main Window")]
+		[DisplayName("Minimap wormhole size")]
+		[Description("Size to use for wormhole indicators on the minimap")]
+		[DefaultValue(typeof(int), "32")]
+		[Range(0, 100)]
+		public int MinimapWormholeSize { get; set; }
 
 
 		[Category("Alert")]
@@ -2307,7 +2359,30 @@ img.rounded-corners {
 		[DefaultValue(typeof(Color), "IndianRed")]
 		public Color AlertPopupMinimapMercoxitColour { get; set; }
 
+		[Category("Alert")]
+		[DisplayName("Minimap Mercoxit Indicator colour")]
+		[Description("Colour to use for Wormhole on the alert popup")]
+		[DefaultValue(typeof(Color), "DeepPink")]
+		public Color AlertPopupMinimapWormholeColour { get; set; }
+		[Category("Alert")]
+		[DisplayName("Minimap Mercoxit Indicator colour")]
+		[Description("Colour to use for Wormhole outline on the alert popup")]
+		[DefaultValue(typeof(Color), "DarkKhaki")]
+		public Color AlertPopupMinimapWormholeOutlineColour { get; set; }
 
+		[Category("Alert")]
+		[DisplayName("Minimap wormhole alpha")]
+		[Description("Alpha to use for wormhole on the minimap")]
+		[DefaultValue(typeof(int), "70")]
+		[Range(0, 100)]
+		public int AlertPopupMinimapWormholeAlpha { get; set; }
+
+		[Category("Alert")]
+		[DisplayName("Minimap wormhole size")]
+		[Description("Size to use for wormhole on the minimap")]
+		[DefaultValue(typeof(int), "32")]
+		[Range(0, 100)]
+		public int AlertPopupMinimapWormholeSize { get; set; }
 
 		[Category("Main Window")]
 		[DisplayName("Minimap Jumps")]
