@@ -6,6 +6,7 @@ using Quesadilla.Classes.Alerts;
 using Quesadilla.Classes.Anoikis;
 using Quesadilla.Classes.Characters;
 using Quesadilla.Classes.ESIData;
+using Quesadilla.Classes.Events;
 using Quesadilla.Classes.EveScout;
 using Quesadilla.Classes.GraphData;
 using Quesadilla.Classes.ImageGeneration;
@@ -149,41 +150,50 @@ namespace Quesadilla
 			Application.DoEvents();
 			Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
 
-
-			splash.SetStatus("Setting up EveScout...");
-			Application.DoEvents();
-			EveScoutProcessor = new EveScoutManager(Log.Logger);
-
 			splash.SetStatus("Loading Character Cache...");
 			Application.DoEvents();
 			Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
-
-			splash.SetStatus("Setting up Anoikis...");
-			Application.DoEvents();
-			AnoikisProcessor = new AnoikisManager();
-
-			splash.SetStatus("Setting up EveScout...");
-			Application.DoEvents();
-			EveScoutProcessor = new EveScoutManager(Log.Logger);
-
-
-			splash.SetStatus("Creating Zkill Handler");
-			Application.DoEvents();
-			ZKillHandler = new ZKill();
 
 			splash.SetStatus("Creating Logfile Watchers...");
 			Application.DoEvents();
 			LogWatcherManager = new LogWatcherManager(MainConfiguration.HowManyTicksBeforeLogfileCheck * MainConfiguration.TickMiliseconds);
 			Program.SetupLogfileWatchers();
 
-			splash.SetStatus("Creating Alert Queue Manager...");
-			Application.DoEvents();
-			AlertQueueManager = new AlertQueueManager();
-
 			splash.SetStatus("Creating Main Window...");
 			Application.DoEvents();
 			q = new Quesadilla();
 			q.SplashScreen = splash;
+            q.ReloadConfiguration();
+			ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(q.ESI_ProcessNewData);
+			ESIHandler.EnqueueRequestIncursions();
+
+			splash.SetStatus("Setting up EveScout...");
+			Application.DoEvents();
+			EveScoutProcessor = new EveScoutManager(Log.Logger);
+			EveScoutProcessor.EveScoutEventHandler += new EventHandler<EveScoutEventArgs>(q.EveScout_ProcessNewData);
+
+			splash.SetStatus("Setting up Anoikis...");
+			Application.DoEvents();
+			AnoikisProcessor = new AnoikisManager();
+
+			splash.SetStatus("Creating Zkill Handler");
+			Application.DoEvents();
+			ZKillHandler = new ZKill();
+			ZKillHandler.ZKillFeedR2Z2.ZKillEventHandler += new EventHandler<ZKillEventArgs>(q.ZKill_ProcessNewData);
+
+			splash.SetStatus("Creating Alert Queue Manager...");
+			Application.DoEvents();
+			AlertQueueManager = new AlertQueueManager();
+
+
+			splash.SetStatus("Starting Logwatcher.");
+			Application.DoEvents();
+			LogWatcherManager.Start();
+
+			splash.SetStatus("Starting Tickmangers");
+			Application.DoEvents();
+			q.TickManagerUpdates.Start();
+			q.TickManagerUI.Start();
 
 			splash.SetStatus("Done.");
 			Application.DoEvents();

@@ -218,21 +218,12 @@ namespace Quesadilla
             menuConfiguration.MenuItems.Add(menuConfiguredAlerts);
             menuConfiguration.MenuItems.Add(menuLogWatchers);
 
-            ReloadConfiguration();
-
-            Program.EveScoutProcessor.EveScoutEventHandler += new EventHandler<EveScoutEventArgs>(this.EveScout_ProcessNewData);
-
             DotlanProcessor = new DotlanManager();
             DotlanProcessor.DotlanEventHandler += new EventHandler<DotlanEventArgs>(this.Dotlan_ProcessNewData);
 
 			SetupLogfileEvents();
-
             RebuildLogfilesMenu();
-            Program.LogWatcherManager.Start();
 
-			// Program.ZKillHandler.ZKillFeedRedisQ.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
-			Program.ZKillHandler.ZKillFeedR2Z2.ZKillEventHandler += new EventHandler<ZKillEventArgs>(this.ZKill_ProcessNewData);
-            Program.ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(this.ESI_ProcessNewData);
 
             ActivityLineInc = 1;
             ActivityLineMax = Program.MainConfiguration.HeartBeatIndicatorWorkingText.Length - 1;
@@ -249,7 +240,6 @@ namespace Quesadilla
             UpdateEveProcesses(true);
 
             GetSkyhookTimers();
-            Program.ESIHandler.EnqueueRequestIncursions();
 
 			if (Program.MainConfiguration.ShowWindowOverlayMap)
 			{
@@ -265,8 +255,6 @@ namespace Quesadilla
 
             if (Program.MainConfiguration.ShowAlertWindowsNotification) SetupToastAlert();
 
-			TickManagerUpdates.Start();
-			TickManagerUI.Start();
 		}
 
         private void UpdateMinimapParameters()
@@ -359,8 +347,9 @@ namespace Quesadilla
             menuLatestAlerts.MenuItems.Clear();
             bool first = true;
             DateTime now = DateTime.Now;
+            if (Program.AlertQueueManager == null) return;
 
-            foreach (var alert in Program.AlertQueueManager.GetLastActiveAlerts(Program.MainConfiguration.ShowLastUnexpiredAlerts)) 
+			foreach (var alert in Program.AlertQueueManager.GetLastActiveAlerts(Program.MainConfiguration.ShowLastUnexpiredAlerts)) 
             {
                 DateTime timeAdded = alert.Entry != null ? alert.Entry.TimeAdded : alert.Kill.TimeAdded;
 
@@ -412,9 +401,9 @@ namespace Quesadilla
 				   location.Y >= bounds.Top &&
 				   location.Y <= bounds.Bottom;
 		}
-		public void ReloadConfiguration()
+        public void ReloadConfiguration()
         {
-            BackColor = Program.MainConfiguration.MainWindowBackgroundColour;
+			BackColor = Program.MainConfiguration.MainWindowBackgroundColour;
             ForeColor = Program.MainConfiguration.MainWindowTextColour;
 
             Program.MainConfiguration.ApplyConfiguration(this, Program.MainConfiguration.MainWindowItemLocations, TopbarPanel.Height, MiningPerHourTotal, ISKPerHourTotal, false);
@@ -1542,7 +1531,7 @@ namespace Quesadilla
             }
         }
 
-		private void ESI_ProcessNewData(object sender, ESIEventArgs e)
+		public void ESI_ProcessNewData(object sender, ESIEventArgs e)
 		{
 			if (e.RequestType != ESIRequestType.System)
 				return;
@@ -1558,7 +1547,7 @@ namespace Quesadilla
 			Invalidate();
 		}
 
-		private void ZKill_ProcessNewData(object sender, ZKillEventArgs e)
+		public void ZKill_ProcessNewData(object sender, ZKillEventArgs e)
         {
 			void QueueZKillAlert(ZKillKill kill, PathInfo path, string context, string menuTextCharacter, string friendlyName)
 			{
@@ -1751,7 +1740,7 @@ namespace Quesadilla
 			Log.Information($"EveScout: Closest Turnur {c.ClosestTurnur?.ToSystemId}:{c.ClosestTurnur?.FromSystemId} {c.ClosestTurnurPath?.TotalJumps} {c.ClosestTurnurPath?.ToSystemName}");
 		}
 
-		private void EveScout_ProcessNewData(object sender, EveScoutEventArgs e)
+		public void EveScout_ProcessNewData(object sender, EveScoutEventArgs e)
         {
             foreach (var c in Program.CharacterManager.IsActive())
             {

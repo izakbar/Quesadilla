@@ -20,33 +20,38 @@ namespace Quesadilla.Classes
     {
 		public void ApplyConfiguration(Form form,List<ConfigurationItemLocationInformation> locations,int topAdjust,bool miningPerHourTotal,bool iskPerHourTotal,bool ignoreVisible)
 		{
-			if (form.InvokeRequired)
-			{
-				form.BeginInvoke((MethodInvoker)(() =>
-					ApplyConfiguration(form,locations,topAdjust,miningPerHourTotal,iskPerHourTotal,ignoreVisible)));
-				return;
-			}
-
 			foreach (ConfigurationItemLocationInformation item in locations)
 			{
 				var foundItem = form.Controls.Find(item.Name, true).FirstOrDefault();
 
 				if (foundItem != null)
 				{
-					if (!foundItem.Name.Equals("ChatServerDown") && !ignoreVisible) foundItem.Visible = item.IsVisible;
+					if (foundItem.InvokeRequired)
+					{
+						var itemToApply = item;
+						foundItem.BeginInvoke((MethodInvoker)(() => ApplyItemConfiguration(foundItem, itemToApply, topAdjust, miningPerHourTotal, iskPerHourTotal, ignoreVisible)));
+						continue;
+					}
 
-					foundItem.Location = new Point(item.Location.X, item.Location.Y + topAdjust);
-
-					foundItem.ForeColor = item.Color;
-					foundItem.BackColor = item.BackColor;
-					foundItem.Size = item.Size;
-
-					foundItem.Font = item.Font;
-
-					if (foundItem.Name.Equals("MiningData") && miningPerHourTotal) foundItem.ForeColor = item.AlternateColor;
-					if (foundItem.Name.Equals("RattingData") && iskPerHourTotal) foundItem.ForeColor = item.AlternateColor;
+					ApplyItemConfiguration(foundItem, item, topAdjust, miningPerHourTotal, iskPerHourTotal, ignoreVisible);
 				}
 			}
+		}
+
+		private static void ApplyItemConfiguration(Control foundItem, ConfigurationItemLocationInformation item, int topAdjust, bool miningPerHourTotal, bool iskPerHourTotal, bool ignoreVisible)
+		{
+			if (!foundItem.Name.Equals("ChatServerDown") && !ignoreVisible) foundItem.Visible = item.IsVisible;
+
+			foundItem.Location = new Point(item.Location.X, item.Location.Y + topAdjust);
+
+			foundItem.ForeColor = item.Color;
+			foundItem.BackColor = item.BackColor;
+			foundItem.Size = item.Size;
+
+			foundItem.Font = item.Font;
+
+			if (foundItem.Name.Equals("MiningData") && miningPerHourTotal) foundItem.ForeColor = item.AlternateColor;
+			if (foundItem.Name.Equals("RattingData") && iskPerHourTotal) foundItem.ForeColor = item.AlternateColor;
 		}
         public ConfigurationItemLocationInformation GetConfiguration(string name, List<ConfigurationItemLocationInformation> locations)
         {
