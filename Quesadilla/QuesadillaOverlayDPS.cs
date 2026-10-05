@@ -182,7 +182,7 @@ namespace Quesadilla
 					// setup second slots
 					foreach (var c in Program.GraphDataManager.GetCombatDataLines(currToon) /*.OrderBy(o => o.TimeAdded).ToList() */ )
 					{
-						var slot = (int)Math.Truncate((c.TimeAdded.TrimToSeconds(span) - start.TrimToSeconds(span)).TotalSeconds);
+						var slot = (int)Math.Truncate((c.TimeAdded.TrimToSeconds(1) - start.TrimToSeconds(1)).TotalSeconds);
 						if (slot < 0) continue;
 						if (!_combatGraphData.ContainsKey(slot))
 						{
@@ -272,33 +272,34 @@ namespace Quesadilla
 				}
 				if (seconds > 0)
 				{
+					var _span_divide = (span * 2)+1;
 					if (dReceived > 0)
 					{
-						var dpsReceived = dReceived / (span * 2 + 1);
+						var dpsReceived = dReceived / _span_divide;
 						toon1Received.Points.AddXY(seconds, dpsReceived);
 						maxDReceived = Math.Max(dpsReceived, maxDReceived);
 					}
 					if (dGiven > 0)
 					{
-						var dpsGiven = dGiven / (span * 2 + 1);
+						var dpsGiven = dGiven / _span_divide;
 						toon1Given.Points.AddXY(seconds, dpsGiven);
 						maxDGiven = Math.Max(dpsGiven, maxDGiven);
 					}
 
-					if (nReceived > 0) toon1NeutReceived.Points.AddXY(seconds, nReceived / (span * 2 + 1));
-					if (nGiven > 0) toon1NeutGiven.Points.AddXY(seconds, nGiven / (span * 2 + 1));
+					if (nReceived > 0) toon1NeutReceived.Points.AddXY(seconds, nReceived / _span_divide);
+					if (nGiven > 0) toon1NeutGiven.Points.AddXY(seconds, nGiven / _span_divide);
 
-					if (sReceived > 0) toon1ShieldReceived.Points.AddXY(seconds, sReceived / (span * 2 + 1));
-					if (sGiven > 0) toon1ShieldGiven.Points.AddXY(seconds, sGiven / (span * 2 + 1));
+					if (sReceived > 0) toon1ShieldReceived.Points.AddXY(seconds, sReceived / _span_divide);
+					if (sGiven > 0) toon1ShieldGiven.Points.AddXY(seconds, sGiven / _span_divide);
 
-					if (aReceived > 0) toon1ArmorReceived.Points.AddXY(seconds, aReceived / (span * 2 + 1));
-					if (aGiven > 0) toon1ArmorGiven.Points.AddXY(seconds, aGiven / (span * 2 + 1));
+					if (aReceived > 0) toon1ArmorReceived.Points.AddXY(seconds, aReceived / _span_divide);
+					if (aGiven > 0) toon1ArmorGiven.Points.AddXY(seconds, aGiven / _span_divide);
 
-					if (hReceived > 0) toon1HullReceived.Points.AddXY(seconds, hReceived / (span * 2 + 1));
-					if (hGiven > 0) toon1HullGiven.Points.AddXY(seconds, hGiven / (span * 2 + 1));
+					if (hReceived > 0) toon1HullReceived.Points.AddXY(seconds, hReceived / _span_divide);
+					if (hGiven > 0) toon1HullGiven.Points.AddXY(seconds, hGiven / _span_divide);
 
-					if (cReceived > 0) toon1CapReceived.Points.AddXY(seconds, cReceived / (span * 2 + 1));
-					if (cGiven > 0) toon1CapGiven.Points.AddXY(seconds, cGiven / (span * 2 + 1));
+					if (cReceived > 0) toon1CapReceived.Points.AddXY(seconds, cReceived / _span_divide);
+					if (cGiven > 0) toon1CapGiven.Points.AddXY(seconds, cGiven / _span_divide);
 
 				}
 			}
