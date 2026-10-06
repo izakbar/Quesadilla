@@ -65,9 +65,6 @@ namespace Quesadilla
         public static GraphDataManager GraphDataManager = new GraphDataManager();
         public static AnoikisManager AnoikisProcessor;
 
-		public const string configuration_filename = "Quesadilla.config.json";
-        public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
-
         public static Version version;
         public static String UserAgent;
         public static Image CachedBackground;
@@ -75,7 +72,6 @@ namespace Quesadilla
 		private static Mutex _mutex;
 		private static string MUTEX_NAME = "Quesadilla Single Instance Mutex";
 		public const string RESTORE_INSTANCE_MESSAGE_NAME = "Quesadilla Restore Instance";
-
 
 		[STAThread]
         static void Main()
@@ -91,9 +87,10 @@ namespace Quesadilla
 				return;
 			}
 
-			ConfigureSerilog();
+			QuesadillaPaths.Initialise();
+            ConfigureSerilog();
 
-            MainConfiguration = Config.Load(configuration_filename);
+            MainConfiguration = Config.Load(QuesadillaPaths.ConfigurationFile);
 
             try { 
 				System.Deployment.Application.ApplicationDeployment ad = System.Deployment.Application.ApplicationDeployment.CurrentDeployment;
@@ -152,7 +149,7 @@ namespace Quesadilla
 
 			splash.SetStatus("Loading Character Cache...");
 			Application.DoEvents();
-			Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
+			Universe.ReadESICharacters(QuesadillaPaths.CharacterCacheFile);
 
 			splash.SetStatus("Creating Logfile Watchers...");
 			Application.DoEvents();
@@ -200,7 +197,7 @@ namespace Quesadilla
 			System.Threading.Thread.Sleep(500);
 
 			Application.Run(q);
-			MainConfiguration.Save(configuration_filename);
+			MainConfiguration.Save(QuesadillaPaths.ConfigurationFile);
             GDICache.Clear();
         }
 
@@ -226,7 +223,7 @@ namespace Quesadilla
         {
             // Store items into config
             Program.MainConfiguration = c;
-            c.Save(configuration_filename);
+            c.Save(QuesadillaPaths.ConfigurationFile);
             q.ReloadConfiguration();
         }
 
@@ -331,7 +328,7 @@ namespace Quesadilla
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .MinimumLevel.Information()
-                .WriteTo.File("Quesadilla_.log", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(QuesadillaPaths.LogFile, rollingInterval: RollingInterval.Day)
                 .WriteToSimpleAndRichTextBox(new MessageTemplateTextFormatter("{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}"))
             .CreateLogger();
         }

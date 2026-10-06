@@ -368,7 +368,7 @@ namespace Quesadilla
 			// dump to csv
 			if (Program.MainConfiguration.DPSSaveCSV)
 			{
-				using (var file = File.CreateText((Toon == "*ALL*" ? "All" : Toon) + "_raw_combat.csv"))
+				using (var file = File.CreateText(Path.Combine(QuesadillaPaths.ExportDirectory,(Toon == "*ALL*" ? "All" : Toon) + "_raw_combat.csv")))
 				{
 					foreach (var a in _combatGraphData.Keys)
 					{

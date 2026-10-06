@@ -870,9 +870,10 @@ namespace Quesadilla
 					foreach (var c in Program.CharacterManager.Characters)
 					{
 						s.AppendLine($"{c.CharacterName}:{c.Location}{(c.InAbyss ? " *IN-ABYSS*" : "")}");
-                        File.WriteAllText($"Quesadilla.Locations.{c.CharacterName}", $"{c.Location} {(c.InAbyss ? " *IN-ABYSS*" : "")}");
+
+						File.WriteAllText(Path.Combine(QuesadillaPaths.ExportDirectory, $"Quesadilla.Locations.{c.CharacterName}"), $"{c.Location} {(c.InAbyss ? " *IN-ABYSS*" : "")}");
                     }
-                    File.WriteAllText($"Quesadilla.Locations", s.ToString());
+                    File.WriteAllText(Path.Combine(QuesadillaPaths.ExportDirectory, "Quesadilla.Locations"), s.ToString());
                 }
                 catch (Exception ex)
                 {
@@ -912,7 +913,7 @@ namespace Quesadilla
 			}
 			
             Program.MainConfiguration.StayOnTop = TopMost;
-            Program.Universe.WriteESICharacters(Program.CHARACTER_CACHE_FILE);
+            Program.Universe.WriteESICharacters(QuesadillaPaths.CharacterCacheFile);
             ClearEveLocations();
         }
 
@@ -2438,7 +2439,7 @@ namespace Quesadilla
 
             try
             {
-                using (var writer = new StreamWriter("miningdata.csv"))
+                using (var writer = new StreamWriter(Path.Combine(QuesadillaPaths.ExportDirectory, "miningdata.csv")))
                 {
                     writer.WriteLine("Character,MinedItem,Amount,Wastage");
                     foreach (var m in miningDetail)

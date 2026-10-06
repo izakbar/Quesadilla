@@ -52,7 +52,7 @@ namespace Quesadilla.Classes.Anoikis
 
 		public AnoikisManager()
 		{
-			CacheFilename = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Quesadilla.anoikis-static.json");
+			CacheFilename = Path.Combine(QuesadillaPaths.ExternalDownloadDirectory, "Quesadilla.anoikis-static.json");
 
 			Worker = new BackgroundWorker();
 			Worker.WorkerSupportsCancellation = false;

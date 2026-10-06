@@ -168,6 +168,7 @@
     <Compile Include="Classes\MiningDetails.cs" />
     <Compile Include="Classes\InterOp\Processes\ProcessInfo.cs" />
     <Compile Include="Classes\InterOp\Processes\ProcessMonitor.cs" />
+    <Compile Include="Classes\QuesadillaPaths.cs" />
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
     <Compile Include="Classes\Resources\QuesadillaSound.cs" />
     <Compile Include="Classes\ItemType.cs" />
