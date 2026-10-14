@@ -275,6 +275,15 @@ namespace Quesadilla.Classes
 				MenuDisplay = "cargo full",
 				SoundFile = "full",
 			});
+			AlertConfiguration.Add(new AlertConfig()
+			{
+				Name = "Crystal destroyed",
+				Enabled = true,
+				AlertType = AlertConfigType.MiningEndedCrystalDestroyed,
+				TextDisplay = "{character} crystal destroyed",
+				MenuDisplay = "crystal destroyed",
+				SoundFile = "destroyed",
+			});
 
 		}
 
