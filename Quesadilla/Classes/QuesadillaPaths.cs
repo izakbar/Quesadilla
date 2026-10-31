@@ -14,6 +14,8 @@ namespace Quesadilla.Classes
 		public static readonly string LogDirectory = Path.Combine(DataDirectory, "Logs");
 
 		public static readonly string LocationDirectory = Path.Combine(DataDirectory, "Locations");
+		public static readonly string SoundDirectory = Path.Combine(DataDirectory, "Sounds");
+		public static readonly string ImageDirectory = Path.Combine(DataDirectory, "Images");
 
 		public static readonly string ExportDirectory = Path.Combine(DataDirectory, "Exports");
 		

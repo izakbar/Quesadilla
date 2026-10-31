@@ -16,6 +16,7 @@ curl https://evemaps.dotlan.net/svg/Esoteria.svg > Esoteria.svg
 curl https://evemaps.dotlan.net/svg/Essence.svg > Essence.svg
 curl https://evemaps.dotlan.net/svg/Etherium_Reach.svg > Etherium_Reach.svg
 curl https://evemaps.dotlan.net/svg/Everyshore.svg > Everyshore.svg
+curl https://evemaps.dotlan.net/svg/Exordium.svg > Exordium.svg
 curl https://evemaps.dotlan.net/svg/Fade.svg > Fade.svg
 curl https://evemaps.dotlan.net/svg/Feythabolis.svg > Feythabolis.svg
 curl https://evemaps.dotlan.net/svg/Fountain.svg > Fountain.svg

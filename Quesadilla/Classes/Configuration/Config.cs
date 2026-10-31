@@ -79,7 +79,135 @@ namespace Quesadilla.Classes
             return newItems;
 		}
 
-		private List<ConfigurationItemLocationInformation> MergeLocations(List<ConfigurationItemLocationInformation> mergeData, List<ConfigurationItemLocationInformation> original)
+
+
+		private static Dictionary<string, T> CreateLookup<T>(List<T> items,Func<T, string> keySelector)
+		{
+			if (items == null) items = new List<T>();
+			return items.ToDictionary(keySelector);
+		}
+
+		private static T GetSource<T>(Dictionary<string, T> lookup,string name,T original)
+		{
+			T loaded;
+			if (lookup.TryGetValue(name, out loaded)) return loaded;
+			return original;
+		}
+
+		private static void AddMissingItemsByName<T>(List<T> merged,IEnumerable<T> sourceItems,Func<T, string> keySelector)
+		{
+			foreach (var sourceItem in sourceItems)
+			{
+				var key = keySelector(sourceItem);
+				if (!merged.Any(x => keySelector(x) == key)) merged.Add(sourceItem);
+			}
+		}
+		private List<ConfigurationItemLocationInformation> MergeLocations(List<ConfigurationItemLocationInformation> mergeData,List<ConfigurationItemLocationInformation> original)
+		{
+			if (mergeData == null) mergeData = new List<ConfigurationItemLocationInformation>();
+			if (original == null) original = new List<ConfigurationItemLocationInformation>();
+
+			var merged = new List<ConfigurationItemLocationInformation>();
+			var lookup = CreateLookup(mergeData, x => x.Name);
+
+			foreach (var originalItem in original)
+			{
+				var source = GetSource(lookup,originalItem.Name,originalItem);
+
+				merged.Add(new ConfigurationItemLocationInformation
+				{
+					Name = source.Name,
+					Location = new Point(source.Location.X, source.Location.Y),
+					Color = source.Color,
+					IsVisible = source.IsVisible,
+					Size = new Size(source.Size.Width, source.Size.Height),
+					Font = source.Font,
+					BackColor = source.BackColor,
+					AlternateColor = source.AlternateColor
+				});
+			}
+
+			AddMissingItemsByName(merged,mergeData,x => x.Name);
+			return merged;
+		}
+
+		private List<AlertConfig> MergeAlertConfiguration(List<AlertConfig> mergeData,List<AlertConfig> original)
+		{
+			if (mergeData == null) mergeData = new List<AlertConfig>();
+			if (original == null) original = new List<AlertConfig>();
+
+			var merged = new List<AlertConfig>();
+			var lookup = CreateLookup(mergeData, x => x.Name);
+
+			foreach (var originalItem in original)
+			{
+				var source = GetSource(lookup,originalItem.Name,originalItem);
+				merged.Add(new AlertConfig
+				{
+					Name = source.Name,
+					Enabled = source.Enabled,
+					AlertType = source.AlertType,
+					AlertRangeType = source.AlertRangeType,
+					SoundFile = source.SoundFile,
+					TextDisplay = source.TextDisplay,
+					MenuDisplay = source.MenuDisplay,
+					Jumps1Number = source.Jumps1Number,
+					Jumps1Comparison = source.Jumps1Comparison,
+					Jumps2Number = source.Jumps2Number,
+					Jumps2Comparison = source.Jumps2Comparison,
+					TriggerText = source.TriggerText,
+					CustomTriggerEverySeconds = source.CustomTriggerEverySeconds
+				});
+			}
+			AddMissingItemsByName(merged,mergeData,x => x.Name);
+			return merged;
+		}
+		private List<CSSData> MergeCSSData(List<CSSData> mergeData,List<CSSData> original)
+		{
+			if (mergeData == null) mergeData = new List<CSSData>();
+			if (original == null) original = new List<CSSData>();
+
+			var merged = new List<CSSData>();
+			var lookup = CreateLookup(mergeData, x => x.Name);
+
+			foreach (var originalItem in original)
+			{
+				var source = GetSource(lookup,originalItem.Name,originalItem);
+				merged.Add(new CSSData
+				{
+					Name = source.Name,
+					FriendlyName = source.FriendlyName,
+					CSS = source.CSS
+				});
+			}
+			AddMissingItemsByName(merged,mergeData,x => x.Name);
+			return merged;
+		}
+
+		private List<LogfileConfig> MergeLogfiles(List<LogfileConfig> mergeData,List<LogfileConfig> original)
+		{
+			if (mergeData == null) mergeData = new List<LogfileConfig>(); 
+			if (original == null) original = new List<LogfileConfig>();
+
+			var merged = new List<LogfileConfig>();
+			var lookup = CreateLookup(mergeData, x => x.Name);
+
+			foreach (var originalItem in original)
+			{
+				var source = GetSource(lookup,originalItem.Name,originalItem);
+				merged.Add(new LogfileConfig
+				{
+					Name = source.Name,
+					Enabled = source.Enabled,
+					LogType = source.LogType,
+					Logfile = source.Logfile
+				});
+			}
+			AddMissingItemsByName(merged,mergeData,x => x.Name);
+			return merged;
+		}
+
+		private List<ConfigurationItemLocationInformation> OriginalMergeLocations(List<ConfigurationItemLocationInformation> mergeData, List<ConfigurationItemLocationInformation> original)
 		{
 			var merged = new List<ConfigurationItemLocationInformation>();
 			var mergeLookup = mergeData.ToDictionary(x => x.Name);
@@ -274,6 +402,15 @@ namespace Quesadilla.Classes
 				TextDisplay = "{character} cargo full",
 				MenuDisplay = "cargo full",
 				SoundFile = "full",
+			});
+			AlertConfiguration.Add(new AlertConfig()
+			{
+				Name = "Crystal destroyed",
+				Enabled = true,
+				AlertType = AlertConfigType.MiningEndedCrystalDestroyed,
+				TextDisplay = "{character} crystal destroyed",
+				MenuDisplay = "crystal destroyed",
+				SoundFile = "destroyed",
 			});
 
 		}
@@ -829,22 +966,23 @@ img.rounded-corners {
 				if (!File.Exists(filename))
 					return new Config();
 
+				var baseConfig = new Config();
 				var c = new Config();
-
-				var _MainWindowItemLocations = c.DuplicateLocations(c.MainWindowItemLocations);
-				var _AlertWindowItemLocations = c.DuplicateLocations(c.AlertWindowItemLocations);
-				var _OverlayWindowItemLocations = c.DuplicateLocations(c.OverlayWindowItemLocations);
-				var _DPSWindowItemLocations = c.DuplicateLocations(c.DPSWindowItemLocations);
 
 				c = JsonSerializer.Deserialize<Config>(
 						   File.ReadAllText(filename),
 						   CreateJsonOptions())
 					   ?? new Config();
 
-				c.MainWindowItemLocations = c.MergeLocations(c.MainWindowItemLocations, _MainWindowItemLocations);
-				c.AlertWindowItemLocations = c.MergeLocations(c.AlertWindowItemLocations, _AlertWindowItemLocations);
-				c.OverlayWindowItemLocations = c.MergeLocations(c.OverlayWindowItemLocations, _OverlayWindowItemLocations);
-				c.DPSWindowItemLocations = c.MergeLocations(c.DPSWindowItemLocations, _DPSWindowItemLocations);
+				c.MainWindowItemLocations = c.MergeLocations(c.MainWindowItemLocations, baseConfig.MainWindowItemLocations);
+				c.AlertWindowItemLocations = c.MergeLocations(c.AlertWindowItemLocations, baseConfig.AlertWindowItemLocations);
+				c.OverlayWindowItemLocations = c.MergeLocations(c.OverlayWindowItemLocations, baseConfig.OverlayWindowItemLocations);
+				c.DPSWindowItemLocations = c.MergeLocations(c.DPSWindowItemLocations, baseConfig.DPSWindowItemLocations);
+
+				c.AlertConfiguration = c.MergeAlertConfiguration(c.AlertConfiguration, baseConfig.AlertConfiguration);
+				c.CSSData = c.MergeCSSData(c.CSSData, baseConfig.CSSData);
+				c.Logfiles = c.MergeLogfiles(c.Logfiles, baseConfig.Logfiles);
+
 
 				return c;
 			}

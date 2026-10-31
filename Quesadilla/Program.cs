@@ -288,9 +288,9 @@ namespace Quesadilla
                 return soundPlayer;
             }
 
-            if (File.Exists(fileName))
+            if (File.Exists(Path.Combine(QuesadillaPaths.SoundDirectory, fileName)))
             {
-                using (FileStream fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (FileStream fileStream = File.Open(Path.Combine(QuesadillaPaths.SoundDirectory, fileName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     try
                     {
@@ -316,9 +316,9 @@ namespace Quesadilla
                 return imageStream;
             }
 
-            if (File.Exists(fileName))
+            if (File.Exists(Path.Combine(QuesadillaPaths.ImageDirectory, fileName)))
             {
-                Image imageFile = Image.FromFile(fileName);
+                Image imageFile = Image.FromFile(Path.Combine(QuesadillaPaths.ImageDirectory, fileName));
                 return imageFile;
             }
             return (Image)null;

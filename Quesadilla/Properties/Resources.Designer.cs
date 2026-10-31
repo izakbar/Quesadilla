@@ -259,6 +259,15 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
+        internal static System.IO.UnmanagedMemoryStream destroyed {
+            get {
+                return ResourceManager.GetStream("destroyed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
         internal static System.IO.UnmanagedMemoryStream epic_orchestra {
             get {
                 return ResourceManager.GetStream("epic_orchestra", resourceCulture);

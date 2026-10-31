@@ -70,8 +70,9 @@ namespace Quesadilla
 
         private readonly Regex _MiningRegexRoidExploded = new Regex("(?<miningDevice>.*)\\sdeactivates as it finds the resource it was harvesting\\s(?<miningHowItEnded>.*)", RegexOptions.Compiled);
         private readonly Regex _MiningRegexCargoFull = new Regex("Your\\s*(?<miningDevice>.*)\\s*has completed operations. Ship.s cargo hold is full.*", RegexOptions.Compiled);
+		private readonly Regex _MiningCrystalDestroyedRegex = new Regex(@"(?<miningDevice>.+?)\s+deactivates due to the destruction of the (?<crystal>.+?) it was fitted with.", RegexOptions.Compiled);
 
-        private readonly Regex _MiningRegexAmounts = new Regex("^<color=.*>\\s*You mined\\s*<font size=..><color=.*>(?<miningAmount>.*)<color=.*><font size=..>\\s*units* of\\s*<color=.*><font size=..>\\s*(?<miningContext>.*)", RegexOptions.Compiled);
+		private readonly Regex _MiningRegexAmounts = new Regex("^<color=.*>\\s*You mined\\s*<font size=..><color=.*>(?<miningAmount>.*)<color=.*><font size=..>\\s*units* of\\s*<color=.*><font size=..>\\s*(?<miningContext>.*)", RegexOptions.Compiled);
         private readonly Regex _MiningRegexAmountsCritical = new Regex("^^<color=.*>\\s*Critical mining success!\\s*<color=.*><font size=..>\\sYou mined an additional\\s<color=.*><font size=..>(?<miningAmount>.*)<color=.*><font size=..>\\s*units* of\\s*<color=.*><font size=..>\\s*(?<miningContext>.*)", RegexOptions.Compiled);
         private readonly Regex _MiningRegexAmountsResidue = new Regex("^^<color=.*>\\s*Additional\\s*<font size=..><color=.*>(?<miningResidue>.*)<color=.*><font size=..>\\s*units depleted from asteroid as residue", RegexOptions.Compiled);
         // normal: <color=0x77ffffff>You mined <font size=12><color=#ff8dc169>40<color=0x77ffffff><font size=10> units of <color=0xffffffff><font size=12>Arkonor
@@ -1256,6 +1257,32 @@ namespace Quesadilla
 				{
 					Log.Information("Mining: cargo full");
 					var alertText = GenerateAlertText(e.Entry, null, alert, e.Entry.CharacterName, AlertTextType.Alert, match.Groups["miningDevice"].Value + " stopped - Cargo full");
+					PathInfo path = null;
+
+					Program.AlertQueueManager.EnqueueNewAlert(
+						new AlertQueueItem()
+						{
+							AlertText = alertText,
+							MenuText = e.Entry.CharacterName + alertText,
+							Entry = e.Entry,
+							Path = path,
+							Context = alertText,
+							SoundFile = alert.SoundFile,
+							FriendlyName = alert.Name + " - " + e.Entry.CharacterName,
+							isMiningOver = true,
+							ShowAlert = true,
+						});
+				}
+			}
+
+			// is crystal destroyed ?
+			match = _MiningCrystalDestroyedRegex.Match(e.Entry.LineContent);
+			if (match.Success)
+			{
+				foreach (var alert in GetEnabledAlerts(AlertConfigType.MiningEndedCrystalDestroyed))
+				{
+					Log.Information("Mining: crystal destroyed");
+					var alertText = GenerateAlertText(e.Entry, null, alert, e.Entry.CharacterName, AlertTextType.Alert, match.Groups["miningDevice"].Value + " stopped - Crystal destroyed");
 					PathInfo path = null;
 
 					Program.AlertQueueManager.EnqueueNewAlert(
