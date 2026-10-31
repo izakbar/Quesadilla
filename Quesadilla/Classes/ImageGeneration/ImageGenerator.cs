@@ -1153,7 +1153,7 @@ namespace Quesadilla.Classes.ImageGeneration
 						var wormholeClass = Program.AnoikisProcessor.GetWormholeClass(systemData?.WormholeClass ?? "C1");
 						var wanderers = Program.AnoikisProcessor.GetPossibleWanderers(systemData);
 						DrawSystemName(g, originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y - (int)(textSize * .4),
-							wormholeClass.Title,
+							wormholeClass?.Title,
 							parameters.SystemColourText, textSize / 5 * 2);
 
 						DrawSystemName(g, originPoint.X + currentSystem.X, originPoint.Y + currentSystem.Y + (int)(textSize * 1.3),
