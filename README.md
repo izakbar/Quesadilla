@@ -160,6 +160,15 @@ Thanks to:
 - Cyotek.Windows.Forms.ColorPicker.
 - Atkinson Hyperlegible font for accessibility and readability improvements.
 
+## Project Identity
+
+The Quesadilla source code is provided under the MIT License.
+
+The Quesadilla name, logos, website content and branding remain associated
+with the official project. Forks and modified versions should clearly identify
+themselves as unofficial releases and must not be represented as official
+Quesadilla builds without permission from the project author.
+
 ### CCP Games
 
 Quesadilla exists because of EVE Online and its incredible community.
