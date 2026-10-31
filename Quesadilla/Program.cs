@@ -1,5 +1,27 @@
-﻿using System;
+﻿using EVEStandard;
+using EVEStandard.Enumerations;
+using Microsoft.AspNetCore.Hosting;
+using Quesadilla.Classes;
+using Quesadilla.Classes.Alerts;
+using Quesadilla.Classes.Anoikis;
+using Quesadilla.Classes.Characters;
+using Quesadilla.Classes.ESIData;
+using Quesadilla.Classes.Events;
+using Quesadilla.Classes.EveScout;
+using Quesadilla.Classes.GraphData;
+using Quesadilla.Classes.ImageGeneration;
+using Quesadilla.Classes.InterOp;
+using Quesadilla.Classes.Logfile;
+using Quesadilla.Classes.Processes;
+using Quesadilla.Classes.Resources;
+using Quesadilla.Classes.SolarSystems;
+using Quesadilla.Classes.ZKill;
+using Serilog;
+using Serilog.Formatting.Display;
+using Serilog.Sinks.WinForms.Base;
+using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
@@ -8,26 +30,11 @@ using System.Linq;
 using System.Media;
 using System.Reflection;
 using System.Resources;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Web.WebPages;
 using System.Windows.Forms;
-using EVEStandard.Enumerations;
-using EVEStandard;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Quesadilla.Classes;
-using Quesadilla.Classes.ESIData;
-using Quesadilla.Classes.Events;
-using Quesadilla.Classes.Logfile;
-using Quesadilla.Classes.Processes;
-using Quesadilla.Classes.Queues;
-using Quesadilla.Classes.Resources;
-using Quesadilla.Classes.SolarSystems;
-using Quesadilla.Classes.ZKill;
-using Serilog;
-using Serilog.Formatting.Display;
-using Serilog.Sinks.WinForms.Base;
-using System.Collections.Concurrent;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Quesadilla
 {
@@ -41,52 +48,71 @@ namespace Quesadilla
 
         private static EVEStandardAPI esiClient;
 
-        public static ZKill ZKillHandler = new ZKill();
+        public static ZKill ZKillHandler;
         public static Config MainConfiguration = new Config();
         public static ESIWorker ESIHandler;
-
-        public static UniverseManager Universe;
+		public static EveScoutManager EveScoutProcessor;
+		public static UniverseManager Universe;
 
         public static List<QuesadillaSound> Sounds = new List<QuesadillaSound>();
         public static List<QuesadillaBackground> Backgrounds = new List<QuesadillaBackground>();
 
-        public static ConcurrentQueue<AlertQueueItem> NewAlerts = new ConcurrentQueue<AlertQueueItem>();
-        public static ConcurrentQueue<AlertQueueItem> ActiveAlerts = new ConcurrentQueue<AlertQueueItem>();
+        public static AlertQueueManager AlertQueueManager;
 
-        public static  List<LogWatcher> logfileWatchers = new List<LogWatcher>();
-        public static List<Character> CharacterList { get; set; }
-
+		public static LogWatcherManager LogWatcherManager;
         public static ProcessMonitor ProcessMonitorHandler = new ProcessMonitor();
+		public static CharacterManager CharacterManager = new CharacterManager();
+        public static GraphDataManager GraphDataManager = new GraphDataManager();
+        public static AnoikisManager AnoikisProcessor;
 
-        public static Dictionary<string, List<CombatLine>> Combat = new Dictionary<string, List<CombatLine>>();
-        public static Dictionary<string, List<IskLine>> ISK = new Dictionary<string, List<IskLine>>();
-        public static Dictionary<string, List<MiningLine>> Mining = new Dictionary<string, List<MiningLine>>();
+        public static Version version;
+        public static String UserAgent;
+        public static Image CachedBackground;
 
-        public const string configuration_filename = "Quesadilla.config.json";
-        public const string CHARACTER_CACHE_FILE = "Quesadilla.CharacterCache.Json";
+		private static Mutex _mutex;
+		private static string MUTEX_NAME = "Quesadilla Single Instance Mutex";
+		public const string RESTORE_INSTANCE_MESSAGE_NAME = "Quesadilla Restore Instance";
 
-        public static Version version = Assembly.GetEntryAssembly().GetName().Version;
-
-        [STAThread]
+		[STAThread]
         static void Main()
         {
+			Program._mutex = Program.GetMutex();
+			if (Program._mutex == null)
+			{
+				uint message = User32NativeMethods.RegisterWindowMessage(Program.RESTORE_INSTANCE_MESSAGE_NAME);
+				if (message != 0)
+				{
+					User32NativeMethods.PostMessage(User32NativeMethods.HWND_BROADCAST, message, IntPtr.Zero, IntPtr.Zero);
+				}
+				return;
+			}
+
+			QuesadillaPaths.Initialise();
             ConfigureSerilog();
 
-            MainConfiguration = Config.Load(configuration_filename);
+            MainConfiguration = Config.Load(QuesadillaPaths.ConfigurationFile);
 
-            esiClient = new EVEStandardAPI(
+            try { 
+				System.Deployment.Application.ApplicationDeployment ad = System.Deployment.Application.ApplicationDeployment.CurrentDeployment;
+                if (ad != null) {
+                    version = ad.CurrentVersion;
+                }
+			}
+            catch
+            {
+                version = Assembly.GetEntryAssembly().GetName().Version;
+			}
+			UserAgent = $"Mozilla/5.0 (Quesadilla version {version.ToString()} )";
+
+			esiClient = new EVEStandardAPI(
                     "Quesadilla",                  // User agent
                     DataSource.Tranquility,         // Server [Tranquility/Singularity]
-                    TimeSpan.FromSeconds(30));       // Timeout
+					CompatibilityDate.v2026_06_09,
+					TimeSpan.FromSeconds(30));       // Timeout
+
 
             ESIHandler = new ESIWorker(esiClient, Log.Logger);
             Universe = new UniverseManager(esiClient, Log.Logger);
-
-            Universe.ReadSolarSystems("Quesadilla.Systems.Json");
-            Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
-            Universe.ReadESICharacters(CHARACTER_CACHE_FILE);
-
-            CharacterList = new List<Character>();
 
             string listeningPort = MainConfiguration.IntegrationPort.ToString();
 
@@ -99,19 +125,105 @@ namespace Quesadilla
                 ;
             webhost.Build().RunAsync();
 
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(q = new Quesadilla());
+			var splash = new QuesadillaSplashScreen();
+			splash.Show();
 
-            MainConfiguration.Save(configuration_filename);
+			DateTime end = DateTime.Now.AddSeconds(2);
+
+			while (DateTime.Now < end)
+			{
+				Application.DoEvents();
+				System.Threading.Thread.Sleep(50);
+			}
+
+			splash.SetStatus("Loading Universe...");
+			Application.DoEvents();
+			Universe.ReadSolarSystems("Quesadilla.Systems.Json");
+
+			splash.SetStatus("Loading Item Types...");
+			Application.DoEvents();
+			Universe.ReadItemTypes("Quesadilla.ItemTypes.Json");
+
+			splash.SetStatus("Loading Character Cache...");
+			Application.DoEvents();
+			Universe.ReadESICharacters(QuesadillaPaths.CharacterCacheFile);
+
+			splash.SetStatus("Creating Logfile Watchers...");
+			Application.DoEvents();
+			LogWatcherManager = new LogWatcherManager(MainConfiguration.HowManyTicksBeforeLogfileCheck * MainConfiguration.TickMiliseconds);
+			Program.SetupLogfileWatchers();
+
+			splash.SetStatus("Creating Main Window...");
+			Application.DoEvents();
+			q = new Quesadilla();
+			q.SplashScreen = splash;
+            q.ReloadConfiguration();
+			ESIHandler.ESIEventHandler += new EventHandler<ESIEventArgs>(q.ESI_ProcessNewData);
+			ESIHandler.EnqueueRequestIncursions();
+
+			splash.SetStatus("Setting up EveScout...");
+			Application.DoEvents();
+			EveScoutProcessor = new EveScoutManager(Log.Logger);
+			EveScoutProcessor.EveScoutEventHandler += new EventHandler<EveScoutEventArgs>(q.EveScout_ProcessNewData);
+
+			splash.SetStatus("Setting up Anoikis...");
+			Application.DoEvents();
+			AnoikisProcessor = new AnoikisManager();
+
+			splash.SetStatus("Creating Zkill Handler");
+			Application.DoEvents();
+			ZKillHandler = new ZKill();
+			ZKillHandler.ZKillFeedR2Z2.ZKillEventHandler += new EventHandler<ZKillEventArgs>(q.ZKill_ProcessNewData);
+
+			splash.SetStatus("Creating Alert Queue Manager...");
+			Application.DoEvents();
+			AlertQueueManager = new AlertQueueManager();
+
+
+			splash.SetStatus("Starting Logwatcher.");
+			Application.DoEvents();
+			LogWatcherManager.Start();
+
+			splash.SetStatus("Starting Tickmangers");
+			Application.DoEvents();
+			q.TickManagerUpdates.Start();
+			q.TickManagerUI.Start();
+
+			splash.SetStatus("Done.");
+			Application.DoEvents();
+			System.Threading.Thread.Sleep(500);
+
+			Application.Run(q);
+			MainConfiguration.Save(QuesadillaPaths.ConfigurationFile);
+            GDICache.Clear();
         }
 
-        public static void SaveAndReloadConfiguration(Config c)
+		private static Mutex GetMutex()
+		{
+			try
+			{
+				Mutex.OpenExisting(Program.MUTEX_NAME);
+				return null;
+			}
+			catch (UnauthorizedAccessException)
+			{
+				return null;
+			}
+			catch (Exception)
+			{
+				Mutex m = new Mutex(true, Program.MUTEX_NAME, out var result);
+				return result ? m : null;
+			}
+		}
+
+		public static void SaveAndReloadConfiguration(Config c)
         {
             // Store items into config
             Program.MainConfiguration = c;
-            c.Save(configuration_filename);
+            c.Save(QuesadillaPaths.ConfigurationFile);
             q.ReloadConfiguration();
         }
 
@@ -121,35 +233,14 @@ namespace Quesadilla
             // load from config
             foreach(var l in MainConfiguration.Logfiles.Where(o => o.Enabled == true))
             {
-                logfileWatchers.Add(new LogWatcher(l.Logfile, l.LogType, l.FriendlyName));
+                LogWatcherManager.AddWatcher(l.Logfile, l.LogType, l.Name);
             }
 
-            // always add gamelogs and local !
-            logfileWatchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat"));
-            logfileWatchers.Add(new LogWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs"));
+			// always add gamelogs and local !
+			LogWatcherManager.AddWatcher(null, Classes.Logfile.LogFileType.Local, "Local chat");
+			LogWatcherManager.AddWatcher(null, Classes.Logfile.LogFileType.Game, "Gamelogs");
         }
 
-        public static void StartLogfileWatchers()
-        {
-            // start watchers
-            foreach (LogWatcher watcher in logfileWatchers)
-            {
-                watcher.StartWatch();
-            }
-        }
-
-        public static void AddNewCharacter(string characterName)
-        {
-            if (characterName.Trim().Length == 0)
-                return;
-
-            CharacterList.Add(new Character()
-            {
-                CharacterName = characterName.Trim(),
-                IsClientActive = false,
-            });
-            Log.Information("New character found: " + characterName);
-        }
         public static void InitializeResources()
         {
             // find all resources - put sounds into sound array, backgrounds in background
@@ -184,298 +275,7 @@ namespace Quesadilla
                 }
             }
         }
-
-        public static int ExpireAlerts()
-        {
-            int Expired = 0;
-
-            lock (ActiveAlerts)
-            {
-                bool removedAlert = true;
-                while (ActiveAlerts.Count > 0 && removedAlert)
-                {
-                    var alert = ActiveAlerts.First();
-                    DateTime timeAdded = alert.Entry != null ? alert.Entry.TimeAdded : alert.Kill.TimeAdded;
-                    var diffInSeconds = (DateTime.Now - timeAdded).TotalSeconds;
-                    if (diffInSeconds > Program.MainConfiguration.ExpireAlertSeconds)
-                    {
-
-                        Program.ActiveAlerts.TryDequeue(out alert);
-                        Expired++;
-
-                        // expired so dequeue
-                        if (!alert.isFaction && !alert.isDecloak && alert.Kill == null && alert.Path != null)
-                        {
-                            // remove alert to solarsystem info
-                            var solarSystem = Universe.SolarSystems[alert.Path.ToSystemId];
-                            if (solarSystem.Alerts != null)
-                            {
-                                var removed = solarSystem.Alerts.Remove(alert);
-                            }
-                        }
-                        removedAlert = true;
-                    }
-                    else
-                    {
-                        removedAlert = false;
-                    }
-                }
-            }
-            return Expired;
-        }
-
-        public static void EnqueueNewAlert(AlertQueueItem alert, ConcurrentQueue<AlertQueueItem> q)
-        {
-            // only add to new alerts if not already in new alerts. This should prevent an alert for each character on same logfile entry
-            lock (q)
-            {
-                try
-                {
-                    var checkZkillAlerts = 0;
-                    // check if zkill already exists
-                    if (alert.Kill != null)
-                    {
-                        checkZkillAlerts =
-                            ActiveAlerts.Where(o => (o.Kill != null && o.Kill.ID == alert.Kill.ID)).ToList().Count() +
-                            q.Where(o => (o.Kill != null && o.Kill.ID == alert.Kill.ID)).ToList().Count();
-                    }
-                    var foundAlerts = NewAlerts.Where(
-                        o => (
-                        (o.Path != null && alert.Path != null && o.Path.ToSystemId == alert.Path.ToSystemId) || (o.AlertText == alert.AlertText)
-                        || (o.Kill != null && alert.Kill != null && o.Kill.ID == alert.Kill.ID)
-                        )).ToList();
-
-                    if ( (foundAlerts.Count == 0 || q.Count == 0) && checkZkillAlerts == 0)
-                    {
-                        alert.RouteText = Program.Universe.PathToString(alert.Path);
-                        q.Enqueue(alert);
-                    }
-                    if (foundAlerts.Count != 0)
-                    {
-                        if (foundAlerts.First().Path != null && alert.Path != null && alert.Path.TotalJumps < foundAlerts.First().Path.TotalJumps)
-                        {
-                            foundAlerts.First().Path = alert.Path;
-                            foundAlerts.First().AlertText = alert.AlertText;
-                            foundAlerts.First().Entry = alert.Entry;
-                            foundAlerts.First().Context = alert.Context;
-                            foundAlerts.First().RouteText = alert.RouteText;
-                            foundAlerts.First().SoundFile = alert.SoundFile;
-                            foundAlerts.First().ShowAlert = alert.ShowAlert;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex.Message);
-                    if (ex.InnerException != null)
-                    {
-                        Log.Debug(ex.InnerException.Message);
-                    }
-                }
-            }
-        }
-
-        public static void EnqueueActiveAlert(AlertQueueItem alert)
-        {
-            ActiveAlerts.Enqueue(alert);
-            if ( alert.Path != null && alert.Path.ToSystemId != null )
-            {
-                Program.Universe.AddAlert(alert.Path.ToSystemId, alert);
-            }
-        }
-
-        public static string GetIskLastHour(string toon)
-        {
-            var ret = "";
-            double isk = 0;
-
-            //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
-            var expireTime = DateTime.Now.AddSeconds(-3600);
-
-            foreach (var t in CharacterList)
-            {
-                if (!toon.IsEmpty() && t.CharacterName != toon || !ISK.ContainsKey(t.CharacterName)) continue;
-                foreach (var i in ISK[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
-                {
-                    isk += i.IskAmount;
-                }
-            }
-
-            if (isk > 0)
-            {
-                ret = Math.Truncate(isk).ToString("0,000 ISK");
-            }
-
-            return ret;
-        }
-        public static string GetMiningLastHour(string toon)
-        {
-            var ret = "";
-            double units = 0;
-            double units3Wasted = 0;
-
-            //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
-            var expireTime = DateTime.Now.AddSeconds(-3600);
-
-            foreach (var t in CharacterList)
-            {
-                if (!toon.IsEmpty() && t.CharacterName != toon || !Mining.ContainsKey(t.CharacterName)) continue;
-                foreach (var m in Mining[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
-                {
-                    units += m.MiningAmount;
-                    units3Wasted += m.WastageAmount;
-                }
-            }
-
-            if (units > 0)
-            {
-                ret = ((int)Math.Truncate(units)).ToString("N0")+" - " + ((int)Math.Truncate(units3Wasted)).ToString("N0")+" ";
-            }
-
-            return ret;
-        }
-        public static Dictionary<string, List<MiningDetails>> GetMiningLastHourDetail(string toon, bool itemTotalsOnly)
-        {
-        Dictionary<string, List<MiningDetails>> miningDetails = new Dictionary<string, List<MiningDetails>>();
-
-        //var diffInSeconds = (DateTime.Now - a.Entry.TimeAdded).TotalSeconds;
-        var expireTime = DateTime.Now.AddSeconds(-3600);
-
-            foreach (var t in CharacterList)
-            {
-                if (!toon.IsEmpty() && t.CharacterName != toon || !Mining.ContainsKey(t.CharacterName)) continue;
-                if (!miningDetails.ContainsKey(t.CharacterName))
-                {
-                    miningDetails[t.CharacterName] = new List<MiningDetails>();
-                }
-
-                foreach (var m in Mining[t.CharacterName].Where(o => o.TimeAdded >= expireTime))
-                {
-                    MiningDetails md = miningDetails[t.CharacterName].Find(o => o.MiningItem == m.MiningItem);
-                    if (md == null)
-                    {
-                        md = new MiningDetails()
-                        {
-                            MiningItem = m.MiningItem,
-                            MiningAmount = m.MiningAmount,
-                            WastageAmount = m.WastageAmount,
-                        };
-                        miningDetails[t.CharacterName].Add(md);
-                    } else
-                    {
-                        md.MiningAmount += m.MiningAmount;
-                        md.WastageAmount += m.WastageAmount;
-                    }
-                }
-            }
-
-            if ( itemTotalsOnly)
-            {
-                return MiningItemSummary(miningDetails);
-            }
-            else
-            {
-                return miningDetails;
-            }
-        }
-
-        public static Dictionary<string, List<MiningDetails>> MiningItemSummary(Dictionary<string, List<MiningDetails>> miningDetail)
-        {
-            Dictionary<string, List<MiningDetails>> miningSummary = new Dictionary<string, List<MiningDetails>>();
-
-            if (miningDetail.Count == 0) return miningSummary;
-
-            miningSummary["Summary"] = new List<MiningDetails>();
-            foreach (var detail in miningDetail)
-            {
-                foreach (var detailItem in detail.Value)
-                {
-                    MiningDetails miningSummaryItem = miningSummary["Summary"].Find(o => o.MiningItem == detailItem.MiningItem);
-                    if (miningSummaryItem == null)
-                    {
-                        miningSummaryItem= new MiningDetails()
-                        {
-                            MiningItem = detailItem.MiningItem,
-                            MiningAmount = detailItem.MiningAmount,
-                            WastageAmount = detailItem.WastageAmount,
-                        };
-                        miningSummary["Summary"].Add(miningSummaryItem);
-                    }
-                    else
-                    {
-                        miningSummaryItem.MiningAmount += detailItem.MiningAmount;
-                        miningSummaryItem.WastageAmount += detailItem.WastageAmount;
-                    }
-                }
-            }
-            return miningSummary;
-        }
-
-        public static void ExpireMining()
-        {
-            // expire ISK ?
-            foreach (var k in Mining.Keys)
-            {
-                bool removedEntry = true;
-                while (removedEntry && Mining[k].Count > 0)
-                {
-                    removedEntry = false;
-                    lock (Mining[k])
-                    {
-                        TimeSpan ts = DateTime.Now - Mining[k].First().TimeAdded;
-                        if (ts.TotalSeconds > MainConfiguration.ExpireMiningSeconds)
-                        {
-                            Mining[k].Remove(Mining[k].First());
-                            removedEntry = true;
-                        }
-                    }
-                }
-            }
-        }
-        public static void ExpireISK()
-        {
-            // expire ISK ?
-            foreach (var k in ISK.Keys)
-            {
-                bool removedEntry = true;
-                while (removedEntry && ISK[k].Count > 0)
-                {
-                    removedEntry = false;
-                    lock (ISK[k])
-                    {
-                        TimeSpan ts = DateTime.Now - ISK[k].First().TimeAdded;
-                        if (ts.TotalSeconds > MainConfiguration.ExpireISKSeconds)
-                        {
-                            ISK[k].Remove(ISK[k].First());
-                            removedEntry = true;
-                        }
-                    }
-                }
-            }
-        }
-        public static void ExpireCombat()
-        {
-            // expire combats ?
-            foreach (var k in Combat.Keys)
-            {
-
-                bool removedEntry = true;
-                while (removedEntry && Combat[k].Count > 0)
-                {
-                    removedEntry = false;
-                    lock (Combat[k])
-                    {
-                        TimeSpan ts = DateTime.Now - Combat[k].First().TimeAdded;
-                        if (ts.TotalSeconds > MainConfiguration.ExpireCombatSeconds)
-                        {
-                            Combat[k].Remove(Combat[k].First());
-                            removedEntry = true;
-                        }
-                    }
-                }
-            }
-        }
-        public static SoundPlayer LoadSoundFromFile(string fileName)
+		public static SoundPlayer LoadSoundFromFile(string fileName)
         {
             Stream soundStream = null;
 
@@ -488,9 +288,9 @@ namespace Quesadilla
                 return soundPlayer;
             }
 
-            if (File.Exists(fileName))
+            if (File.Exists(Path.Combine(QuesadillaPaths.SoundDirectory, fileName)))
             {
-                using (FileStream fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (FileStream fileStream = File.Open(Path.Combine(QuesadillaPaths.SoundDirectory, fileName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     try
                     {
@@ -516,31 +316,21 @@ namespace Quesadilla
                 return imageStream;
             }
 
-            if (File.Exists(fileName))
+            if (File.Exists(Path.Combine(QuesadillaPaths.ImageDirectory, fileName)))
             {
-                Image imageFile = Image.FromFile(fileName);
+                Image imageFile = Image.FromFile(Path.Combine(QuesadillaPaths.ImageDirectory, fileName));
                 return imageFile;
             }
             return (Image)null;
-        }
-
-        public static void LogfileWatchersProcessing()
-        {
-            // progress logfiles
-            foreach (LogWatcher watcher in logfileWatchers)
-            {
-                watcher.Tick();
-            }
-
         }
         private static void ConfigureSerilog()
         {
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .MinimumLevel.Information()
-                .WriteTo.File("Quesadilla_.log", rollingInterval: RollingInterval.Day)
-                .WriteToSimpleAndRichTextBox(new MessageTemplateTextFormatter("{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Exception}\n"))
-                .CreateLogger();
+                .WriteTo.File(QuesadillaPaths.LogFile, rollingInterval: RollingInterval.Day)
+                .WriteToSimpleAndRichTextBox(new MessageTemplateTextFormatter("{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}"))
+            .CreateLogger();
         }
-    }
+	}
 }

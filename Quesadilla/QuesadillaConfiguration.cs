@@ -1,18 +1,16 @@
-﻿using Quesadilla.Classes.Queues;
+﻿using Cyotek.Windows.Forms;
 using Quesadilla.Classes;
+using Quesadilla.Classes.Configuration;
+using Quesadilla.Classes.Extensions;
+using Quesadilla.Classes.Queues;
+using Quesadilla.Classes.SolarSystems;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Quesadilla.Classes.SolarSystems;
-using System.Xml.Xsl;
-using Cyotek.Windows.Forms;
-using Quesadilla.Classes.Extensions;
 
 namespace Quesadilla
 {
@@ -25,18 +23,22 @@ namespace Quesadilla
         private QuesadillaAlertPopup _alertPopup;
         private AlertQueueItem _dummyAlert;
 
-        private bool formLoaded = false;
+        private bool _formLoaded = false;
 
+		private CustomPropertyExtractorWrapper _propertySource;
+		private int _fixedWidth;
 
-        public QuesadillaConfiguration(Config configuration, MenuItem configWindowMenu, Quesadilla mainForm)
+		public QuesadillaConfiguration(Config configuration, MenuItem configWindowMenu, Quesadilla mainForm)
         {
             InitializeComponent();
             _configuration = configuration.Duplicate();
             _configMenu = configWindowMenu;
             _mainForm = mainForm;
-        }
 
-        private void SetSystem(ComboBox cmb, string systemName)
+			LocationCollectionEditor.CollectionChanged += OnCollectionChanged;
+		}
+
+		private void SetSystem(ComboBox cmb, string systemName)
         {
             cmb.Items.Clear();
             cmb.DataSource = Program.Universe.Names.Keys.OrderBy(x => x).ToList();
@@ -50,8 +52,12 @@ namespace Quesadilla
         }
         private void QuesadillaConfiguration_Load(object sender, EventArgs e)
         {
+			_fixedWidth = Width;
 
-            ConfigurationProperties.SetLabelColumnWidth(270);
+			MinimumSize = new Size(Width, 640);
+			MaximumSize = new Size(Width, 5000);
+
+			ConfigurationProperties.SetLabelColumnWidth(270);
 
             SetSystem(cmbHomeSystem, _configuration.HomeSystem);
             _dummyAlert = new AlertQueueItem()
@@ -84,34 +90,58 @@ namespace Quesadilla
                     RawLine = "rawXXXraw",
                 },
             };
-            trackOpacity.Value = _configuration.AlertPopupOpacity;
-            trackPopupTime.Value = _configuration.AlertPopupSeconds;
-            trackDPSGraphLineSize.Value = _configuration.DPSGraphLineSize;
-            trackShowLastUnexpiredAlerts.Value = _configuration.ShowLastUnexpiredAlerts;
 
             SetBackground(cmbBackground, _configuration.AlertPopupBackground);
-            lblOpacity.Text = _configuration.AlertPopupOpacity.ToString();
-            lblPopupSeconds.Text = _configuration.AlertPopupSeconds.ToString();
-            lblDPSGraphLineSize.Text = _configuration.DPSGraphLineSize.ToString();
-            lblShowLastUnexpiredAlerts.Text = _configuration.ShowLastUnexpiredAlerts.ToString();
 
-            trackAlertPopupMinimapSizeWidth.Minimum = 1;
-            trackAlertPopupMinimapSizeHeight.Minimum = 1;
-            trackAlertPopupMinimapPositionX.Minimum = 0;
-            trackAlertPopupMinimapPositionY.Minimum = 0;
-
-            trackAlertPopupMinimapSizeWidth.Value = _configuration.AlertPopupMinimapSize.X > trackAlertPopupMinimapSizeWidth.Maximum ? trackAlertPopupMinimapSizeWidth.Maximum : _configuration.AlertPopupMinimapSize.X;
-            trackAlertPopupMinimapSizeHeight.Value = _configuration.AlertPopupMinimapSize.Y > trackAlertPopupMinimapSizeHeight.Maximum ? trackAlertPopupMinimapSizeHeight.Maximum : _configuration.AlertPopupMinimapSize.Y; 
-            trackAlertPopupMinimapPositionX.Value = _configuration.AlertPopupMinimapPosition.X;
-            trackAlertPopupMinimapPositionY.Value = _configuration.AlertPopupMinimapPosition.Y;
-
-            formLoaded = true;
+            _formLoaded = true;
             ShowAlertBitmap();
 
-            ConfigurationProperties.SelectedObject = new CustomPropertyExtractorWrapper(_configuration);
-
+			_propertySource = new CustomPropertyExtractorWrapper(_configuration);
+			ConfigurationProperties.SelectedObject = _propertySource;
+			PopulateConfigurationFilter();
         }
-        private Bitmap GetControlImage(Control ctl)
+
+		private void PopulateConfigurationFilter()
+		{
+			var categories = TypeDescriptor.GetProperties(_propertySource)
+				.Cast<PropertyDescriptor>()
+				.Select(p => p.Category)
+				.Where(c => !string.IsNullOrWhiteSpace(c))
+				.Distinct()
+				.OrderBy(c => c)
+				.ToList();
+
+			cmbFilterCategory.Items.Clear();
+			cmbFilterCategory.Items.Add("All Categories");
+
+			foreach (var category in categories)
+			{
+				cmbFilterCategory.Items.Add(category);
+			}
+
+			cmbFilterCategory.SelectedIndex = 0;
+		}
+
+		private void ApplyPropertyFilter()
+		{
+			string filterText = txtFilterProperties.Text?.Trim();
+
+			string category = null;
+
+			if (cmbFilterCategory.SelectedIndex > 0)
+			{
+				category = cmbFilterCategory.SelectedItem.ToString();
+			}
+
+			ConfigurationProperties.SelectedObject = new PropertyGridFilterWrapper(
+				_configuration,
+				filterText,
+				category);
+
+			ConfigurationProperties.Refresh();
+		}
+
+		private Bitmap GetControlImage(Control ctl)
         {
             Bitmap bm = new Bitmap(ctl.Width, ctl.Height);
             ctl.DrawToBitmap(bm,
@@ -145,28 +175,33 @@ namespace Quesadilla
 
         private void ShowAlertBitmap()
         {
-            if (!formLoaded) return;
+            if (!_formLoaded) return;
 
-            if ( _alertPopup != null )
-            {
-                _alertPopup.Close();
-            }
-            _alertPopup = new QuesadillaAlertPopup(_dummyAlert, _configuration, Program.LoadImageFromFile(_configuration.AlertPopupBackground), _mainForm);
+			_alertPopup?.Close();
+			_alertPopup?.Dispose();
+
+			_alertPopup = new QuesadillaAlertPopup(_dummyAlert, _configuration, Program.LoadImageFromFile(_configuration.AlertPopupBackground), _mainForm);
             _alertPopup.Show();
             _alertPopup.Hide();
-            alertDemo.Image = GetFormImageWithoutBorders(_alertPopup);
+            var _oldBitmap = alertDemo.Image;
+			alertDemo.Image = GetFormImageWithoutBorders(_alertPopup);
+            _oldBitmap?.Dispose();
+		}
 
-            trackAlertPopupMinimapSizeWidth.Maximum = _alertPopup.Width - _configuration.AlertPopupMinimapPosition.X - 1;
-            trackAlertPopupMinimapSizeHeight.Maximum = _alertPopup.Height - -_configuration.AlertPopupMinimapPosition.Y - 1;
+		private void OnCollectionChanged(object sender, EventArgs e)
+		{
+			ShowAlertBitmap();
+		}
 
-            trackAlertPopupMinimapPositionX.Maximum = _alertPopup.Width - _configuration.AlertPopupMinimapSize.X - 1;
-            trackAlertPopupMinimapPositionY.Maximum = _alertPopup.Height - -_configuration.AlertPopupMinimapSize.Y - 1;
-        }
-
-        private void QuesadillaConfiguration_FormClosing(object sender, FormClosingEventArgs e)
+		private void QuesadillaConfiguration_FormClosing(object sender, FormClosingEventArgs e)
         {
             _configMenu.Enabled = true;
-        }
+
+			_alertPopup?.Dispose();
+			alertDemo.Image?.Dispose();
+
+			LocationCollectionEditor.CollectionChanged -= OnCollectionChanged;
+		}
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
@@ -176,140 +211,108 @@ namespace Quesadilla
         private void buttonSave_Click(object sender, EventArgs e)
         {
             Program.SaveAndReloadConfiguration(_configuration);
-            Close();
-        }
-        private Color ChooseColour(Color c)
-        {
-            /*
-                        colourPicker.Color = c;
-                        colourPicker.SolidColorOnly = false;
-                        colourPicker.AnyColor = true;
-                        colourPicker.AllowFullOpen = true;
-                        if (colourPicker.ShowDialog() == DialogResult.OK)
-                        {
-                            return(colourPicker.Color);
-                        }
-            */
-
-            using (ColorPickerDialog dialog = new ColorPickerDialog
-            {
-                Color = c,
-            })
-            {
-                //dialog.CustomColorsLoading += this.DialogCustomColorsLoadingHandler;
-                //dialog.PreviewColorChanged += this.DialogColorChangedHandler;
-
-                if (dialog.ShowDialog(this) == DialogResult.OK)
-                {
-                    c = dialog.Color;
-                }
-
-                //dialog.PreviewColorChanged -= this.DialogColorChangedHandler;
-            }
-
-
-            return (c);
-        }
-
-        private void buttonPickSystemColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupSystemNameColour = ChooseColour(_configuration.AlertPopupSystemNameColour);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickContextColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupContextInfoColour = ChooseColour(_configuration.AlertPopupContextInfoColour);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickRegionColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupRegionNameColour = ChooseColour(_configuration.AlertPopupRegionNameColour);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickIntelLineColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupIntelLineColour = ChooseColour(_configuration.AlertPopupIntelLineColour);
-            ShowAlertBitmap();
-        }
-
-        private void buttonPickAlertTextColour_Click(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupAlertTextColour = ChooseColour(_configuration.AlertPopupAlertTextColour);
-            ShowAlertBitmap();
-        }
+			ShowAlertBitmap();
+		}
 
         private void cmbBackground_SelectedIndexChanged(object sender, EventArgs e)
         {
             _configuration.AlertPopupBackground = cmbBackground.Text;
             ShowAlertBitmap();
         }
-
-        private void trackOpacity_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupOpacity = ((TrackBar)sender).Value;
-            lblOpacity.Text = ((TrackBar)sender).Value.ToString();
-            ShowAlertBitmap();
-        }
-
-        private void trackPopupTime_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupSeconds = ((TrackBar)sender).Value;
-            lblPopupSeconds.Text = ((TrackBar)sender).Value.ToString();
-        }
-
-        private void trackDPSGraphLineSize_Scroll(object sender, EventArgs e)
-        {
-            _configuration.DPSGraphLineSize = ((TrackBar)sender).Value;
-            lblDPSGraphLineSize.Text = ((TrackBar)sender).Value.ToString();
-        }
-
-        private void trackShowLastUnexpiredAlerts_Scroll(object sender, EventArgs e)
-        {
-            _configuration.ShowLastUnexpiredAlerts = ((TrackBar)sender).Value;
-            lblShowLastUnexpiredAlerts.Text = ((TrackBar)sender).Value.ToString();
-        }
-
         private void cmbHomeSystem_SelectedIndexChanged(object sender, EventArgs e)
         {
             _configuration.HomeSystem = cmbHomeSystem.Text;
         }
 
-        private void trackAlertPopupMinimapSizeWidth_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapSize = (new Point(((TrackBar)sender).Value, _configuration.AlertPopupMinimapSize.Y));
-            ShowAlertBitmap();
-        }
+		private void txtFilterProperties_TextChanged(object sender, EventArgs e)
+		{
+			ApplyPropertyFilter();
+		}
 
-        private void trackAlertPopupMinimapSizeHeight_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapSize = (new Point(_configuration.AlertPopupMinimapSize.X ,((TrackBar)sender).Value));
-            ShowAlertBitmap();
+		private void cmbFilterCategory_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			ApplyPropertyFilter();
+		}
 
-        }
+		private void ConfigurationProperties_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+		{
+			ShowAlertBitmap();
+		}
 
-        private void trackAlertPopupMinimapPositionX_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapPosition = (new Point(((TrackBar)sender).Value, _configuration.AlertPopupMinimapPosition.Y));
-            ShowAlertBitmap();
-        }
+		private void ConfigurationProperties_SelectedObjectsChanged(object sender, EventArgs e)
+		{
+			ShowAlertBitmap();
+		}
 
-        private void trackAlertPopupMinimapPositionY_Scroll(object sender, EventArgs e)
-        {
-            _configuration.AlertPopupMinimapPosition = (new Point(_configuration.AlertPopupMinimapPosition.X, ((TrackBar)sender).Value));
-            ShowAlertBitmap();
-        }
+		private void QuesadillaConfiguration_ResizeEnd(object sender, EventArgs e)
+		{
+			if (Width != _fixedWidth) Width = _fixedWidth;
+		}
+	}
 
-        private void Properties_Click(object sender, EventArgs e)
-        {
+	public class PropertyGridFilterWrapper : CustomTypeDescriptor
+	{
+		private readonly object _instance;
+		private readonly string _filterText;
+		private readonly string _category;
 
-        }
+		public PropertyGridFilterWrapper(
+			object instance,
+			string filterText,
+			string category)
+			: base(TypeDescriptor.GetProvider(instance).GetTypeDescriptor(instance))
+		{
+			_instance = instance;
+			_filterText = filterText ?? string.Empty;
+			_category = category;
+		}
 
-        private void ColourProperties_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
-        {
-            ShowAlertBitmap();
-        }
-    }
+		public override object GetPropertyOwner(PropertyDescriptor pd)
+		{
+			return _instance;
+		}
+
+		public override PropertyDescriptorCollection GetProperties()
+		{
+			return Filter(base.GetProperties());
+		}
+
+		public override PropertyDescriptorCollection GetProperties(Attribute[] attributes)
+		{
+			return Filter(base.GetProperties(attributes));
+		}
+
+		private PropertyDescriptorCollection Filter(PropertyDescriptorCollection properties)
+		{
+			List<PropertyDescriptor> filtered = new List<PropertyDescriptor>();
+
+			foreach (PropertyDescriptor property in properties)
+			{
+				if (!string.IsNullOrEmpty(_category) &&
+					!string.Equals(property.Category, _category, StringComparison.OrdinalIgnoreCase))
+				{
+					continue;
+				}
+
+				if (!string.IsNullOrWhiteSpace(_filterText))
+				{
+					bool match =
+						property.Name.IndexOf(_filterText, StringComparison.OrdinalIgnoreCase) >= 0
+						|| property.DisplayName.IndexOf(_filterText, StringComparison.OrdinalIgnoreCase) >= 0
+						|| (property.Description?.IndexOf(_filterText, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0;
+
+					if (!match)
+					{
+						continue;
+					}
+				}
+
+				filtered.Add(property);
+			}
+
+			return new PropertyDescriptorCollection(filtered.ToArray());
+		}
+	}
+
+
 }

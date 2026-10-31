@@ -20,10 +20,16 @@ public class CustomPropertyExtractorWrapper : CustomTypeDescriptor
     {
         var properties = base.GetProperties().Cast<PropertyDescriptor>()
             .Where(o => o.PropertyType == typeof(Color) || 
-            o.PropertyType == typeof(bool) || 
-            o.PropertyType == typeof(int) || 
-            o.PropertyType == typeof(PopupLocationType) ||
-            o.Category == "HeartBeat"
+            o.PropertyType == typeof(bool) ||
+			o.PropertyType == typeof(int) ||
+			o.PropertyType == typeof(float) ||
+			o.PropertyType == typeof(Size) ||
+            o.PropertyType == typeof(Point) ||
+			o.PropertyType == typeof(PopupLocationType) ||
+			o.PropertyType == typeof(MapType) ||
+            o.PropertyType == typeof(ConfigurationItemLocationInformation) ||
+			o.PropertyType == typeof(List<ConfigurationItemLocationInformation>) ||
+			o.Category == "HeartBeat"
             )
             .ToArray();
         return new PropertyDescriptorCollection(properties);

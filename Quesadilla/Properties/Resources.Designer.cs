@@ -19,7 +19,7 @@ namespace Quesadilla.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -95,6 +95,36 @@ namespace Quesadilla.Properties {
         internal static System.Drawing.Bitmap bg_0001 {
             get {
                 object obj = ResourceManager.GetObject("bg_0001", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap bg_Aura {
+            get {
+                object obj = ResourceManager.GetObject("bg_Aura", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap bg_aura1 {
+            get {
+                object obj = ResourceManager.GetObject("bg_aura1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap bg_DefaultAlert {
+            get {
+                object obj = ResourceManager.GetObject("bg_DefaultAlert", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -229,6 +259,15 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
+        internal static System.IO.UnmanagedMemoryStream destroyed {
+            get {
+                return ResourceManager.GetStream("destroyed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
         internal static System.IO.UnmanagedMemoryStream epic_orchestra {
             get {
                 return ResourceManager.GetStream("epic_orchestra", resourceCulture);
@@ -265,6 +304,26 @@ namespace Quesadilla.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap INITlogo {
+            get {
+                object obj = ResourceManager.GetObject("INITlogo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Insidiouslogo {
+            get {
+                object obj = ResourceManager.GetObject("Insidiouslogo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap izakbar {
             get {
                 object obj = ResourceManager.GetObject("izakbar", resourceCulture);
@@ -287,6 +346,16 @@ namespace Quesadilla.Properties {
         internal static System.IO.UnmanagedMemoryStream modsinglenote {
             get {
                 return ResourceManager.GetStream("modsinglenote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap NClogo {
+            get {
+                object obj = ResourceManager.GetObject("NClogo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -361,6 +430,16 @@ namespace Quesadilla.Properties {
         internal static System.Drawing.Bitmap Quesadilla {
             get {
                 object obj = ResourceManager.GetObject("Quesadilla", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap QuesadillaSplashBackground {
+            get {
+                object obj = ResourceManager.GetObject("QuesadillaSplashBackground", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

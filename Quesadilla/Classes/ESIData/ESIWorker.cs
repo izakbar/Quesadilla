@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,12 +36,13 @@ namespace Quesadilla.Classes.ESIData
         public Queue<ESIRequest> ESIRequests = new Queue<ESIRequest>();
 
         private string LastETAG = "";
+        private Dictionary<string, DateTime> retryAfterList = new Dictionary<string, DateTime>();
 
-        public ESIWorker(EVEStandardAPI esiClient, ILogger Log)
+		public ESIWorker(EVEStandardAPI esiClient, ILogger log)
         {
             _esiClient = esiClient;
-            _log = Log;
-            _MAX_ESI_REQUESTS = 5; // maybe in config later ?
+            _log = log;
+            _MAX_ESI_REQUESTS = 50; // maybe in config later ?
 
             FeedPaused = true;
 
@@ -73,38 +75,39 @@ namespace Quesadilla.Classes.ESIData
 
         public void Pause()
         {
-            Log.Error("ESI processing PAUSED");
+            _log.Information("ESI processing PAUSED");
             FeedPaused = true;
         }
         public void Resume()
         {
-            Log.Error("ESI processing RESUMED");
+            _log.Information("ESI processing RESUMED");
             FeedPaused = false;
         }
 
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //            log.Information("ESI done");
+            //            _log.Information("ESI done");
         }
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
             // check queue etc
-            // Log.Information("ESI DoWork");
+            // _log.Information("ESI DoWork");
 
             ESIRequest request = null;
             int requestsProcessed = 0;
 
-            while (ESIRequests.Count > 0 && requestsProcessed++ < _MAX_ESI_REQUESTS)
-            {
-                lock (ESIRequests)
-                {
-                    if (ESIRequests.Count > 0)
-                    {
-                        request = ESIRequests.Dequeue();
-                    }
-                }
+
+			while (requestsProcessed++ < _MAX_ESI_REQUESTS)
+			{
+				lock (ESIRequests)
+				{
+					if (ESIRequests.Count == 0)
+						break;
+
+					request = ESIRequests.Dequeue();
+				}
 
                 if (request == null) { return; }
 
@@ -114,48 +117,134 @@ namespace Quesadilla.Classes.ESIData
                     case ESIRequestType.System:
                         ESIGetSystem(request.RequestContext);
                         break;
-                    case ESIRequestType.Planet:
-                        ESIGetPlanet(request.RequestContext);
-                        break;
-                }
+					case ESIRequestType.Planet:
+						ESIGetPlanet(request.RequestContext);
+						break;
+					case ESIRequestType.Incursions:
+						ESIGetIncursions();
+						break;
+					case ESIRequestType.SkyhookTheftData:
+						ESIGetRaidableSkyhooks();
+						break;
+					case ESIRequestType.JumpsPerHour:
+						ESIGetJumpsPerHour();
+						break;
+					case ESIRequestType.KillsPerHour:
+						ESIGetKillsPerHour();
+						break;
+				}
 
-                if (ESIEventHandler != null)
-                {
-                    ESIEventHandler((object)this, new ESIEventArgs()
-                    {
-                        RequestType = request.RequestType,
-                    });
-                }
-            }
+				ESIEventHandler?.Invoke(this,
+					new ESIEventArgs
+					{
+						RequestType = request.RequestType
+					});
+			}
         }
+		private void ESIGetJumpsPerHour()
+		{
+			if (!retryAfterCheck(System.Reflection.MethodBase.GetCurrentMethod().Name)) return;
 
-        private void ESIGetSystem(int systemId)
+			try
+			{
+				var jumpsPerHour = _esiClient.Universe.GetSystemJumpsAsync().GetAwaiter().GetResult();
+				StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, jumpsPerHour.RetryAfter);
+
+				foreach (var s in jumpsPerHour.Model)
+				{
+					_log.Debug($"Hook : {s.SystemId} {s.ShipJumps}");
+					if (Program.Universe.SolarSystems.TryGetValue((int)s.SystemId, out var solarSystem))
+					{
+						solarSystem.JumpsPerHour = s.ShipJumps;
+					}
+				}
+			}
+			catch
+			{
+				if (!retryAfterList.ContainsKey(System.Reflection.MethodBase.GetCurrentMethod().Name))
+				{
+					StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, 120);
+				}
+			}
+		}
+		private void ESIGetKillsPerHour()
+		{
+			if (!retryAfterCheck(System.Reflection.MethodBase.GetCurrentMethod().Name)) return;
+
+			try
+			{
+				var killsPerHour = _esiClient.Universe.GetSystemKillsAsync().GetAwaiter().GetResult();
+				StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, killsPerHour.RetryAfter);
+
+				foreach (var s in killsPerHour.Model)
+				{
+					_log.Debug($"Hook : {s.SystemId} {s.NpcKills} {s.PodKills} {s.ShipKills}");
+					if (Program.Universe.SolarSystems.TryGetValue((int)s.SystemId, out var solarSystem))
+					{
+						solarSystem.NPCKillsPerHour = s.NpcKills;
+						solarSystem.ShipKillsPerHour = s.ShipKills;
+						solarSystem.PodKillsPerHour = s.PodKills;
+					}
+				}
+			}
+			catch
+			{
+				if (!retryAfterList.ContainsKey(System.Reflection.MethodBase.GetCurrentMethod().Name))
+				{
+					StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, 120);
+				}
+			}
+		}
+
+		private void ESIGetSystem(int systemId)
         {
             try
             {
 
                 _log.Debug($"Getting planet information for {systemId}");
-                var systemInfo = _esiClient.Universe.GetSolarSystemInfoV4Async(systemId).Result.Model;
+                var systemInfo = _esiClient.Universe.GetSolarSystemInfoAsync(systemId).GetAwaiter().GetResult().Model;
                 if (systemInfo != null)
-                {
-                    _log.Debug($"{systemInfo.Name} {systemInfo.Planets.Count}");
-                    List<PlanetInfo> planets = new List<PlanetInfo>();
-                    foreach (var p in systemInfo.Planets)
-                    {
-                        var planetInfo = _esiClient.Universe.GetPlanetInfoV1Async(p.PlanetId).Result.Model;
-                        var newPlanet = new PlanetInfo()
-                        {
-                            PlanetId = planetInfo.PlanetId,
-                            PlanetName = planetInfo.Name,
-                            PlanetTypeId = planetInfo.TypeId,
-                            PlanetTypeName = Program.Universe.ItemTypes.ContainsKey((int)planetInfo.TypeId) ? Program.Universe.ItemTypes[(int)planetInfo.TypeId].Name : "Unknown:",
-                        };
-                        planets.Add(newPlanet);
-                    }
+				{
+					_log.Debug($"{systemInfo.Name} {systemInfo.Planets?.Count ?? 0}");
+					List<PlanetInfo> planets = new List<PlanetInfo>();
 
-                    // all planet info added - add to solarsystem info
-                    Program.Universe.SolarSystems[systemId].Planets = planets;
-                }
+					using (var semaphore = new SemaphoreSlim(4))
+					{
+						var planetTasks = systemInfo.Planets.Select(async p =>
+						{
+							await semaphore.WaitAsync();
+							try
+							{
+								return await _esiClient.Universe.GetPlanetInfoAsync(p.PlanetId);
+							}
+							finally
+							{
+								semaphore.Release();
+							}
+						});
+						var planetResults = Task.WhenAll(planetTasks).GetAwaiter().GetResult();
+
+						foreach (var result in planetResults)
+						{
+							var planetInfo = result.Model;
+
+							planets.Add(new PlanetInfo
+							{
+								PlanetId = planetInfo.PlanetId,
+								PlanetName = planetInfo.Name,
+								PlanetTypeId = planetInfo.TypeId,
+								PlanetTypeName = Program.Universe.ItemTypes.TryGetValue((int)planetInfo.TypeId, out var itemType) ? itemType.Name : "Unknown"
+							});
+						}
+					}
+
+					// all planet info added - add to solarsystem info
+					if (Program.Universe.SolarSystems.TryGetValue(systemId, out var solarSystem))
+					{
+						solarSystem.Planets = planets;
+					}
+
+				}
             }
             catch (Exception ex)
             {
@@ -171,7 +260,7 @@ namespace Quesadilla.Classes.ESIData
         {
             try
             {
-                var planetInfo = _esiClient.Universe.GetPlanetInfoV1Async(planetId).Result.Model;
+                var planetInfo = _esiClient.Universe.GetPlanetInfoAsync(planetId).Result.Model;
                 if (planetInfo != null)
                 {
                 }
@@ -187,7 +276,43 @@ namespace Quesadilla.Classes.ESIData
             }
         }
 
-        private void EnqueueRequest(ESIRequestType type, int context)
+        private void ESIGetIncursions()
+        {
+			try
+			{
+                var incursionInfo = _esiClient.Incursion.ListIncursionsAsync().GetAwaiter().GetResult();
+				if (incursionInfo != null)
+				{
+                    // clear all incursions
+                    foreach( var s in Program.Universe.SolarSystems.Where(o => o.Value.Incursion)) {
+                        s.Value.Incursion = false;
+                    }
+
+                    // add new ones
+					foreach (var incursion in  incursionInfo.Model)
+                    {
+                        foreach(var systemId in incursion.InfestedSolarSystems)
+                        {
+							if (Program.Universe.SolarSystems.TryGetValue((int)systemId, out var solarSystem))
+							{
+								solarSystem.Incursion = true;
+							}
+                        }
+                    }
+				}
+			}
+			catch (Exception ex)
+			{
+				_log.Error($"Error getting incursions ESI data");
+				_log.Debug(ex.Message);
+				if (ex.InnerException != null)
+				{
+					_log.Debug(ex.InnerException.Message);
+				}
+			}
+		}
+
+		private void EnqueueRequest(ESIRequestType type, int context)
         {
             lock (ESIRequests)
             {
@@ -197,7 +322,7 @@ namespace Quesadilla.Classes.ESIData
                 ).ToList();
                 if (f.Count == 0 || ESIRequests.Count == 0)
                 {
-                    //Log.Information($"ESI enqueue {context}");
+                    //_log.Information($"ESI enqueue {context}");
                     ESIRequests.Enqueue(
                         new ESIRequest()
                         {
@@ -207,11 +332,19 @@ namespace Quesadilla.Classes.ESIData
                 }
             }
         }
-        public void EnqueueRequestSystem(int systemid)
-        {
-            EnqueueRequest(ESIRequestType.System, systemid);
-        }
-        public void EnqueueRequestPlanet(int planetid)
+		public void EnqueueRequestSkyhookData()
+		{
+			EnqueueRequest(ESIRequestType.SkyhookTheftData, -1);
+		}
+		public void EnqueueRequestSystem(int systemid)
+		{
+			EnqueueRequest(ESIRequestType.System, systemid);
+		}
+		public void EnqueueRequestJumpsPerHour()
+		{
+			EnqueueRequest(ESIRequestType.JumpsPerHour, -1);
+		}
+		public void EnqueueRequestPlanet(int planetid)
         {
             EnqueueRequest(ESIRequestType.Planet, planetid);
         }
@@ -219,9 +352,82 @@ namespace Quesadilla.Classes.ESIData
         {
             EnqueueRequest(ESIRequestType.Moon, moonid);
         }
-        public void EnqueueRequestBelt(int beltid)
+		public void EnqueueRequestBelt(int beltid)
+		{
+			EnqueueRequest(ESIRequestType.Belt, beltid);
+		}
+		public void EnqueueRequestIncursions()
+		{
+			EnqueueRequest(ESIRequestType.Incursions, -1);
+		}
+
+		public Killmail GetKillMail(long killId, string killHash)
         {
-            EnqueueRequest(ESIRequestType.Belt, beltid);
+            try
+            {
+                var kill = _esiClient.Killmails.GetKillmailAsync((int)killId, killHash);
+                return kill.GetAwaiter().GetResult().Model;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex.Message, ex?.InnerException.Message);
+                return null;
+            }
+		}
+
+        public void ESIGetRaidableSkyhooks()
+        {
+            if (!retryAfterCheck(System.Reflection.MethodBase.GetCurrentMethod().Name)) return;
+
+            try
+            {
+                var hooks = _esiClient.Activities.ListRaidableSkyhooksAsync().GetAwaiter().GetResult();
+                StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, hooks.RetryAfter);
+
+                foreach (var hook in hooks.Model.Skyhooks)
+                {
+                    _log.Debug($"Hook : {hook.SolarSystemId} {hook.PlanetId} {hook.TheftVulnerability.Start} {hook.TheftVulnerability.End}");
+
+                    if (Program.Universe.SolarSystems.TryGetValue((int)hook.SolarSystemId, out var solarSystem))
+                    {
+                        if (solarSystem.Planets != null) // might not have loaded yet :-/
+                        {
+							var planet = solarSystem.Planets.FirstOrDefault(o => o.PlanetId == hook.PlanetId);
+                            if (planet != null)
+                            {
+                                planet.SkyhookVulneralbilityStart = hook.TheftVulnerability.Start;
+                                planet.SkyhookVulneralbilityEnd = hook.TheftVulnerability.End;
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                if (!retryAfterList.ContainsKey(System.Reflection.MethodBase.GetCurrentMethod().Name))
+                {
+                    StoreRetryAfter(System.Reflection.MethodBase.GetCurrentMethod().Name, 120);
+                }
+			}
+		}
+
+        private void StoreRetryAfter(string method, int seconds) {
+            retryAfterList[method] = DateTime.Now.AddSeconds(seconds);
+		}
+
+        private bool retryAfterCheck(string method)
+        {
+            bool result = true;
+            if ( retryAfterList.ContainsKey(method) )
+            {
+                if (retryAfterList[method] > DateTime.Now )
+                {
+                    result = false;
+                } 
+			}
+
+            return result;
         }
-    }
+
+	}
 }

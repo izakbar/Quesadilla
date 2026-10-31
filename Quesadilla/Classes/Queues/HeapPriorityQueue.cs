@@ -27,7 +27,12 @@ namespace Quesadilla.Classes
             this._numNodes = 0;
         }
 
-        public bool Contains(T node) => (object)this._nodes[node.QueueIndex] == (object)node;
+        public bool Contains(T node)
+        {
+			return node.QueueIndex > 0 &&
+				   node.QueueIndex <= _numNodes &&
+				   ReferenceEquals(_nodes[node.QueueIndex], node);
+        } 
 
         public void Enqueue(T node, double priority)
         {
@@ -101,30 +106,52 @@ namespace Quesadilla.Classes
 
         private bool HasHigherPriority(T higher, T lower)
         {
-            if (higher.Priority < lower.Priority)
-                return true;
-            return higher.Priority == lower.Priority && higher.InsertionIndex < lower.InsertionIndex;
-        }
+			return higher.Priority < lower.Priority ||
+				   (higher.Priority == lower.Priority &&
+					higher.InsertionIndex < lower.InsertionIndex);
+		}
 
         public T Dequeue()
         {
-            T node = this._nodes[1];
+			if (_numNodes == 0)
+			{
+				throw new InvalidOperationException(
+					"Queue is empty");
+			}
+
+			T node = this._nodes[1];
             this.Remove(node);
             return node;
         }
 
         public void Resize(int maxNodes)
         {
-            T[] objArray = new T[maxNodes + 1];
+
+			if (maxNodes < _numNodes)
+			{
+				throw new InvalidOperationException(
+					"Cannot resize below current node count.");
+			}
+
+			T[] objArray = new T[maxNodes + 1];
             int num = Math.Min(maxNodes, this._numNodes);
             for (int index = 1; index <= num; ++index)
                 objArray[index] = this._nodes[index];
             this._nodes = objArray;
         }
 
-        public T First => this._nodes[1];
+        public T First
+		{
+			get
+			{
+				if (_numNodes == 0)
+					throw new InvalidOperationException();
 
-        public void UpdatePriority(T node, double priority)
+				return _nodes[1];
+			}
+		}
+
+		public void UpdatePriority(T node, double priority)
         {
             node.Priority = priority;
             this.OnNodeUpdated(node);

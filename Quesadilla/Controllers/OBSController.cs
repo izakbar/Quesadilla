@@ -1,4 +1,15 @@
-﻿using System;
+﻿using EVEStandard;
+using EVEStandard.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.IdentityModel.Tokens;
+using Quesadilla;
+using Quesadilla.Classes;
+using Quesadilla.Classes.ZKill;
+using Serilog.Core;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -7,16 +18,7 @@ using System.Runtime.Remoting.Metadata;
 using System.Security.Cryptography.Xml;
 using System.Threading.Tasks;
 using System.Web.WebPages;
-using EVEStandard;
-using EVEStandard.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.IdentityModel.Tokens;
-using Quesadilla;
-using Quesadilla.Classes.ZKill;
-using Serilog.Core;
+using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Quesadilla.Controllers
@@ -32,7 +34,7 @@ namespace Quesadilla.Controllers
             return Ok("Welcome To Quesadilla");
         }
         [Route("[controller]/zkillfeed")]
-        public ActionResult zkillfeed(int? limit = 10, bool bigbois = false, string feedtype = "all")
+        public ActionResult zkillfeed(int? limit = 10, bool bigbois = false, string feedtype = "all", bool onlymine = false)
         {
             string output = "<meta http-equiv=\"refresh\" content=\"3\">\r\n";
             int count = 0;
@@ -52,12 +54,48 @@ namespace Quesadilla.Controllers
                     {
                         break;
                     }
-                    var zkillVictim = Program.Universe.GetCharacterName((int)k.VictimCharacterId);
-                    string kf = $"<div class=zkillkill><div class=zkill-ship><a href=https://zkillboard.com/kill/{k.ID}><img class=\"rounded-corners\" width=98% src=https://images.evetech.net/types/{k.VictimShipTypeId}/render></a>" +
-                "</div>" +
-                $"<div class=zkill-value>{k.TotalValue}</div>" +
-                $"<div class=zkill-victim>{zkillVictim}</div>" +
-                "</div>";
+					var zkillVictim = Program.Universe.GetCharacterName((int)(k.VictimCharacterId ?? 0));
+					var zkillKiller = Program.Universe.GetCharacterName((int)(k.KillerCharacterId ?? 0));
+
+					var KillerLogoUrl = "";
+					if ((k.KillerAllianceId ?? 0) != 0)
+					{
+						KillerLogoUrl = $"https://images.evetech.net/alliances/{k.KillerAllianceId}/logo";
+					}
+					if (KillerLogoUrl.Length == 0 && (k.KillerCorporationId ?? 0) != 0)
+					{
+						KillerLogoUrl = $"https://images.evetech.net/corporations/{k.KillerCorporationId}/logo";
+					}
+
+					var VictimLogoUrl = "";
+					if ((k.VictimAllianceId ?? 0) != 0)
+					{
+						VictimLogoUrl = $"https://images.evetech.net/alliances/{k.VictimAllianceId}/logo";
+					}
+					if (VictimLogoUrl.Length == 0 && (k.VictimCorporationId ?? 0) != 0)
+					{
+						VictimLogoUrl = $"https://images.evetech.net/corporations/{k.VictimCorporationId}/logo";
+					}
+
+					string kf = $"<div class=zkillkill>" + 
+                        $"<div class=zkill-ship><a href=https://zkillboard.com/kill/{k.ID}/><img class=\"rounded-corners\" width=98% src=https://images.evetech.net/types/{k.VictimShipTypeId}/render></a></div>" +
+                        $"<div class=zkill-value>{k.TotalValue}</div>" +
+						$"<div class=zkill-killer>{zkillKiller}</div>" +
+						$"<div class=zkill-victim>{zkillVictim}</div>" +
+						$"<div class=zkill-region>{k.RegionName}</div>" +
+						$"<div class=zkill-system>{k.SolarSystemName}</div>" +
+						$"<div class=zkill-timestamp>{k.Timestamp.ToString("H:mm")}</div>" +
+						$"<div class=zkill-shipname>{k.VictimShipName}</div>" +
+
+						$"<div class=zkill-killer-logo>{KillerLogoUrl}</div>" +
+						$"<div class=zkill-killer-alliance>{k.KillerAllianceId ?? 0}</div>" +
+						$"<div class=zkill-killer-corporation>{k.KillerCorporationId ?? 0}</div>" +
+
+						$"<div class=zkill-victim-logo>{VictimLogoUrl}</div>" +
+						$"<div class=zkill-victim-alliance>{k.VictimAllianceId ?? 0}</div>" +
+						$"<div class=zkill-victim-corporation>{k.VictimCorporationId ?? 0}</div>" +
+
+						"</div>";
                     ZKillOutput += kf;
                 }
                 ZKillOutput += "</div>";
@@ -82,7 +120,7 @@ namespace Quesadilla.Controllers
             if (Program.q != null && Program.q.latestAlertBitmap != null)
             {
                 TimeSpan timeAgo = DateTime.Now - Program.q.latestAlertTimestamp;
-                if (timeAgo.Seconds > seconds)
+                if (timeAgo.TotalSeconds > seconds)
                 {
                     return new ContentResult
                     {
@@ -120,8 +158,8 @@ namespace Quesadilla.Controllers
             string output = "<meta http-equiv=\"refresh\" content=\"10\">\r\n";
             if (Program.q != null)
             {
-                string isk = Program.GetIskLastHour(toon);
-                if (!isk.IsNullOrEmpty())
+                string isk = Program.GraphDataManager.GetIskLastHour(toon);
+                if (!string.IsNullOrEmpty(isk))
                 {
                     output += $"<div class=iskcontainer><div class=iskperhour>{isk}</div></div>";
 
@@ -141,8 +179,8 @@ namespace Quesadilla.Controllers
             string output = "<meta http-equiv=\"refresh\" content=\"10\">\r\n";
             if (Program.q != null)
             {
-                string mining = Program.GetMiningLastHour(toon);
-                if (!mining.IsNullOrEmpty())
+                string mining = Program.GraphDataManager.GetMiningLastHour(toon);
+                if (!string.IsNullOrEmpty(mining))
                 {
                     output += $"<div class=miningcontainer><div class=miningperhour>{mining}</div></div>";
 
@@ -162,8 +200,8 @@ namespace Quesadilla.Controllers
             string output = "<meta http-equiv=\"refresh\" content=\"10\">\r\n";
             if (Program.q != null)
             {
-                var mining = Program.GetMiningLastHourDetail(toon, totalsOnly);
-                if (!mining.IsNullOrEmpty())
+                var mining = Program.GraphDataManager.GetMiningLastHourDetail(toon, totalsOnly);
+                if (mining != null)
                 {
                     output += $"<div class=miningcontainer><div class=miningperhour>";
 

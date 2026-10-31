@@ -11,28 +11,26 @@ namespace Quesadilla.Classes.ZKill
     public class ZKill
     {
         public ConcurrentQueue<ZKillKill> ZKillKills { get; set; }
-        public ZKillRedisQ ZKillFeed { get; set; }
+		// public ZKillRedisQ ZKillFeedRedisQ { get; set; }
+		private readonly ConcurrentDictionary<long, byte> _knownKills = new ConcurrentDictionary<long, byte>(); 
+        public ZKillR2Z2 ZKillFeedR2Z2 { get; set; }
 
         public ZKill()
         {
             ZKillKills = new ConcurrentQueue<ZKillKill>();
-            ZKillFeed = new ZKillRedisQ();
-        }
+            // ZKillFeedRedisQ = new ZKillRedisQ();
+            ZKillFeedR2Z2 = new ZKillR2Z2();
+		}
 
         public void EnqueueZKillAlert(ConcurrentQueue<ZKillKill> q, ZKillKill kill, SolarSystem system)
         {
-            // only add to new zkill list if not already in list. This should prevent multiple entries for same thing
-            if ( q.Where(o => o.ID == kill.ID).Count() == 0 )
-            {
-            kill.VictimCharacterName = Program.Universe.GetCharacterName((int)kill.VictimCharacterId);
-            if (system.Kills == null)
-            {
-                system.Kills = new List<ZKillKill>();
-            }
-            system.Kills.Add(kill);
+			if (_knownKills.TryAdd(kill.ID, 0))
+			{
+				kill.VictimCharacterName =  kill.VictimCharacterId.HasValue ? Program.Universe.GetCharacterName((int)kill.VictimCharacterId.Value): "**NO ONE**";
 
-            q.Enqueue(kill);
-            }
+				system.AddKill(kill);
+				q.Enqueue(kill);
+			}
         }
 
         public void EnqueueZKillAlert(ZKillKill kill, SolarSystem system)
@@ -56,8 +54,10 @@ namespace Quesadilla.Classes.ZKill
                     zq.TryDequeue(out kk);
 
                     SolarSystem system = Program.Universe.SolarSystems[(int)kk.SolarSystemId];
-                    var removed = system.Kills.Remove(kk);
-                    kk.Expired = true;
+                    system.RemoveKill(kk);
+					kk.Expired = true;
+
+					_knownKills.TryRemove(kk.ID, out _);
 
                     Expired++;
                     removedOBSZkill = true;

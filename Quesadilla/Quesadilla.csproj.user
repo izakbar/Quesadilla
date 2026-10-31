@@ -1,13 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <PublishUrlHistory>\\dsmfluf3\Development\EVE\Quesadilla\|publish\</PublishUrlHistory>
-    <InstallUrlHistory>\\dsmfluf3\Development\EVE\Quesadilla\</InstallUrlHistory>
+    <InstallUrlHistory>https://quesadilla.prioryofthelemon.co.uk/download/|\\dsmfluf3\Development\EVE\Quesadilla\</InstallUrlHistory>
     <SupportUrlHistory />
     <UpdateUrlHistory />
     <BootstrapperUrlHistory />
     <ErrorReportUrlHistory />
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
+  </PropertyGroup>
+  <PropertyGroup>
+    <EnableSecurityDebugging>false</EnableSecurityDebugging>
   </PropertyGroup>
 </Project>

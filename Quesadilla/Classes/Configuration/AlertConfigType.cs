@@ -13,6 +13,7 @@ namespace Quesadilla.Classes.Configuration
         Decloak,
         MiningEndedRoidPopped,
         MiningEndedFull,
-        Text
-    }
+        MiningEndedCrystalDestroyed,
+        Text,
+	}
 }

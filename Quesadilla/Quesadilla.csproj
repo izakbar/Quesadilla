@@ -8,30 +8,34 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>Quesadilla</RootNamespace>
     <AssemblyName>Quesadilla</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
     <PublishUrl>\\dsmfluf3\Development\EVE\Quesadilla\</PublishUrl>
     <Install>true</Install>
-    <InstallFrom>Unc</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
     <UpdateMode>Foreground</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>\\dsmfluf3\Development\EVE\Quesadilla\</InstallUrl>
+    <InstallUrl>https://quesadilla.prioryofthelemon.co.uk/download/</InstallUrl>
     <ProductName>Quesadilla</ProductName>
+    <PublisherName>Izakbar</PublisherName>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>0.2.0.%2a</ApplicationVersion>
+    <ApplicationRevision>29</ApplicationRevision>
+    <ApplicationVersion>0.6.9.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>false</BootstrapperEnabled>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -60,17 +64,30 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>false</SignManifests>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>q.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>C5D158F5AC972EB89876DAAE672C8106CC337A16</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>Quesadilla_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8.1\System.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Net" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Security" />
@@ -89,13 +106,45 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\AnimationState.cs" />
+    <Compile Include="Classes\Alerts\AlertQueueManager.cs" />
+    <Compile Include="Classes\Alerts\AlertTextType.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisCelestialConverter.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisCelestialDefinition.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisCelestialType.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisManager.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisStaticData.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisSystemInfo.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisWormhole.cs" />
+    <Compile Include="Classes\Anoikis\AnoikisWormholeClass.cs" />
+    <Compile Include="Classes\Characters\Character.cs" />
+    <Compile Include="Classes\Characters\CharacterManager.cs" />
+    <Compile Include="Classes\Configuration\ColorConvertor.cs" />
+    <Compile Include="Classes\Configuration\LocationCollectionEditor.cs" />
+    <Compile Include="Classes\Events\AnoiksEventArgs.cs" />
+    <Compile Include="Classes\GraphData\GraphDataManager.cs" />
+    <Compile Include="Classes\ImageGeneration\Animation\AnimationManager.cs" />
+    <Compile Include="Classes\ImageGeneration\Animation\AnimationState.cs" />
     <Compile Include="Classes\Attributes\IsColourAttribute.cs" />
-    <Compile Include="Classes\CombatGraphData.cs" />
+    <Compile Include="Classes\ImageGeneration\MinimapParameters.cs" />
+    <Compile Include="Classes\InterOp\EVEOPreview\EveOAgression.cs" />
+    <Compile Include="Classes\InterOp\EVEOPreview\EveOAlertClient.cs" />
+    <Compile Include="Classes\InterOp\EVEOPreview\EveOClient.cs" />
+    <Compile Include="Classes\InterOp\EVEOPreview\EveOEnvelope.cs" />
+    <Compile Include="Classes\InterOp\EVEOPreview\EveOSystemUpdate.cs" />
+    <Compile Include="Classes\Extensions\DateTimeExtensions.cs" />
+    <Compile Include="Classes\GraphData\CombatGraphData.cs" />
+    <Compile Include="Classes\Configuration\ConfigurationItemLocationInformation.cs" />
+    <Compile Include="Classes\Configuration\MapType.cs" />
     <Compile Include="Classes\ESIData\ESIRequest.cs" />
     <Compile Include="Classes\ESIData\ESIRequestType.cs" />
     <Compile Include="Classes\Events\ESIEventArgs.cs" />
     <Compile Include="Classes\ESIData\ESIWorker.cs" />
+    <Compile Include="Classes\EveScout\EveScoutStorm.cs" />
+    <Compile Include="Classes\GraphData\IskGraphData.cs" />
+    <Compile Include="Classes\GraphData\MinedGraphData.cs" />
+    <Compile Include="Classes\ImageGeneration\Animation\AnimationTypes.cs" />
+    <Compile Include="Classes\ImageGeneration\GDICache.cs" />
+    <Compile Include="Classes\InterOp\User32NativeMethods.cs" />
     <Compile Include="Classes\Logfile\CombatLine.cs" />
     <Compile Include="Classes\Configuration\CSSData.cs" />
     <Compile Include="Classes\Configuration\LogfileConfig.cs" />
@@ -112,39 +161,53 @@
     <Compile Include="Classes\EveScout\EveScoutManager.cs" />
     <Compile Include="Classes\EveScout\EveScoutWH.cs" />
     <Compile Include="Classes\Extensions\PropertyGridExtensions.cs" />
-    <Compile Include="Classes\ImageGenerator.cs" />
+    <Compile Include="Classes\ImageGeneration\ImageGenerator.cs" />
     <Compile Include="Classes\Logfile\IskLine.cs" />
+    <Compile Include="Classes\Logfile\LogWatcherManager.cs" />
     <Compile Include="Classes\Logfile\MiningLine.cs" />
     <Compile Include="Classes\MiningDetails.cs" />
-    <Compile Include="Classes\Processes\ProcessInfo.cs" />
-    <Compile Include="Classes\Processes\ProcessMonitor.cs" />
+    <Compile Include="Classes\InterOp\Processes\ProcessInfo.cs" />
+    <Compile Include="Classes\InterOp\Processes\ProcessMonitor.cs" />
+    <Compile Include="Classes\QuesadillaPaths.cs" />
     <Compile Include="Classes\Resources\QuesadillaBackground.cs" />
     <Compile Include="Classes\Resources\QuesadillaSound.cs" />
     <Compile Include="Classes\ItemType.cs" />
     <Compile Include="Classes\SolarSystems\PlanetInfoDisplay.cs" />
     <Compile Include="Classes\SolarSystems\MinimapConnection.cs" />
     <Compile Include="Classes\SolarSystems\MinimapSystem.cs" />
+    <Compile Include="Classes\SolarSystems\PlanetSummary.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemBelt.cs" />
     <Compile Include="Classes\SolarSystems\SolarSystemMoon.cs" />
     <Compile Include="Classes\SolarSystems\PlanetInfo.cs" />
+    <Compile Include="Classes\Tick\TickItem.cs" />
+    <Compile Include="Classes\Tick\TickManager.cs" />
+    <Compile Include="Classes\Windows\TransparentOverlayForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Classes\ZKill\JsonPropertyNameNameAttribute.cs" />
     <Compile Include="Classes\ZKill\ZKill.cs" />
     <Compile Include="Classes\ZKill\ZKillKill.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedisQ.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedisQAttacker.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedisQKillmail.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedisQVictim.cs" />
-    <Compile Include="Classes\ZKill\ZkillRedisQZkb.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedistQData.cs" />
-    <Compile Include="Classes\ZKill\ZKillRedistQPackage.cs" />
+    <Compile Include="Classes\ZKill\ZKillR2Z2.cs" />
+    <Compile Include="Classes\ZKill\ZKillR2Z2Data.cs" />
+    <Compile Include="Classes\ZKill\ZKillR2Z2ESI.cs" />
+    <Compile Include="Classes\ZKill\ZKillAttacker.cs" />
+    <Compile Include="Classes\ZKill\ZKillVictim.cs" />
+    <Compile Include="Classes\ZKill\ZkillZkb.cs" />
+    <Compile Include="Classes\ZKill\ZKillSequence.cs" />
     <Compile Include="Controllers\OBSController.cs" />
     <Compile Include="Extensions\StringExtentions.cs" />
+    <Compile Include="QuesadillaOverlayDPS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuesadillaOverlayDPS.Designer.cs">
+      <DependentUpon>QuesadillaOverlayDPS.cs</DependentUpon>
+    </Compile>
     <Compile Include="QuesadillaAlertPopup.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="QuesadillaAlertPopup.Designer.cs">
       <DependentUpon>QuesadillaAlertPopup.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes\Character.cs" />
     <Compile Include="Classes\Configuration\AlertConfig.cs" />
     <Compile Include="Classes\Configuration\AlertConfigJumpsComparison.cs" />
     <Compile Include="Classes\Configuration\AlertConfigRangeType.cs" />
@@ -155,7 +218,7 @@
     <Compile Include="Classes\Events\ProcessCombatEventArgs.cs" />
     <Compile Include="Classes\Events\ProcessNewDataEventArgs.cs" />
     <Compile Include="Classes\Events\ProcessSystemChangeEventArgs.cs" />
-    <Compile Include="Classes\Queues\AlertQueueItem.cs" />
+    <Compile Include="Classes\Alerts\AlertQueueItem.cs" />
     <Compile Include="Classes\Queues\HeapPriorityQueue.cs" />
     <Compile Include="Classes\InterestingFile.cs" />
     <Compile Include="Classes\Queues\IPriorityQueue.cs" />
@@ -187,11 +250,11 @@
     <Compile Include="QuesadillaConfiguration.Designer.cs">
       <DependentUpon>QuesadillaConfiguration.cs</DependentUpon>
     </Compile>
-    <Compile Include="QuesadillaDPSGraph.cs">
+    <Compile Include="QuesadillaOverlayMap.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="QuesadillaDPSGraph.Designer.cs">
-      <DependentUpon>QuesadillaDPSGraph.cs</DependentUpon>
+    <Compile Include="QuesadillaOverlayMap.Designer.cs">
+      <DependentUpon>QuesadillaOverlayMap.cs</DependentUpon>
     </Compile>
     <Compile Include="QuesadillaSplashScreen.cs">
       <SubType>Form</SubType>
@@ -200,6 +263,9 @@
       <DependentUpon>QuesadillaSplashScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <EmbeddedResource Include="Classes\Windows\TransparentOverlayForm.resx">
+      <DependentUpon>TransparentOverlayForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="QuesadillaAlertPopup.resx">
       <DependentUpon>QuesadillaAlertPopup.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -221,11 +287,12 @@
     <EmbeddedResource Include="QuesadillaConfiguration.resx">
       <DependentUpon>QuesadillaConfiguration.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="QuesadillaDPSGraph.resx">
-      <DependentUpon>QuesadillaDPSGraph.cs</DependentUpon>
+    <EmbeddedResource Include="QuesadillaOverlayMap.resx">
+      <DependentUpon>QuesadillaOverlayMap.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="QuesadillaSplashScreen.resx">
       <DependentUpon>QuesadillaSplashScreen.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -236,20 +303,19 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Quesadilla.config.json">
+    <None Include="Quesadilla.config.json" />
+    <Content Include="Quesadilla.ItemTypes.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Quesadilla.ItemTypes.json">
+    </Content>
+    <Content Include="Quesadilla.Systems.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Quesadilla.Systems.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Quesadilla_TemporaryKey.pfx" />
     <None Include="Resources\Icon1.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -385,6 +451,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="images\DefaultAlert.png" />
+    <None Include="images\QuesadillaSplashBackground.png" />
+    <None Include="images\NClogo.png" />
+    <None Include="images\Insidiouslogo.png" />
+    <None Include="images\INITlogo.png" />
     <None Include="Resources\Sounds\full.wav" />
     <None Include="Resources\Sounds\pop1.wav" />
     <None Include="Resources\Sounds\pop3.wav" />
@@ -412,32 +483,38 @@
     <PackageReference Include="Cyotek.Windows.Forms.ColorPicker">
       <Version>1.7.2</Version>
     </PackageReference>
+    <PackageReference Include="HtmlAgilityPack">
+      <Version>1.12.4</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.AspNet.WebPages">
       <Version>3.3.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Hosting">
-      <Version>2.2.7</Version>
+      <Version>2.3.11</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Mvc">
-      <Version>2.2.0</Version>
+      <Version>2.3.11</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel">
-      <Version>2.2.0</Version>
+      <Version>2.3.11</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration">
+      <Version>10.0.10</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables">
-      <Version>8.0.0</Version>
+      <Version>10.0.10</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json">
-      <Version>8.0.0</Version>
+      <Version>10.0.10</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
       <Version>7.1.3</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.3</Version>
+      <Version>13.0.4</Version>
     </PackageReference>
     <PackageReference Include="PointyHatGames.EVEStandard">
-      <Version>3.1.3</Version>
+      <Version>4.1.1</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>3.1.1</Version>
@@ -451,6 +528,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\Wormholes\" />
+    <Folder Include="External Files\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

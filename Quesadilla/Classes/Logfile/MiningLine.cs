@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Quesadilla.Classes.Logfile
 {
@@ -12,5 +8,6 @@ namespace Quesadilla.Classes.Logfile
         public int MiningAmount { get; set; }
         public int WastageAmount { get; set; }
         public string MiningItem { get; set; }
+        public bool Critical { get; set;  }
     }
 }

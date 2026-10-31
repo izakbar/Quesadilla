@@ -12,5 +12,10 @@ namespace Quesadilla.Classes.ESIData
         Planet,
         Moon,
         Belt,
+        Killmail,
+        SkyhookTheftData,
+        Incursions,
+        JumpsPerHour,
+        KillsPerHour
     }
 }
